@@ -1,0 +1,22 @@
+project(qapttest)
+cmake_minimum_required(VERSION 2.6.0)
+
+find_package(KDE4 REQUIRED)
+include(FindPkgConfig REQUIRED)
+include(KDE4Defaults)
+
+set(qapttest_SRCS
+   qapttest.cpp
+   main.cpp
+ )
+
+include( FindPkgConfig )
+
+include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} )
+
+kde4_add_executable(qaptest ${qapttest_SRCS})
+
+target_link_libraries(qaptest ${KDE4_KDEUI_LIBS} qapt)
+
+install(TARGETS qaptest ${INSTALL_TARGETS_DEFAULT_ARGS} )
+
