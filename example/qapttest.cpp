@@ -10,13 +10,14 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QHBoxLayout>
 
-#include <KVBox>
-#include <kconfigdialog.h>
-#include <kstatusbar.h>
-#include <KDE/KLocale>
-#include <KIcon>
-#include <KLineEdit>
 #include <KDebug>
+#include <KIcon>
+#include <KGlobal>
+#include <KLocale>
+#include <KLineEdit>
+#include <KStatusBar>
+#include <KVBox>
+
 
 qapttest::qapttest()
     : KXmlGuiWindow()
@@ -77,10 +78,12 @@ void qapttest::updateLabels()
 
     m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
     m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
-    m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", m_package->installedSize()));
+    QString installedSize(KGlobal::locale()->formatByteSize(m_package->installedSize()));
+    m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
     m_maintainerLabel->setText(i18n("<b>Maintainer:</b> %1", m_package->maintainer()));
     m_sourceLabel->setText(i18n("<b>Source package:</b> %1", m_package->sourcePackage()));
-    m_packageSizeLabel->setText(i18n("<b>Size:</b> %1", m_package->availablePackageSize()));
+    QString packageSize(KGlobal::locale()->formatByteSize(m_package->availablePackageSize()));
+    m_packageSizeLabel->setText(i18n("<b>Size:</b> %1", packageSize));
     m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
     m_longDescriptionLabel->setText(m_package->longDescription());
 }
