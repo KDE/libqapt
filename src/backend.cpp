@@ -120,6 +120,12 @@ Package *Backend::package(const QString &name)
     qDebug() << "Porked!";
 }
 
+Group *Backend::group(const QString &name)
+{
+    Group *group = new Group(this, name, m_cache, m_depCache, m_records);
+    return group;
+}
+
 Group::List Backend::availableGroups()
 {
     QStringList groupStringList;
@@ -133,11 +139,8 @@ Group::List Backend::availableGroups()
 
     Group::List groupList;
 
-    pkgCache *cache = m_cache;
-    pkgRecords *records = m_records;
-
     foreach(const QString &name, groupSet) {
-        Group *group = new Group(this, name, cache, m_depCache, records);
+        Group *group = new Group(this, name, m_cache, m_depCache, m_records);
         groupList << group;
     }
 

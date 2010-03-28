@@ -54,7 +54,7 @@ public:
     bool init();
 
     Package *package(const QString &name);
-
+    Group *group(const QString &name);
     Group::List availableGroups();
  
 };
