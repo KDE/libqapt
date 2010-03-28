@@ -44,19 +44,21 @@ public:
     pkgRecords *m_records;
     pkgCache::PkgIterator *m_packageIter;
 
-    QString name();
-    QString section();
-    QString sourcePackage();
-    QString shortDescription();
-    QString maintainer();
-    QString installedVersion();
-    QString availableVersion();
-    QString priority();
-    QStringList installedFilesList();
-    QString longDescription();
-    qint32 installedSize();
-    qint32 availableInstalledSize();
-    qint32 availablePackageSize();
+    QString name() const;
+    QString section() const;
+    QString sourcePackage() const;
+    QString shortDescription() const;
+    QString maintainer() const;
+    QString installedVersion() const;
+    QString availableVersion() const;
+    QString priority() const;
+    QStringList installedFilesList() const;
+    QString longDescription() const;
+    qint32 installedSize() const;
+    qint32 availableInstalledSize() const;
+    qint32 availablePackageSize() const;
+
+    bool isInstalled();
 
 };
 

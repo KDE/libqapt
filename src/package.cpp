@@ -40,7 +40,7 @@ Package::~Package()
 {
 }
 
-QString Package::name()
+QString Package::name() const
 {
     QString name = QString(m_packageIter->Name());
 
@@ -51,7 +51,7 @@ QString Package::name()
     }
 }
 
-QString Package::section()
+QString Package::section() const
 {
     QString section = QString(m_packageIter->Section());
 
@@ -62,7 +62,7 @@ QString Package::section()
     }
 }
 
-QString Package::sourcePackage()
+QString Package::sourcePackage() const
 {
     QString sourcePackage;
     pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
@@ -72,7 +72,7 @@ QString Package::sourcePackage()
     return sourcePackage;
 }
 
-QString Package::shortDescription()
+QString Package::shortDescription() const
 {
     QString shortDescription;
     pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
@@ -86,7 +86,7 @@ QString Package::shortDescription()
     return shortDescription;
 }
 
-QString Package::maintainer()
+QString Package::maintainer() const
 {
     QString maintainer;
     pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
@@ -98,7 +98,7 @@ QString Package::maintainer()
     return maintainer;
 }
 
-QString Package::installedVersion()
+QString Package::installedVersion() const
 {
     QString installedVersion;
     if ((*m_packageIter)->CurrentVer == 0) {
@@ -108,7 +108,7 @@ QString Package::installedVersion()
     return installedVersion;
 }
 
-QString Package::availableVersion()
+QString Package::availableVersion() const
 {
     QString availableVersion;
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
@@ -120,7 +120,7 @@ QString Package::availableVersion()
     return availableVersion;
 }
 
-QString Package::priority()
+QString Package::priority() const
 {
     QString priority;
     pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
@@ -132,7 +132,7 @@ QString Package::priority()
     }
 }
 
-QStringList Package::installedFilesList()
+QStringList Package::installedFilesList() const
 {
     QStringList installedFilesList;
     QFile infoFile("/var/lib/dpkg/info/" + name() + ".list");
@@ -153,7 +153,7 @@ QStringList Package::installedFilesList()
     return installedFilesList;
 }
 
-QString Package::longDescription()
+QString Package::longDescription() const
 {
     QString longDescription;
     pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
@@ -170,7 +170,7 @@ QString Package::longDescription()
     }
 }
 
-qint32 Package::installedSize()
+qint32 Package::installedSize() const
 {
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
 
@@ -180,7 +180,7 @@ qint32 Package::installedSize()
         return -1;
 }
 
-qint32 Package::availableInstalledSize()
+qint32 Package::availableInstalledSize() const
 {
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     if (State.CandidateVer == 0) {
@@ -189,7 +189,7 @@ qint32 Package::availableInstalledSize()
     return State.CandidateVerIter(*m_depCache)->InstalledSize;
 }
 
-qint32 Package::availablePackageSize()
+qint32 Package::availablePackageSize() const
 {
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     if (State.CandidateVer == 0) {
@@ -197,6 +197,17 @@ qint32 Package::availablePackageSize()
     }
 
     return State.CandidateVerIter(*m_depCache)->Size;
+}
+
+bool Package::isInstalled()
+{
+    pkgCache::VerIterator ver = m_packageIter->CurrentVer();
+
+    if (!ver.end()) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 }
