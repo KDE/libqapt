@@ -16,6 +16,7 @@
 #include <KDE/KLocale>
 #include <KIcon>
 #include <KLineEdit>
+#include <KDebug>
 
 qapttest::qapttest()
     : KXmlGuiWindow()
@@ -42,6 +43,7 @@ qapttest::qapttest()
 
     m_lineEdit = new KLineEdit(hbox);
     m_lineEdit->setText("kdelibs5");
+    m_lineEdit->setClearButtonShown(true);
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(updateLabels()));
 
     QPushButton *pushButton = new QPushButton(hbox);
