@@ -47,6 +47,11 @@ Group::~Group()
     delete d;
 }
 
+QString Group::name() const
+{
+    return d->name;
+}
+
 Package::List Group::packages()
 {
     Package::List packages;

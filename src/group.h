@@ -42,11 +42,13 @@ public:
 
     typedef QList<Group*> List;
 
-    Package::List packages();
-
     pkgCache *m_cache;
     pkgDepCache *m_depCache;
     pkgRecords *m_records;
+
+    QString name() const;
+
+    Package::List packages();
 
 private:
     GroupPrivate * const d;
