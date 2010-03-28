@@ -29,6 +29,8 @@
 #include <apt-pkg/pkgcachegen.h>
 #include <apt-pkg/init.h>
 
+#include <QtCore/QDebug>
+
 namespace QApt {
 
 Backend::Backend()
@@ -109,6 +111,11 @@ Package *Backend::package(const QString &name)
             return package;
         }
     }
+
+    // FIXME: Need some type of fake package to return here if all else fails.
+    // Otherwise, make sure you don't give this function invalid data. Sucks,
+    // I know...
+    qDebug() << "Porked!";
 }
 
 
