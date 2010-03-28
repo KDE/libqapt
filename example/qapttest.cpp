@@ -6,18 +6,16 @@
 #include "qapttest.h"
 
 #include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QHBoxLayout>
 
 #include <KVBox>
 #include <kconfigdialog.h>
 #include <kstatusbar.h>
-#include <kaction.h>
-#include <kactioncollection.h>
-#include <kstandardaction.h>
 #include <KDE/KLocale>
 #include <KIcon>
-
-#include <../src/backend.h>
-#include <../src/package.h>
+#include <KLineEdit>
 
 qapttest::qapttest()
     : KXmlGuiWindow()
@@ -33,27 +31,55 @@ qapttest::qapttest()
     setupGUI();
     setWindowIcon(KIcon("application-x-deb"));
 
-    QApt::Backend *backend = new QApt::Backend();
-    backend->init();
+    m_backend = new QApt::Backend();
+    m_backend->init();
 
-    QApt::Package *package = backend->package("kdelibs5");
+    QWidget *mainWidget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(mainWidget);
 
-    KVBox *mainWidget = new KVBox(this);
+    KHBox *hbox = new KHBox(mainWidget);
+    layout->addWidget(hbox);
 
-    QLabel* nameLabel = new QLabel(i18n("<b>Package:</b> %1", package->name()), mainWidget);
-    QLabel* sectionLabel = new QLabel(i18n("<b>Section:</b> %1", package->section()), mainWidget);
-    QLabel* installedSizeLabel = new QLabel(i18n("<b>Installed Size:</b> %1", package->installedSize()), mainWidget);
-    QLabel* maintainerLabel = new QLabel(i18n("<b>Maintainer:</b> %1", package->maintainer()), mainWidget);
-    QLabel* sourceLabel = new QLabel(i18n("<b>Source package:</b> %1", package->sourcePackage()), mainWidget);
-    QLabel* packageSizeLabel = new QLabel(i18n("<b>Size:</b> %1", package->availablePackageSize()), mainWidget);
-    QLabel* shortDescriptionLabel = new QLabel(i18n("<b>Description:</b> %1", package->shortDescription()), mainWidget);
-    QLabel* longDescriptionLabel = new QLabel(package->longDescription(), mainWidget);
+    m_lineEdit = new KLineEdit(hbox);
+    m_lineEdit->setText("kdelibs5");
 
+    QPushButton *pushButton = new QPushButton(hbox);
+    pushButton->setIcon(KIcon("system-software-update"));
+    pushButton->setText(i18n("Update Listing"));
+    connect(pushButton, SIGNAL(clicked()), this, SLOT(updateLabels()));
+
+    KVBox *vbox = new KVBox(mainWidget);
+    layout->addWidget(vbox);
+
+    m_nameLabel = new QLabel(vbox);
+    m_sectionLabel = new QLabel(vbox);
+    m_installedSizeLabel = new QLabel(vbox);
+    m_maintainerLabel = new QLabel(vbox);
+    m_sourceLabel = new QLabel(vbox);
+    m_packageSizeLabel = new QLabel(vbox);
+    m_shortDescriptionLabel = new QLabel(vbox);
+    m_longDescriptionLabel = new QLabel(vbox);
+
+    updateLabels();
     setCentralWidget(mainWidget);
 }
 
 qapttest::~qapttest()
 {
+}
+
+void qapttest::updateLabels()
+{
+    m_package = m_backend->package(m_lineEdit->text());
+
+    m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
+    m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
+    m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", m_package->installedSize()));
+    m_maintainerLabel->setText(i18n("<b>Maintainer:</b> %1", m_package->maintainer()));
+    m_sourceLabel->setText(i18n("<b>Source package:</b> %1", m_package->sourcePackage()));
+    m_packageSizeLabel->setText(i18n("<b>Size:</b> %1", m_package->availablePackageSize()));
+    m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
+    m_longDescriptionLabel->setText(m_package->longDescription());
 }
 
 #include "qapttest.moc"

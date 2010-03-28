@@ -9,10 +9,13 @@
 
 #include <kxmlguiwindow.h>
 
+#include <../src/backend.h>
+#include <../src/package.h>
+
 class qapttestView;
-class QPrinter;
+class QLabel;
 class KToggleAction;
-class KUrl;
+class KLineEdit;
 
 /**
  * This class serves as the main window for qapttest.  It handles the
@@ -36,9 +39,25 @@ public:
      */
     virtual ~qapttest();
 
+private slots:
+    void updateLabels();
+
 private:
-    KToggleAction *m_toolbarAction;
     KToggleAction *m_statusbarAction;
+
+    KLineEdit *m_lineEdit;
+
+    QApt::Backend *m_backend;
+    QApt::Package *m_package;
+
+    QLabel *m_nameLabel;
+    QLabel *m_sectionLabel;
+    QLabel *m_installedSizeLabel;
+    QLabel *m_maintainerLabel;
+    QLabel *m_sourceLabel;
+    QLabel *m_packageSizeLabel;
+    QLabel *m_shortDescriptionLabel;
+    QLabel *m_longDescriptionLabel;
 };
 
 #endif // _KAPP4_H_
