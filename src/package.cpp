@@ -170,8 +170,6 @@ QString Package::longDescription()
     }
 }
 
-
-// FIXME: Parse numbers we get from libapt-pkg to be human readable
 qint32 Package::installedSize()
 {
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
@@ -200,6 +198,5 @@ qint32 Package::availablePackageSize()
 
     return State.CandidateVerIter(*m_depCache)->Size;
 }
-
 
 }

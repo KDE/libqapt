@@ -38,6 +38,8 @@ public:
 
     virtual ~Package();
 
+    typedef QList<Package*> List;
+
     pkgDepCache *m_depCache;
     pkgRecords *m_records;
     pkgCache::PkgIterator *m_packageIter;
@@ -55,7 +57,7 @@ public:
     qint32 installedSize();
     qint32 availableInstalledSize();
     qint32 availablePackageSize();
-    
+
 };
 
 }

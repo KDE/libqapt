@@ -29,6 +29,7 @@
 #include <apt-pkg/policy.h>
 
 #include "package.h"
+#include "group.h"
 
 namespace QApt {
 
@@ -53,6 +54,8 @@ public:
     bool init();
 
     Package *package(const QString &name);
+
+    Group::List availableGroups();
  
 };
 

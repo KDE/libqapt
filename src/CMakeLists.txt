@@ -1,6 +1,7 @@
 set(qapt_SRCS
     backend.cpp
     package.cpp
+    group.cpp
     )
 
 include_directories(
@@ -11,6 +12,7 @@ include_directories(
 set(qapt_HDRS
     backend.h
     package.h
+    group.h
    )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_HDRS})

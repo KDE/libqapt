@@ -60,6 +60,17 @@ qapttest::qapttest()
 
     updateLabels();
     setCentralWidget(mainWidget);
+
+    // Lists all packages in the KDE section via kDebug()
+    m_groupList = m_backend->availableGroups();
+    foreach (QApt::Group *group, m_groupList) {
+       QApt::Package::List packageList = group->packages();
+       foreach (QApt::Package *package, packageList) {
+           if (package->section() == "kde") {
+               kDebug() << package->name();
+           }
+       }
+    }
 }
 
 qapttest::~qapttest()

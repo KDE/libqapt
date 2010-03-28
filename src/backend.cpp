@@ -20,6 +20,10 @@
 
 #include "backend.h"
 
+// Qt includes
+#include <QtCore/QDebug>
+#include <QtCore/QStringList>
+
 // Apt includes
 #include <apt-pkg/error.h>
 #include <apt-pkg/configuration.h>
@@ -28,8 +32,6 @@
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/pkgcachegen.h>
 #include <apt-pkg/init.h>
-
-#include <QtCore/QDebug>
 
 namespace QApt {
 
@@ -116,6 +118,30 @@ Package *Backend::package(const QString &name)
     // Otherwise, make sure you don't give this function invalid data. Sucks,
     // I know...
     qDebug() << "Porked!";
+}
+
+Group::List Backend::availableGroups()
+{
+    QStringList groupStringList;
+    pkgCache::PkgIterator it = m_cache->PkgBegin();
+    for(;it!=m_cache->PkgEnd();++it)
+    {
+        groupStringList << it.Section();
+    }
+
+    QSet<QString> groupSet = groupStringList.toSet();
+
+    Group::List groupList;
+
+    pkgCache *cache = m_cache;
+    pkgRecords *records = m_records;
+
+    foreach(const QString &name, groupSet) {
+        Group *group = new Group(this, name, cache, m_depCache, records);
+        groupList << group;
+    }
+
+    return groupList;
 }
 
 
