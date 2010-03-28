@@ -34,7 +34,7 @@ private:
 
     QApt::Backend *m_backend;
     QApt::Package *m_package;
-    QApt::Group::List m_groupList;
+    QApt::Group *m_group;
 
     QLabel *m_nameLabel;
     QLabel *m_sectionLabel;
