@@ -42,6 +42,7 @@ qapttest::qapttest()
 
     m_lineEdit = new KLineEdit(hbox);
     m_lineEdit->setText("kdelibs5");
+    connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(updateLabels()));
 
     QPushButton *pushButton = new QPushButton(hbox);
     pushButton->setIcon(KIcon("system-software-update"));
