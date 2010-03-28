@@ -20,17 +20,11 @@
 
 
 qapttest::qapttest()
-    : KXmlGuiWindow()
+    : KMainWindow()
 {
     // add a status bar
     statusBar()->show();
 
-    // a call to KXmlGuiWindow::setupGUI() populates the GUI
-    // with actions, using KXMLGUI.
-    // It also applies the saved mainwindow settings, if any, and ask the
-    // mainwindow to automatically save settings if changed: window size,
-    // toolbar position, icon size, etc.
-    setupGUI();
     setWindowIcon(KIcon("application-x-deb"));
 
     m_backend = new QApt::Backend();

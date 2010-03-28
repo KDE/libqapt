@@ -3,11 +3,11 @@
  *
  * Copyright (C) 2008 Jonathan Thomas <echidnaman@kubuntu.org>
  */
-#ifndef KAPP4_H
-#define KAPP4_H
+#ifndef QAPTTEST_H
+#define QAPTTEST_H
 
 
-#include <kxmlguiwindow.h>
+#include <KMainWindow>
 
 #include <../src/backend.h>
 #include <../src/package.h>
@@ -25,7 +25,7 @@ class KLineEdit;
  * @author Jonathan Thomas <echidnaman@kubuntu.org>
  * @version 0.1
  */
-class qapttest : public KXmlGuiWindow
+class qapttest : public KMainWindow
 {
     Q_OBJECT
 public:
@@ -60,4 +60,4 @@ private:
     QLabel *m_longDescriptionLabel;
 };
 
-#endif // _KAPP4_H_
+#endif
