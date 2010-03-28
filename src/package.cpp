@@ -43,13 +43,23 @@ Package::~Package()
 QString Package::name()
 {
     QString name = QString(m_packageIter->Name());
-    return name;
+
+    if (!name.isNull()) {
+        return name;
+    } else {
+        return QString();
+    }
 }
 
 QString Package::section()
 {
     QString section = QString(m_packageIter->Section());
-    return section;
+
+    if (!section.isNull()) {
+        return section;
+    } else {
+        return QString();
+    }
 }
 
 QString Package::sourcePackage()

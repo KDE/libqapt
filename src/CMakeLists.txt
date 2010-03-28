@@ -41,4 +41,5 @@ install(DIRECTORY .
     DESTINATION include/qapt
     FILES_MATCHING PATTERN "*.h"
     PATTERN "*_p.h" EXCLUDE
+    PATTERN "*.svn*" EXCLUDE
     )
