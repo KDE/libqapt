@@ -45,6 +45,7 @@ public:
     pkgCache::PkgIterator *m_packageIter;
 
     QString name() const;
+    QString version() const;
     QString section() const;
     QString sourcePackage() const;
     QString shortDescription() const;
@@ -59,6 +60,7 @@ public:
     qint32 availablePackageSize() const;
 
     bool isInstalled();
+    List requiredByList();
 
 };
 

@@ -28,7 +28,6 @@ class GroupPrivate
     public:
         QString name;
 };
- 
 
 Group::Group(QObject* parent, const QString &name, pkgCache *cache,
              pkgDepCache *depCache, pkgRecords *records)

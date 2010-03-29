@@ -98,6 +98,20 @@ QString Package::maintainer() const
     return maintainer;
 }
 
+QString Package::version() const
+{
+    if ((*m_packageIter)->CurrentVer == 0) {
+        pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+        if (State.CandidateVer == 0) {
+            return QString();
+        } else {
+            return QString::fromStdString(State.CandidateVerIter(*m_depCache).VerStr());
+        }
+    } else {
+        return QString::fromStdString(m_packageIter->CurrentVer().VerStr());
+    }
+}
+
 QString Package::installedVersion() const
 {
     QString installedVersion;
@@ -113,7 +127,7 @@ QString Package::availableVersion() const
     QString availableVersion;
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     if (State.CandidateVer == 0) {
-        return NULL;
+        return QString();
     }
 
     availableVersion = QString::fromStdString(State.CandidateVerIter(*m_depCache).VerStr());
@@ -208,6 +222,17 @@ bool Package::isInstalled()
     } else {
         return false;
     }
+}
+
+Package::List Package::requiredByList()
+{
+    List reverseDependsList;
+
+    for(pkgCache::DepIterator it = m_packageIter->RevDependsList(); it.end() != true; it++) {
+        
+    }
+
+    return reverseDependsList;
 }
 
 }

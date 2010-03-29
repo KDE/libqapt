@@ -54,6 +54,7 @@ qapttest::qapttest()
     m_installedSizeLabel = new QLabel(vbox);
     m_maintainerLabel = new QLabel(vbox);
     m_sourceLabel = new QLabel(vbox);
+    m_versionLabel = new QLabel(vbox);
     m_packageSizeLabel = new QLabel(vbox);
     m_shortDescriptionLabel = new QLabel(vbox);
     m_longDescriptionLabel = new QLabel(vbox);
@@ -83,6 +84,7 @@ void qapttest::updateLabels()
     m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
     m_maintainerLabel->setText(i18n("<b>Maintainer:</b> %1", m_package->maintainer()));
     m_sourceLabel->setText(i18n("<b>Source package:</b> %1", m_package->sourcePackage()));
+    m_sourceLabel->setText(i18n("<b>Version:</b> %1", m_package->version()));
     QString packageSize(KGlobal::locale()->formatByteSize(m_package->availablePackageSize()));
     m_packageSizeLabel->setText(i18n("<b>Size:</b> %1", packageSize));
     m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));

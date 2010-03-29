@@ -41,6 +41,7 @@ private:
     QLabel *m_installedSizeLabel;
     QLabel *m_maintainerLabel;
     QLabel *m_sourceLabel;
+    QLabel *m_versionLabel;
     QLabel *m_packageSizeLabel;
     QLabel *m_shortDescriptionLabel;
     QLabel *m_longDescriptionLabel;
