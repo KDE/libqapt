@@ -103,6 +103,11 @@ void qapttest::updateLabels()
         kDebug() << "reverse dependency: " << name;
     }
 
+    QApt::Package::List  upgradeablePackages = m_backend->upgradeablePackages();
+    foreach (QApt::Package *package, upgradeablePackages) {
+            kDebug() << "Upgradeable packages: " << package->name();
+    }
+
     // How to use flags
     int state = m_package->state();
     if (state & QApt::Package::Installed) {

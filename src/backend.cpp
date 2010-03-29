@@ -115,8 +115,7 @@ bool Backend::reloadCache()
 Package *Backend::package(const QString &name)
 {
     pkgCache::PkgIterator it = m_cache->PkgBegin();
-    for(;it!=m_cache->PkgEnd();++it)
-    {
+    for(;it!=m_cache->PkgEnd();++it) {
         if (it.Name() == name) {
             Package *package = new Package(this, m_depCache, m_records, it);
             return package;
@@ -127,6 +126,32 @@ Package *Backend::package(const QString &name)
     // Otherwise, make sure you don't give this function invalid data. Sucks,
     // I know...
     qDebug() << "Porked!";
+}
+
+Package::List Backend::availablePackages()
+{
+    Package::List availablePackages;
+
+    pkgCache::PkgIterator it = m_cache->PkgBegin();
+    for(;it!=m_cache->PkgEnd();++it) {
+        Package *package = new Package(this, m_depCache, m_records, it);
+        availablePackages << package;
+    }
+
+    return availablePackages;
+}
+
+Package::List Backend::upgradeablePackages()
+{
+    Package::List upgradeablePackages;
+
+    foreach (Package *package, availablePackages()) {
+        if (package->state() & Package::Upgradeable) {
+            upgradeablePackages << package;
+        }
+    }
+
+    return upgradeablePackages;
 }
 
 Group *Backend::group(const QString &name)
