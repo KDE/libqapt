@@ -128,6 +128,37 @@ Package *Backend::package(const QString &name)
     qDebug() << "Porked!";
 }
 
+int Backend::packageCount()
+{
+    int packageCount = 0;
+
+    pkgCache::PkgIterator it = m_cache->PkgBegin();
+    for(;it!=m_cache->PkgEnd();++it) {
+        pkgDepCache::StateCache & state = (*m_depCache)[it];
+        // Don't count no-longer-existant packages
+        if (!state.CandidateVer == 0) {
+            packageCount++;
+        }
+    }
+
+    return packageCount;
+}
+
+int Backend::packageCount(const Package::PackageStates &states)
+{
+    int packageCount = 0;
+
+    pkgCache::PkgIterator it = m_cache->PkgBegin();
+    for(;it!=m_cache->PkgEnd();++it) {
+        Package *package = new Package(this, m_depCache, m_records, it);
+        if ((package->state() & states)) {
+            packageCount++;
+        }
+    }
+
+    return packageCount;
+}
+
 Package::List Backend::availablePackages()
 {
     Package::List availablePackages;

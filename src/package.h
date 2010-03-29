@@ -95,6 +95,7 @@ public:
         NowPolicyBroken = 1 << 22,
         InstallPolicyBroken = 1 << 23
     };
+    Q_DECLARE_FLAGS(PackageStates, PackageState)
 
     enum UpdateImportance {
         UnknownImportance = 1,//
@@ -102,6 +103,7 @@ public:
         CriticalImportance = 3,//
         SecurityImportance = 4//
     };
+    Q_DECLARE_FLAGS(UpdateImportances, UpdateImportance)
 
 private:
     PackagePrivate * const d;

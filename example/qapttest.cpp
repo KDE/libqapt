@@ -22,9 +22,6 @@
 qapttest::qapttest()
     : KMainWindow()
 {
-    // add a status bar
-    statusBar()->show();
-
     setWindowIcon(KIcon("application-x-deb"));
 
     m_backend = new QApt::Backend();
@@ -63,6 +60,21 @@ qapttest::qapttest()
     updateLabels();
     setCentralWidget(mainWidget);
 
+    // Package count and installed package count in the sidebar
+    QLabel* packageCountLabel = new QLabel(this);
+
+    packageCountLabel->setText(i18np("%1 package available",
+                                     "%1 packages available",
+                                     m_backend->packageCount()));
+    QLabel* installedCountLabel = new QLabel(this);
+    installedCountLabel->setText(i18np("(%1 package installed)",
+                                     "(%1 packages installed)",
+                                     // Yay for flags!
+                                     m_backend->packageCount(QApt::Package::Installed)));
+    statusBar()->addWidget(packageCountLabel);
+    statusBar()->addWidget(installedCountLabel);
+    statusBar()->show();
+
     // Lists all packages in the KDE section via kDebug()
     m_group = m_backend->group("kde");
     QApt::Package::List packageList = m_group->packages();
@@ -79,9 +91,9 @@ void qapttest::updateLabels()
 {
     kDebug() << "============= New package Listing =============";
     // Catch changes that could happen while we're open by reloading the cache.
+    m_backend->reloadCache();
     // You'd usually call this after searching for updates. This example can't
     // do that yet, so just call it here for the sake of example-ing.
-    m_backend->reloadCache();
 
     m_package = m_backend->package(m_lineEdit->text());
 
@@ -108,12 +120,13 @@ void qapttest::updateLabels()
             kDebug() << "Upgradeable packages: " << package->name();
     }
 
-    // How to use flags
-    int state = m_package->state();
-    if (state & QApt::Package::Installed) {
+    // A convenient way to check the install status of a package
+    if (m_package->isInstalled()) {
         kDebug() << "Package is installed!!!";
     }
 
+    // Another flag usage example
+    int state = m_package->state();
     if (state & QApt::Package::Upgradeable) {
         kDebug() << "Package is upgradeable!!!";
     }

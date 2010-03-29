@@ -55,6 +55,8 @@ public:
     bool reloadCache();
 
     Package *package(const QString &name);
+    int packageCount();
+    int packageCount(const Package::PackageStates &states);
     Package::List availablePackages();
     Package::List upgradeablePackages();
     Group *group(const QString &name);
