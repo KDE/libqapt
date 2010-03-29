@@ -253,7 +253,7 @@ int Package::state()
         packageState |= Installed;
 
         if (stateCache.Upgradable() && stateCache.CandidateVer != NULL) {
-            packageState |= Outdated;
+            packageState |= Upgradeable;
             if (stateCache.Keep()) {
                 packageState |= Held;
             }

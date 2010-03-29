@@ -79,7 +79,7 @@ public:
         ToRemove = 1 << 6,
         Held = 1 << 7,
         Installed = 1 << 8,
-        Outdated = 1 << 9,
+        Upgradeable = 1 << 9,
         NowBroken = 1 << 10,
         InstallBroken = 1 << 11,
         Orphaned = 1 << 12,//

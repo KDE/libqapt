@@ -108,7 +108,7 @@ bool Backend::reloadCache()
     if (init()) {
         return true;
     } else {
-       return false
+       return false;
     }
 }
 
