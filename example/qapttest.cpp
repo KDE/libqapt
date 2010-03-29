@@ -109,6 +109,10 @@ void qapttest::updateLabels()
         kDebug() << "Package is installed!!!";
     }
 
+    if (state & QApt::Package::Upgradeable) {
+        kDebug() << "Package is upgradeable!!!";
+    }
+
 }
 
 #include "qapttest.moc"
