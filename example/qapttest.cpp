@@ -50,6 +50,7 @@ qapttest::qapttest()
     layout->addWidget(vbox);
 
     m_nameLabel = new QLabel(vbox);
+    m_stateLabel = new QLabel(vbox);
     m_sectionLabel = new QLabel(vbox);
     m_installedSizeLabel = new QLabel(vbox);
     m_maintainerLabel = new QLabel(vbox);
@@ -76,9 +77,11 @@ qapttest::~qapttest()
 
 void qapttest::updateLabels()
 {
+    kDebug() << "============= New package Listing =============";
     m_package = m_backend->package(m_lineEdit->text());
 
     m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
+    m_stateLabel->setText(i18n("<b>State:</b> %1", m_package->state()));
     m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
     QString installedSize(KGlobal::locale()->formatByteSize(m_package->installedSize()));
     m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
@@ -93,6 +96,12 @@ void qapttest::updateLabels()
     QStringList requiredByList(m_package->requiredByList());
     foreach (const QString &name, requiredByList) {
         kDebug() << "reverse dependency: " << name;
+    }
+
+    // How to use flags
+    int state = m_package->state();
+    if (state & QApt::Package::Installed) {
+        kDebug() << "Package is installed!!!";
     }
 
 }

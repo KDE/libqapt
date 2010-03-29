@@ -70,27 +70,30 @@ public:
 
     /* "//" == TODO */
     enum PackageState {
-        Unknown = 0,
-        Keep = 1,  //
-        ToInstall = 2, //
-        NewInstall = 3,//
-        ToReInstall = 4,//
-        Upgradable = 5,//
-        ToUpgrade = 6,//
-        ToDowngrade = 7,//
-        ToRemove = 8,//
-        Held = 9,//
-        Installed = 10,//
-        Outdated = 11,//
-        NowBroken = 12,//
-        InstallBroken = 13,//
-        Orphaned = 14,//
-        Pinned = 15,//
-        ResidualConfig = 16,//
-        IsAuto = 17,//
-        IsGarbage = 18,//
-        NowPolicyBroken = 19,//
-        InstPolicyBroken = 20//
+        ToKeep = 1 << 0,
+        ToInstall = 1 << 1,
+        NewInstall = 1 << 2,
+        ToReInstall = 1 << 3,//
+        ToUpgrade = 1 << 4,
+        ToDowngrade = 1 << 5,
+        ToRemove = 1 << 6,
+        Held = 1 << 7,
+        Installed = 1 << 8,
+        Outdated = 1 << 9,
+        NowBroken = 1 << 10,
+        InstallBroken = 1 << 11,
+        Orphaned = 1 << 12,//
+        Pinned = 1 << 13,//
+        New = 1 << 14, //
+        ResidualConfig = 1 << 15,
+        NotInstallable = 1 << 16,
+        ToPurge = 1 << 17,//
+        IsImportant = 1 << 18,
+        OverrideVersion = 1 << 19,//
+        IsAuto = 1 << 20,
+        IsGarbage = 1 << 21,
+        NowPolicyBroken = 1 << 22,
+        InstallPolicyBroken = 1 << 23
     };
 
     enum UpdateImportance {

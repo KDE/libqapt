@@ -223,7 +223,86 @@ qint32 Package::availablePackageSize() const
 
 int Package::state()
 {
-    int state = Unknown;
+    int packageState = 0;
+
+    pkgDepCache::StateCache &stateCache = (*m_depCache)[*m_packageIter];
+    pkgCache::VerIterator ver = m_packageIter->CurrentVer();
+
+    if (stateCache.Install()) {
+        packageState |= ToInstall;
+    }
+
+    if (stateCache.iFlags & pkgDepCache::ReInstall) {
+        packageState |= ToReInstall;
+    } else if (stateCache.NewInstall()) { // Order matters here.
+        packageState |= NewInstall;
+    } else if (stateCache.Upgrade()) {
+        packageState |= ToUpgrade;
+    } else if (stateCache.Downgrade()) {
+        packageState |= ToDowngrade;
+    } else if (stateCache.Delete()) {
+        packageState |= ToRemove;
+        if (stateCache.iFlags & pkgDepCache::Purge) {
+            packageState |= ToPurge;
+        }
+    } else if (stateCache.Keep()) {
+        packageState |= ToKeep;
+    }
+
+    if (!ver.end()) {
+        packageState |= Installed;
+
+        if (stateCache.Upgradable() && stateCache.CandidateVer != NULL) {
+            packageState |= Outdated;
+            if (stateCache.Keep()) {
+                packageState |= Held;
+            }
+      }
+
+        if (stateCache.Downgrade()) {
+            packageState |= ToDowngrade;
+        }
+    }
+
+    if (stateCache.NowBroken()) {
+        packageState |= NowBroken;
+    }
+
+    if (stateCache.InstBroken()) {
+        packageState |= InstallBroken;
+    }
+
+    if ((*m_packageIter)->Flags & (pkgCache::Flag::Important |
+                              pkgCache::Flag::Essential)) {
+        packageState |= IsImportant;
+    }
+
+    if ((*m_packageIter)->CurrentState == pkgCache::State::ConfigFiles) {
+        packageState |= ResidualConfig;
+    }
+
+    if (stateCache.CandidateVer == 0 ||
+        !stateCache.CandidateVerIter(*m_depCache).Downloadable()) {
+        packageState |= NotInstallable;
+    }
+
+    if (stateCache.Flags & pkgCache::Flag::Auto) {
+        packageState |= IsAuto;
+    }
+
+    if (stateCache.Garbage) {
+        packageState |= IsGarbage;
+    }
+
+    if (stateCache.NowPolicyBroken()) {
+        packageState |= NowPolicyBroken;
+    }
+
+    if (stateCache.InstPolicyBroken()) {
+        packageState |= InstallPolicyBroken;
+    }
+
+   return packageState /*| _boolFlags*/;
 }
 
 bool Package::isInstalled()

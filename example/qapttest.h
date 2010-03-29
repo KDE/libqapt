@@ -37,6 +37,7 @@ private:
     QApt::Group *m_group;
 
     QLabel *m_nameLabel;
+    QLabel *m_stateLabel;
     QLabel *m_sectionLabel;
     QLabel *m_installedSizeLabel;
     QLabel *m_maintainerLabel;
