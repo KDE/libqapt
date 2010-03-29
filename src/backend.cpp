@@ -103,6 +103,13 @@ bool Backend::init()
     return true;
 }
 
+bool Backend::reloadCache()
+{
+    if (init()) {
+        return true;
+    }
+}
+
 Package *Backend::package(const QString &name)
 {
     pkgCache::PkgIterator it = m_cache->PkgBegin();

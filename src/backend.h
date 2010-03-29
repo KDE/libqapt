@@ -52,6 +52,7 @@ public:
     pkgRecords *m_records;
 
     bool init();
+    bool reloadCache();
 
     Package *package(const QString &name);
     Group *group(const QString &name);
