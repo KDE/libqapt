@@ -89,6 +89,12 @@ void qapttest::updateLabels()
     m_packageSizeLabel->setText(i18n("<b>Size:</b> %1", packageSize));
     m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
     m_longDescriptionLabel->setText(m_package->longDescription());
+
+    QStringList requiredByList(m_package->requiredByList());
+    foreach (const QString &name, requiredByList) {
+        kDebug() << "reverse dependency: " << name;
+    }
+
 }
 
 #include "qapttest.moc"

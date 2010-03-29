@@ -27,13 +27,21 @@
 
 namespace QApt {
 
+class PackagePrivate
+{
+    public:
+        int state;
+};
+
 Package::Package(QObject* parent, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
         : QObject(parent)
+        , d(new PackagePrivate())
         , m_depCache(depCache)
         , m_records(records)
 {
     m_packageIter = new pkgCache::PkgIterator(packageIter);
+    d->state = state();
 }
 
 Package::~Package()
@@ -213,6 +221,11 @@ qint32 Package::availablePackageSize() const
     return State.CandidateVerIter(*m_depCache)->Size;
 }
 
+int Package::state()
+{
+    int state = Unknown;
+}
+
 bool Package::isInstalled()
 {
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
@@ -224,12 +237,12 @@ bool Package::isInstalled()
     }
 }
 
-Package::List Package::requiredByList()
+QStringList Package::requiredByList()
 {
-    List reverseDependsList;
+    QStringList reverseDependsList;
 
     for(pkgCache::DepIterator it = m_packageIter->RevDependsList(); it.end() != true; it++) {
-        
+        reverseDependsList << QString::fromStdString(it.ParentPkg().Name());
     }
 
     return reverseDependsList;

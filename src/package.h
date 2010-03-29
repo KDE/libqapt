@@ -29,9 +29,12 @@
 
 namespace QApt {
 
+class PackagePrivate;
 class Package : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(PackageState)
+    Q_ENUMS(UpdateImportance)
 public:
     Package(QObject* parent, pkgDepCache *depcache,
             pkgRecords *records, pkgCache::PkgIterator &packageIter);
@@ -58,10 +61,47 @@ public:
     qint32 installedSize() const;
     qint32 availableInstalledSize() const;
     qint32 availablePackageSize() const;
+    int state();
 
     bool isInstalled();
-    List requiredByList();
+    QStringList requiredByList();
 
+    void setState();
+
+    /* "//" == TODO */
+    enum PackageState {
+        Unknown = 0,
+        Keep = 1,  //
+        ToInstall = 2, //
+        NewInstall = 3,//
+        ToReInstall = 4,//
+        Upgradable = 5,//
+        ToUpgrade = 6,//
+        ToDowngrade = 7,//
+        ToRemove = 8,//
+        Held = 9,//
+        Installed = 10,//
+        Outdated = 11,//
+        NowBroken = 12,//
+        InstallBroken = 13,//
+        Orphaned = 14,//
+        Pinned = 15,//
+        ResidualConfig = 16,//
+        IsAuto = 17,//
+        IsGarbage = 18,//
+        NowPolicyBroken = 19,//
+        InstPolicyBroken = 20//
+    };
+
+    enum UpdateImportance {
+        UnknownImportance = 1,//
+        NormalImportance = 2,//
+        CriticalImportance = 3,//
+        SecurityImportance = 4//
+    };
+
+private:
+    PackagePrivate * const d;
 };
 
 }
