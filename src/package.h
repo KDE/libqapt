@@ -71,6 +71,12 @@ public:
     */
     typedef QList<Package*> List;
 
+
+   /**
+    * Pointer to the parent object passed to us by the constructor
+    */
+    QObject *m_parent;
+
    /**
     * Pointer to the Apt dependency cache passed to us by the constructor
     */
@@ -221,7 +227,7 @@ public:
     QStringList requiredByList();
 
 
-    // TODO: Implement, take an int/PackageState flag
+    // TODO: Implement, take a PackageState flag
     //void setState();
 
     // "//" == TODO

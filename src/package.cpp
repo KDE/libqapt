@@ -40,6 +40,7 @@ Package::Package(QObject* parent, pkgDepCache *depCache,
         , m_depCache(depCache)
         , m_records(records)
 {
+    m_parent = parent;
     m_packageIter = new pkgCache::PkgIterator(packageIter);
     d->state = state();
 }
@@ -309,9 +310,7 @@ int Package::state()
 
 bool Package::isInstalled()
 {
-    pkgCache::VerIterator ver = m_packageIter->CurrentVer();
-
-    if (!ver.end()) {
+    if (d->state & Package::Installed) {
         return true;
     } else {
         return false;
