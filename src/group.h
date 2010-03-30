@@ -66,17 +66,17 @@ public:
     typedef QList<Group*> List;
 
    /**
-    * Pointer to the Apt package cache passed to us by the Backend class
+    * Pointer to the Apt package cache passed to us by the constructor
     */
     pkgCache *m_cache;
 
    /**
-    * Pointer to the Apt dependency cache passed to us by the Backend class
+    * Pointer to the Apt dependency cache passed to us by the constructor
     */
     pkgDepCache *m_depCache;
 
    /**
-    * Pointer to the Apt package records passed to us by the Backend class
+    * Pointer to the Apt package records passed to us by the constructor
     */
     pkgRecords *m_records;
 

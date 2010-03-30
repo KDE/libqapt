@@ -196,22 +196,21 @@ qint32 Package::installedSize() const
 {
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
 
-    if (!ver.end())
+    // If we are installed
+    if (!ver.end()) {
         return ver->InstalledSize;
-    else
-        return -1;
-}
-
-qint32 Package::availableInstalledSize() const
-{
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
-    if (State.CandidateVer == 0) {
-        return -1;
+    // Else we aren't installed
+    } else {
+        pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+        if (State.CandidateVer == 0) {
+            // Nonexistant package
+            return -1;
+        }
+        return State.CandidateVerIter(*m_depCache)->InstalledSize;
     }
-    return State.CandidateVerIter(*m_depCache)->InstalledSize;
 }
 
-qint32 Package::availablePackageSize() const
+qint32 Package::downloadSize() const
 {
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     if (State.CandidateVer == 0) {
