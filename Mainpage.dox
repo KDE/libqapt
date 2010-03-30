@@ -1,0 +1,9 @@
+/** @mainpage The QApt Library API Reference
+
+This is a Qt wrapper library around the libapt-pkg API/Apt implementation. It
+provides a nice object-oriented, Qt-like API for controlling Apt in a world
+where iterators and strange API reign supreme.
+
+// DOXYGEN_NAME=libqapt
+// DOXYGEN_ENABLE=YES
+// vim:ts=4:sw=4:expandtab:filetype=doxygen
