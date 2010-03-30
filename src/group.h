@@ -28,29 +28,78 @@
 
 #include "package.h"
 
+/**
+ * The QApt namespace is the main namespace for LibQApt. All classes in this
+ * library fall under this namespace.
+ */
 namespace QApt {
 
+/**
+ * GroupPrivate is a class containing all private members of the Group class
+ */
 class GroupPrivate;
+
+/**
+ * The group class is a container for package groups, which are defined as
+ * "sections" in the libapt-pkg API.
+ *
+ * @author Jonathan Thomas
+ */
 class Group : public QObject
 {
     Q_OBJECT
 public:
+   /**
+    * Default constructor
+    */
     Group(QObject* parent, const QString &name, pkgCache *cache,
           pkgDepCache *depCache, pkgRecords *records);
 
+   /**
+    * Default destructor
+    */
     virtual ~Group();
 
+   /**
+    * Defines the Group::List type, which is a QList of Groups
+    */
     typedef QList<Group*> List;
 
+   /**
+    * Pointer to the Apt package cache passed to us by the Backend class
+    */
     pkgCache *m_cache;
+
+   /**
+    * Pointer to the Apt dependency cache passed to us by the Backend class
+    */
     pkgDepCache *m_depCache;
+
+   /**
+    * Pointer to the Apt package records passed to us by the Backend class
+    */
     pkgRecords *m_records;
 
+
+    /**
+     * Member function that returns the name of the group
+     *
+     * \return The name of the group as a @c QString
+     */
     QString name() const;
 
+    /**
+     * A list of all packages in the group
+     *
+     * \return A @c Package::List of all packages in the group
+     */
     Package::List packages();
 
 private:
+    /**
+     * Pointer to the GroupPrivate class that contains all of Group's private
+     * members
+     */
     GroupPrivate * const d;
 
 };
