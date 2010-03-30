@@ -31,14 +31,35 @@
 #include "package.h"
 #include "group.h"
 
+/**
+ * The QApt namespace is the main namespace for LibQApt. All classes in this
+ * library fall under this namespace.
+ */
 namespace QApt {
 
+/**
+ * @brief The main entry point for performing operations with the dpkg database
+ *
+ * Backend encapsulates all the needed logic to perform most apt operations.
+ * It implements the initializing of the database and all requests to/for the
+ * database. Please note that you \b _MUST_ call init() before doing any
+ * further operations to the backend, or else risk encountering undefined
+ * behavior.
+ *
+ * @author Jonathan Thomas
+ */
 class Backend : public QObject
 {
     Q_OBJECT
 public:
+     /**
+      * Default constructor
+      */
     Backend();
 
+     /**
+      * Default destructor
+      */
     virtual ~Backend();
 
     OpProgress m_progressMeter;
@@ -51,15 +72,89 @@ public:
     pkgSourceList *m_list;
     pkgRecords *m_records;
 
+    /**
+     * Initializes the Apt database for usage. Sets up everything the backend
+     * will need to perform all operations. Please note that you @b _MUST_ call
+     * this funtion before doing any further operations in the backend, or else
+     * risk encountering undefined behavior.
+     *
+     * @return @c true if initialization was successful
+     * @return @c false if there was a problem initializing
+     */
     bool init();
+
+    /**
+     * Re-initializes the apt database by calling init().
+     * You would normally call this if you expected some external program to
+     * change the package cache while the cache was not locked.
+     *
+     * @return @c true if initialization was successful
+     * @return @c false if there was a problem initializing
+     */
     bool reloadCache();
 
+    /**
+     * Queries the backend for a Package object for the specified name.
+     * @b _WARNING_ :
+     * Note that at the moment this method is unsafe to use unless you are sure
+     * that a package with the name you specified, as the library currently
+     * does not have a null package to return in the case where a package
+     * with the specified name doesn't exists, and returns nothing, resulting
+     * in a crash
+     *
+     * @param name name used to specify the package returned
+     *
+     * @return A @c Package defined by the specified name
+     */
     Package *package(const QString &name);
+
+    /**
+     * Queries the backend for the total number of packages in the Apt
+     * database, discarding no-longer-existing packages that linger on in the
+     * status cache (That have a version of 0)
+     *
+     * @return The total number of packages in the Apt database
+     */
     int packageCount();
+
+    /**
+     * Essentially the same as the above function, but you can specify the
+     * PackageState that you want the Backend to count packages for.
+     *
+     * @return The total number of packages of the given PackageState in the Apt database
+     */
     int packageCount(const Package::PackageStates &states);
+
+    /**
+     * Queries the backend for a list of all available packages, which is
+     * essentially all packages, excluding now-nonexistant packages that have
+     * a version of 0.
+     *
+     * \return A @c Package::List of all available packages in the Apt database
+     */
     Package::List availablePackages();
+
+    /**
+     * Queries the backend for a list of all upgradeable packages
+     *
+     * \return A @c Package::List of all upgradeable packages in the Apt database
+     */
     Package::List upgradeablePackages();
+
+    /**
+     * Queries the backend for a Group object for the specified name.
+     *
+     * @param name name used to specify the group returned
+     *
+     * @return A @c Group defined by the specified name
+     */
     Group *group(const QString &name);
+
+    /**
+     * Queries the backend for a list of all available groups
+     *
+     * \return A @c Group::List of all available groups in the Apt database
+     */
     Group::List availableGroups();
  
 };
