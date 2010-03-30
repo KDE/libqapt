@@ -186,6 +186,9 @@ QString Package::longDescription() const
         // TODO: Probably needs parsing somewhat, to get rid of non-human-
         // readable lines
         longDescription = QString::fromStdString(parser.LongDesc());
+        // Dpkg uses a line with a space and a dot to mark a double newline.
+        // It's not really human-readable, though, so remove it.
+        longDescription.replace(QLatin1String("\n .\n"), QLatin1String("\n\n"));
         return longDescription;
     } else {
         return QString();

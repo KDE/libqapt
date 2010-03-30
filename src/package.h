@@ -166,9 +166,7 @@ public:
 
     /**
      * Member function that returns the long description of the package. Note
-     * that this also includes the summary/short description. Currently the
-     * function does not strip away human-nonreadable characters such as the
-     * periods in package descriptions that denote a double line break.
+     * that this also includes the summary/short description.
      *
      * \return The long description of the package as a @c QString
      */
