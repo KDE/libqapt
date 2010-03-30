@@ -91,7 +91,7 @@ void qapttest::updateLabels()
 {
     kDebug() << "============= New package Listing =============";
     // Catch changes that could happen while we're open by reloading the cache.
-    m_backend->reloadCache();
+    //  m_backend->reloadCache();
     // You'd usually call this after searching for updates. This example can't
     // do that yet, so just call it here for the sake of example-ing.
 
