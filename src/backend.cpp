@@ -50,9 +50,6 @@ Backend::~Backend()
 
 bool Backend::init()
 {
-    if (_config->FindB("Initialized"))
-        return true;
-
     if (!pkgInitConfig(*_config)) {
         return false;
     }

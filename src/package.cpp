@@ -111,7 +111,7 @@ QString Package::version() const
 {
     if ((*m_packageIter)->CurrentVer == 0) {
         pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
-        if (State.CandidateVer == 0) {
+        if (d->state & NotInstallable) {
             return QString();
         } else {
             return QString::fromStdString(State.CandidateVerIter(*m_depCache).VerStr());
@@ -135,7 +135,7 @@ QString Package::availableVersion() const
 {
     QString availableVersion;
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
-    if (State.CandidateVer == 0) {
+    if (d->state & NotInstallable) {
         return QString();
     }
 
@@ -184,8 +184,6 @@ QString Package::longDescription() const
     if (!ver.end()) {
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
         pkgRecords::Parser & parser = m_records->Lookup(Desc.FileList());
-        // TODO: Probably needs parsing somewhat, to get rid of non-human-
-        // readable lines
         longDescription = QString::fromStdString(parser.LongDesc());
         // Dpkg uses a line with a space and a dot to mark a double newline.
         // It's not really human-readable, though, so remove it.
@@ -201,12 +199,12 @@ qint32 Package::installedSize() const
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
 
     // If we are installed
-    if (!ver.end()) {
+    if (d->state & Installed) {
         return ver->InstalledSize;
     // Else we aren't installed
     } else {
         pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
-        if (State.CandidateVer == 0) {
+        if (d->state & NotInstallable) {
             // Nonexistant package
             return -1;
         }
@@ -217,7 +215,7 @@ qint32 Package::installedSize() const
 qint32 Package::downloadSize() const
 {
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
-    if (State.CandidateVer == 0) {
+    if (d->state & NotInstallable) {
         return -1;
     }
 
@@ -310,7 +308,7 @@ int Package::state()
 
 bool Package::isInstalled()
 {
-    if (d->state & Package::Installed) {
+    if (d->state & Installed) {
         return true;
     } else {
         return false;
