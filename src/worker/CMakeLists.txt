@@ -7,6 +7,7 @@ include_directories(
 set(qapt_worker_SRCS
     main.cpp
     worker.cpp
+    workeracquire.cpp
 )
 
 set(qapt_worker_HDRS

@@ -90,11 +90,6 @@ qapttest::~qapttest()
 void qapttest::updateLabels()
 {
     kDebug() << "============= New package Listing =============";
-    // Catch changes that could happen while we're open by reloading the cache.
-    //  m_backend->reloadCache();
-    // You'd usually call this after searching for updates. This example can't
-    // do that yet, so just call it here for the sake of example-ing.
-
     m_package = m_backend->package(m_lineEdit->text());
 
     m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
@@ -133,6 +128,7 @@ void qapttest::updateLabels()
 
     if (m_backend->updateCache()) {
         kDebug() << "Cache updated!";
+        m_backend->reloadCache();
     } else {
         kDebug() << "Phailure!";
     }
