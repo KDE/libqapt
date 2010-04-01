@@ -24,6 +24,8 @@
 
 #include <QTimer>
 #include <QDebug>
+#include <QFile>
+
 
 #include <polkit-qt-1/polkitqt1-authority.h>
 
@@ -49,6 +51,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
         qDebug() << QDBusConnection::systemBus().lastError().message();
+        QFile::rename("/home/jonathan/lol", "/home/jonathan/" + QDBusConnection::systemBus().lastError().message());
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
@@ -61,7 +64,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
     initializeApt();
 
-    QTimer::singleShot(3000, this, SLOT(quit()));
+    QTimer::singleShot(30000, this, SLOT(quit()));
 }
 
 bool QAptWorker::initializeApt()

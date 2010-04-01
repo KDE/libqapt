@@ -18,8 +18,21 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qapt.pc.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/qapt.pc
                @ONLY )
 
+# This macro is defined in FindPolkitQt.cmake
+macro(dbus_add_activation_system_service _sources)
+    foreach (_i ${_sources})
+        get_filename_component(_service_file ${_i} ABSOLUTE)
+        string(REGEX REPLACE "\\.service.*$" ".service" _output_file ${_i})
+        set(_target ${CMAKE_CURRENT_BINARY_DIR}/${_output_file})
+        configure_file(${_service_file} ${_target})
+        install(FILES ${_target} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services )
+        #install(FILES ${_target} DESTINATION ${_install_dir})
+    endforeach (_i ${ARGN})
+endmacro(dbus_add_activation_system_service _sources)
+
 find_package(Qt4 REQUIRED)
 find_package(Automoc4 REQUIRED)
+find_package(PolkitQt-1 REQUIRED)
 
 # Find the required Libaries
 include_directories(
@@ -28,6 +41,7 @@ include_directories(
     ${QT_INCLUDE_DIR}
     ${QT_QTCORE_INCLUDE_DIR}
     ${QT_QTDBUS_INCLUDE_DIR}
+    ${POLKITQT-1_INCLUDE_DIR}
     )
 
 add_subdirectory(src)

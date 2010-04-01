@@ -7,45 +7,27 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )
 
-#--------Helper Application
-
-# This macro is defined in FindPolkitQt.cmake
-macro(dbus_add_activation_system_service _sources)
-    foreach (_i ${_sources})
-        get_filename_component(_service_file ${_i} ABSOLUTE)
-        string(REGEX REPLACE "\\.service.*$" ".service" _output_file ${_i})
-        set(_target ${CMAKE_CURRENT_BINARY_DIR}/${_output_file})
-        configure_file(${_service_file} ${_target})
-        install(FILES ${_target} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services )
-        #install(FILES ${_target} DESTINATION ${_install_dir})
-    endforeach (_i ${ARGN})
-endmacro(dbus_add_activation_system_service _sources)
-
-set(qapt_helper_SRCS
+set(qapt_worker_SRCS
     main.cpp
     worker.cpp
 )
 
-set(qapt_helper_HDRS
+set(qapt_worker_HDRS
     worker.h
 )
 
-qt4_add_dbus_adaptor(qapt_helper_SRCS
+qt4_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker.xml
     worker.h
     QAptWorker
 )
 
-QT4_WRAP_CPP(qapt_helper_MOC_SRCS
-    worker.h
+automoc4_add_executable(qaptworker
+    ${qapt_worker_SRCS}
+    ${qapt_worker_adaptor_SRCS}
 )
 
-add_executable(qaptworker
-    ${qapt_helper_SRCS}
-    ${qapt_helper_MOC_SRCS}
-)
-
-# see our helper is pretty small :D
+# see our worker is pretty small :D
 target_link_libraries(qaptworker
     ${QT_QTCORE_LIBRARY}
     polkit-qt-core-1
@@ -56,4 +38,4 @@ install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
 
-install(FILES org.kubuntu.qaptworker.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d)
+install(FILES org.kubuntu.qaptworker.conf DESTINATION /etc/dbus-1/system.d)
