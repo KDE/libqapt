@@ -102,24 +102,28 @@ bool QAptWorker::initializeApt()
         return false;
     }
 
+   m_map = new MMap(File, MMap::Public | MMap::ReadOnly);
+   if (_error->PendingError())
+      return false;
+
     // Open the cache file
-//     m_cache = new pkgCache(m_map);
-//     m_policy = new pkgPolicy(m_cache);
-//     m_records = new pkgRecords(*m_cache);
-//     if (!ReadPinFile(*m_policy)) {
-//         return false;
-//     }
-// 
-//     if (_error->PendingError()) {
-//         return false;
-//     }
-// 
-//     m_depCache = new pkgDepCache(m_cache, m_policy);
-//     m_depCache->Init(&m_progressMeter);
-//
-//     if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
-//         return false;
-//     }
+    m_cache = new pkgCache(m_map);
+    m_policy = new pkgPolicy(m_cache);
+    m_records = new pkgRecords(*m_cache);
+    if (!ReadPinFile(*m_policy)) {
+        return false;
+    }
+
+    if (_error->PendingError()) {
+        return false;
+    }
+
+    m_depCache = new pkgDepCache(m_cache, m_policy);
+    m_depCache->Init(&m_progressMeter);
+
+    if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
+        return false;
+    }
 
     return true;
 }
