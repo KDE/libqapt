@@ -213,25 +213,14 @@ Group::List Backend::availableGroups()
     return groupList;
 }
 
-bool Backend::updateCache()
+void Backend::updateCache()
 {
     QDBusMessage message;
     message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
               "/",
               "org.kubuntu.qaptworker",
               QLatin1String("updateCache"));
-    // notice the systemBus here..
-    QDBusMessage reply = QDBusConnection::systemBus().call(message);
-    qDebug() << QDBusConnection::systemBus().lastError().message();
-    if (reply.type() == QDBusMessage::ReplyMessage
-        && reply.arguments().size() == 1) {
-        // the reply can be anything, here we receive a bool
-        if (reply.arguments().first().toBool()) {
-            return true;
-        }
-    }
-
-    return false;
+    QDBusMessage reply = QDBusConnection::systemBus().call(message, QDBus::NoBlock);
 }
 
 }

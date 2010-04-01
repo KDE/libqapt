@@ -134,12 +134,7 @@ void qapttest::updateLabels()
 
 void qapttest::updateCache()
 {
-    if (m_backend->updateCache()) {
-        kDebug() << "Cache updated!";
-        m_backend->reloadCache();
-    } else {
-        kDebug() << "Phailure!";
-    }
+    m_backend->updateCache();
 }
 
 #include "qapttest.moc"

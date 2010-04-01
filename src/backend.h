@@ -158,7 +158,7 @@ public:
     Group::List availableGroups();
 
 
-    bool updateCache();
+    void updateCache();
 };
 
 }
