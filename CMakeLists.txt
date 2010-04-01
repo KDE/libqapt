@@ -1,7 +1,7 @@
 project(qapt)
 
 cmake_minimum_required(VERSION 2.6.0)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 set(qapt_VERSION 0.1.0)
 
@@ -19,18 +19,15 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qapt.pc.cmake
                @ONLY )
 
 find_package(Qt4 REQUIRED)
+find_package(Automoc4 REQUIRED)
 
 # Find the required Libaries
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}/misc
-    ${CMAKE_SOURCE_DIR}/misc
     ${QT_INCLUDE_DIR}
     ${QT_QTCORE_INCLUDE_DIR}
     ${QT_QTDBUS_INCLUDE_DIR}
-    ${QT_QTXML_INCLUDE_DIR}
-    ${QT_QTGUI_INCLUDE_DIR}
     )
 
 add_subdirectory(src)

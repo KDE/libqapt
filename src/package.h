@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Heavily inspired by Synaptic library code ;-)                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *

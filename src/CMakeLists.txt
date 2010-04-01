@@ -9,6 +9,8 @@ include_directories(
     ${CMAKE_BINARY_DIR}/src
     )
 
+add_subdirectory(worker)
+
 set(qapt_HDRS
     backend.h
     package.h
@@ -16,11 +18,6 @@ set(qapt_HDRS
    )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_HDRS})
-
-# qt4_add_dbus_adaptor(dbusmenu_qt_SRCS
-#     ${CMAKE_CURRENT_SOURCE_DIR}/org.ayatana.dbusmenu.xml
-#     ${CMAKE_CURRENT_SOURCE_DIR}/dbusmenuexporter.h DBusMenuExporter
-#     )
 
 add_library(qapt SHARED ${qapt_SRCS})
 set_target_properties(qapt PROPERTIES
@@ -39,9 +36,10 @@ target_link_libraries(qapt
 install(TARGETS qapt
     LIBRARY DESTINATION lib${LIB_SUFFIX})
 
-install(DIRECTORY .
-    DESTINATION include/qapt
-    FILES_MATCHING PATTERN "*.h"
-    PATTERN "*_p.h" EXCLUDE
-    PATTERN "*.svn*" EXCLUDE
-    )
+install(FILES
+    backend.h
+    package.h
+    group.h
+
+    DESTINATION
+    ${INCLUDE_INSTALL_DIR}/libqapt COMPONENT Devel)
