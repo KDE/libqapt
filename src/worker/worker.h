@@ -52,6 +52,7 @@ public:
     bool m_locked;
 
     bool lock();
+    void unlock();
     bool initializeApt();
 
     bool updateCache();

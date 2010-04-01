@@ -145,6 +145,15 @@ bool QAptWorker::lock()
    return true;
 }
 
+void QAptWorker::unlock()
+{
+   if (!m_locked)
+      return;
+
+   _system->UnLock();
+   m_locked = false;
+}
+
 bool QAptWorker::updateCache()
 {
     Authority::Result result;
@@ -158,6 +167,7 @@ bool QAptWorker::updateCache()
         qDebug() << message().service() << QString("Auth'd");
         initializeApt();
         lock();
+        unlock();
         return true;
     } else {
         qDebug() << message().service() << QString("Auth phailure");
