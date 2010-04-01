@@ -46,6 +46,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         , m_cache(0)
         , m_policy(0)
         , m_depCache(0)
+        , m_locked(false)
 {
     new QaptworkerAdaptor(this);
 
@@ -66,6 +67,8 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
 bool QAptWorker::initializeApt()
 {
+// Seems to crash?
+//     lock();
     m_list = new pkgSourceList;
 
     if (!pkgInitConfig(*_config)) {
@@ -96,6 +99,19 @@ bool QAptWorker::initializeApt()
 
 QAptWorker::~QAptWorker()
 {
+    delete m_list;
+}
+
+bool QAptWorker::lock()
+{
+   if (m_locked)
+      return true;
+
+   _system->Lock();
+   m_locked = true;
+
+   //FIXME: should depend on the result of _system->lock()
+   return true;
 }
 
 bool QAptWorker::updateCache()

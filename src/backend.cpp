@@ -48,6 +48,7 @@ Backend::Backend()
 
 Backend::~Backend()
 {
+    delete m_list;
 }
 
 bool Backend::init()

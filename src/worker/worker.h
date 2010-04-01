@@ -49,7 +49,9 @@ public:
     pkgDepCache *m_depCache;
     pkgSourceList *m_list;
     pkgRecords *m_records;
+    bool m_locked;
 
+    bool lock();
     bool initializeApt();
 
     bool updateCache();
