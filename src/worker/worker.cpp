@@ -51,7 +51,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
         qDebug() << QDBusConnection::systemBus().lastError().message();
-        QFile::rename("/home/jonathan/lol", "/home/jonathan/" + QDBusConnection::systemBus().lastError().message());
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
@@ -62,9 +61,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         return;
     }
 
-    initializeApt();
-
-    QTimer::singleShot(30000, this, SLOT(quit()));
+    QTimer::singleShot(3000, this, SLOT(quit()));
 }
 
 bool QAptWorker::initializeApt()
@@ -95,7 +92,6 @@ bool QAptWorker::initializeApt()
     }
 
     pkgMakeStatusCache(*m_list, m_progressMeter, 0, true);
-    qDebug() << "Hi!";
 }
 
 QAptWorker::~QAptWorker()
@@ -113,11 +109,10 @@ bool QAptWorker::updateCache()
              subject , Authority::AllowUserInteraction);
     if (result == Authority::Yes) {
         qDebug() << message().service() << QString("Auth'd");
-        // Caller is authorized so we can perform the action
+        initializeApt();
         return true;
     } else {
-        qDebug() << message().service() << QString("Can't set the implicit authorization");
-        // Caller is not authorized so the action can't be performed
+        qDebug() << message().service() << QString("Auth phailure");
         return false;
     }
 }

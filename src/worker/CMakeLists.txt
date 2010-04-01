@@ -1,6 +1,3 @@
-
-install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -39,3 +36,4 @@ install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
 
 install(FILES org.kubuntu.qaptworker.conf DESTINATION /etc/dbus-1/system.d)
+install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
