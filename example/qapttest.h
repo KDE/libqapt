@@ -26,6 +26,7 @@ public:
 
 private slots:
     void updateLabels();
+    void updateCache();
 
 private:
     KToggleAction *m_statusbarAction;

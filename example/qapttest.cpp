@@ -39,9 +39,13 @@ qapttest::qapttest()
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(updateLabels()));
 
     QPushButton *pushButton = new QPushButton(hbox);
-    pushButton->setIcon(KIcon("system-software-update"));
     pushButton->setText(i18n("Update Listing"));
+    pushButton->setIcon(KIcon("system-software-update"));
     connect(pushButton, SIGNAL(clicked()), this, SLOT(updateLabels()));
+    QPushButton *cachePushButton = new QPushButton(hbox);
+    cachePushButton->setIcon(KIcon("dialog-password"));
+    cachePushButton->setText(i18n("Update Software Lists"));
+    connect(cachePushButton, SIGNAL(clicked()), this, SLOT(updateCache()));
 
     KVBox *vbox = new KVBox(mainWidget);
     layout->addWidget(vbox);
@@ -126,13 +130,16 @@ void qapttest::updateLabels()
         kDebug() << "Package is upgradeable!!!";
     }
 
+}
+
+void qapttest::updateCache()
+{
     if (m_backend->updateCache()) {
         kDebug() << "Cache updated!";
         m_backend->reloadCache();
     } else {
         kDebug() << "Phailure!";
     }
-
 }
 
 #include "qapttest.moc"
