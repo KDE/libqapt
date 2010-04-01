@@ -131,6 +131,12 @@ void qapttest::updateLabels()
         kDebug() << "Package is upgradeable!!!";
     }
 
+    if (m_backend->updateCache()) {
+        kDebug() << "Cache updated!";
+    } else {
+        kDebug() << "Phailure!";
+    }
+
 }
 
 #include "qapttest.moc"

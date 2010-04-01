@@ -1,5 +1,5 @@
 [D-BUS Service]
-Name=org.chakraproject.aqpmworker
-Exec=@QAPT_HELPER_INSTALL_DIR@/aqpmworker
+Name=org.kubuntu.qaptworker
+Exec=/usr/bin/qaptworker
 User=root
 

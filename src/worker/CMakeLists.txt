@@ -16,7 +16,7 @@ macro(dbus_add_activation_system_service _sources)
         string(REGEX REPLACE "\\.service.*$" ".service" _output_file ${_i})
         set(_target ${CMAKE_CURRENT_BINARY_DIR}/${_output_file})
         configure_file(${_service_file} ${_target})
-        install(FILES ${_target} DESTINATION ${SHARE_INSTALL_PREFIX}/dbus-1/system-services )
+        install(FILES ${_target} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services )
         #install(FILES ${_target} DESTINATION ${_install_dir})
     endforeach (_i ${ARGN})
 endmacro(dbus_add_activation_system_service _sources)
@@ -40,19 +40,19 @@ QT4_WRAP_CPP(qapt_helper_MOC_SRCS
     worker.h
 )
 
-add_executable(qapt-helper
+add_executable(qaptworker
     ${qapt_helper_SRCS}
     ${qapt_helper_MOC_SRCS}
 )
 
 # see our helper is pretty small :D
-target_link_libraries(qapt-helper
+target_link_libraries(qaptworker
     ${QT_QTCORE_LIBRARY}
     polkit-qt-core-1
     qapt
 )
 
-install(TARGETS qapt-helper DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
 

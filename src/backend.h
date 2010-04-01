@@ -156,7 +156,9 @@ public:
      * \return A @c Group::List of all available groups in the Apt database
      */
     Group::List availableGroups();
- 
+
+
+    bool updateCache();
 };
 
 }

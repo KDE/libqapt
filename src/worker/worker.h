@@ -52,7 +52,7 @@ public:
 
     bool initializeApt();
 
-    bool updateSourcesList();
+    bool updateCache();
 };
 
 #endif

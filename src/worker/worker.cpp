@@ -26,7 +26,6 @@
 #include <QDebug>
 
 #include <polkit-qt-1/polkitqt1-authority.h>
-#include <polkit-qt-1/polkitqt1-subject.h>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -49,7 +48,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     new QaptworkerAdaptor(this);
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
-        qDebug() << QDBusConnection::systemBus().lastError().message();;
+        qDebug() << QDBusConnection::systemBus().lastError().message();
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
@@ -100,7 +99,22 @@ QAptWorker::~QAptWorker()
 {
 }
 
-bool QAptWorker::updateSourcesList()
+bool QAptWorker::updateCache()
 {
+    Authority::Result result;
+    SystemBusNameSubject *subject;
 
+    subject = new SystemBusNameSubject(message().service());
+
+    result = Authority::instance()->checkAuthorizationSync("org.kubuntu.qaptworker.updateCache",
+             subject , Authority::AllowUserInteraction);
+    if (result == Authority::Yes) {
+        qDebug() << message().service() << QString("Auth'd");
+        // Caller is authorized so we can perform the action
+        return true;
+    } else {
+        qDebug() << message().service() << QString("Can't set the implicit authorization");
+        // Caller is not authorized so the action can't be performed
+        return false;
+    }
 }
