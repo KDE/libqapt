@@ -42,4 +42,4 @@ install(FILES
     group.h
 
     DESTINATION
-    ${INCLUDE_INSTALL_DIR}/libqapt COMPONENT Devel)
+    include/libqapt COMPONENT Devel)

@@ -21,15 +21,38 @@
 #ifndef QAPTWORKER_H
 #define QAPTWORKER_H
 
-#include <QtCore/QObject>
+#include <QtCore/QCoreApplication>
+#include <QtDBus/QDBusContext>
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusMessage>
 
-class QAptWorker : public QObject
+#include <apt-pkg/progress.h>
+#include <apt-pkg/sourcelist.h>
+#include <apt-pkg/pkgrecords.h>
+#include <apt-pkg/policy.h>
+
+class QAptWorker : public QCoreApplication, protected QDBusContext
 {
     Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker")
 public:
-    explicit QAptWorker(QObject *parent = 0);
+    QAptWorker(int &argc, char **argv);
 
     virtual ~QAptWorker();
+
+    OpProgress m_progressMeter;
+    MMap *m_map;
+
+    pkgCache *m_cache;
+    pkgPolicy *m_policy;
+
+    pkgDepCache *m_depCache;
+    pkgSourceList *m_list;
+    pkgRecords *m_records;
+
+    bool initializeApt();
+
+    bool updateSourcesList();
 };
 
 #endif

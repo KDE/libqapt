@@ -1,5 +1,5 @@
 
-install(FILES org.kubuntu.qaptworker.policy DESTINATION ${SHARE_INSTALL_PREFIX}/polkit-1/actions/)
+install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -30,11 +30,11 @@ set(qapt_helper_HDRS
     worker.h
 )
 
-# qt4_add_dbus_adaptor(qapt_helper_SRCS
-#     org.kubuntu.qaptworker.xml
-#     worker.cpp
-#     AptWorker
-# )
+qt4_add_dbus_adaptor(qapt_helper_SRCS
+    org.kubuntu.qaptworker.xml
+    worker.h
+    QAptWorker
+)
 
 QT4_WRAP_CPP(qapt_helper_MOC_SRCS
     worker.h
@@ -56,4 +56,4 @@ install(TARGETS qapt-helper DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
 
-install(FILES org.qt.policykit.examples.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d)
+install(FILES org.kubuntu.qaptworker.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d)

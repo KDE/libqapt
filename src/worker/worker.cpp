@@ -20,21 +20,87 @@
 
 #include "worker.h"
 
-#include <QtDBus/QDBusConnection>
+#include "qaptworkeradaptor.h"
+
 #include <QTimer>
 #include <QDebug>
 
 #include <polkit-qt-1/polkitqt1-authority.h>
 #include <polkit-qt-1/polkitqt1-subject.h>
 
+// Apt includes
+#include <apt-pkg/error.h>
+#include <apt-pkg/configuration.h>
+#include <apt-pkg/depcache.h>
+#include <apt-pkg/pkgsystem.h>
+#include <apt-pkg/fileutl.h>
+#include <apt-pkg/pkgcachegen.h>
+#include <apt-pkg/init.h>
+
 using namespace PolkitQt1;
 
-QAptWorker::QAptWorker(QObject *parent)
-        : QObject(parent)
+QAptWorker::QAptWorker(int &argc, char **argv)
+        : QCoreApplication(argc, argv)
+        , m_progressMeter()
+        , m_cache(0)
+        , m_policy(0)
+        , m_depCache(0)
 {
+    new QaptworkerAdaptor(this);
 
+    if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
+        qDebug() << QDBusConnection::systemBus().lastError().message();;
+        QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
+        return;
+    }
+
+    if (!QDBusConnection::systemBus().registerObject("/", this)) {
+        qDebug() << "unable to register service interface to dbus";
+        QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
+        return;
+    }
+
+    initializeApt();
+
+    QTimer::singleShot(3000, this, SLOT(quit()));
+}
+
+bool QAptWorker::initializeApt()
+{
+    m_list = new pkgSourceList;
+
+    if (!pkgInitConfig(*_config)) {
+        return false;
+    }
+
+    _config->Set("Initialized", 1);
+
+    if (!pkgInitSystem(*_config, _system)) {
+        return false;
+    }
+
+   // delete any old structures
+    if(m_depCache)
+        delete m_depCache;
+    if(m_policy)
+        delete m_policy;
+    if(m_cache)
+        delete m_cache;
+
+    // Read the sources list
+    if (!m_list->ReadMainList()) {
+        return false;
+    }
+
+    pkgMakeStatusCache(*m_list, m_progressMeter, 0, true);
+    qDebug() << "Hi!";
 }
 
 QAptWorker::~QAptWorker()
 {
+}
+
+bool QAptWorker::updateSourcesList()
+{
+
 }

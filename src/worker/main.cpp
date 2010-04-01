@@ -20,18 +20,9 @@
 
 #include "worker.h"
 
-#include <QCoreApplication>
-
 int main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv);
+    QAptWorker worker(argc, argv);
 
-    QCoreApplication::setOrganizationName("kubuntu");
-    QCoreApplication::setOrganizationDomain("kubuntu.org");
-    QCoreApplication::setApplicationName("qaptworker");
-    QCoreApplication::setApplicationVersion("0.1");
-
-    QAptWorker worker();
-
-    app.exec();
+    return worker.exec();
 }
