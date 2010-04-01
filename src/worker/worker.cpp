@@ -62,13 +62,11 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         return;
     }
 
-    QTimer::singleShot(3000, this, SLOT(quit()));
+    QTimer::singleShot(60000, this, SLOT(quit()));
 }
 
 bool QAptWorker::initializeApt()
 {
-// Seems to crash?
-//     lock();
     m_list = new pkgSourceList;
 
     if (!pkgInitConfig(*_config)) {
@@ -95,6 +93,35 @@ bool QAptWorker::initializeApt()
     }
 
     pkgMakeStatusCache(*m_list, m_progressMeter, 0, true);
+    m_progressMeter.Done();
+
+    // Open the cache file
+    FileFd File;
+    File.Open(_config->FindFile("Dir::Cache::pkgcache"), FileFd::ReadOnly);
+    if (_error->PendingError()) {
+        return false;
+    }
+
+    // Open the cache file
+//     m_cache = new pkgCache(m_map);
+//     m_policy = new pkgPolicy(m_cache);
+//     m_records = new pkgRecords(*m_cache);
+//     if (!ReadPinFile(*m_policy)) {
+//         return false;
+//     }
+// 
+//     if (_error->PendingError()) {
+//         return false;
+//     }
+// 
+//     m_depCache = new pkgDepCache(m_cache, m_policy);
+//     m_depCache->Init(&m_progressMeter);
+//
+//     if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
+//         return false;
+//     }
+
+    return true;
 }
 
 QAptWorker::~QAptWorker()
@@ -126,6 +153,7 @@ bool QAptWorker::updateCache()
     if (result == Authority::Yes) {
         qDebug() << message().service() << QString("Auth'd");
         initializeApt();
+        lock();
         return true;
     } else {
         qDebug() << message().service() << QString("Auth phailure");

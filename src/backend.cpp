@@ -77,6 +77,7 @@ bool Backend::init()
     }
 
     pkgMakeStatusCache(*m_list, m_progressMeter, &m_map, true);
+    m_progressMeter.Done();
     if (_error->PendingError()) {
         return false;
     }
