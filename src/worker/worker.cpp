@@ -38,6 +38,7 @@
 #include <apt-pkg/init.h>
 #include <apt-pkg/algorithms.h>
 
+#include "qaptauthorization.h"
 #include "workeracquire.h"
 
 using namespace PolkitQt1;
@@ -171,41 +172,25 @@ void QAptWorker::unlock()
 bool QAptWorker::updateCache()
 {
     WorkerAcquire acquireStatus;
-    Authority::Result result;
-    SystemBusNameSubject *subject;
-    bool authorized;
-
-    subject = new SystemBusNameSubject(message().service());
-
-    result = Authority::instance()->checkAuthorizationSync("org.kubuntu.qaptworker.updateCache",
-             subject , Authority::AllowUserInteraction);
-    if (result == Authority::Yes) {
-        qDebug() << message().service() << QString("Auth'd");
-        bool authorized = true;
-    } else {
-        qDebug() << message().service() << QString("Auth phailure");
+    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
         return false;
     }
 
-    if (authorized) {
-        emit workerStarted("update");
+    emit workerStarted("update");
 
-        // Lock the list directory
-        FileFd Lock;
-        if (_config->FindB("Debug::NoLocking", false) == false)
-        {
-            Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
-            if (_error->PendingError()) {
-                return false;
-        //   return _error->Error(_("Unable to lock the list directory"));
-            }
+    // Lock the list directory
+    FileFd Lock;
+    if (_config->FindB("Debug::NoLocking", false) == false) {
+        Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
+        if (_error->PendingError()) {
+            return false;
         }
-
-        // do the work
-        if (_config->FindB("APT::Get::Download",true) == true) {
-            ListUpdate(acquireStatus, *m_list);
-        }
-
-        return true;
     }
+
+    // do the work
+    if (_config->FindB("APT::Get::Download",true) == true) {
+        ListUpdate(acquireStatus, *m_list);
+    }
+
+    return true;
 }

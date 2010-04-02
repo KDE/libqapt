@@ -10,10 +10,6 @@ set(qapt_worker_SRCS
     workeracquire.cpp
 )
 
-set(qapt_worker_HDRS
-    worker.h
-)
-
 qt4_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker.xml
     worker.h
