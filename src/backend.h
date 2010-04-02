@@ -157,8 +157,14 @@ public:
      */
     Group::List availableGroups();
 
-
     void updateCache();
+    void waitForWorkerReady();
+
+Q_SIGNALS:
+    void cacheUpdateStarted();
+
+private Q_SLOTS:
+    void workerStarted(const QString &name);
 };
 
 }

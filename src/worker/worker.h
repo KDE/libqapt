@@ -31,6 +31,8 @@
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/policy.h>
 
+class QAptWorkerPrivate;
+
 class QAptWorker : public QCoreApplication, protected QDBusContext
 {
     Q_OBJECT
@@ -55,7 +57,18 @@ public:
     void unlock();
     bool initializeApt();
 
+    bool isWorkerReady();
     bool updateCache();
+
+Q_SIGNALS:
+    /**
+     * This signal is emitted when a property on the interface changes.
+     */
+    void changed();
+    void workerStarted(const QString &name);
+
+private:
+    QAptWorkerPrivate *d;
 };
 
 #endif

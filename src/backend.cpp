@@ -25,6 +25,9 @@
 #include <QtCore/QStringList>
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusConnectionInterface>
+#include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusPendingCall>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -215,12 +218,51 @@ Group::List Backend::availableGroups()
 
 void Backend::updateCache()
 {
+    waitForWorkerReady();
     QDBusMessage message;
     message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
               "/",
               "org.kubuntu.qaptworker",
               QLatin1String("updateCache"));
-    QDBusMessage reply = QDBusConnection::systemBus().call(message, QDBus::NoBlock);
+    QDBusConnection::systemBus().asyncCall(message);
+
+    // FIXME Why won't this work? connected always ends up false :(
+    bool connected = QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "workerStarted", this, SLOT(workerStarted(const QString &name)));
+
+    qDebug() << "Hi" << connected;
+}
+
+void Backend::workerStarted(const QString &name)
+{
+    qDebug() << "Got a reply!";
+    if (name == "update") {
+        emit cacheUpdateStarted();
+    }
+}
+
+void Backend::waitForWorkerReady()
+{
+    if (!QDBusConnection::systemBus().interface()->isServiceRegistered("org.kubuntu.qaptworker")) {
+        usleep(20);
+        qDebug() << "Waiting for interface to appear";
+    }
+
+    QDBusInterface i("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker", QDBusConnection::systemBus());
+
+    qDebug() << "Got the interface";
+
+    bool ready = false;
+
+    while (!ready) {
+        qDebug() << "Checking if interface is ready";
+
+        QDBusReply<bool> reply = i.call("isWorkerReady");
+
+        ready = reply.value();
+    }
+
+    qDebug() << "Ready, here we go";
 }
 
 }

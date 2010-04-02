@@ -42,14 +42,22 @@
 
 using namespace PolkitQt1;
 
+class QAptWorkerPrivate
+{
+public:
+    bool ready;
+};
+
 QAptWorker::QAptWorker(int &argc, char **argv)
         : QCoreApplication(argc, argv)
+        , d(new QAptWorkerPrivate)
         , m_progressMeter()
         , m_cache(0)
         , m_policy(0)
         , m_depCache(0)
         , m_locked(false)
 {
+    d->ready = false;
     new QaptworkerAdaptor(this);
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
@@ -65,6 +73,12 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     }
 
     QTimer::singleShot(60000, this, SLOT(quit()));
+    d->ready = true;
+}
+
+bool QAptWorker::isWorkerReady()
+{
+    return d->ready;
 }
 
 bool QAptWorker::initializeApt()
@@ -176,6 +190,7 @@ bool QAptWorker::updateCache()
     }
 
     if (authorized) {
+        emit workerStarted("update");
         initializeApt();
         lock();
         unlock();
