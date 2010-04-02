@@ -22,11 +22,8 @@
 
 #include "qaptworkeradaptor.h"
 
-#include <QTimer>
 #include <QDebug>
 #include <QFile>
-
-#include <polkit-qt-1/polkitqt1-authority.h>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -40,8 +37,6 @@
 
 #include "qaptauthorization.h"
 #include "workeracquire.h"
-
-using namespace PolkitQt1;
 
 class QAptWorkerPrivate
 {
