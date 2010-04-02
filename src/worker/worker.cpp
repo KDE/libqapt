@@ -154,11 +154,9 @@ bool QAptWorker::lock()
    if (m_locked)
       return true;
 
-   _system->Lock();
-   m_locked = true;
+   m_locked = _system->Lock();
 
-   //FIXME: should depend on the result of _system->lock()
-   return true;
+   return m_locked;
 }
 
 void QAptWorker::unlock()
