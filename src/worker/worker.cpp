@@ -73,7 +73,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     }
 
     QTimer::singleShot(60000, this, SLOT(quit()));
-    d->ready = true;
+    d->ready = initializeApt();
 }
 
 bool QAptWorker::isWorkerReady()
@@ -191,9 +191,6 @@ bool QAptWorker::updateCache()
 
     if (authorized) {
         emit workerStarted("update");
-        initializeApt();
-        lock();
-        unlock();
 
         // Lock the list directory
         FileFd Lock;
