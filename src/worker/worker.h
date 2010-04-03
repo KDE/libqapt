@@ -53,14 +53,14 @@ public:
     pkgRecords *m_records;
     bool m_locked;
 
-    bool lock();
-    void unlock();
-    bool initializeApt();
-
+public Q_SLOTS:
     bool isWorkerReady();
     bool updateCache();
 
 private Q_SLOTS:
+    bool lock();
+    void unlock();
+    bool initializeApt();
 //     void percentageChanged(const qint32 percentage);
 
 Q_SIGNALS:
