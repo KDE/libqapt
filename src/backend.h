@@ -75,7 +75,7 @@ public:
     /**
      * Initializes the Apt database for usage. Sets up everything the backend
      * will need to perform all operations. Please note that you @b _MUST_ call
-     * this funtion before doing any further operations in the backend, or else
+     * this function before doing any further operations in the backend, or else
      * risk encountering undefined behavior.
      *
      * @return @c true if initialization was successful
@@ -127,7 +127,7 @@ public:
 
     /**
      * Queries the backend for a list of all available packages, which is
-     * essentially all packages, excluding now-nonexistant packages that have
+     * essentially all packages, excluding now-nonexistent packages that have
      * a version of 0.
      *
      * \return A @c Package::List of all available packages in the Apt database

@@ -23,7 +23,6 @@
 #include "qaptworkeradaptor.h"
 
 #include <QDebug>
-#include <QFile>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -162,11 +161,10 @@ void QAptWorker::updateCache()
     emit workerStarted("update");
     // Lock the list directory
     FileFd Lock;
-    if (_config->FindB("Debug::NoLocking", false) == false) {
+    if (!_config->FindB("Debug::NoLocking", false)) {
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
-          // TODO: emit failure
-//             return false;
+            emit workerFinished("update", false);
         }
     }
 

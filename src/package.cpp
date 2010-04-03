@@ -205,7 +205,7 @@ qint32 Package::installedSize() const
     } else {
         pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
         if (d->state & NotInstallable) {
-            // Nonexistant package
+            // Nonexistent package
             return -1;
         }
         return State.CandidateVerIter(*m_depCache)->InstalledSize;

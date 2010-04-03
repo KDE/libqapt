@@ -153,7 +153,7 @@ int Backend::packageCount()
     pkgCache::PkgIterator it = m_cache->PkgBegin();
     for(;it!=m_cache->PkgEnd();++it) {
         pkgDepCache::StateCache & state = (*m_depCache)[it];
-        // Don't count no-longer-existant packages
+        // Don't count no-longer-existent packages
         if (!state.CandidateVer == 0) {
             packageCount++;
         }
