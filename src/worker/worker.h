@@ -60,6 +60,9 @@ public:
     bool isWorkerReady();
     bool updateCache();
 
+private Q_SLOTS:
+//     void percentageChanged(const qint32 percentage);
+
 Q_SIGNALS:
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);

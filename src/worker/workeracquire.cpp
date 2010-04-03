@@ -107,3 +107,12 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
     m_mediaBlock = 0;
     return change;
 }
+
+bool WorkerAcquire::Pulse(pkgAcquire *Owner)
+{
+    pkgAcquireStatus::Pulse(Owner);
+    qint32 percentage = qint32(qint32((CurrentBytes + CurrentItems)*100.0)/qint32(TotalBytes+TotalItems));
+    emit percentageChanged(percentage);
+
+    return true;
+}

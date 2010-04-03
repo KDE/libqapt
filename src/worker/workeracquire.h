@@ -40,13 +40,14 @@ public:
     virtual void Fail(pkgAcquire::ItemDesc &Itm);
     virtual void Stop();
     virtual bool MediaChange(string Media, string Drive);
-// 
-//     bool Pulse(pkgAcquire *Owner);
+
+    bool Pulse(pkgAcquire *Owner);
 
     unsigned long ID;
 
 signals:
     void mediaChangeRequest(const QString &media, const QString &drive);
+    void percentageChanged(const qint32 percentage);
 
 private:
     QEventLoop *m_mediaBlock;

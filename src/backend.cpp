@@ -262,7 +262,7 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
 
     // Ok, something got screwed. Report and flee
     // emit errorOccurred((int) Aqpm::Globals::WorkerDisappeared, QVariantMap());
-//     workerResult(false);
+    // workerResult(false);
 }
 
 }

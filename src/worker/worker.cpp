@@ -167,6 +167,7 @@ void QAptWorker::unlock()
 bool QAptWorker::updateCache()
 {
     WorkerAcquire acquireStatus;
+//     connect(acquireStatus, SIGNAL(percentageChanged(const qint32)), this, SLOT(percentageChanged(const qint32)));
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
         return false;
     }
