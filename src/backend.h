@@ -163,7 +163,7 @@ public:
 Q_SIGNALS:
     void cacheUpdateStarted();
 
-private Q_SLOTS:
+public Q_SLOTS:
     void workerStarted(const QString &name);
 };
 

@@ -47,6 +47,9 @@ Backend::Backend()
         , m_depCache(0)
 {
     m_list = new pkgSourceList;
+
+    bool connected = QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "workerStarted", this, SLOT(workerStarted(const QString&)));
 }
 
 Backend::~Backend()
@@ -225,12 +228,6 @@ void Backend::updateCache()
               "org.kubuntu.qaptworker",
               QLatin1String("updateCache"));
     QDBusConnection::systemBus().asyncCall(message);
-
-    // FIXME Why won't this work? connected always ends up false :(
-    bool connected = QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerStarted", this, SLOT(workerStarted(const QString &name)));
-
-    qDebug() << "Hi" << connected;
 }
 
 void Backend::workerStarted(const QString &name)
