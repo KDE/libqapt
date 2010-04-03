@@ -184,7 +184,8 @@ bool QAptWorker::updateCache()
 
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
-        ListUpdate(acquireStatus, *m_list);
+        bool result = ListUpdate(acquireStatus, *m_list);
+        emit workerFinished("update", result);
     }
 
     return true;

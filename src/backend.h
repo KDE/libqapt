@@ -158,13 +158,17 @@ public:
     Group::List availableGroups();
 
     void updateCache();
-    void waitForWorkerReady();
 
 Q_SIGNALS:
     void cacheUpdateStarted();
+    void cacheUpdateFinished();
 
 public Q_SLOTS:
     void workerStarted(const QString &name);
+    void workerFinished(const QString &name, bool result);
+
+private Q_SLOTS:
+    void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
 };
 
 }

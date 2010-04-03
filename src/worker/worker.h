@@ -61,11 +61,8 @@ public:
     bool updateCache();
 
 Q_SIGNALS:
-    /**
-     * This signal is emitted when a property on the interface changes.
-     */
-    void changed();
     void workerStarted(const QString &name);
+    void workerFinished(const QString &name, bool result);
 
 private:
     QAptWorkerPrivate *d;

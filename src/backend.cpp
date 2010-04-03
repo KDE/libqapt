@@ -25,9 +25,9 @@
 #include <QtCore/QStringList>
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusConnectionInterface>
-#include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusPendingCall>
+#include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusServiceWatcher>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -48,8 +48,17 @@ Backend::Backend()
 {
     m_list = new pkgSourceList;
 
-    bool connected = QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerStarted", this, SLOT(workerStarted(const QString&)));
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "workerFinished", this, SLOT(workerFinished(const QString&, bool)));
+
+    QDBusServiceWatcher *watcher = new QDBusServiceWatcher(this);
+    watcher->setConnection(QDBusConnection::systemBus());
+    watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
+    watcher->addWatchedService("org.kubuntu.qaptworker");
+    connect(watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
+            SLOT(serviceOwnerChanged(QString, QString, QString)));
 }
 
 Backend::~Backend()
@@ -221,7 +230,6 @@ Group::List Backend::availableGroups()
 
 void Backend::updateCache()
 {
-    waitForWorkerReady();
     QDBusMessage message;
     message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
               "/",
@@ -232,34 +240,29 @@ void Backend::updateCache()
 
 void Backend::workerStarted(const QString &name)
 {
-    qDebug() << "Got a reply!";
+    qDebug() << "Worker Started!";
     if (name == "update") {
         emit cacheUpdateStarted();
     }
 }
 
-void Backend::waitForWorkerReady()
+void Backend::workerFinished(const QString &name, bool result)
 {
-    if (!QDBusConnection::systemBus().interface()->isServiceRegistered("org.kubuntu.qaptworker")) {
-        usleep(20);
-        qDebug() << "Waiting for interface to appear";
+    qDebug() << "Worker Finished!";
+    if (name == "update") {
+        emit cacheUpdateFinished();
     }
+}
 
-    QDBusInterface i("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker", QDBusConnection::systemBus());
+void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
+{
+    Q_UNUSED(oldOwner)
 
-    qDebug() << "Got the interface";
+    qDebug() << "It looks like our worker got lost";
 
-    bool ready = false;
-
-    while (!ready) {
-        qDebug() << "Checking if interface is ready";
-
-        QDBusReply<bool> reply = i.call("isWorkerReady");
-
-        ready = reply.value();
-    }
-
-    qDebug() << "Ready, here we go";
+    // Ok, something got screwed. Report and flee
+    // emit errorOccurred((int) Aqpm::Globals::WorkerDisappeared, QVariantMap());
+//     workerResult(false);
 }
 
 }
