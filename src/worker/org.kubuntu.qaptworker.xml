@@ -1,17 +1,17 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
-   <interface name="org.kubuntu.qaptworker">
-       <method name="isWorkerReady">
-           <arg type="b" direction="out" />
-       </method>
-       <method name="updateCache" >
-       </method>
-       <signal name="workerStarted">
-            <arg type="s" direction="out" />
-       </signal>
-       <signal name="workerFinished" >
-            <arg type="s" direction="out" />
-            <arg type="b" direction="out" />
-       </signal>
-   </interface>
+  <interface name="org.kubuntu.qaptworker">
+    <signal name="workerStarted">
+      <arg name="name" type="s" direction="out"/>
+    </signal>
+    <signal name="workerFinished">
+      <arg name="name" type="s" direction="out"/>
+      <arg name="result" type="b" direction="out"/>
+    </signal>
+    <signal name="percentageChanged">
+      <arg name="percentage" type="i" direction="out"/>
+    </signal>
+    <method name="updateCache">
+    </method>
+  </interface>
 </node>

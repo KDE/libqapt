@@ -17,6 +17,7 @@
 #include <KLineEdit>
 #include <KStatusBar>
 #include <KVBox>
+#include <KProgressDialog>
 
 
 qapttest::qapttest()
@@ -27,10 +28,13 @@ qapttest::qapttest()
     m_backend = new QApt::Backend();
     m_backend->init();
 
-    QWidget *mainWidget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(mainWidget);
+    connect(m_backend, SIGNAL(cacheUpdateStarted()), this, SLOT(cacheUpdateStarted()));
+    connect(m_backend, SIGNAL(percentageChanged(int)), this, SLOT(percentageChanged(int)));
 
-    KHBox *hbox = new KHBox(mainWidget);
+    m_mainWidget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(m_mainWidget);
+
+    KHBox *hbox = new KHBox(m_mainWidget);
     layout->addWidget(hbox);
 
     m_lineEdit = new KLineEdit(hbox);
@@ -47,7 +51,7 @@ qapttest::qapttest()
     cachePushButton->setText(i18n("Update Software Lists"));
     connect(cachePushButton, SIGNAL(clicked()), this, SLOT(updateCache()));
 
-    KVBox *vbox = new KVBox(mainWidget);
+    KVBox *vbox = new KVBox(m_mainWidget);
     layout->addWidget(vbox);
 
     m_nameLabel = new QLabel(vbox);
@@ -62,7 +66,7 @@ qapttest::qapttest()
     m_longDescriptionLabel = new QLabel(vbox);
 
     updateLabels();
-    setCentralWidget(mainWidget);
+    setCentralWidget(m_mainWidget);
 
     // Package count and installed package count in the sidebar
     QLabel* packageCountLabel = new QLabel(this);
@@ -135,6 +139,18 @@ void qapttest::updateLabels()
 void qapttest::updateCache()
 {
     m_backend->updateCache();
+}
+
+void qapttest::cacheUpdateStarted()
+{
+    m_mainWidget->setEnabled(false);
+    KProgressDialog *cacheUpdateDialog = new KProgressDialog(this, i18n("Updating package cache"));
+    cacheUpdateDialog->progressBar()->setRange(0,0);
+}
+
+void qapttest::percentageChanged(int percentage)
+{
+    kDebug() << "Percentage == " << percentage;
 }
 
 #include "qapttest.moc"

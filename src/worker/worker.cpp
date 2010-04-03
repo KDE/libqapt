@@ -38,22 +38,14 @@
 #include "qaptauthorization.h"
 #include "workeracquire.h"
 
-class QAptWorkerPrivate
-{
-public:
-    bool ready;
-};
-
 QAptWorker::QAptWorker(int &argc, char **argv)
         : QCoreApplication(argc, argv)
-        , d(new QAptWorkerPrivate)
         , m_progressMeter()
         , m_cache(0)
         , m_policy(0)
         , m_depCache(0)
         , m_locked(false)
 {
-    d->ready = false;
     new QaptworkerAdaptor(this);
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
@@ -69,12 +61,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     }
 
     QTimer::singleShot(60000, this, SLOT(quit()));
-    d->ready = initializeApt();
-}
-
-bool QAptWorker::isWorkerReady()
-{
-    return d->ready;
+    initializeApt();
 }
 
 bool QAptWorker::initializeApt()
@@ -164,22 +151,22 @@ void QAptWorker::unlock()
    m_locked = false;
 }
 
-bool QAptWorker::updateCache()
+void QAptWorker::updateCache()
 {
     WorkerAcquire acquireStatus;
-//     connect(acquireStatus, SIGNAL(percentageChanged(const qint32)), this, SLOT(percentageChanged(const qint32)));
+    connect(&acquireStatus, SIGNAL(percentageChanged(int)), this, SLOT(percentageChanged(int)));
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
-        return false;
+        return;
     }
 
     emit workerStarted("update");
-
     // Lock the list directory
     FileFd Lock;
     if (_config->FindB("Debug::NoLocking", false) == false) {
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
-            return false;
+          // TODO: emit failure
+//             return false;
         }
     }
 
@@ -188,6 +175,4 @@ bool QAptWorker::updateCache()
         bool result = ListUpdate(acquireStatus, *m_list);
         emit workerFinished("update", result);
     }
-
-    return true;
 }

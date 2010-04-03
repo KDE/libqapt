@@ -31,8 +31,6 @@
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/policy.h>
 
-class QAptWorkerPrivate;
-
 class QAptWorker : public QCoreApplication, protected QDBusContext
 {
     Q_OBJECT
@@ -54,21 +52,17 @@ public:
     bool m_locked;
 
 public Q_SLOTS:
-    bool isWorkerReady();
-    bool updateCache();
+    void updateCache();
 
 private Q_SLOTS:
     bool lock();
     void unlock();
     bool initializeApt();
-//     void percentageChanged(const qint32 percentage);
 
 Q_SIGNALS:
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
-
-private:
-    QAptWorkerPrivate *d;
+    void percentageChanged(int percentage);
 };
 
 #endif

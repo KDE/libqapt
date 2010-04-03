@@ -26,8 +26,9 @@
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/acquire-worker.h>
 
-WorkerAcquire::WorkerAcquire() : m_mediaBlock(0)
-                               , ID(0)
+WorkerAcquire::WorkerAcquire()
+        : m_mediaBlock(0)
+        , ID(0)
 {
 }
 
@@ -111,7 +112,7 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
     pkgAcquireStatus::Pulse(Owner);
-    qint32 percentage = qint32(qint32((CurrentBytes + CurrentItems)*100.0)/qint32(TotalBytes+TotalItems));
+    int percentage = int(qint32((CurrentBytes + CurrentItems)*100.0)/qint32(TotalBytes+TotalItems));
     emit percentageChanged(percentage);
 
     return true;

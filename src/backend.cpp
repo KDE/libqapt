@@ -52,6 +52,8 @@ Backend::Backend()
                                 "workerStarted", this, SLOT(workerStarted(const QString&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerFinished", this, SLOT(workerFinished(const QString&, bool)));
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "percentageChanged", this, SLOT(emitPercentageChanged(int)));
 
     QDBusServiceWatcher *watcher = new QDBusServiceWatcher(this);
     watcher->setConnection(QDBusConnection::systemBus());
@@ -263,6 +265,11 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
     // Ok, something got screwed. Report and flee
     // emit errorOccurred((int) Aqpm::Globals::WorkerDisappeared, QVariantMap());
     // workerResult(false);
+}
+
+void Backend::emitPercentageChanged(int percentage)
+{
+    qDebug() << "Percentage == " << percentage;
 }
 
 }

@@ -24,9 +24,11 @@ public:
 
     virtual ~qapttest();
 
-private slots:
+private Q_SLOTS:
     void updateLabels();
     void updateCache();
+    void cacheUpdateStarted();
+    void percentageChanged(int percentage);
 
 private:
     KToggleAction *m_statusbarAction;
@@ -37,6 +39,7 @@ private:
     QApt::Package *m_package;
     QApt::Group *m_group;
 
+    QWidget *m_mainWidget;
     QLabel *m_nameLabel;
     QLabel *m_stateLabel;
     QLabel *m_sectionLabel;

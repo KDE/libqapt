@@ -47,7 +47,7 @@ public:
 
 signals:
     void mediaChangeRequest(const QString &media, const QString &drive);
-    void percentageChanged(const qint32 percentage);
+    void percentageChanged(int percentage);
 
 private:
     QEventLoop *m_mediaBlock;
