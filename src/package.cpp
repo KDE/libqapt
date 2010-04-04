@@ -47,6 +47,8 @@ Package::Package(QObject* parent, pkgDepCache *depCache,
 
 Package::~Package()
 {
+    delete d;
+    delete m_packageIter;
 }
 
 QString Package::name() const

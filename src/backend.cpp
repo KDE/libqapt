@@ -66,6 +66,10 @@ Backend::Backend()
 Backend::~Backend()
 {
     delete m_list;
+    delete m_cache;
+    delete m_policy;
+    delete m_records;
+    delete m_depCache;
 }
 
 bool Backend::init()
