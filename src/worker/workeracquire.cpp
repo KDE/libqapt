@@ -112,8 +112,10 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
     pkgAcquireStatus::Pulse(Owner);
-    int percentage = int(qint32((CurrentBytes + CurrentItems)*100.0)/qint32(TotalBytes+TotalItems));
+    int percentage = int(int((CurrentBytes + CurrentItems)*100.0)/int(TotalBytes+TotalItems));
     emit percentageChanged(percentage);
+
+    Update = false;
 
     return true;
 }

@@ -15,6 +15,7 @@ class qapttestView;
 class QLabel;
 class KToggleAction;
 class KLineEdit;
+class KProgressDialog;
 
 class qapttest : public KMainWindow
 {
@@ -28,6 +29,7 @@ private Q_SLOTS:
     void updateLabels();
     void updateCache();
     void cacheUpdateStarted();
+    void cacheUpdateFinished();
     void percentageChanged(int percentage);
 
 private:
@@ -50,6 +52,8 @@ private:
     QLabel *m_packageSizeLabel;
     QLabel *m_shortDescriptionLabel;
     QLabel *m_longDescriptionLabel;
+
+    KProgressDialog *m_cacheUpdateDialog;
 };
 
 #endif

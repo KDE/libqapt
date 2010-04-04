@@ -58,6 +58,7 @@ private Q_SLOTS:
     bool lock();
     void unlock();
     bool initializeApt();
+    void emitPercentageChanged(int percentage);
 
 Q_SIGNALS:
     void workerStarted(const QString &name);

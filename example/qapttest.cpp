@@ -29,6 +29,7 @@ qapttest::qapttest()
     m_backend->init();
 
     connect(m_backend, SIGNAL(cacheUpdateStarted()), this, SLOT(cacheUpdateStarted()));
+    connect(m_backend, SIGNAL(cacheUpdateFinished()), this, SLOT(cacheUpdateFinished()));
     connect(m_backend, SIGNAL(percentageChanged(int)), this, SLOT(percentageChanged(int)));
 
     m_mainWidget = new QWidget(this);
@@ -144,13 +145,22 @@ void qapttest::updateCache()
 void qapttest::cacheUpdateStarted()
 {
     m_mainWidget->setEnabled(false);
-    KProgressDialog *cacheUpdateDialog = new KProgressDialog(this, i18n("Updating package cache"));
-    cacheUpdateDialog->progressBar()->setRange(0,0);
+    m_cacheUpdateDialog = new KProgressDialog(this, i18n("Updating package cache"));
 }
 
 void qapttest::percentageChanged(int percentage)
 {
-    kDebug() << "Percentage == " << percentage;
+    if (m_cacheUpdateDialog) {
+        m_cacheUpdateDialog->progressBar()->setValue(percentage);
+    }
+}
+
+void qapttest::cacheUpdateFinished()
+{
+    if (m_cacheUpdateDialog) {
+        m_cacheUpdateDialog->close();
+        m_mainWidget->setEnabled(true);
+    }
 }
 
 #include "qapttest.moc"

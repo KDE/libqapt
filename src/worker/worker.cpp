@@ -153,7 +153,8 @@ void QAptWorker::unlock()
 void QAptWorker::updateCache()
 {
     WorkerAcquire acquireStatus;
-    connect(&acquireStatus, SIGNAL(percentageChanged(int)), this, SLOT(percentageChanged(int)));
+    connect(&acquireStatus, SIGNAL(percentageChanged(int)),
+            this, SLOT(emitPercentageChanged(int)));
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
         return;
     }
@@ -173,4 +174,10 @@ void QAptWorker::updateCache()
         bool result = ListUpdate(acquireStatus, *m_list);
         emit workerFinished("update", result);
     }
+}
+
+void QAptWorker::emitPercentageChanged(int percentage)
+{
+    emit percentageChanged(percentage);
+//     QFile::rename("/home/jonathan/lol", "/home/jonathan/" + QString().setNum(percentage) );
 }

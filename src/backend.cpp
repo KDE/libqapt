@@ -53,7 +53,7 @@ Backend::Backend()
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerFinished", this, SLOT(workerFinished(const QString&, bool)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "percentageChanged", this, SLOT(emitPercentageChanged(int)));
+                                "percentageChanged", this, SLOT(percentageChanged(int)));
 
     QDBusServiceWatcher *watcher = new QDBusServiceWatcher(this);
     watcher->setConnection(QDBusConnection::systemBus());
