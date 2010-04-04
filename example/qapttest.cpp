@@ -84,12 +84,12 @@ qapttest::qapttest()
     statusBar()->addWidget(installedCountLabel);
     statusBar()->show();
 
-    // Lists all packages in the KDE section via kDebug()
-    m_group = m_backend->group("kde");
-    QApt::Package::List packageList = m_group->packages();
-    foreach (QApt::Package *package, packageList) {
-            kDebug() << package->name();
-    }
+    // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
+//     m_group = m_backend->group("kde");
+//     QApt::Package::List packageList = m_group->packages();
+//     foreach (QApt::Package *package, packageList) {
+//             kDebug() << package->name();
+//     }
 }
 
 qapttest::~qapttest()
@@ -114,26 +114,28 @@ void qapttest::updateLabels()
     m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
     m_longDescriptionLabel->setText(m_package->longDescription());
 
-    QStringList requiredByList(m_package->requiredByList());
-    foreach (const QString &name, requiredByList) {
-        kDebug() << "reverse dependency: " << name;
-    }
+    // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them
 
-    QApt::Package::List  upgradeablePackages = m_backend->upgradeablePackages();
-    foreach (QApt::Package *package, upgradeablePackages) {
-            kDebug() << "Upgradeable packages: " << package->name();
-    }
+    // QStringList requiredByList(m_package->requiredByList());
+    // foreach (const QString &name, requiredByList) {
+        // kDebug() << "reverse dependency: " << name;
+    // }
+
+    // QApt::Package::List  upgradeablePackages = m_backend->upgradeablePackages();
+    // foreach (QApt::Package *package, upgradeablePackages) {
+            // kDebug() << "Upgradeable packages: " << package->name();
+    // }
 
     // A convenient way to check the install status of a package
-    if (m_package->isInstalled()) {
-        kDebug() << "Package is installed!!!";
-    }
+    // if (m_package->isInstalled()) {
+        // kDebug() << "Package is installed!!!";
+    // }
 
     // Another flag usage example
-    int state = m_package->state();
-    if (state & QApt::Package::Upgradeable) {
-        kDebug() << "Package is upgradeable!!!";
-    }
+    // int state = m_package->state();
+    // if (state & QApt::Package::Upgradeable) {
+        // kDebug() << "Package is upgradeable!!!";
+    // }
 
 }
 
