@@ -140,6 +140,13 @@ public:
     QString maintainer() const;
 
     /**
+     * Member function that returns the homepage of the package
+     *
+     * \return The homepage of the package as a @c QString
+     */
+    QString homepage() const;
+
+    /**
      * Member function that returns the installed version of the package
      * If this package is not installed, this function will return a null
      * QString

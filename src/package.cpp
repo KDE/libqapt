@@ -109,6 +109,18 @@ QString Package::maintainer() const
     return maintainer;
 }
 
+QString Package::homepage() const
+{
+    QString homepage;
+    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    if (!ver.end()) {
+        pkgRecords::Parser & parser = m_records->Lookup(ver.FileList());
+        homepage = QString::fromStdString(parser.Homepage());
+        return homepage;
+    }
+    return homepage;
+}
+
 QString Package::version() const
 {
     if ((*m_packageIter)->CurrentVer == 0) {
