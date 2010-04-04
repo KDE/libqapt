@@ -59,7 +59,10 @@ Package::List Group::packages()
     for(;it!=m_cache->PkgEnd();++it) {
         if (it.Section() == d->name) {
           Package *package = new Package(this, m_depCache, m_records, it);
-          packages << package;
+
+          if (package->isValid()) {
+              packages << package;
+          }
         }
     }
 

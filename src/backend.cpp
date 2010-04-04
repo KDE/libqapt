@@ -184,7 +184,10 @@ Package::List Backend::availablePackages()
     pkgCache::PkgIterator it = m_cache->PkgBegin();
     for(;it!=m_cache->PkgEnd();++it) {
         Package *package = new Package(this, m_depCache, m_records, it);
-        availablePackages << package;
+
+        if (package->isValid()) {
+            availablePackages << package;
+        }
     }
 
     return availablePackages;

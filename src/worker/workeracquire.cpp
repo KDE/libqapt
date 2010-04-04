@@ -44,6 +44,16 @@ void WorkerAcquire::Start()
 
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
+//     if (Quiet > 1) {
+//         return;
+//     }
+
+    // TODO: emit that the item we're getting now is cached
+//     cout << _("Hit ") << Itm.Description;
+//     if (Itm.Owner->FileSize != 0)
+//         cout << " [" << SizeToStr(Itm.Owner->FileSize) << "B]";
+//     cout << endl;
+
     Update = true;
 }
 

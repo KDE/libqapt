@@ -315,6 +315,15 @@ bool Package::isInstalled()
     }
 }
 
+bool Package::isValid()
+{
+    if (d->state & NotInstallable) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 QStringList Package::requiredByList()
 {
     QStringList reverseDependsList;

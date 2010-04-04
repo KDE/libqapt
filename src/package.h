@@ -218,6 +218,14 @@ public:
     bool isInstalled();
 
     /**
+     * Checks whether or not the Package object is valid
+     *
+     * @return @c true if valid
+     * @return @c false if not invalid
+     */
+    bool isValid();
+
+    /**
      * Member function that returns a list of the names of all the packages
      * that depend on this package. (Reverse dependencies)
      * I would like to see if I could figure out how to construct a Package
