@@ -98,7 +98,6 @@ qapttest::~qapttest()
 
 void qapttest::updateLabels()
 {
-    kDebug() << "============= New package Listing =============";
     m_package = m_backend->package(m_lineEdit->text());
 
     m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
@@ -116,6 +115,7 @@ void qapttest::updateLabels()
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them
 
+    // kDebug() << "============= New package Listing =============";
     // QStringList requiredByList(m_package->requiredByList());
     // foreach (const QString &name, requiredByList) {
         // kDebug() << "reverse dependency: " << name;
@@ -163,6 +163,7 @@ void qapttest::cacheUpdateFinished()
         m_cacheUpdateDialog->close();
         m_mainWidget->setEnabled(true);
     }
+    m_backend->reloadCache();
 }
 
 #include "qapttest.moc"
