@@ -59,11 +59,16 @@ private Q_SLOTS:
     void unlock();
     bool initializeApt();
     void emitPercentageChanged(int percentage);
+    void emitOperationDescription(const QString &name);
 
 Q_SIGNALS:
+    // TODO: consolodate worker* into:
+    // void workerOperationChanged(OperationType, ResultFlag);
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
+    // TODO: Change to operationPercentage throughout the codebase
     void percentageChanged(int percentage);
+    void operationDescription(const QString &description);
 };
 
 #endif

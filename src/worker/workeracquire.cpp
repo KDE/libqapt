@@ -65,6 +65,10 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &Itm)
     }
 
     Itm.Owner->ID = ID++;
+
+    QString progressDescription;
+    progressDescription = QString::fromStdString(Itm.Description);
+    emit operationDescription(progressDescription);
 }
 
 void WorkerAcquire::Done(pkgAcquire::ItemDesc &Itm)

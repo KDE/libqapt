@@ -155,6 +155,8 @@ void QAptWorker::updateCache()
     WorkerAcquire acquireStatus;
     connect(&acquireStatus, SIGNAL(percentageChanged(int)),
             this, SLOT(emitPercentageChanged(int)));
+    connect(&acquireStatus, SIGNAL(operationDescription(const QString&)),
+            this, SLOT(emitOperationDescription(const QString&)));
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
         return;
     }
@@ -179,5 +181,9 @@ void QAptWorker::updateCache()
 void QAptWorker::emitPercentageChanged(int percentage)
 {
     emit percentageChanged(percentage);
-//     QFile::rename("/home/jonathan/lol", "/home/jonathan/" + QString().setNum(percentage) );
+}
+
+void QAptWorker::emitOperationDescription(const QString& description)
+{
+    emit operationDescription(description);
 }

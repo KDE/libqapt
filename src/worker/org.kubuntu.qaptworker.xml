@@ -11,6 +11,9 @@
     <signal name="percentageChanged">
       <arg name="percentage" type="i" direction="out"/>
     </signal>
+    <signal name="operationDescription">
+      <arg name="description" type="s" direction="out"/>
+    </signal>
     <method name="updateCache">
     </method>
   </interface>

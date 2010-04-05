@@ -163,11 +163,11 @@ Q_SIGNALS:
     void cacheUpdateStarted();
     void cacheUpdateFinished();
     void percentageChanged(int percentage);
+    void operationDescription(const QString &description);
 
 public Q_SLOTS:
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
-    void emitPercentageChanged(int percentage);
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

@@ -46,6 +46,7 @@ private Q_SLOTS:
     void cacheUpdateStarted();
     void cacheUpdateFinished();
     void percentageChanged(int percentage);
+    void operationDescription(const QString &name);
 
 private:
     KToggleAction *m_statusbarAction;

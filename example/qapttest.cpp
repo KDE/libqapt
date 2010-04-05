@@ -46,6 +46,7 @@ qapttest::qapttest()
     connect(m_backend, SIGNAL(cacheUpdateStarted()), this, SLOT(cacheUpdateStarted()));
     connect(m_backend, SIGNAL(cacheUpdateFinished()), this, SLOT(cacheUpdateFinished()));
     connect(m_backend, SIGNAL(percentageChanged(int)), this, SLOT(percentageChanged(int)));
+    connect(m_backend, SIGNAL(operationDescription(const QString&)), this, SLOT(operationDescription(const QString &)));
 
     m_mainWidget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(m_mainWidget);
@@ -169,6 +170,13 @@ void qapttest::percentageChanged(int percentage)
 {
     if (m_cacheUpdateDialog) {
         m_cacheUpdateDialog->progressBar()->setValue(percentage);
+    }
+}
+
+void qapttest::operationDescription(const QString &description)
+{
+    if (m_cacheUpdateDialog) {
+        m_cacheUpdateDialog->setLabelText(description);
     }
 }
 
