@@ -222,7 +222,10 @@ Group::List Backend::availableGroups()
     pkgCache::PkgIterator it = m_cache->PkgBegin();
     for(;it!=m_cache->PkgEnd();++it)
     {
-        groupStringList << it.Section();
+        QString section = it.Section();
+        if (!section.isEmpty()) {
+            groupStringList << section;
+        }
     }
 
     QSet<QString> groupSet = groupStringList.toSet();
@@ -265,8 +268,6 @@ void Backend::workerFinished(const QString &name, bool result)
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
-    Q_UNUSED(oldOwner)
-
     qDebug() << "It looks like our worker got lost";
 
     // Ok, something got screwed. Report and flee
