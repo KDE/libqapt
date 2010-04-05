@@ -48,7 +48,8 @@ public:
 signals:
     void mediaChangeRequest(const QString &media, const QString &drive);
     void percentageChanged(int percentage);
-    // Set fetch type in operationDescription, (Get, Hit, Ign, etc like in apt-get)
+    // TODO: Set fetch type in operationDescription, (Get, Hit, Ign, etc like in apt-get)
+    // perhaps also rename to operationMessage()
     void operationDescription(const QString&);
 
 private:
