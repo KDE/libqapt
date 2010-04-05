@@ -15,6 +15,7 @@ set(qapt_HDRS
     backend.h
     package.h
     group.h
+    globals.h
    )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_HDRS})

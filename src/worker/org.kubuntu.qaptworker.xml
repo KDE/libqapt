@@ -8,10 +8,14 @@
       <arg name="name" type="s" direction="out"/>
       <arg name="result" type="b" direction="out"/>
     </signal>
-    <signal name="percentageChanged">
+    <signal name="downloadProgress">
       <arg name="percentage" type="i" direction="out"/>
     </signal>
-    <signal name="operationDescription">
+    <signal name="downloadSubProgress">
+      <arg name="percentage" type="i" direction="out"/>
+    </signal>
+    <signal name="downloadMessage">
+      <arg type="i" direction="out"/>
       <arg name="description" type="s" direction="out"/>
     </signal>
     <method name="updateCache">

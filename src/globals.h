@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Heavily inspired by Synaptic library code ;-)                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,57 +19,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTWORKER_H
-#define QAPTWORKER_H
+#ifndef GLOBALSH
+#define GLOBALSH
 
-#include <QtCore/QCoreApplication>
-#include <QtDBus/QDBusContext>
-#include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusMessage>
+#include <QtCore/QFlags>
 
-#include <apt-pkg/progress.h>
-#include <apt-pkg/sourcelist.h>
-#include <apt-pkg/pkgrecords.h>
-#include <apt-pkg/policy.h>
-
-class QAptWorker : public QCoreApplication, protected QDBusContext
+namespace QApt
 {
-    Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker")
-public:
-    QAptWorker(int &argc, char **argv);
 
-    virtual ~QAptWorker();
-
-    OpProgress m_progressMeter;
-    MMap *m_map;
-
-    pkgCache *m_cache;
-    pkgPolicy *m_policy;
-
-    pkgDepCache *m_depCache;
-    pkgSourceList *m_list;
-    pkgRecords *m_records;
-    bool m_locked;
-
-public Q_SLOTS:
-    void updateCache();
-
-private Q_SLOTS:
-    bool lock();
-    void unlock();
-    bool initializeApt();
-    void emitDownloadProgress(int percentage);
-    void emitDownloadMessage(int flag, const QString &message);
-
-Q_SIGNALS:
-    // TODO: consolodate worker* into:
-    // void workerOperationChanged(OperationType, ResultFlag);
-    void workerStarted(const QString &name);
-    void workerFinished(const QString &name, bool result);
-    // TODO: Change to operationPercentage throughout the codebase
-    void downloadProgress(int percentage);
-    void downloadMessage(int flag, const QString &message);
+namespace Globals
+{
+    enum FetchType {
+        DownloadFetch = 1,
+        HitFetch = 2,
+        IgnoredFetch = 3
+    };
+    Q_DECLARE_FLAGS(FetchTypes, FetchType)
 };
+
+}
 
 #endif

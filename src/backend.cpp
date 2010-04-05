@@ -53,9 +53,9 @@ Backend::Backend()
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerFinished", this, SLOT(workerFinished(const QString&, bool)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "percentageChanged", this, SLOT(percentageChanged(int)));
+                                "downloadProgress", this, SLOT(downloadProgress(int)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "operationDescription", this, SLOT(operationDescription(const QString&)));
+                                "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
 
     QDBusServiceWatcher *watcher = new QDBusServiceWatcher(this);
     watcher->setConnection(QDBusConnection::systemBus());

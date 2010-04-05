@@ -45,8 +45,8 @@ private Q_SLOTS:
     void updateCache();
     void cacheUpdateStarted();
     void cacheUpdateFinished();
-    void percentageChanged(int percentage);
-    void operationDescription(const QString &name);
+    void updateDownloadProgress(int percentage);
+    void updateDownloadMessage(int flag, const QString &name);
 
 private:
     KToggleAction *m_statusbarAction;

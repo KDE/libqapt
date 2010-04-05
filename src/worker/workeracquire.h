@@ -21,13 +21,16 @@
 #ifndef WORKERACQUIRE_H
 #define WORKERACQUIRE_H
 
+#include <QtCore/QEventLoop>
+
 #include <apt-pkg/acquire.h>
 
-#include <QtCore/QEventLoop>
+#include "globals.h"
 
 class WorkerAcquire : public QObject, public pkgAcquireStatus
 {
     Q_OBJECT
+    Q_ENUMS(FetchType)
 public:
     WorkerAcquire();
 
@@ -47,10 +50,10 @@ public:
 
 signals:
     void mediaChangeRequest(const QString &media, const QString &drive);
-    void percentageChanged(int percentage);
-    // TODO: Set fetch type in operationDescription, (Get, Hit, Ign, etc like in apt-get)
-    // perhaps also rename to operationMessage()
-    void operationDescription(const QString&);
+    void downloadProgress(int percentage);
+    void downloadSubProgress(int percentage);
+    // TODO: Set fetch type in downloadMessage, (Get, Hit, Ign, etc like in apt-get)
+    void downloadMessage(int flag, const QString &message);
 
 private:
     QEventLoop *m_mediaBlock;

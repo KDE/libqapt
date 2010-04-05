@@ -39,59 +39,52 @@ WorkerAcquire::~WorkerAcquire()
 void WorkerAcquire::Start()
 {
     pkgAcquireStatus::Start();
-    ID = 1;
 }
 
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
-//     if (Quiet > 1) {
-//         return;
-//     }
-
-    // TODO: emit that the item we're getting now is cached
-//     cout << _("Hit ") << Itm.Description;
-//     if (Itm.Owner->FileSize != 0)
-//         cout << " [" << SizeToStr(Itm.Owner->FileSize) << "B]";
-//     cout << endl;
-
+    QString message;
+    message = QString::fromStdString(item.Description);
+    emit downloadMessage((int) QApt::Globals::HitFetch, message);
     Update = true;
 }
 
-void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &Itm)
+void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
 {
     Update = true;
-    if (Itm.Owner->Complete == true) {
+    if (item.Owner->Complete == true) {
         return;
     }
 
-    Itm.Owner->ID = ID++;
-
-    QString progressDescription;
-    progressDescription = QString::fromStdString(Itm.Description);
-    emit operationDescription(progressDescription);
+    QString message;
+    message = QString::fromStdString(item.Description);
+    emit downloadMessage((int) QApt::Globals::DownloadFetch, message);
 }
 
-void WorkerAcquire::Done(pkgAcquire::ItemDesc &Itm)
+void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
 {
    Update = true;
 };
 
-void WorkerAcquire::Fail(pkgAcquire::ItemDesc &Itm)
+void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
 {
     // Ignore certain kinds of transient failures (bad code)
-    if (Itm.Owner->Status == pkgAcquire::Item::StatIdle) {
+    if (item.Owner->Status == pkgAcquire::Item::StatIdle) {
         return;
     }
 
-    if (Itm.Owner->Status == pkgAcquire::Item::StatDone)
+    if (item.Owner->Status == pkgAcquire::Item::StatDone)
     {
-//         cout << /*_*/("Ign ") << Itm.Description << endl;
+        QString message;
+        message = QString::fromStdString(item.Description);
+        emit downloadMessage((int) QApt::Globals::IgnoredFetch, message);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
+        //TODO: emit error
         _error->Error("Error %s\n  %s",
-                  Itm.Description.c_str(),
-                  Itm.Owner->ErrorText.c_str());
+                  item.Description.c_str(),
+                  item.Owner->ErrorText.c_str());
     }
 
     Update = true;
@@ -100,12 +93,6 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &Itm)
 void WorkerAcquire::Stop()
 {
    pkgAcquireStatus::Stop();
-
-//    if (FetchedBytes != 0 && _error->PendingError() == false)
-//       ioprintf(cout,/*_*/("Fetched %sB in %s (%sB/s)\n"),
-//            SizeToStr(FetchedBytes).c_str(),
-//            TimeToStr(ElapsedTime).c_str(),
-//            SizeToStr(CurrentCPS).c_str());
 }
 
 bool WorkerAcquire::MediaChange(string Media, string Drive)
@@ -127,7 +114,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
     pkgAcquireStatus::Pulse(Owner);
     int percentage = int(int((CurrentBytes + CurrentItems)*100.0)/int(TotalBytes+TotalItems));
-    emit percentageChanged(percentage);
+    emit downloadProgress(percentage);
 
     Update = false;
 

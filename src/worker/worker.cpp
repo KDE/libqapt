@@ -153,10 +153,10 @@ void QAptWorker::unlock()
 void QAptWorker::updateCache()
 {
     WorkerAcquire acquireStatus;
-    connect(&acquireStatus, SIGNAL(percentageChanged(int)),
-            this, SLOT(emitPercentageChanged(int)));
-    connect(&acquireStatus, SIGNAL(operationDescription(const QString&)),
-            this, SLOT(emitOperationDescription(const QString&)));
+    connect(&acquireStatus, SIGNAL(downloadProgress(int)),
+            this, SLOT(emitDownloadProgress(int)));
+    connect(&acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
+            this, SLOT(emitDownloadMessage(int, const QString&)));
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
         return;
     }
@@ -178,12 +178,13 @@ void QAptWorker::updateCache()
     }
 }
 
-void QAptWorker::emitPercentageChanged(int percentage)
+void QAptWorker::emitDownloadProgress(int percentage)
 {
-    emit percentageChanged(percentage);
+    emit downloadProgress(percentage);
 }
 
-void QAptWorker::emitOperationDescription(const QString& description)
+void QAptWorker::emitDownloadMessage(int flag, const QString& message)
 {
-    emit operationDescription(description);
+    QFile::rename("/home/jonathan/lol", "/home/jonathan/" + message);
+    emit downloadMessage(flag, message);
 }

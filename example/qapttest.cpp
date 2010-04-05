@@ -45,8 +45,9 @@ qapttest::qapttest()
 
     connect(m_backend, SIGNAL(cacheUpdateStarted()), this, SLOT(cacheUpdateStarted()));
     connect(m_backend, SIGNAL(cacheUpdateFinished()), this, SLOT(cacheUpdateFinished()));
-    connect(m_backend, SIGNAL(percentageChanged(int)), this, SLOT(percentageChanged(int)));
-    connect(m_backend, SIGNAL(operationDescription(const QString&)), this, SLOT(operationDescription(const QString &)));
+    connect(m_backend, SIGNAL(downloadProgress(int)), this, SLOT(updateDownloadProgress(int)));
+    connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
+            this, SLOT(updateDownloadMessage(int, const QString&)));
 
     m_mainWidget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(m_mainWidget);
@@ -166,17 +167,26 @@ void qapttest::cacheUpdateStarted()
     m_cacheUpdateDialog = new KProgressDialog(this, i18n("Updating package cache"));
 }
 
-void qapttest::percentageChanged(int percentage)
+void qapttest::updateDownloadProgress(int percentage)
 {
     if (m_cacheUpdateDialog) {
         m_cacheUpdateDialog->progressBar()->setValue(percentage);
     }
 }
 
-void qapttest::operationDescription(const QString &description)
+void qapttest::updateDownloadMessage(int flag, const QString &message)
 {
     if (m_cacheUpdateDialog) {
-        m_cacheUpdateDialog->setLabelText(description);
+        QString fullMessage;
+        switch(flag) {
+          case QApt::Globals::DownloadFetch:
+              fullMessage = i18n("Downloading: %1", message);
+          case QApt::Globals::HitFetch:
+              fullMessage = i18n("Checking: %1", message);
+          case QApt::Globals::IgnoredFetch:
+              fullMessage = i18n("Ignored: %1", message);
+        }
+        m_cacheUpdateDialog->setLabelText(fullMessage);
     }
 }
 

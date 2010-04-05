@@ -30,6 +30,7 @@
 
 #include "package.h"
 #include "group.h"
+#include "globals.h"
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
@@ -162,8 +163,8 @@ public:
 Q_SIGNALS:
     void cacheUpdateStarted();
     void cacheUpdateFinished();
-    void percentageChanged(int percentage);
-    void operationDescription(const QString &description);
+    void downloadProgress(int percentage);
+    void downloadMessage(int flag, const QString &message);
 
 public Q_SLOTS:
     void workerStarted(const QString &name);
