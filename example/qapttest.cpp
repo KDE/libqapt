@@ -177,16 +177,20 @@ void qapttest::updateDownloadProgress(int percentage)
 void qapttest::updateDownloadMessage(int flag, const QString &message)
 {
     if (m_cacheUpdateDialog) {
+        kDebug() << flag;
         QString fullMessage;
-
-        if (flag == QApt::Globals::DownloadFetch) {
-            fullMessage = i18n("Downloading: %1", message);
-        } else if (flag == QApt::Globals::HitFetch) {
-            fullMessage = i18n("Checking: %1", message);
-        } else if (flag == QApt::Globals::IgnoredFetch) {
-            fullMessage = i18n("Ignored: %1", message);
-        } else {
-            fullMessage = message;
+        switch(flag) {
+          case QApt::Globals::DownloadFetch:
+              fullMessage = i18n("Downloading: %1", message);
+              break;
+          case QApt::Globals::HitFetch:
+              fullMessage = i18n("Checking: %1", message);
+              break;
+          case QApt::Globals::IgnoredFetch:
+              fullMessage = i18n("Ignored: %1", message);
+              break;
+          default:
+              fullMessage = message;
         }
         m_cacheUpdateDialog->setLabelText(fullMessage);
     }
