@@ -177,8 +177,8 @@ void qapttest::updateDownloadProgress(int percentage)
 void qapttest::updateDownloadMessage(int flag, const QString &message)
 {
     if (m_cacheUpdateDialog) {
-        kDebug() << flag;
         QString fullMessage;
+
         switch(flag) {
           case QApt::Globals::DownloadFetch:
               fullMessage = i18n("Downloading: %1", message);
