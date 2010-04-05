@@ -41,6 +41,7 @@ install(FILES
     backend.h
     package.h
     group.h
+    globals.h
 
     DESTINATION
     include/libqapt COMPONENT Devel)
