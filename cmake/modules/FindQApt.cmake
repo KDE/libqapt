@@ -23,7 +23,7 @@ if (NOT WIN32)
    # use pkg-config to get the directories and then use these values
    # in the FIND_PATH() and FIND_LIBRARY() calls
    find_package(PkgConfig)
-   pkg_check_modules(PC_QAPT  libqapt)
+   pkg_check_modules(PC_QAPT libqapt)
    set(QAPT_DEFINITIONS ${PC_QAPT_CFLAGS_OTHER})
 endif (NOT WIN32)
 
@@ -58,8 +58,8 @@ elseif(QAPT_INCLUDE_DIR)
   endif(QAPT_FIND_REQUIRED)
 endif(QAPT_INCLUDE_DIR)
 
-    find_library(QAPT_LIBRARIES
-        NAMES libqapt qapt
+    find_library(QAPT_LIBRARY
+        NAMES qapt
         HINTS ${PC_QAPT_LIBDIR} ${PC_QAPT_LIBRARY_DIRS}
         )
 
