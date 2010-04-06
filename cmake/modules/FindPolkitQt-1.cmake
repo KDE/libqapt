@@ -26,7 +26,7 @@ if (NOT WIN32)
    # use pkg-config to get the directories and then use these values
    # in the FIND_PATH() and FIND_LIBRARY() calls
    find_package(PkgConfig)
-   pkg_check_modules(PC_POLKITQT-1 QUIET polkit-qt-1)
+   pkg_check_modules(PC_POLKITQT-1 polkit-qt-1)
    set(POLKITQT-1_DEFINITIONS ${PC_POLKITQT-1_CFLAGS_OTHER})
 endif (NOT WIN32)
 
