@@ -1,4 +1,4 @@
-set(libqapt_SRCS
+set(qapt_SRCS
     backend.cpp
     package.cpp
     group.cpp
@@ -11,22 +11,22 @@ include_directories(
 
 add_subdirectory(worker)
 
-set(libqapt_HDRS
+set(qapt_HDRS
     backend.h
     package.h
     group.h
     globals.h
    )
 
-qt4_wrap_cpp(libqapt_SRCS ${libqapt_HDRS})
+qt4_wrap_cpp(qapt_SRCS ${qapt_HDRS})
 
-add_library(libqapt SHARED ${libqapt_SRCS})
-set_target_properties(libqapt PROPERTIES
-    VERSION ${libqapt_lib_VERSION}
-    SOVERSION ${libqapt_lib_SOVERSION}
+add_library(qapt SHARED ${qapt_SRCS})
+set_target_properties(qapt PROPERTIES
+    VERSION ${qapt_lib_VERSION}
+    SOVERSION ${qapt_lib_SOVERSION}
     )
 
-target_link_libraries(libqapt
+target_link_libraries(qapt
     ${QT_QTGUI_LIBRARIES}
     ${QT_QTDBUS_LIBRARIES}
     ${QT_QTXML_LIBRARIES}
@@ -34,7 +34,7 @@ target_link_libraries(libqapt
     apt-pkg
     )
 
-install(TARGETS libqapt
+install(TARGETS qapt
     LIBRARY DESTINATION lib${LIB_SUFFIX})
 
 install(FILES
