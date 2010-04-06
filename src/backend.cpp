@@ -214,7 +214,7 @@ Package::List Backend::upgradeablePackages()
 
 Group *Backend::group(const QString &name)
 {
-    Group *group = new Group(this, name, m_cache, m_depCache, m_records);
+    Group *group = new Group(this, name);
     return group;
 }
 
@@ -235,7 +235,7 @@ Group::List Backend::availableGroups()
     Group::List groupList;
 
     foreach(const QString &name, groupSet) {
-        Group *group = new Group(this, name, m_cache, m_depCache, m_records);
+        Group *group = new Group(this, name);
         groupList << group;
     }
 

@@ -27,21 +27,13 @@ class GroupPrivate
 {
     public:
         QString name;
-        pkgCache *cache;
-        pkgDepCache *depCache;
-        pkgRecords *records;
 };
 
-Group::Group(QObject* parent, const QString &name, pkgCache *cache,
-             pkgDepCache *depCache, pkgRecords *records)
+Group::Group(QObject* parent, const QString &name)
         : QObject(parent)
         , d(new GroupPrivate)
 {
     d->name = name;
-
-    d->cache = cache;
-    d->depCache = depCache;
-    d->records = records;
 }
 
 Group::~Group()
@@ -52,24 +44,6 @@ Group::~Group()
 QString Group::name() const
 {
     return d->name;
-}
-
-Package::List Group::packages()
-{
-    Package::List packages;
-
-    pkgCache::PkgIterator it = d->cache->PkgBegin();
-    for(;it!=d->cache->PkgEnd();++it) {
-        if (it.Section() == d->name) {
-          Package *package = new Package(this, d->depCache, d->records, it);
-
-          if (package->isValid()) {
-              packages << package;
-          }
-        }
-    }
-
-    return packages;
 }
 
 }

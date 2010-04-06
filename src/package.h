@@ -252,6 +252,7 @@ public:
      */
     QStringList requiredByList();
 
+    bool wouldBreak();
     void setInstall();
 
 

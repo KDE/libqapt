@@ -23,9 +23,6 @@
 
 #include <QtCore/QObject>
 
-#include <apt-pkg/pkgcache.h>
-#include <apt-pkg/pkgrecords.h>
-
 #include "package.h"
 
 /**
@@ -52,8 +49,7 @@ public:
    /**
     * Default constructor
     */
-    Group(QObject* parent, const QString &name, pkgCache *cache,
-          pkgDepCache *depCache, pkgRecords *records);
+    Group(QObject* parent, const QString &name);
 
    /**
     * Default destructor
@@ -65,35 +61,12 @@ public:
     */
     typedef QList<Group*> List;
 
-   /**
-    * Pointer to the Apt package cache passed to us by the constructor
-    */
-    pkgCache *m_cache;
-
-   /**
-    * Pointer to the Apt dependency cache passed to us by the constructor
-    */
-    pkgDepCache *m_depCache;
-
-   /**
-    * Pointer to the Apt package records passed to us by the constructor
-    */
-    pkgRecords *m_records;
-
-
     /**
      * Member function that returns the name of the group
      *
      * \return The name of the group as a @c QString
      */
     QString name() const;
-
-    /**
-     * A list of all packages in the group
-     *
-     * \return A @c Package::List of all packages in the group
-     */
-    Package::List packages();
 
 private:
     /**

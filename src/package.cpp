@@ -374,10 +374,10 @@ QStringList Package::requiredByList()
 
 bool Package::wouldBreak()
 {
-    if ((d->state & Remove) || (!(d->state & Installed) && (d->state & Keep))) {
+    if ((d->state & ToRemove) || (!(d->state & Installed) && (d->state & ToKeep))) {
         return false;
     }
-    return d->state & InstBroken;
+    return d->state & InstallBroken;
 }
 
 void Package::setInstall()
