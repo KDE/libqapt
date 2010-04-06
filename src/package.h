@@ -233,6 +233,16 @@ public:
     bool isValid();
 
     /**
+     * Member function that returns a list of the names of all the dependencies
+     * of this package.
+     * I would like to see if I could figure out how to construct a Package
+     * from inside a Package and have this function return a Package::List
+     *
+     * \return A list of packages that this package depends on as a @c QStringList
+     */
+    QStringList dependencyList(bool useCandidateVersion);
+
+    /**
      * Member function that returns a list of the names of all the packages
      * that depend on this package. (Reverse dependencies)
      * I would like to see if I could figure out how to construct a Package
@@ -241,6 +251,8 @@ public:
      * \return A list of packages that depend on this package as a @c QStringList
      */
     QStringList requiredByList();
+
+    void setInstall();
 
 
     // TODO: Implement, take a PackageState flag

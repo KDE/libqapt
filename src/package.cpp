@@ -25,6 +25,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
 
+#include <apt-pkg/algorithms.h>
+
 namespace QApt {
 
 class PackagePrivate
@@ -338,6 +340,27 @@ bool Package::isValid()
     }
 }
 
+QStringList Package::dependencyList(bool useCanidateVersion)
+{
+    // TODO: Stub, won't return anything.
+    QStringList dependsList;
+    pkgCache::VerIterator current;
+
+    if(!useCanidateVersion) {
+        current = (*m_depCache)[*m_packageIter].InstVerIter(*m_depCache);
+    }
+    if(useCanidateVersion || current.end()) {
+        current = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    }
+
+    // no information found
+    if(current.end()) {
+        return dependsList;
+    }
+
+    return dependsList;
+}
+
 QStringList Package::requiredByList()
 {
     QStringList reverseDependsList;
@@ -348,5 +371,29 @@ QStringList Package::requiredByList()
 
     return reverseDependsList;
 }
+
+bool Package::wouldBreak()
+{
+    if ((d->state & Remove) || (!(d->state & Installed) && (d->state & Keep))) {
+        return false;
+    }
+    return d->state & InstBroken;
+}
+
+void Package::setInstall()
+{
+   m_depCache->MarkInstall(*m_packageIter, true);
+   pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+
+   // FIXME: can't we get rid of it here?
+   // if there is something wrong, try to fix it
+   if (!State.Install() || m_depCache->BrokenCount() > 0) {
+      pkgProblemResolver Fix(m_depCache);
+      Fix.Clear(*m_packageIter);
+      Fix.Protect(*m_packageIter);
+      Fix.Resolve(true);
+   }
+}
+
 
 }
