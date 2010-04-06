@@ -20,13 +20,19 @@
 
 #include "cacheupdatewidget.h"
 
+#include <QtGui/QLabel>
 #include <QtGui/QListView>
 #include <QtGui/QProgressBar>
 #include <QStandardItemModel>
 
+#include <KLocalizedString>
+
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     : KVBox(parent)
 {
+    QLabel *label = new QLabel(this);
+    label->setText(i18n("<b>Updating software sources</b>"));
+
     m_downloadView = new QListView(this);
 
     m_downloadModel = new QStandardItemModel();
