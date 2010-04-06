@@ -25,7 +25,7 @@ automoc4_add_executable(qaptworker
 target_link_libraries(qaptworker
     ${QT_QTCORE_LIBRARY}
     polkit-qt-core-1
-    qapt
+    libqapt
 )
 
 install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

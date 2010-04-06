@@ -1,12 +1,12 @@
-project(qapt)
+project(libqapt)
 
 cmake_minimum_required(VERSION 2.6.0)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-set(qapt_VERSION 0.1.0)
+set(libqapt_VERSION 0.1.0)
 
-set(qapt_lib_SOVERSION 0)
-set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.1.0)
+set(libqapt_lib_SOVERSION 0)
+set(libqapt_lib_VERSION ${libqapt_lib_SOVERSION}.1.0)
 
 configure_file(
        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/cmake_uninstall.cmake.in"
@@ -14,9 +14,12 @@ configure_file(
        IMMEDIATE @ONLY)
 add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qapt.pc.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/qapt.pc
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libqapt.pc.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
                @ONLY )
+
+configure_file(qaptversion.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/libqapt)
 
 # This macro is defined in FindPolkitQt.cmake
 macro(dbus_add_activation_system_service _sources)
@@ -46,8 +49,11 @@ include_directories(
 
 add_subdirectory(src)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qapt.pc
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig
+        COMPONENT Devel )
+install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/FindQApt.cmake
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libqapt/cmake/modules/
         COMPONENT Devel )
 
 # Add translations
