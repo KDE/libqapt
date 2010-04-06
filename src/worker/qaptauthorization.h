@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #ifndef QAPTAUTHORIZATION_H
-#define QAPTAUTHORIZATION_P_H
+#define QAPTAUTHORIZATION_H
 
 #include <PolkitQt1/Authority>
 #include <PolkitQt1/Subject>
@@ -34,11 +34,8 @@ inline bool authorize(const QString &action, const QString &service)
     switch (PolkitQt1::Authority::instance()->checkAuthorizationSync(action, subject,
                                               PolkitQt1::Authority::AllowUserInteraction)) {
     case PolkitQt1::Authority::Yes:
-        qDebug() << service << " authorized for " << action;
         return true;
     default:
-        qDebug() << subject->toString() << "Not authorized for " << action;
-        qDebug() << "Last error: " <<  PolkitQt1::Authority::instance()->lastError();
         return false;
     }
 
