@@ -1,4 +1,7 @@
+-Add ability to install/remove/upgrade/etc packages in the worker
 -Thread Backend interactions with the apt cache. While not too slow, it's slow enough to warrant the use of threading to prevent GUI blockage.
+-Add the ability to cancel worker operations
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/
 ;-)
+

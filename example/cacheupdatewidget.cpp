@@ -18,56 +18,44 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTTEST_H
-#define QAPTTEST_H
+#include "cacheupdatewidget.h"
 
+#include <QtGui/QListView>
+#include <QtGui/QProgressBar>
+#include <QStandardItemModel>
 
-#include <KMainWindow>
-
-#include <../src/backend.h>
-
-class QLabel;
-class QStackedWidget;
-
-class KToggleAction;
-class KLineEdit;
-
-class CacheUpdateWidget;
-
-class qapttest : public KMainWindow
+CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
+    : KVBox(parent)
 {
-    Q_OBJECT
-public:
-    qapttest();
+    m_downloadView = new QListView(this);
 
-    virtual ~qapttest();
+    m_downloadModel = new QStandardItemModel();
+    m_downloadView->setModel(m_downloadModel);
 
-private Q_SLOTS:
-    void updateLabels();
-    void updateCache();
-    void cacheUpdateStarted();
-    void cacheUpdateFinished();
-    void updateDownloadProgress(int percentage);
-    void updateDownloadMessage(int flag, const QString &name);
+    m_totalProgress = new QProgressBar(this);
+}
 
-private:
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
-    QApt::Group *m_group;
+CacheUpdateWidget::~CacheUpdateWidget()
+{
+}
 
-    QStackedWidget *m_stack;
-    QWidget *m_mainWidget;
-    CacheUpdateWidget *m_cacheUpdateWidget;
-    KLineEdit *m_lineEdit;
-    QLabel *m_nameLabel;
-    QLabel *m_sectionLabel;
-    QLabel *m_installedSizeLabel;
-    QLabel *m_maintainerLabel;
-    QLabel *m_sourceLabel;
-    QLabel *m_versionLabel;
-    QLabel *m_packageSizeLabel;
-    QLabel *m_shortDescriptionLabel;
-    QLabel *m_longDescriptionLabel;
-};
+void CacheUpdateWidget::clear()
+{
+    m_downloadModel->clear();
+    m_totalProgress->setValue(0);
+}
 
-#endif
+void CacheUpdateWidget::addItem(const QString &message)
+{
+    QStandardItem *n = new QStandardItem();
+    n->setText(message);
+    m_downloadModel->appendRow(n);
+    m_downloadView->scrollTo(m_downloadModel->indexFromItem(n));
+}
+
+void CacheUpdateWidget::setTotalProgress(int percentage)
+{
+    m_totalProgress->setValue(percentage);
+}
+
+#include "cacheupdatewidget.moc"

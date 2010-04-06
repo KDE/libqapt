@@ -24,6 +24,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QStackedWidget>
 
 #include <KDebug>
 #include <KIcon>
@@ -32,11 +33,12 @@
 #include <KLineEdit>
 #include <KStatusBar>
 #include <KVBox>
-#include <KProgressDialog>
 
+#include "cacheupdatewidget.h"
 
 qapttest::qapttest()
     : KMainWindow()
+    , m_stack(0)
 {
     setWindowIcon(KIcon("application-x-deb"));
 
@@ -49,8 +51,16 @@ qapttest::qapttest()
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
 
-    m_mainWidget = new QWidget(this);
+    m_stack = new QStackedWidget(this);
+
+    m_mainWidget = new QWidget(m_stack);
     QVBoxLayout *layout = new QVBoxLayout(m_mainWidget);
+    m_stack->addWidget(m_mainWidget);
+
+    m_cacheUpdateWidget = new CacheUpdateWidget(m_stack);
+    m_stack->addWidget(m_cacheUpdateWidget);
+
+    m_stack->setCurrentWidget(m_mainWidget);
 
     KHBox *hbox = new KHBox(m_mainWidget);
     layout->addWidget(hbox);
@@ -73,7 +83,6 @@ qapttest::qapttest()
     layout->addWidget(vbox);
 
     m_nameLabel = new QLabel(vbox);
-    m_stateLabel = new QLabel(vbox);
     m_sectionLabel = new QLabel(vbox);
     m_installedSizeLabel = new QLabel(vbox);
     m_maintainerLabel = new QLabel(vbox);
@@ -84,7 +93,7 @@ qapttest::qapttest()
     m_longDescriptionLabel = new QLabel(vbox);
 
     updateLabels();
-    setCentralWidget(m_mainWidget);
+    setCentralWidget(m_stack);
 
     // Package count and installed package count in the sidebar
     QLabel* packageCountLabel = new QLabel(this);
@@ -118,7 +127,6 @@ void qapttest::updateLabels()
     m_package = m_backend->package(m_lineEdit->text());
 
     m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
-    m_stateLabel->setText(i18n("<b>State:</b> %1", m_package->state()));
     m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
     QString installedSize(KGlobal::locale()->formatByteSize(m_package->installedSize()));
     m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
@@ -163,45 +171,38 @@ void qapttest::updateCache()
 
 void qapttest::cacheUpdateStarted()
 {
-    m_mainWidget->setEnabled(false);
-    m_cacheUpdateDialog = new KProgressDialog(this, i18n("Updating package cache"));
+    m_cacheUpdateWidget->clear();
+    m_stack->setCurrentWidget(m_cacheUpdateWidget);
 }
 
 void qapttest::updateDownloadProgress(int percentage)
 {
-    if (m_cacheUpdateDialog) {
-        m_cacheUpdateDialog->progressBar()->setValue(percentage);
-    }
+    m_cacheUpdateWidget->setTotalProgress(percentage);
 }
 
 void qapttest::updateDownloadMessage(int flag, const QString &message)
 {
-    if (m_cacheUpdateDialog) {
-        QString fullMessage;
+    QString fullMessage;
 
-        switch(flag) {
-          case QApt::Globals::DownloadFetch:
-              fullMessage = i18n("Downloading: %1", message);
-              break;
-          case QApt::Globals::HitFetch:
-              fullMessage = i18n("Checking: %1", message);
-              break;
-          case QApt::Globals::IgnoredFetch:
-              fullMessage = i18n("Ignored: %1", message);
-              break;
-          default:
-              fullMessage = message;
-        }
-        m_cacheUpdateDialog->setLabelText(fullMessage);
+    switch(flag) {
+      case QApt::Globals::DownloadFetch:
+          fullMessage = i18n("Downloading: %1", message);
+          break;
+      case QApt::Globals::HitFetch:
+          fullMessage = i18n("Checking: %1", message);
+          break;
+      case QApt::Globals::IgnoredFetch:
+          fullMessage = i18n("Ignored: %1", message);
+          break;
+      default:
+          fullMessage = message;
     }
+    m_cacheUpdateWidget->addItem(fullMessage);
 }
 
 void qapttest::cacheUpdateFinished()
 {
-    if (m_cacheUpdateDialog) {
-        m_cacheUpdateDialog->close();
-        m_mainWidget->setEnabled(true);
-    }
+    m_stack->setCurrentWidget(m_mainWidget);
     m_backend->reloadCache();
 }
 

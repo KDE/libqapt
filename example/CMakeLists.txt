@@ -6,8 +6,9 @@ include(FindPkgConfig REQUIRED)
 include(KDE4Defaults)
 
 set(qapttest_SRCS
-   qapttest.cpp
-   main.cpp
+    main.cpp
+    qapttest.cpp
+    cacheupdatewidget.cpp
  )
 
 include( FindPkgConfig )
@@ -16,7 +17,7 @@ include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} )
 
 kde4_add_executable(qaptest ${qapttest_SRCS})
 
-target_link_libraries(qaptest ${KDE4_KDEUI_LIBS} qapt)
+target_link_libraries(qaptest ${KDE4_KDEUI_LIBS} libqapt)
 
 install(TARGETS qaptest ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

@@ -18,56 +18,35 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTTEST_H
-#define QAPTTEST_H
+#ifndef CACHEUPDATEWIDGET_H
+#define CACHEUPDATEWIDGET_H
 
+#include <QItemDelegate>
+#include <QTextDocument>
+#include <QWidget>
 
-#include <KMainWindow>
+#include <KVBox>
 
-#include <../src/backend.h>
+class QListView;
+class QProgressBar;
+class QStandardItemModel;
 
-class QLabel;
-class QStackedWidget;
-
-class KToggleAction;
-class KLineEdit;
-
-class CacheUpdateWidget;
-
-class qapttest : public KMainWindow
+class CacheUpdateWidget : public KVBox
 {
     Q_OBJECT
 public:
-    qapttest();
+    CacheUpdateWidget(QWidget *parent);
 
-    virtual ~qapttest();
+    ~CacheUpdateWidget();
 
-private Q_SLOTS:
-    void updateLabels();
-    void updateCache();
-    void cacheUpdateStarted();
-    void cacheUpdateFinished();
-    void updateDownloadProgress(int percentage);
-    void updateDownloadMessage(int flag, const QString &name);
+    void clear();
+    void addItem(const QString &message);
+    void setTotalProgress(int percentage);
 
 private:
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
-    QApt::Group *m_group;
-
-    QStackedWidget *m_stack;
-    QWidget *m_mainWidget;
-    CacheUpdateWidget *m_cacheUpdateWidget;
-    KLineEdit *m_lineEdit;
-    QLabel *m_nameLabel;
-    QLabel *m_sectionLabel;
-    QLabel *m_installedSizeLabel;
-    QLabel *m_maintainerLabel;
-    QLabel *m_sourceLabel;
-    QLabel *m_versionLabel;
-    QLabel *m_packageSizeLabel;
-    QLabel *m_shortDescriptionLabel;
-    QLabel *m_longDescriptionLabel;
+    QListView *m_downloadView;
+    QStandardItemModel *m_downloadModel;
+    QProgressBar *m_totalProgress;
 };
 
 #endif
