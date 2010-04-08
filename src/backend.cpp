@@ -40,8 +40,20 @@
 
 namespace QApt {
 
+class BackendPrivate
+{
+public:
+    // The canonical list of all unique, non-virutal package objects
+    Package::List packages;
+    // List of unique indentifiers for the packages
+    QList<int> packagesIndex;
+    // Set of group names extracted from our packages
+    QSet<Group*> groupSet;
+};
+
 Backend::Backend()
-        : m_progressMeter()
+        : d(new BackendPrivate)
+        , m_progressMeter()
         , m_cache(0)
         , m_policy(0)
         , m_depCache(0)
@@ -124,6 +136,30 @@ bool Backend::init()
         return false;
     }
 
+    int count = 0;
+    QSet<QString> groups;
+
+    pkgCache::PkgIterator iter;
+    for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
+        if (iter->VersionList == 0) {
+            continue; // Exclude virtual packages.
+        }
+
+        Package *pkg = new Package(this, m_depCache, m_records, iter);
+        d->packagesIndex.insert(iter->ID, count);
+        d->packages.insert(count++, pkg);
+
+        if (iter.Section()) {
+            QString name = QString::fromStdString(iter.Section());
+            groups << name;
+        }
+    }
+
+    foreach (QString groupName, groups) {
+        Group *group = new Group(this, groupName);
+        d->groupSet << group;
+    }
+
     return true;
 }
 
@@ -154,16 +190,7 @@ Package *Backend::package(const QString &name)
 
 int Backend::packageCount()
 {
-    int packageCount = 0;
-
-    pkgCache::PkgIterator it = m_cache->PkgBegin();
-    for(;it!=m_cache->PkgEnd();++it) {
-        pkgDepCache::StateCache & state = (*m_depCache)[it];
-        // Don't count no-longer-existent packages
-        if (!state.CandidateVer == 0) {
-            packageCount++;
-        }
-    }
+    int packageCount = d->packages.size();
 
     return packageCount;
 }
@@ -172,9 +199,7 @@ int Backend::packageCount(const Package::PackageStates &states)
 {
     int packageCount = 0;
 
-    pkgCache::PkgIterator it = m_cache->PkgBegin();
-    for(;it!=m_cache->PkgEnd();++it) {
-        Package *package = new Package(this, m_depCache, m_records, it);
+    foreach(Package *package, d->packages) {
         if ((package->state() & states)) {
             packageCount++;
         }
@@ -185,25 +210,14 @@ int Backend::packageCount(const Package::PackageStates &states)
 
 Package::List Backend::availablePackages()
 {
-    Package::List availablePackages;
-
-    pkgCache::PkgIterator it = m_cache->PkgBegin();
-    for(;it!=m_cache->PkgEnd();++it) {
-        Package *package = new Package(this, m_depCache, m_records, it);
-
-        if (package->isValid()) {
-            availablePackages << package;
-        }
-    }
-
-    return availablePackages;
+    return d->packages;
 }
 
 Package::List Backend::upgradeablePackages()
 {
     Package::List upgradeablePackages;
 
-    foreach (Package *package, availablePackages()) {
+    foreach (Package *package, d->packages) {
         if (package->state() & Package::Upgradeable) {
             upgradeablePackages << package;
         }
@@ -214,30 +228,17 @@ Package::List Backend::upgradeablePackages()
 
 Group *Backend::group(const QString &name)
 {
-    Group *group = new Group(this, name);
-    return group;
+    foreach (Group *group, d->groupSet) {
+        if (group->name() == name) {
+            return group;
+        }
+    }
 }
 
 Group::List Backend::availableGroups()
 {
-    QStringList groupStringList;
-    pkgCache::PkgIterator it = m_cache->PkgBegin();
-    for(;it!=m_cache->PkgEnd();++it)
-    {
-        QString section = it.Section();
-        if (!section.isEmpty()) {
-            groupStringList << section;
-        }
-    }
-
-    QSet<QString> groupSet = groupStringList.toSet();
-
-    Group::List groupList;
-
-    foreach(const QString &name, groupSet) {
-        Group *group = new Group(this, name);
-        groupList << group;
-    }
+    Group::List groupList = d->groupSet.toList();
+    qDebug() << groupList.size();
 
     return groupList;
 }

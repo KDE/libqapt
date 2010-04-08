@@ -17,7 +17,7 @@ include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} )
 
 kde4_add_executable(qaptest ${qapttest_SRCS})
 
-target_link_libraries(qaptest ${KDE4_KDEUI_LIBS} libqapt)
+target_link_libraries(qaptest ${KDE4_KDEUI_LIBS} qapt)
 
 install(TARGETS qaptest ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

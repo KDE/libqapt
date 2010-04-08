@@ -111,7 +111,7 @@ qapttest::qapttest()
     statusBar()->show();
 
     // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
-//     m_group = m_backend->group("kde");
+    m_group = m_backend->group("kde");
 //     QApt::Package::List packageList = m_group->packages();
 //     foreach (QApt::Package *package, packageList) {
 //             kDebug() << package->name();

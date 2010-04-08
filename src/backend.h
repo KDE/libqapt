@@ -21,7 +21,7 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include <QtCore/QObject>
+#include <QtCore/QSet>
 
 #include <apt-pkg/progress.h>
 #include <apt-pkg/sourcelist.h>
@@ -37,6 +37,8 @@
  * library fall under this namespace.
  */
 namespace QApt {
+
+class BackendPrivate;
 
 /**
  * @brief The main entry point for performing operations with the dpkg database
@@ -158,7 +160,8 @@ public:
      */
     Group::List availableGroups();
 
-    void updateCache();
+private:
+    BackendPrivate *d;
 
 Q_SIGNALS:
     void cacheUpdateStarted();
@@ -167,6 +170,7 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
 
 public Q_SLOTS:
+    void updateCache();
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
 

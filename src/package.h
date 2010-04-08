@@ -102,6 +102,13 @@ public:
     QString name() const;
 
     /**
+     * Member function that returns the unique identifier for the package
+     *
+     * \return The identifier of the package as an @c int
+     */
+    int id() const;
+
+    /**
      * Member function that returns the version of the package, regardless of
      * whether it is installed or not
      *

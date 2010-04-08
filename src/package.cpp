@@ -64,6 +64,13 @@ QString Package::name() const
     }
 }
 
+int Package::id() const
+{
+    int id = (*m_packageIter)->ID;
+
+    return id;
+}
+
 QString Package::section() const
 {
     QString section = QString(m_packageIter->Section());
