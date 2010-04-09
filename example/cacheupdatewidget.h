@@ -30,6 +30,7 @@
 class QListView;
 class QProgressBar;
 class QStandardItemModel;
+class QPushButton;
 
 class CacheUpdateWidget : public KVBox
 {
@@ -47,6 +48,13 @@ private:
     QListView *m_downloadView;
     QStandardItemModel *m_downloadModel;
     QProgressBar *m_totalProgress;
+    QPushButton *m_cancelButton;
+
+private Q_SLOTS:
+    void cancelButtonPressed();
+
+signals:
+    void cancelCacheUpdate();
 };
 
 #endif

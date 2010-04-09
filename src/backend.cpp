@@ -280,11 +280,18 @@ void Backend::cancelCacheUpdate()
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
-    qDebug() << "It looks like our worker got lost";
+    if (oldOwner.isEmpty()) {
+        // Don't care, just appearing
+        return;
+    }
 
-    // Ok, something got screwed. Report and flee
-    // emit errorOccurred((int) Aqpm::Globals::WorkerDisappeared, QVariantMap());
-    // workerResult(false);
+    if (newOwner.isEmpty()) {
+        qDebug() << "It looks like our worker got lost";
+
+        // Ok, something got screwed. Report and flee
+        // emit errorOccurred((int) Aqpm::Globals::WorkerDisappeared, QVariantMap());
+        // workerResult(false);
+    }
 }
 
 }

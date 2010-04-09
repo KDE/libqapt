@@ -67,7 +67,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
             this, SLOT(emitDownloadProgress(int)));
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(emitDownloadMessage(int, const QString&)));
-//     connect(this, SIGNAL
 }
 
 bool QAptWorker::initializeApt()
@@ -192,5 +191,8 @@ void QAptWorker::emitDownloadMessage(int flag, const QString& message)
 
 void QAptWorker::cancelCacheUpdate()
 {
+    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+        return;
+    }
     m_acquireStatus->requestCancel();
 }

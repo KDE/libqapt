@@ -111,7 +111,7 @@ qapttest::qapttest()
     statusBar()->show();
 
     // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
-    m_group = m_backend->group("kde");
+//     m_group = m_backend->group("kde");
 //     QApt::Package::List packageList = m_group->packages();
 //     foreach (QApt::Package *package, packageList) {
 //             kDebug() << package->name();
@@ -126,6 +126,9 @@ void qapttest::updateLabels()
 {
     m_package = m_backend->package(m_lineEdit->text());
 
+    // Gotta be careful when getting a package directly from the user's input. We can't currently
+    // return empty Package containers when the package doesn't exist. And this is why most
+    // package managers are MVC based. ;-)
     if (!m_package == 0) {
         m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
         m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
@@ -175,6 +178,7 @@ void qapttest::cacheUpdateStarted()
 {
     m_cacheUpdateWidget->clear();
     m_stack->setCurrentWidget(m_cacheUpdateWidget);
+    connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelCacheUpdate()));
 }
 
 void qapttest::updateDownloadProgress(int percentage)

@@ -23,8 +23,10 @@
 #include <QtGui/QLabel>
 #include <QtGui/QListView>
 #include <QtGui/QProgressBar>
+#include <QtGui/QPushButton>
 #include <QStandardItemModel>
 
+#include <KIcon>
 #include <KLocalizedString>
 
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
@@ -39,6 +41,10 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     m_downloadView->setModel(m_downloadModel);
 
     m_totalProgress = new QProgressBar(this);
+    m_cancelButton = new QPushButton(this);
+    m_cancelButton->setText(i18n("Cancel"));
+    m_cancelButton->setIcon(KIcon("cancel"));
+    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelButtonPressed()));
 }
 
 CacheUpdateWidget::~CacheUpdateWidget()
@@ -62,6 +68,11 @@ void CacheUpdateWidget::addItem(const QString &message)
 void CacheUpdateWidget::setTotalProgress(int percentage)
 {
     m_totalProgress->setValue(percentage);
+}
+
+void CacheUpdateWidget::cancelButtonPressed()
+{
+    emit(cancelCacheUpdate());
 }
 
 #include "cacheupdatewidget.moc"
