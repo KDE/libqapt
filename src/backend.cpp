@@ -184,6 +184,7 @@ Package *Backend::package(const QString &name)
     // Otherwise, make sure you don't give this function invalid data. Sucks,
     // I know...
     qDebug() << "Porked!";
+    return 0;
 }
 
 int Backend::packageCount()

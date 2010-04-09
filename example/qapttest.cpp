@@ -126,17 +126,19 @@ void qapttest::updateLabels()
 {
     m_package = m_backend->package(m_lineEdit->text());
 
-    m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
-    m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
-    QString installedSize(KGlobal::locale()->formatByteSize(m_package->installedSize()));
-    m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
-    m_maintainerLabel->setText(i18n("<b>Maintainer:</b> %1", m_package->maintainer()));
-    m_sourceLabel->setText(i18n("<b>Source package:</b> %1", m_package->sourcePackage()));
-    m_sourceLabel->setText(i18n("<b>Version:</b> %1", m_package->version()));
-    QString packageSize(KGlobal::locale()->formatByteSize(m_package->downloadSize()));
-    m_packageSizeLabel->setText(i18n("<b>Download size:</b> %1", packageSize));
-    m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
-    m_longDescriptionLabel->setText(m_package->longDescription());
+    if (!m_package == 0) {
+        m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
+        m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
+        QString installedSize(KGlobal::locale()->formatByteSize(m_package->installedSize()));
+        m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
+        m_maintainerLabel->setText(i18n("<b>Maintainer:</b> %1", m_package->maintainer()));
+        m_sourceLabel->setText(i18n("<b>Source package:</b> %1", m_package->sourcePackage()));
+        m_sourceLabel->setText(i18n("<b>Version:</b> %1", m_package->version()));
+        QString packageSize(KGlobal::locale()->formatByteSize(m_package->downloadSize()));
+        m_packageSizeLabel->setText(i18n("<b>Download size:</b> %1", packageSize));
+        m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
+        m_longDescriptionLabel->setText(m_package->longDescription());
+    }
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them
 
