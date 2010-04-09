@@ -174,10 +174,8 @@ bool Backend::reloadCache()
 
 Package *Backend::package(const QString &name)
 {
-    pkgCache::PkgIterator it = m_cache->PkgBegin();
-    for(;it!=m_cache->PkgEnd();++it) {
-        if (it.Name() == name) {
-            Package *package = new Package(this, m_depCache, m_records, it);
+    foreach (Package *package, d->packages) {
+        if (package->name() == name) {
             return package;
         }
     }
@@ -238,7 +236,6 @@ Group *Backend::group(const QString &name)
 Group::List Backend::availableGroups()
 {
     Group::List groupList = d->groupSet.toList();
-    qDebug() << groupList.size();
 
     return groupList;
 }
