@@ -28,7 +28,6 @@
 
 WorkerAcquire::WorkerAcquire()
         : m_mediaBlock(0)
-        , ID(0)
 {
 }
 
@@ -38,6 +37,7 @@ WorkerAcquire::~WorkerAcquire()
 
 void WorkerAcquire::Start()
 {
+    m_canceled = false;
     pkgAcquireStatus::Start();
 }
 
@@ -118,5 +118,10 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 
     Update = false;
 
-    return true;
+    return !m_canceled;
+}
+
+void WorkerAcquire::requestCancel()
+{
+    m_canceled = true;
 }

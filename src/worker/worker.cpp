@@ -61,6 +61,13 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
     QTimer::singleShot(60000, this, SLOT(quit()));
     initializeApt();
+
+    m_acquireStatus = new WorkerAcquire;
+    connect(m_acquireStatus, SIGNAL(downloadProgress(int)),
+            this, SLOT(emitDownloadProgress(int)));
+    connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
+            this, SLOT(emitDownloadMessage(int, const QString&)));
+//     connect(this, SIGNAL
 }
 
 bool QAptWorker::initializeApt()
@@ -152,11 +159,6 @@ void QAptWorker::unlock()
 
 void QAptWorker::updateCache()
 {
-    WorkerAcquire acquireStatus;
-    connect(&acquireStatus, SIGNAL(downloadProgress(int)),
-            this, SLOT(emitDownloadProgress(int)));
-    connect(&acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
-            this, SLOT(emitDownloadMessage(int, const QString&)));
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
         return;
     }
@@ -173,7 +175,7 @@ void QAptWorker::updateCache()
 
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
-        bool result = ListUpdate(acquireStatus, *m_list);
+        bool result = ListUpdate(*m_acquireStatus, *m_list);
         emit workerFinished("update", result);
     }
 }
@@ -185,6 +187,10 @@ void QAptWorker::emitDownloadProgress(int percentage)
 
 void QAptWorker::emitDownloadMessage(int flag, const QString& message)
 {
-    QFile::rename("/home/jonathan/lol", "/home/jonathan/" + message);
     emit downloadMessage(flag, message);
+}
+
+void QAptWorker::cancelCacheUpdate()
+{
+    m_acquireStatus->requestCancel();
 }

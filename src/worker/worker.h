@@ -31,6 +31,8 @@
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/policy.h>
 
+class WorkerAcquire;
+
 class QAptWorker : public QCoreApplication, protected QDBusContext
 {
     Q_OBJECT
@@ -50,9 +52,11 @@ public:
     pkgSourceList *m_list;
     pkgRecords *m_records;
     bool m_locked;
+    WorkerAcquire *m_acquireStatus;
 
 public Q_SLOTS:
     void updateCache();
+    void cancelCacheUpdate();
 
 private Q_SLOTS:
     bool lock();

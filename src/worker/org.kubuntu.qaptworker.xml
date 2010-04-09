@@ -20,5 +20,7 @@
     </signal>
     <method name="updateCache">
     </method>
+    <method name="cancelCacheUpdate">
+    </method>
   </interface>
 </node>

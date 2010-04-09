@@ -173,6 +173,7 @@ public Q_SLOTS:
     void updateCache();
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
+    void cancelCacheUpdate();
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

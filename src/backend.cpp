@@ -269,6 +269,17 @@ void Backend::workerFinished(const QString &name, bool result)
     }
 }
 
+void Backend::cancelCacheUpdate()
+{
+    QDBusMessage message;
+    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
+              "/",
+              "org.kubuntu.qaptworker",
+              QLatin1String("cancelCacheUpdate"));
+    QDBusConnection::systemBus().asyncCall(message);
+    qDebug() << "Canceling..";
+}
+
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
     qDebug() << "It looks like our worker got lost";

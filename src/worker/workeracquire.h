@@ -46,7 +46,12 @@ public:
 
     bool Pulse(pkgAcquire *Owner);
 
-    unsigned long ID;
+public Q_SLOTS:
+    void requestCancel();
+
+private:
+    QEventLoop *m_mediaBlock;
+    bool m_canceled;
 
 signals:
     void mediaChangeRequest(const QString &media, const QString &drive);
@@ -54,9 +59,6 @@ signals:
     void downloadSubProgress(int percentage);
     // TODO: Set fetch type in downloadMessage, (Get, Hit, Ign, etc like in apt-get)
     void downloadMessage(int flag, const QString &message);
-
-private:
-    QEventLoop *m_mediaBlock;
 };
 
 #endif
