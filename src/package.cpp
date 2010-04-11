@@ -217,6 +217,27 @@ QString Package::longDescription() const
     }
 }
 
+QString Package::component() const
+{
+    QString res;
+    pkgCache::VerIterator Ver;
+    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    if (d->state & NotInstallable) {
+        return QString();
+    }
+    Ver = State.CandidateVerIter(*m_depCache);
+    pkgCache::VerFileIterator VF = Ver.FileList();
+    pkgCache::PkgFileIterator File = VF.File();
+
+    if(File.Component() == NULL) {
+        return QString();
+    }
+
+    res = QString::fromStdString(File.Component());
+
+    return res;
+}
+
 qint32 Package::installedSize() const
 {
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();

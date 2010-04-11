@@ -194,6 +194,13 @@ public:
     QString longDescription() const;
 
     /**
+     * Member function that returns the archive component of the package.
+     *
+     * \return The long description of the package as a @c QString
+     */
+    QString component() const;
+
+    /**
      * Member function that returns the amount of hard drive space that this
      * package will take up once installed.
      * This is human-unreadable, so KDE applications may wish to run this
