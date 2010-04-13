@@ -400,6 +400,24 @@ QStringList Package::requiredByList()
     return reverseDependsList;
 }
 
+QStringList Package::providesList()
+{
+    QStringList provides;
+
+    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    if (d->state & NotInstallable) {
+        return provides;
+    }
+
+    for (pkgCache::PrvIterator Prv =
+         State.CandidateVerIter(*m_depCache).ProvidesList(); Prv.end() != true;
+         Prv++) {
+        provides.push_back(Prv.Name());
+    }
+
+   return provides;
+}
+
 bool Package::wouldBreak()
 {
     if ((d->state & ToRemove) || (!(d->state & Installed) && (d->state & ToKeep))) {

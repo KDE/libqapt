@@ -266,6 +266,16 @@ public:
      */
     QStringList requiredByList();
 
+    /**
+     * Member function that returns a list of the names of all the virtual
+     * packages that this package provides.
+     * I would like to see if I could figure out how to construct a Package
+     * from inside a Package and have this function return a Package::List
+     *
+     * \return A list of packages that this package provides as a @c QStringList
+     */
+    QStringList providesList();
+
     bool wouldBreak();
     void setInstall();
 
