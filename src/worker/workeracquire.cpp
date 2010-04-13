@@ -21,6 +21,7 @@
 #include "workeracquire.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QCoreApplication>
 
 #include <apt-pkg/error.h>
 #include <apt-pkg/acquire-item.h>
@@ -112,6 +113,7 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
 
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
+    QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
     int percentage = int(int((CurrentBytes + CurrentItems)*100.0)/int(TotalBytes+TotalItems));
     emit downloadProgress(percentage);
