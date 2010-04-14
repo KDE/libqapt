@@ -113,6 +113,7 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
 
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
+    // FIXME: processEvents() is dangerous. Proper threading is needed
     QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
     int percentage = int(int((CurrentBytes + CurrentItems)*100.0)/int(TotalBytes+TotalItems));
