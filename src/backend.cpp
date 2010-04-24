@@ -136,6 +136,7 @@ bool Backend::init()
         return false;
     }
 
+    // Populate internal package cache
     int count = 0;
     QSet<QString> groups;
 
@@ -146,7 +147,11 @@ bool Backend::init()
         }
 
         Package *pkg = new Package(this, m_depCache, m_records, iter);
+        // Here every unique package ID is given a value. By looking it up we
+        // can get this count value...
         d->packagesIndex.insert(iter->ID, count);
+        // ... and then retrieve a QApt::Package by looking at the value of the
+        // key in the official Package::List, d->packages()
         d->packages.insert(count++, pkg);
 
         if (iter.Section()) {
@@ -155,6 +160,7 @@ bool Backend::init()
         }
     }
 
+    // Populate groups
     foreach (QString groupName, groups) {
         Group *group = new Group(this, groupName);
         d->groupSet << group;
@@ -281,8 +287,7 @@ void Backend::cancelCacheUpdate()
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
     if (oldOwner.isEmpty()) {
-        // Don't care, just appearing
-        return;
+        return; // Don't care, just appearing
     }
 
     if (newOwner.isEmpty()) {
