@@ -97,6 +97,14 @@ public:
     bool reloadCache();
 
     /**
+     * Returns a pointer to the internal package source list. Mainly used for
+     * internal purposes
+     *
+     * @return @c pkgSourceList The package source list used by the backend
+     */
+    pkgSourceList *packageSourceList();
+
+    /**
      * Queries the backend for a Package object for the specified name.
      * @b _WARNING_ :
      * Note that at the moment this method is unsafe to use unless you are sure

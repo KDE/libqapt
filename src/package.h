@@ -38,6 +38,7 @@ namespace QApt {
  * GroupPrivate is a class containing all private members of the Group class
  */
 class PackagePrivate;
+class Backend;
 
 /**
  * The Package class is an object for referencing a software package in the Apt
@@ -59,7 +60,7 @@ public:
    /**
     * Default constructor
     */
-    Package(QObject* parent, pkgDepCache *depcache,
+    Package(QApt::Backend* parent, pkgDepCache *depcache,
             pkgRecords *records, pkgCache::PkgIterator &packageIter);
 
    /**
@@ -76,7 +77,7 @@ public:
    /**
     * Pointer to the parent object passed to us by the constructor
     */
-    QObject *m_parent;
+    QApt::Backend *m_backend;
 
    /**
     * Pointer to the Apt dependency cache passed to us by the constructor
@@ -276,7 +277,16 @@ public:
      */
     QStringList providesList();
 
+    /**
+     * Member function that returns wether or not the package is signed with a
+     * trusted GPG signature.
+     *
+     * @return @c true if trusted
+     * @return @c false if untrusted or the package has a version of 0
+     */
+    bool isTrusted();
     bool wouldBreak();
+
     void setInstall();
 
 

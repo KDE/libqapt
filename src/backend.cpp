@@ -178,6 +178,11 @@ bool Backend::reloadCache()
     }
 }
 
+pkgSourceList *Backend::packageSourceList()
+{
+    return m_list;
+}
+
 Package *Backend::package(const QString &name)
 {
     foreach (Package *package, d->packages) {

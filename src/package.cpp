@@ -27,6 +27,8 @@
 
 #include <apt-pkg/algorithms.h>
 
+#include "backend.h"
+
 namespace QApt {
 
 class PackagePrivate
@@ -35,14 +37,14 @@ class PackagePrivate
         int state;
 };
 
-Package::Package(QObject* parent, pkgDepCache *depCache,
+Package::Package(QApt::Backend* parent, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
         : QObject(parent)
         , d(new PackagePrivate())
+        , m_backend(parent)
         , m_depCache(depCache)
         , m_records(records)
 {
-    m_parent = parent;
     m_packageIter = new pkgCache::PkgIterator(packageIter);
     d->state = state();
 }
@@ -418,6 +420,30 @@ QStringList Package::providesList()
    return provides;
 }
 
+bool Package::isTrusted()
+{
+    pkgCache::VerIterator Ver;
+    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    Ver = State.CandidateVerIter(*m_depCache);
+    if (Ver == 0) {
+        return false;
+    }
+
+    pkgSourceList *Sources = m_backend->packageSourceList();
+    for (pkgCache::VerFileIterator i = Ver.FileList(); i.end() == false; i++)
+    {
+        pkgIndexFile *Index;
+        if (Sources->FindIndex(i.File(),Index) == false) {
+           continue;
+        }
+        if (Index->IsTrusted()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Package::wouldBreak()
 {
     if ((d->state & ToRemove) || (!(d->state & Installed) && (d->state & ToKeep))) {
@@ -428,17 +454,17 @@ bool Package::wouldBreak()
 
 void Package::setInstall()
 {
-   m_depCache->MarkInstall(*m_packageIter, true);
-   pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    m_depCache->MarkInstall(*m_packageIter, true);
+    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
 
-   // FIXME: can't we get rid of it here?
-   // if there is something wrong, try to fix it
-   if (!State.Install() || m_depCache->BrokenCount() > 0) {
-      pkgProblemResolver Fix(m_depCache);
-      Fix.Clear(*m_packageIter);
-      Fix.Protect(*m_packageIter);
-      Fix.Resolve(true);
-   }
+    // FIXME: can't we get rid of it here?
+    // if there is something wrong, try to fix it
+    if (!State.Install() || m_depCache->BrokenCount() > 0) {
+        pkgProblemResolver Fix(m_depCache);
+        Fix.Clear(*m_packageIter);
+        Fix.Protect(*m_packageIter);
+        Fix.Resolve(true);
+    }
 }
 
 
