@@ -219,6 +219,18 @@ QString Package::longDescription() const
     }
 }
 
+QString Package::origin() const
+{
+    pkgCache::VerIterator Ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+
+    if(!Ver.end()) {
+         pkgCache::VerFileIterator VF = Ver.FileList();
+         return VF.File().Origin();
+    }
+
+   return QString();
+}
+
 QString Package::component() const
 {
     QString res;
@@ -466,6 +478,5 @@ void Package::setInstall()
         Fix.Resolve(true);
     }
 }
-
 
 }

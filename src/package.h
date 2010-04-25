@@ -195,9 +195,17 @@ public:
     QString longDescription() const;
 
     /**
+     * Member function that returns the origin of the package.
+     * (Usually Ubuntu or Debian)
+     *
+     * \return The origin of the package as a @c QString
+     */
+    QString origin() const;
+
+    /**
      * Member function that returns the archive component of the package.
      *
-     * \return The long description of the package as a @c QString
+     * \return The archive component of the package as a @c QString
      */
     QString component() const;
 

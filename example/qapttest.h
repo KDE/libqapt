@@ -61,6 +61,7 @@ private:
     KLineEdit *m_lineEdit;
     QLabel *m_nameLabel;
     QLabel *m_sectionLabel;
+    QLabel *m_originLabel;
     QLabel *m_installedSizeLabel;
     QLabel *m_maintainerLabel;
     QLabel *m_sourceLabel;
