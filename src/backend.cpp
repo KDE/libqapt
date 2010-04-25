@@ -267,10 +267,56 @@ void Backend::markPackagesForDistUpgrade()
 
 void Backend::commitChanges()
 {
-    // TODO: Make lists for each possible package operation, and add all
-    // packages with a state change to the correct list.
-    // Then send this list over DBus to qaptworker, who will carry out all
-    // operations based on this list.
+    // TODO: Send these lists over DBus to qaptworker, who will carry out all
+    // operations based on them.
+    QList<int> held;
+    QList<int> kept;
+    QList<int> toInstall;
+    QList<int> toReInstall;
+    QList<int> toUpgrade;
+    QList<int> toRemove;
+    QList<int> toPurge;
+    QList<int> toDowngrade;
+
+    foreach (Package *package, d->packages) {
+        int flags = package->state();
+        // Cannot have any of these flags simultaneously
+        int status = flags & (Package::ToKeep |
+                              Package::NewInstall |
+                              Package::ToReInstall |
+                              Package::ToUpgrade |
+                              Package::ToDowngrade |
+                              Package::ToRemove);
+
+        switch (status) {
+           case Package::ToKeep:
+               if (flags & Package::Held) {
+                   held.append(package->id());
+               } else {
+                   kept.append(package->id());
+               }
+               break;
+           case Package::NewInstall:
+               toInstall.append(package->id());
+               break;
+           case Package::ToReInstall:
+               toReInstall.append(package->id());
+               break;
+           case Package::ToUpgrade:
+               toUpgrade.append(package->id());
+               break;
+           case Package::ToDowngrade:
+               toDowngrade.append(package->id());
+               break;
+           case Package::ToRemove:
+               if(flags & Package::ToPurge) {
+                   toPurge.append(package->id());
+               } else {
+                   toRemove.append(package->id());
+               }
+               break;
+        }
+    }
 }
 
 void Backend::packageChanged(Package *package)
