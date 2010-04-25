@@ -178,6 +178,27 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
 
 public Q_SLOTS:
+    /**
+     * Marks all upgradeable packages for upgrading, without marking new
+     * packages for installation.
+     */
+    void markPackagesForUpgrade();
+
+    /**
+     * Marks all upgradeable packages for upgrading, including updates that
+     * would require marking new packages for installation.
+     */
+    void markPackagesForDistUpgrade();
+
+    /**
+     * Commits all pending package state changes that have been made.
+     */
+    void commitChanges();
+
+    /**
+     * A slot that Packages use to tell the backend they've changed.
+     * (Used internally by QApt::Package. You likely will never use this)
+     */
     void packageChanged(Package *package);
 
     void updateCache();

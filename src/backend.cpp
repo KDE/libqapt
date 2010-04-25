@@ -30,6 +30,7 @@
 #include <QtDBus/QDBusServiceWatcher>
 
 // Apt includes
+#include <apt-pkg/algorithms.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/depcache.h>
@@ -250,6 +251,26 @@ Group::List Backend::availableGroups()
     Group::List groupList = d->groupSet.toList();
 
     return groupList;
+}
+
+void Backend::markPackagesForUpgrade()
+{
+    // TODO: Should say something if there's an error?
+    pkgAllUpgrade((*m_depCache));
+}
+
+void Backend::markPackagesForDistUpgrade()
+{
+    // TODO: Should say something if there's an error?
+    pkgDistUpgrade((*m_depCache));
+}
+
+void Backend::commitChanges()
+{
+    // TODO: Make lists for each possible package operation, and add all
+    // packages with a state change to the correct list.
+    // Then send this list over DBus to qaptworker, who will carry out all
+    // operations based on this list.
 }
 
 void Backend::packageChanged(Package *package)
