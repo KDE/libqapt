@@ -464,19 +464,65 @@ bool Package::wouldBreak()
     return d->state & InstallBroken;
 }
 
+void Package::setAuto(bool flag)
+{
+    m_depCache->MarkAuto(*m_packageIter, flag);
+}
+
+
+void Package::setKeep()
+{
+    m_depCache->MarkKeep(*m_packageIter, false);
+    // TODO: Notify backend of changes so it can update the UI, marking
+    // what is to be installed, removed, etc
+    // m_backend->notifyChanged(this);
+    setReInstall(false);
+}
+
 void Package::setInstall()
 {
     m_depCache->MarkInstall(*m_packageIter, true);
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
 
     // FIXME: can't we get rid of it here?
     // if there is something wrong, try to fix it
-    if (!State.Install() || m_depCache->BrokenCount() > 0) {
+    if (!d->state & ToInstall || m_depCache->BrokenCount() > 0) {
         pkgProblemResolver Fix(m_depCache);
         Fix.Clear(*m_packageIter);
         Fix.Protect(*m_packageIter);
         Fix.Resolve(true);
     }
+
+    // TODO: Notify backend of changes so it can update the UI, marking
+    // what is to be installed, removed, etc
+    // m_lister->notifyChanged(this);
+}
+
+void Package::setReInstall(bool flag)
+{
+    m_depCache->SetReInstall(*m_packageIter, flag);
+    // TODO: Notify backend of changes so it can update the UI, marking
+    // what is to be installed, removed, etc
+    // m_backend->notifyChanged(this);
+}
+
+
+void Package::setRemove(bool purge)
+{
+    pkgProblemResolver Fix(m_depCache);
+
+    Fix.Clear(*m_packageIter);
+    Fix.Protect(*m_packageIter);
+    Fix.Remove(*m_packageIter);
+
+    Fix.InstallProtect();
+    Fix.Resolve(true);
+
+    m_depCache->SetReInstall(*m_packageIter, false);
+    m_depCache->MarkDelete(*m_packageIter, purge);
+
+    // TODO: Notify backend of changes so it can update the UI, marking
+    // what is to be installed, removed, etc
+    // m_backend->notifyChanged(this);
 }
 
 }

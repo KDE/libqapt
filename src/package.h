@@ -68,7 +68,7 @@ public:
     */
     virtual ~Package();
 
-    /**
+   /**
     * Defines the Package::List type, which is a QList of Packages
     */
     typedef QList<Package*> List;
@@ -95,237 +95,267 @@ public:
     pkgCache::PkgIterator *m_packageIter;
 
 
-    /**
-     * Member function that returns the name of the package
-     *
-     * \return The name of the package as a @c QString
-     */
+   /**
+    * Member function that returns the name of the package
+    *
+    * \return The name of the package as a @c QString
+    */
     QString name() const;
 
-    /**
-     * Member function that returns the unique identifier for the package
-     *
-     * \return The identifier of the package as an @c int
-     */
+   /**
+    * Member function that returns the unique identifier for the package
+    *
+    * \return The identifier of the package as an @c int
+    */
     int id() const;
 
-    /**
-     * Member function that returns the version of the package, regardless of
-     * whether it is installed or not
-     *
-     * \return The version of the package as a @c QString
-     */
+   /**
+    * Member function that returns the version of the package, regardless of
+    * whether it is installed or not
+    *
+    * \return The version of the package as a @c QString
+    */
     QString version() const;
 
-    /**
-     * Member function that returns the section of the package
-     *
-     * \return The section of the package as a @c QString
-     */
+   /**
+    * Member function that returns the section of the package
+    *
+    * \return The section of the package as a @c QString
+    */
     QString section() const;
 
-    /**
-     * Member function that returns the source package corresponding
-     * to the package
-     *
-     * \return The source package of the package as a @c QString
-     */
+   /**
+    * Member function that returns the source package corresponding
+    * to the package
+    *
+    * \return The source package of the package as a @c QString
+    */
     QString sourcePackage() const;
 
-    /**
-     * Member function that returns the short description (or summary in
-     * libapt-pkg terms) of the package
-     *
-     * \return The short description of the package as a @c QString
-     */
+   /**
+    * Member function that returns the short description (or summary in
+    * libapt-pkg terms) of the package
+    *
+    * \return The short description of the package as a @c QString
+    */
     QString shortDescription() const;
 
-    /**
-     * Member function that returns the maintainer of the package
-     *
-     * \return The maintainer of the package as a @c QString
-     */
+   /**
+    * Member function that returns the maintainer of the package
+    *
+    * \return The maintainer of the package as a @c QString
+    */
     QString maintainer() const;
 
-    /**
-     * Member function that returns the homepage of the package
-     *
-     * \return The homepage of the package as a @c QString
-     */
+   /**
+    * Member function that returns the homepage of the package
+    *
+    * \return The homepage of the package as a @c QString
+    */
     QString homepage() const;
 
-    /**
-     * Member function that returns the installed version of the package
-     * If this package is not installed, this function will return a null
-     * QString
-     *
-     * \return The installed version of the package as a @c QString
-     */
+   /**
+    * Member function that returns the installed version of the package
+    * If this package is not installed, this function will return a null
+    * QString
+    *
+    * \return The installed version of the package as a @c QString
+    */
     QString installedVersion() const;
 
-    /**
-     * Member function that returns the newest available version of the
-     * package if it is not installed. If this package is installed, this
-     * function will return a null QString
-     *
-     * \return The available version of the package as a @c QString
-     */
+   /**
+    * Member function that returns the newest available version of the
+    * package if it is not installed. If this package is installed, this
+    * function will return a null QString
+    *
+    * \return The available version of the package as a @c QString
+    */
     QString availableVersion() const;
 
-    /**
-     * Member function that returns the priority of the package
-     *
-     * \return The priority of the package as a @c QString
-     */
+   /**
+    * Member function that returns the priority of the package
+    *
+    * \return The priority of the package as a @c QString
+    */
     QString priority() const;
 
-    /**
-     * Member function that returns the file list of the package
-     *
-     * \return The file list of the package as a @c QStringList
-     */
+   /**
+    * Member function that returns the file list of the package
+    *
+    * \return The file list of the package as a @c QStringList
+    */
     QStringList installedFilesList() const;
 
-    /**
-     * Member function that returns the long description of the package. Note
-     * that this also includes the summary/short description.
-     *
-     * \return The long description of the package as a @c QString
-     */
+   /**
+    * Member function that returns the long description of the package. Note
+    * that this also includes the summary/short description.
+    *
+    * \return The long description of the package as a @c QString
+    */
     QString longDescription() const;
 
-    /**
-     * Member function that returns the origin of the package.
-     * (Usually Ubuntu or Debian)
-     *
-     * \return The origin of the package as a @c QString
-     */
+   /**
+    * Member function that returns the origin of the package.
+    * (Usually Ubuntu or Debian)
+    *
+    * \return The origin of the package as a @c QString
+    */
     QString origin() const;
 
-    /**
-     * Member function that returns the archive component of the package.
-     *
-     * \return The archive component of the package as a @c QString
-     */
+   /**
+    * Member function that returns the archive component of the package.
+    *
+    * \return The archive component of the package as a @c QString
+    */
     QString component() const;
 
-    /**
-     * Member function that returns the amount of hard drive space that this
-     * package will take up once installed.
-     * This is human-unreadable, so KDE applications may wish to run this
-     * through the KGlobal::locale()->formatByteSize() function to get a
-     * localized, human-readable number.
-     *
-     * \return The installed size of the package as a @c qint32
-     */
+   /**
+    * Member function that returns the amount of hard drive space that this
+    * package will take up once installed.
+    * This is human-unreadable, so KDE applications may wish to run this
+    * through the KGlobal::locale()->formatByteSize() function to get a
+    * localized, human-readable number.
+    *
+    * \return The installed size of the package as a @c qint32
+    */
     qint32 installedSize() const;
 
-    /**
-     * Member function that returns the download size of the package archive
-     * in bytes.
-     * This is human-unreadable, so KDE applications may wish to run this
-     * through the KGlobal::locale()->formatByteSize() function to get a
-     * localized, human-readable number.
-     *
-     * \return The installed size of the package as a @c qint32
-     */
+   /**
+    * Member function that returns the download size of the package archive
+    * in bytes.
+    * This is human-unreadable, so KDE applications may wish to run this
+    * through the KGlobal::locale()->formatByteSize() function to get a
+    * localized, human-readable number.
+    *
+    * \return The installed size of the package as a @c qint32
+    */
     qint32 downloadSize() const;
 
-    /**
-     * Member function that returns the state of a package, using the
-     * @b PackageState enum to define states.
-     *
-     * \return The PackageState flags of the package as an @c int
-     */
+   /**
+    * Member function that returns the state of a package, using the
+    * @b PackageState enum to define states.
+    *
+    * \return The PackageState flags of the package as an @c int
+    */
     int state();
 
-    /**
-     * Checks whether or not the Package object is installed
-     *
-     * @return @c true if installed
-     * @return @c false if not installed
-     */
+   /**
+    * Checks whether or not the Package object is installed
+    *
+    * @return @c true if installed
+    * @return @c false if not installed
+    */
     bool isInstalled();
 
-    /**
-     * Checks whether or not the Package object is valid
-     *
-     * @return @c true if valid
-     * @return @c false if not invalid
-     */
+   /**
+    * Checks whether or not the Package object is valid
+    *
+    * @return @c true if valid
+    * @return @c false if not invalid
+    */
     bool isValid();
 
-    /**
-     * Member function that returns a list of the names of all the dependencies
-     * of this package.
-     * I would like to see if I could figure out how to construct a Package
-     * from inside a Package and have this function return a Package::List
-     *
-     * \return A list of packages that this package depends on as a @c QStringList
-     */
+   /**
+    * Member function that returns a list of the names of all the dependencies
+    * of this package.
+    * I would like to see if I could figure out how to construct a Package
+    * from inside a Package and have this function return a Package::List
+    *
+    * \return A list of packages that this package depends on as a @c QStringList
+    */
     QStringList dependencyList(bool useCandidateVersion);
 
-    /**
-     * Member function that returns a list of the names of all the packages
-     * that depend on this package. (Reverse dependencies)
-     * I would like to see if I could figure out how to construct a Package
-     * from inside a Package and have this function return a Package::List
-     *
-     * \return A list of packages that depend on this package as a @c QStringList
-     */
+   /**
+    * Member function that returns a list of the names of all the packages
+    * that depend on this package. (Reverse dependencies)
+    * I would like to see if I could figure out how to construct a Package
+    * from inside a Package and have this function return a Package::List
+    *
+    * \return A list of packages that depend on this package as a @c QStringList
+    */
     QStringList requiredByList();
 
-    /**
-     * Member function that returns a list of the names of all the virtual
-     * packages that this package provides.
-     * I would like to see if I could figure out how to construct a Package
-     * from inside a Package and have this function return a Package::List
-     *
-     * \return A list of packages that this package provides as a @c QStringList
-     */
+   /**
+    * Member function that returns a list of the names of all the virtual
+    * packages that this package provides.
+    * I would like to see if I could figure out how to construct a Package
+    * from inside a Package and have this function return a Package::List
+    *
+    * \return A list of packages that this package provides as a @c QStringList
+    */
     QStringList providesList();
 
-    /**
-     * Member function that returns wether or not the package is signed with a
-     * trusted GPG signature.
-     *
-     * @return @c true if trusted
-     * @return @c false if untrusted or the package has a version of 0
-     */
+   /**
+    * Member function that returns whether or not the package is signed with a
+    * trusted GPG signature.
+    *
+    * @return @c true if trusted
+    * @return @c false if untrusted or the package has a version of 0
+    */
     bool isTrusted();
+
+   /**
+    * Member function that returns whether or not the package would break
+    * the package system if changed.
+    *
+    * @return @c true if it would break
+    * @return @c false otherwise
+    */
     bool wouldBreak();
 
+   /**
+    * Marks whether or not the package was automatically installed (e.g. as a
+    * dependency of another package.
+    */
+    void setAuto(bool flag);
+
+   /**
+    * Marks the package to be kept
+    */
+    void setKeep();
+
+   /**
+    * Marks the package for installation
+    */
     void setInstall();
 
+   /**
+    * Member function that sets whether or not the package needs
+    * reinstallation, based on a boolean value passed to it.
+    */
+    void setReInstall(bool flag);
 
-    // TODO: Implement, take a PackageState flag
-    //void setState();
+   /**
+    * Marks the package for removal. The boolean value sets whether or not
+    * to purge configuration files
+    */
+    void setRemove(bool purge);
 
     // "//" == TODO
     enum PackageState {
-        ToKeep = 1 << 0,
-        ToInstall = 1 << 1,
-        NewInstall = 1 << 2,
-        ToReInstall = 1 << 3,//
-        ToUpgrade = 1 << 4,
-        ToDowngrade = 1 << 5,
-        ToRemove = 1 << 6,
-        Held = 1 << 7,
-        Installed = 1 << 8,
-        Upgradeable = 1 << 9,
-        NowBroken = 1 << 10,
-        InstallBroken = 1 << 11,
-        Orphaned = 1 << 12,//
-        Pinned = 1 << 13,//
-        New = 1 << 14, //
-        ResidualConfig = 1 << 15,
-        NotInstallable = 1 << 16,
-        ToPurge = 1 << 17,//
-        IsImportant = 1 << 18,
-        OverrideVersion = 1 << 19,//
-        IsAuto = 1 << 20,
-        IsGarbage = 1 << 21,
-        NowPolicyBroken = 1 << 22,
+        ToKeep              = 1 << 0,
+        ToInstall           = 1 << 1,
+        NewInstall          = 1 << 2,
+        ToReInstall         = 1 << 3,
+        ToUpgrade           = 1 << 4,
+        ToDowngrade         = 1 << 5,
+        ToRemove            = 1 << 6,
+        Held                = 1 << 7,
+        Installed           = 1 << 8,
+        Upgradeable         = 1 << 9,
+        NowBroken           = 1 << 10,
+        InstallBroken       = 1 << 11,
+        Orphaned            = 1 << 12,//
+        Pinned              = 1 << 13,//
+        New                 = 1 << 14,//
+        ResidualConfig      = 1 << 15,
+        NotInstallable      = 1 << 16,
+        ToPurge             = 1 << 17,
+        IsImportant         = 1 << 18,
+        OverrideVersion     = 1 << 19,//
+        IsAuto              = 1 << 20,
+        IsGarbage           = 1 << 21,
+        NowPolicyBroken     = 1 << 22,
         InstallPolicyBroken = 1 << 23
     };
     Q_DECLARE_FLAGS(PackageStates, PackageState)
