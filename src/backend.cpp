@@ -252,6 +252,13 @@ Group::List Backend::availableGroups()
     return groupList;
 }
 
+void Backend::packageChanged(Package *package)
+{
+    qDebug() << "A package changed!";
+    //TODO: Reload package pointers, emit a signal so that frontends can reload
+    // their UI's.
+}
+
 void Backend::updateCache()
 {
     QDBusMessage message;

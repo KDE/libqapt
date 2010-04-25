@@ -473,9 +473,7 @@ void Package::setAuto(bool flag)
 void Package::setKeep()
 {
     m_depCache->MarkKeep(*m_packageIter, false);
-    // TODO: Notify backend of changes so it can update the UI, marking
-    // what is to be installed, removed, etc
-    // m_backend->notifyChanged(this);
+    m_backend->packageChanged(this);
     setReInstall(false);
 }
 
@@ -492,17 +490,13 @@ void Package::setInstall()
         Fix.Resolve(true);
     }
 
-    // TODO: Notify backend of changes so it can update the UI, marking
-    // what is to be installed, removed, etc
-    // m_lister->notifyChanged(this);
+    m_backend->packageChanged(this);
 }
 
 void Package::setReInstall(bool flag)
 {
     m_depCache->SetReInstall(*m_packageIter, flag);
-    // TODO: Notify backend of changes so it can update the UI, marking
-    // what is to be installed, removed, etc
-    // m_backend->notifyChanged(this);
+    m_backend->packageChanged(this);
 }
 
 
@@ -520,9 +514,7 @@ void Package::setRemove(bool purge)
     m_depCache->SetReInstall(*m_packageIter, false);
     m_depCache->MarkDelete(*m_packageIter, purge);
 
-    // TODO: Notify backend of changes so it can update the UI, marking
-    // what is to be installed, removed, etc
-    // m_backend->notifyChanged(this);
+    m_backend->packageChanged(this);
 }
 
 }

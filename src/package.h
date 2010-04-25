@@ -304,10 +304,9 @@ public:
     bool wouldBreak();
 
    /**
-    * Marks whether or not the package was automatically installed (e.g. as a
-    * dependency of another package.
+    * Sets an unsets the auto-install flag
     */
-    void setAuto(bool flag);
+    void setAuto(bool flag = true);
 
    /**
     * Marks the package to be kept
@@ -329,7 +328,7 @@ public:
     * Marks the package for removal. The boolean value sets whether or not
     * to purge configuration files
     */
-    void setRemove(bool purge);
+    void setRemove(bool purge = false);
 
     // "//" == TODO
     enum PackageState {

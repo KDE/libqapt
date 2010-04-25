@@ -178,6 +178,8 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
 
 public Q_SLOTS:
+    void packageChanged(Package *package);
+
     void updateCache();
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
