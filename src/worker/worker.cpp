@@ -243,6 +243,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         return;
     }
 
+    emit workerStarted("commitChanges");
+
     // Lock the archive directory
     FileFd Lock;
     if (_config->FindB("Debug::NoLocking",false) == false)
@@ -367,6 +369,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     close(readFromChildFD[1]);
     close(writeToChildFD[0]);
     close(writeToChildFD[1]);
+
+    emit workerFinished("commitChanges", true);
 }
 
 void QAptWorker::emitDownloadProgress(int percentage)

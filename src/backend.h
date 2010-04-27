@@ -174,6 +174,8 @@ private:
 Q_SIGNALS:
     void cacheUpdateStarted();
     void cacheUpdateFinished();
+    void commitChangesStarted();
+    void commitChangesFinished();
     void downloadProgress(int percentage);
     void downloadMessage(int flag, const QString &message);
 

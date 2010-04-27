@@ -346,6 +346,8 @@ void Backend::workerStarted(const QString &name)
     qDebug() << "Worker Started!";
     if (name == "update") {
         emit cacheUpdateStarted();
+    } else if (name == "commit") {
+        emit commitChangesStarted();
     }
 }
 
@@ -354,6 +356,8 @@ void Backend::workerFinished(const QString &name, bool result)
     qDebug() << "Worker Finished!";
     if (name == "update") {
         emit cacheUpdateFinished();
+    } else if (name == "commitChanges") {
+        emit commitChangesFinished();
     }
 }
 
