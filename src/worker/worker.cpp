@@ -23,6 +23,7 @@
 #include "qaptworkeradaptor.h"
 
 #include <QDebug>
+#include <QFile>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -33,6 +34,11 @@
 #include <apt-pkg/pkgcachegen.h>
 #include <apt-pkg/init.h>
 #include <apt-pkg/algorithms.h>
+
+#include <sys/statvfs.h>
+#include <sys/statfs.h>
+#include <sys/wait.h>
+#include <sys/fcntl.h>
 
 #include "qaptauthorization.h"
 #include "workeracquire.h"
@@ -179,6 +185,150 @@ void QAptWorker::updateCache()
     }
 }
 
+void QAptWorker::cancelCacheUpdate()
+{
+    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+        return;
+    }
+    m_acquireStatus->requestCancel();
+}
+
+void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
+{
+    // Parse out the argument list and mark packages for operations
+    QMap<QString, QVariant>::const_iterator mapIter = instructionList.constBegin();
+
+    while (mapIter != instructionList.constEnd()) {
+        QString operation = mapIter.key();
+        int packageID = mapIter.value().toInt();
+
+        pkgCache::PkgIterator iter;
+        for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
+            if (iter->ID == packageID) {
+                if (operation == "kept") {
+                    m_depCache->MarkKeep(iter, false);
+                    m_depCache->SetReInstall(iter, false);
+                } else if (operation == "toInstall") {
+                    m_depCache->MarkInstall(iter, true);
+                } else if (operation == "toReInstall") {
+                    m_depCache->SetReInstall(iter, true);
+                } else if (operation == "toUpgrade") {
+                    // The QApt Backend will process all dependencies before
+                    // hand, which will include installing new dependencies for
+                    // dist-upgrades. Therefore we don't have to worry about
+                    // supporting a dist-upgrade case here. We're just a blind
+                    // committer.
+                    pkgAllUpgrade((*m_depCache));
+                } else if (operation == "toDowngrade") {
+                    // FIXME: Probably gotta set the candidate version here...
+                    // needs work in QApt::Package so that we can set this anyways
+                } else if (operation == "toPurge") {
+                    m_depCache->SetReInstall(iter, false);
+                    m_depCache->MarkDelete(iter, true);
+                } else if (operation == "toRemove") {
+                    m_depCache->SetReInstall(iter, false);
+                    m_depCache->MarkDelete(iter, false);
+                }
+            }
+        }
+        QFile::rename("/home/jonathan/lol", "/home/jonathan/gotoutofforalive");
+    }
+
+    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+        return;
+    }
+
+    //Now really commit changes
+    lock();
+
+    pkgAcquire fetcher(m_acquireStatus);
+
+    pkgPackageManager *packageManager;
+    packageManager = _system->CreatePM(m_depCache);
+
+    if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
+        _error->PendingError()) {
+        //TODO: Notify of error
+        return;
+    }
+
+    //TODO: Calculate free space in the archive directory here
+
+    if (fetcher.Run() != pkgAcquire::Continue) {
+        //TODO: Notify of error
+        return;
+    }
+
+    setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
+
+    pkgPackageManager::OrderResult res;
+    res = packageManager->DoInstallPreFork();
+    if (res == pkgPackageManager::Failed) {
+        //TODO: Notify that we failed to prepare for installation
+        return;
+    }
+
+    // File descriptors for reading dpkg --status-fd
+    int readFromChildFD[2];
+    int writeToChildFD[2];
+    if (pipe(readFromChildFD) < 0 || pipe(writeToChildFD) < 0) {
+//         cout << "Failed to create a pipe" << endl;
+        return;
+    }
+
+    m_child_pid = fork();
+    if (m_child_pid == -1) {
+        return;
+    }
+
+    if (m_child_pid == 0) {
+        close(0);
+        //cout << "FORKED: installPackages(): DoInstall" << endl;
+        // redirect writeToChildFD to stdin
+        if (dup(writeToChildFD[0]) != 0) {
+//             cerr << "QApt: dup failed duplicate pipe to stdin" << endl;
+            close(readFromChildFD[1]);
+            close(writeToChildFD[0]);
+            _exit(1);
+        }
+
+        // close Forked stdout and the read end of the pipe
+        close(1);
+
+        //TODO: Debconf
+        setenv("DEBIAN_FRONTEND", "non-interactive", 1);
+
+        // Pass the write end of the pipe to the install function
+        res = packageManager->DoInstallPostFork(readFromChildFD[1]);
+
+        // dump errors into cerr (pass it to the parent process)
+        _error->DumpErrors();
+
+        close(readFromChildFD[0]);
+        close(writeToChildFD[1]);
+        close(readFromChildFD[1]);
+        close(writeToChildFD[0]);
+
+        _exit(res);
+    }
+
+    // make it nonblocking, verry important otherwise
+    // when the child finish we stay stuck.
+    fcntl(readFromChildFD[0], F_SETFL, O_NONBLOCK);
+
+    // Check if the child died
+    int ret;
+    while (waitpid(m_child_pid, &ret, WNOHANG) == 0) {
+        //TODO: send out a transactionMessage
+//         updateInterface(readFromChildFD[0], writeToChildFD[1]);
+    }
+
+    close(readFromChildFD[0]);
+    close(readFromChildFD[1]);
+    close(writeToChildFD[0]);
+    close(writeToChildFD[1]);
+}
+
 void QAptWorker::emitDownloadProgress(int percentage)
 {
     emit downloadProgress(percentage);
@@ -187,12 +337,4 @@ void QAptWorker::emitDownloadProgress(int percentage)
 void QAptWorker::emitDownloadMessage(int flag, const QString& message)
 {
     emit downloadMessage(flag, message);
-}
-
-void QAptWorker::cancelCacheUpdate()
-{
-    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
-        return;
-    }
-    m_acquireStatus->requestCancel();
 }

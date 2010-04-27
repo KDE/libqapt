@@ -24,6 +24,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
 #include <QtDBus/QDBusMessage>
+#include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusPendingCall>
 #include <QtDBus/QDBusInterface>
@@ -267,16 +268,7 @@ void Backend::markPackagesForDistUpgrade()
 
 void Backend::commitChanges()
 {
-    // TODO: Send these lists over DBus to qaptworker, who will carry out all
-    // operations based on them.
-    QList<int> held;
-    QList<int> kept;
-    QList<int> toInstall;
-    QList<int> toReInstall;
-    QList<int> toUpgrade;
-    QList<int> toRemove;
-    QList<int> toPurge;
-    QList<int> toDowngrade;
+    QMap<QString, QVariant> instructionList;
 
     foreach (Package *package, d->packages) {
         int flags = package->state();
@@ -291,32 +283,45 @@ void Backend::commitChanges()
         switch (status) {
            case Package::ToKeep:
                if (flags & Package::Held) {
-                   held.append(package->id());
+                   instructionList.insert("held", package->id());
                } else {
-                   kept.append(package->id());
+                   // Seems to be true for a ton of packages? :S
+//                    instructionList.insert("kept", package->id());
                }
                break;
            case Package::NewInstall:
-               toInstall.append(package->id());
+               instructionList.insert("toInstall", package->id());
+               qDebug() << package->name();
                break;
            case Package::ToReInstall:
-               toReInstall.append(package->id());
+               instructionList.insert("toReInstall", package->id());
                break;
            case Package::ToUpgrade:
-               toUpgrade.append(package->id());
+               instructionList.insert("toUpgrade", package->id());
                break;
            case Package::ToDowngrade:
-               toDowngrade.append(package->id());
+               instructionList.insert("toDowngrade", package->id());
                break;
            case Package::ToRemove:
                if(flags & Package::ToPurge) {
-                   toPurge.append(package->id());
+                   instructionList.insert("toPurge", package->id());
                } else {
-                   toRemove.append(package->id());
+                   instructionList.insert("toRemove", package->id());
                }
                break;
         }
     }
+
+    QDBusMessage message;
+    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
+              "/",
+              "org.kubuntu.qaptworker",
+              QLatin1String("commitChanges"));
+
+    QList<QVariant> args;
+    args << QVariant(instructionList);
+    message.setArguments(args);
+    QDBusConnection::systemBus().asyncCall(message);
 }
 
 void Backend::packageChanged(Package *package)

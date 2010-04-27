@@ -11,16 +11,17 @@
     <signal name="downloadProgress">
       <arg name="percentage" type="i" direction="out"/>
     </signal>
-    <signal name="downloadSubProgress">
-      <arg name="percentage" type="i" direction="out"/>
-    </signal>
     <signal name="downloadMessage">
-      <arg type="i" direction="out"/>
-      <arg name="description" type="s" direction="out"/>
+      <arg name="flag" type="i" direction="out"/>
+      <arg name="message" type="s" direction="out"/>
     </signal>
     <method name="updateCache">
     </method>
     <method name="cancelCacheUpdate">
+    </method>
+    <method name="commitChanges">
+      <arg type="a{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
   </interface>
 </node>

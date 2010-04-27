@@ -54,9 +54,13 @@ public:
     bool m_locked;
     WorkerAcquire *m_acquireStatus;
 
+private:
+    pid_t m_child_pid;
+
 public Q_SLOTS:
     void updateCache();
     void cancelCacheUpdate();
+    void commitChanges(QMap<QString, QVariant>);
 
 private Q_SLOTS:
     bool lock();
