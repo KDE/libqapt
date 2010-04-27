@@ -285,8 +285,7 @@ void Backend::commitChanges()
                if (flags & Package::Held) {
                    instructionList.insert("held", package->id());
                } else {
-                   // Seems to be true for a ton of packages? :S
-//                    instructionList.insert("kept", package->id());
+                   instructionList.insert("kept", package->id());
                }
                break;
            case Package::NewInstall:

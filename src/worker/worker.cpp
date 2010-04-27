@@ -222,7 +222,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
                     // committer.
                     pkgAllUpgrade((*m_depCache));
                 } else if (operation == "toDowngrade") {
-                    // FIXME: Probably gotta set the candidate version here...
+                    // TODO: Probably gotta set the candidate version here...
                     // needs work in QApt::Package so that we can set this anyways
                 } else if (operation == "toPurge") {
                     m_depCache->SetReInstall(iter, false);
@@ -230,6 +230,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
                 } else if (operation == "toRemove") {
                     m_depCache->SetReInstall(iter, false);
                     m_depCache->MarkDelete(iter, false);
+                } else {
+                    // Unsupported operation
+                    // TODO: Probably should emit something here
                 }
             }
         }
@@ -240,7 +243,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         return;
     }
 
-    //Now really commit changes
     // Lock the archive directory
     FileFd Lock;
     if (_config->FindB("Debug::NoLocking",false) == false)
@@ -293,7 +295,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     }
 
     if (fetcher.Run() != pkgAcquire::Continue) {
-        //TODO: Notify of error
+        //TODO: Notify of fetching error
         return;
     }
 
