@@ -235,11 +235,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
                 }
             }
         }
-        QFile::rename("/home/jonathan/lol", "/home/jonathan/gotoutofforalive");
         mapIter++;
     }
 
-    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
         return;
     }
 
