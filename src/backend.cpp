@@ -231,6 +231,9 @@ Package::List Backend::upgradeablePackages()
 
     foreach (Package *package, d->packages) {
         if (package->state() & Package::Upgradeable) {
+            if (package->state() & Package::Held) {
+                continue; // Don't count held packages
+            }
             upgradeablePackages << package;
         }
     }
