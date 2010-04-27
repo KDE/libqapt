@@ -40,6 +40,8 @@
 #include <sys/wait.h>
 #include <sys/fcntl.h>
 
+#define RAMFS_MAGIC     0x858458f6
+
 #include "qaptauthorization.h"
 #include "workeracquire.h"
 
@@ -204,10 +206,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
         pkgCache::PkgIterator iter;
         for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
-            if (iter->VersionList == 0) {
-                continue; // Exclude virtual packages.
-            }
-
             if (iter->ID == packageID) {
                 if (operation == "kept") {
                     m_depCache->MarkKeep(iter, false);
@@ -243,7 +241,16 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     }
 
     //Now really commit changes
-    lock();
+    // Lock the archive directory
+    FileFd Lock;
+    if (_config->FindB("Debug::NoLocking",false) == false)
+    {
+        Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
+        if (_error->PendingError() == true) {
+            // TODO: Send error about not being able to lock
+            return;
+        }
+    }
 
     pkgAcquire fetcher(m_acquireStatus);
 
@@ -256,7 +263,34 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         return;
     }
 
-    //TODO: Calculate free space in the archive directory here
+    // Display statistics
+    double FetchBytes = fetcher.FetchNeeded();
+    double FetchPBytes = fetcher.PartialPresent();
+    double DebBytes = fetcher.TotalNeeded();
+    if (DebBytes != m_depCache->DebSize())
+    {
+        //TODO: emit mismatch warning
+    }
+
+    /* Check for enough free space */
+    struct statvfs Buf;
+    string OutputDir = _config->FindDir("Dir::Cache::Archives");
+    if (statvfs(OutputDir.c_str(),&Buf) != 0) {
+        //TODO: emit "can't calculate free space" error
+        return;
+    }
+    if (unsigned(Buf.f_bfree) < (FetchBytes - FetchPBytes)/Buf.f_bsize)
+    {
+        struct statfs Stat;
+        if (statfs(OutputDir.c_str(), &Stat) != 0 ||
+            unsigned(Stat.f_type)            != RAMFS_MAGIC)
+        {
+//             return _error->Error("You don't have enough free space in %s.",
+//                         OutputDir.c_str());
+            // TODO: emit space error
+            return;
+        }
+    }
 
     if (fetcher.Run() != pkgAcquire::Continue) {
         //TODO: Notify of error
