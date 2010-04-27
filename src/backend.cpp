@@ -355,10 +355,11 @@ void Backend::updateCache()
 
 void Backend::workerStarted(const QString &name)
 {
-    qDebug() << "Worker Started!";
     if (name == "update") {
+        qDebug() << "Cache Update Started!";
         emit cacheUpdateStarted();
-    } else if (name == "commit") {
+    } else if (name == "commitChanges") {
+        qDebug() << "Install/remove operation Started!";
         emit commitChangesStarted();
     }
 }

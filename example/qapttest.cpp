@@ -145,6 +145,13 @@ void qapttest::updateLabels()
         m_longDescriptionLabel->setText(m_package->longDescription());
     }
 
+    if (m_package->name() == "kpat") {
+//         m_package->setInstall();
+
+        m_backend->markPackagesForUpgrade();
+        m_backend->commitChanges();
+    }
+
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them
 
     // kDebug() << "============= New package Listing =============";
