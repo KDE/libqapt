@@ -284,8 +284,6 @@ void Backend::commitChanges()
            case Package::ToKeep:
                if (flags & Package::Held) {
                    instructionList.insert("held", package->id());
-               } else {
-                   instructionList.insert("kept", package->id());
                }
                break;
            case Package::NewInstall:
