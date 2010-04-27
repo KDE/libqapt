@@ -204,6 +204,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
         pkgCache::PkgIterator iter;
         for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
+            if (iter->VersionList == 0) {
+                continue; // Exclude virtual packages.
+            }
+
             if (iter->ID == packageID) {
                 if (operation == "kept") {
                     m_depCache->MarkKeep(iter, false);
@@ -232,6 +236,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             }
         }
         QFile::rename("/home/jonathan/lol", "/home/jonathan/gotoutofforalive");
+        mapIter++;
     }
 
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
