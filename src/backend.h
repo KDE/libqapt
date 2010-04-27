@@ -192,6 +192,9 @@ public Q_SLOTS:
      */
     void markPackagesForDistUpgrade();
 
+    void markPackageForInstall(const QString &name);
+    void markPackageForRemoval(const QString &name);
+
     /**
      * Commits all pending package state changes that have been made.
      */

@@ -354,8 +354,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         _exit(res);
     }
 
-    // make it nonblocking, verry important otherwise
-    // when the child finish we stay stuck.
+    // Make it nonblocking. Very important; otherwise
+    // when the child finishes we'll stay stuck.
     fcntl(readFromChildFD[0], F_SETFL, O_NONBLOCK);
 
     // Check if the child died

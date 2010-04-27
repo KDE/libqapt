@@ -269,6 +269,18 @@ void Backend::markPackagesForDistUpgrade()
     pkgDistUpgrade((*m_depCache));
 }
 
+void Backend::markPackageForInstall(const QString &name)
+{
+    Package *pkg = package(name);
+    pkg->setInstall();
+}
+
+void Backend::markPackageForRemoval(const QString &name)
+{
+    Package *pkg = package(name);
+    pkg->setRemove(false);
+}
+
 void Backend::commitChanges()
 {
     QMap<QString, QVariant> instructionList;
