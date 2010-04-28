@@ -51,7 +51,7 @@ public:
     // List of unique indentifiers for the packages
     QList<int> packagesIndex;
     // Set of group names extracted from our packages
-    QSet<Group*> groupSet;
+    QSet<Group*> groups;
 };
 
 Backend::Backend()
@@ -99,6 +99,7 @@ bool Backend::init()
 
 void Backend::reloadCache()
 {
+    m_cache = 0;
     m_cache = new Cache(this);
     m_cache->open();
 
@@ -114,9 +115,14 @@ void Backend::reloadCache()
     d->packages.clear();
     d->packagesIndex.clear();
 
+    foreach(Group *group, d->groups) {
+        group->deleteLater();
+    }
+    d->groups.clear();
+
     // Populate internal package cache
     int count = 0;
-    QSet<QString> groups;
+    QSet<QString> groupSet;
 
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); iter.end() != true; iter++) {
@@ -134,14 +140,14 @@ void Backend::reloadCache()
 
         if (iter.Section()) {
             QString name = QString::fromStdString(iter.Section());
-            groups << name;
+            groupSet << name;
         }
     }
 
     // Populate groups
-    foreach (const QString &groupName, groups) {
+    foreach (const QString &groupName, groupSet) {
         Group *group = new Group(this, groupName);
-        d->groupSet << group;
+        d->groups << group;
     }
 }
 
@@ -210,7 +216,7 @@ Package::List Backend::upgradeablePackages()
 
 Group *Backend::group(const QString &name)
 {
-    foreach (Group *group, d->groupSet) {
+    foreach (Group *group, d->groups) {
         if (group->name() == name) {
             return group;
         }
@@ -219,7 +225,7 @@ Group *Backend::group(const QString &name)
 
 Group::List Backend::availableGroups()
 {
-    Group::List groupList = d->groupSet.toList();
+    Group::List groupList = d->groups.toList();
 
     return groupList;
 }
@@ -338,6 +344,7 @@ void Backend::workerFinished(const QString &name, bool result)
         reloadCache();
         emit cacheUpdateFinished();
     } else if (name == "commitChanges") {
+        reloadCache();
         emit commitChangesFinished();
     }
 }
