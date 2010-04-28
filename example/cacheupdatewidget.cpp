@@ -43,7 +43,7 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     m_totalProgress = new QProgressBar(this);
     m_cancelButton = new QPushButton(this);
     m_cancelButton->setText(i18n("Cancel"));
-    m_cancelButton->setIcon(KIcon("cancel"));
+    m_cancelButton->setIcon(KIcon("dialog-cancel"));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelButtonPressed()));
 }
 
