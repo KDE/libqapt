@@ -56,6 +56,7 @@ public:
 
 Backend::Backend()
         : d(new BackendPrivate)
+        , m_cache(0)
         , m_records(0)
 {
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
@@ -100,7 +101,7 @@ bool Backend::init()
 
 void Backend::reloadCache()
 {
-    m_cache = 0;
+    delete m_cache;
     m_cache = new Cache(this);
     m_cache->open();
 
