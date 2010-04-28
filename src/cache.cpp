@@ -41,6 +41,9 @@ Cache::Cache(QObject* parent)
 Cache::~Cache()
 {
     delete m_list;
+    delete m_cache;
+    delete m_policy;
+    delete m_depCache;
 }
 
 bool Cache::open()
