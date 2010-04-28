@@ -163,7 +163,7 @@ bool Backend::init()
     }
 
     // Populate groups
-    foreach (QString groupName, groups) {
+    foreach (const QString groupName, groups) {
         Group *group = new Group(this, groupName);
         d->groupSet << group;
     }
