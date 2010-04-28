@@ -42,8 +42,8 @@ Cache::~Cache()
 {
     delete m_list;
     delete m_cache;
-    delete m_policy;
     delete m_depCache;
+    delete m_map;
 }
 
 bool Cache::open()
@@ -84,6 +84,7 @@ bool Cache::open()
     if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
         return false;
     }
+    delete m_policy;
 }
 
 pkgDepCache *Cache::depCache()

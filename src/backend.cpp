@@ -48,8 +48,6 @@ class BackendPrivate
 public:
     // The canonical list of all unique, non-virutal package objects
     Package::List packages;
-    // List of unique indentifiers for the packages
-    QList<int> packagesIndex;
     // Set of group names extracted from our packages
     QSet<Group*> groups;
 };
@@ -115,7 +113,6 @@ void Backend::reloadCache()
         package->deleteLater();
     }
     d->packages.clear();
-    d->packagesIndex.clear();
 
     foreach(Group *group, d->groups) {
         group->deleteLater();
@@ -133,11 +130,6 @@ void Backend::reloadCache()
         }
 
         Package *pkg = new Package(this, depCache, m_records, iter);
-        // Here every unique package ID is given a value. By looking it up we
-        // can get this count value...
-        d->packagesIndex.insert(iter->ID, count);
-        // ... and then retrieve a QApt::Package by looking at the value of the
-        // key in the official Package::List, d->packages()
         d->packages.insert(count++, pkg);
 
         if (iter.Section()) {
