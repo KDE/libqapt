@@ -275,10 +275,10 @@ void Backend::markPackageForInstall(const QString &name)
     pkg->setInstall();
 }
 
-void Backend::markPackageForRemoval(const QString &name)
+void Backend::markPackageForRemoval(const QString &name, bool purge)
 {
     Package *pkg = package(name);
-    pkg->setRemove(false);
+    pkg->setRemove(purge);
 }
 
 void Backend::commitChanges()
@@ -382,7 +382,6 @@ void Backend::cancelCacheUpdate()
               "org.kubuntu.qaptworker",
               QLatin1String("cancelCacheUpdate"));
     QDBusConnection::systemBus().asyncCall(message);
-    qDebug() << "Canceling..";
 }
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)

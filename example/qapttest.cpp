@@ -146,7 +146,7 @@ void qapttest::updateLabels()
     }
 
     if (m_package->name() == "kpat") {
-//         m_package->setInstall();
+        m_package->setInstall();
 
         m_backend->markPackagesForUpgrade();
         m_backend->commitChanges();

@@ -204,9 +204,12 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         QString operation = mapIter.key();
         int packageID = mapIter.value().toInt();
 
+        // Iterate through all packages
         pkgCache::PkgIterator iter;
         for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
+            // Find one with a matching ID to the one in the instructions list
             if (iter->ID == packageID) {
+                // Then mark according to the instruction
                 if (operation == "kept") {
                     m_depCache->MarkKeep(iter, false);
                     m_depCache->SetReInstall(iter, false);
@@ -215,11 +218,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
                 } else if (operation == "toReInstall") {
                     m_depCache->SetReInstall(iter, true);
                 } else if (operation == "toUpgrade") {
-                    // The QApt Backend will process all dependencies before
-                    // hand, which will include installing new dependencies for
-                    // dist-upgrades. Therefore we don't have to worry about
-                    // supporting a dist-upgrade case here. We're just a blind
-                    // committer.
+                    // The QApt Backend will handle dist-upgradish things for us
                     pkgAllUpgrade((*m_depCache));
                 } else if (operation == "toDowngrade") {
                     // TODO: Probably gotta set the candidate version here...
