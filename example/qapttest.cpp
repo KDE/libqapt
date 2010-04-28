@@ -105,7 +105,7 @@ qapttest::qapttest()
                                      // Yay for flags!
                                      m_backend->packageCount(QApt::Package::Installed)));
 
-    statusBar()->addWidget(packageCountLabel);
+    statusBar()->addWidget(m_packageCountLabel);
     statusBar()->addWidget(m_installedCountLabel);
     statusBar()->show();
 

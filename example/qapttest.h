@@ -71,6 +71,7 @@ private:
     QLabel *m_longDescriptionLabel;
 
     QLabel *m_installedCountLabel;
+    QLabel *m_packageCountLabel;
 };
 
 #endif

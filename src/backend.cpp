@@ -78,6 +78,7 @@ Backend::Backend()
 Backend::~Backend()
 {
     delete m_cache;
+    delete m_records;
 }
 
 bool Backend::init()
@@ -174,7 +175,6 @@ Package *Backend::package(const QString &name)
 int Backend::packageCount()
 {
     int packageCount = d->packages.size();
-    qDebug() << packageCount;
 
     return packageCount;
 }
@@ -182,7 +182,6 @@ int Backend::packageCount()
 int Backend::packageCount(const Package::PackageStates &states)
 {
     int packageCount = 0;
-    qDebug() << d->packages.size();
 
     foreach(Package *package, d->packages) {
         if ((package->state() & states)) {
