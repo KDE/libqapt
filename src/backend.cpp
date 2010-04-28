@@ -104,9 +104,8 @@ void Backend::reloadCache()
     m_cache->open();
 
     pkgDepCache *depCache = m_cache->depCache();
-    if (m_records) {
-        delete m_records;
-    }
+
+    delete m_records;
     m_records = new pkgRecords(*depCache);
 
     foreach(Package *package, d->packages) {
