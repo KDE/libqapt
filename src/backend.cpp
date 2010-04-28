@@ -38,6 +38,7 @@
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/pkgcachegen.h>
+#include <apt-pkg/cachefile.h>
 #include <apt-pkg/init.h>
 
 namespace QApt {
@@ -55,13 +56,8 @@ public:
 
 Backend::Backend()
         : d(new BackendPrivate)
-        , m_progressMeter()
-        , m_cache(0)
-        , m_policy(0)
-        , m_depCache(0)
+        , m_records(0)
 {
-    m_list = new pkgSourceList;
-
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerStarted", this, SLOT(workerStarted(const QString&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
@@ -81,11 +77,7 @@ Backend::Backend()
 
 Backend::~Backend()
 {
-    delete m_list;
     delete m_cache;
-    delete m_policy;
-    delete m_records;
-    delete m_depCache;
 }
 
 bool Backend::init()
@@ -100,55 +92,39 @@ bool Backend::init()
         return false;
     }
 
-   // delete any old structures
-    if(m_depCache)
-        delete m_depCache;
-    if(m_policy)
-        delete m_policy;
-    if(m_cache)
-        delete m_cache;
+    reloadCache();
 
-    // Read the sources list
-    if (!m_list->ReadMainList()) {
-        return false;
+    return true;
+}
+
+void Backend::reloadCache()
+{
+    m_cache = new Cache(this);
+    m_cache->open();
+
+    pkgDepCache *depCache = m_cache->depCache();
+    if (m_records) {
+        delete m_records;
     }
+    m_records = new pkgRecords(*depCache);
 
-    pkgMakeStatusCache(*m_list, m_progressMeter, &m_map, true);
-    m_progressMeter.Done();
-    if (_error->PendingError()) {
-        return false;
+    foreach(Package *package, d->packages) {
+        package->deleteLater();
     }
-
-    // Open the cache file
-    m_cache = new pkgCache(m_map);
-    m_policy = new pkgPolicy(m_cache);
-    m_records = new pkgRecords(*m_cache);
-    if (!ReadPinFile(*m_policy)) {
-        return false;
-    }
-
-    if (_error->PendingError()) {
-        return false;
-    }
-
-    m_depCache = new pkgDepCache(m_cache, m_policy);
-    m_depCache->Init(&m_progressMeter);
-
-    if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
-        return false;
-    }
+    d->packages.clear();
+    d->packagesIndex.clear();
 
     // Populate internal package cache
     int count = 0;
     QSet<QString> groups;
 
     pkgCache::PkgIterator iter;
-    for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
+    for (iter = depCache->PkgBegin(); iter.end() != true; iter++) {
         if (iter->VersionList == 0) {
             continue; // Exclude virtual packages.
         }
 
-        Package *pkg = new Package(this, m_depCache, m_records, iter);
+        Package *pkg = new Package(this, depCache, m_records, iter);
         // Here every unique package ID is given a value. By looking it up we
         // can get this count value...
         d->packagesIndex.insert(iter->ID, count);
@@ -167,22 +143,11 @@ bool Backend::init()
         Group *group = new Group(this, groupName);
         d->groupSet << group;
     }
-
-    return true;
-}
-
-bool Backend::reloadCache()
-{
-    if (init()) {
-        return true;
-    } else {
-       return false;
-    }
 }
 
 pkgSourceList *Backend::packageSourceList()
 {
-    return m_list;
+    return m_cache->list();
 }
 
 Package *Backend::package(const QString &name)
@@ -203,6 +168,7 @@ Package *Backend::package(const QString &name)
 int Backend::packageCount()
 {
     int packageCount = d->packages.size();
+    qDebug() << packageCount;
 
     return packageCount;
 }
@@ -210,6 +176,7 @@ int Backend::packageCount()
 int Backend::packageCount(const Package::PackageStates &states)
 {
     int packageCount = 0;
+    qDebug() << d->packages.size();
 
     foreach(Package *package, d->packages) {
         if ((package->state() & states)) {
@@ -260,13 +227,13 @@ Group::List Backend::availableGroups()
 void Backend::markPackagesForUpgrade()
 {
     // TODO: Should say something if there's an error?
-    pkgAllUpgrade((*m_depCache));
+    pkgAllUpgrade(*m_cache->depCache());
 }
 
 void Backend::markPackagesForDistUpgrade()
 {
     // TODO: Should say something if there's an error?
-    pkgDistUpgrade((*m_depCache));
+    pkgDistUpgrade(*m_cache->depCache());
 }
 
 void Backend::markPackageForInstall(const QString &name)
@@ -368,6 +335,7 @@ void Backend::workerFinished(const QString &name, bool result)
 {
     qDebug() << "Worker Finished!";
     if (name == "update") {
+        reloadCache();
         emit cacheUpdateFinished();
     } else if (name == "commitChanges") {
         emit commitChangesFinished();

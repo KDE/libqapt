@@ -18,59 +18,53 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTTEST_H
-#define QAPTTEST_H
+#ifndef CACHE_H
+#define CACHE_H
 
+#include <QtCore/QObject>
 
-#include <KMainWindow>
+#include <apt-pkg/depcache.h>
+#include <apt-pkg/sourcelist.h>
+#include <apt-pkg/pkgsystem.h>
 
-#include <../src/backend.h>
+class pkgCache;
+class pkgPolicy;
 
-class QLabel;
-class QStackedWidget;
+/**
+ * The QApt namespace is the main namespace for LibQApt. All classes in this
+ * library fall under this namespace.
+ */
+namespace QApt {
 
-class KToggleAction;
-class KLineEdit;
-
-class CacheUpdateWidget;
-
-class qapttest : public KMainWindow
+class Cache : public QObject
 {
     Q_OBJECT
 public:
-    qapttest();
+     /**
+      * Default constructor
+      */
+    Cache(QObject* parent);
 
-    virtual ~qapttest();
+     /**
+      * Default destructor
+      */
+    virtual ~Cache();
 
-private Q_SLOTS:
-    void updateLabels();
-    void updateCache();
-    void cacheUpdateStarted();
-    void cacheUpdateFinished();
-    void updateDownloadProgress(int percentage);
-    void updateDownloadMessage(int flag, const QString &name);
+    OpProgress m_progressMeter;
+    MMap *m_map;
 
-private:
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
-    QApt::Group *m_group;
+    pkgCache *m_cache;
+    pkgPolicy *m_policy;
 
-    QStackedWidget *m_stack;
-    QWidget *m_mainWidget;
-    CacheUpdateWidget *m_cacheUpdateWidget;
-    KLineEdit *m_lineEdit;
-    QLabel *m_nameLabel;
-    QLabel *m_sectionLabel;
-    QLabel *m_originLabel;
-    QLabel *m_installedSizeLabel;
-    QLabel *m_maintainerLabel;
-    QLabel *m_sourceLabel;
-    QLabel *m_versionLabel;
-    QLabel *m_packageSizeLabel;
-    QLabel *m_shortDescriptionLabel;
-    QLabel *m_longDescriptionLabel;
+    pkgDepCache *m_depCache;
+    pkgSourceList *m_list;
 
-    QLabel *m_installedCountLabel;
+public Q_SLOTS:
+    bool open();
+    pkgDepCache *depCache();
+    pkgSourceList *list();
 };
+
+}
 
 #endif

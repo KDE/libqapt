@@ -18,59 +18,79 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTTEST_H
-#define QAPTTEST_H
+#include "cache.h"
 
+#include <apt-pkg/error.h>
+#include <apt-pkg/sourcelist.h>
+#include <apt-pkg/pkgcachegen.h>
+#include <apt-pkg/configuration.h>
+#include <apt-pkg/policy.h>
 
-#include <KMainWindow>
+namespace QApt {
 
-#include <../src/backend.h>
-
-class QLabel;
-class QStackedWidget;
-
-class KToggleAction;
-class KLineEdit;
-
-class CacheUpdateWidget;
-
-class qapttest : public KMainWindow
+Cache::Cache(QObject* parent)
+        : QObject(parent)
+        , m_map(0)
+        , m_cache(0)
+        , m_policy(0)
+        , m_depCache(0)
 {
-    Q_OBJECT
-public:
-    qapttest();
+    m_list = new pkgSourceList();
+}
 
-    virtual ~qapttest();
+Cache::~Cache()
+{
+    delete m_list;
+}
 
-private Q_SLOTS:
-    void updateLabels();
-    void updateCache();
-    void cacheUpdateStarted();
-    void cacheUpdateFinished();
-    void updateDownloadProgress(int percentage);
-    void updateDownloadMessage(int flag, const QString &name);
+bool Cache::open()
+{
+   // delete any old structures
+    if(m_depCache)
+        delete m_depCache;
+    if(m_policy)
+        delete m_policy;
+    if(m_cache)
+        delete m_cache;
 
-private:
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
-    QApt::Group *m_group;
+    // Read the sources list
+    if (!m_list->ReadMainList()) {
+        return false;
+    }
 
-    QStackedWidget *m_stack;
-    QWidget *m_mainWidget;
-    CacheUpdateWidget *m_cacheUpdateWidget;
-    KLineEdit *m_lineEdit;
-    QLabel *m_nameLabel;
-    QLabel *m_sectionLabel;
-    QLabel *m_originLabel;
-    QLabel *m_installedSizeLabel;
-    QLabel *m_maintainerLabel;
-    QLabel *m_sourceLabel;
-    QLabel *m_versionLabel;
-    QLabel *m_packageSizeLabel;
-    QLabel *m_shortDescriptionLabel;
-    QLabel *m_longDescriptionLabel;
+    pkgMakeStatusCache(*m_list, m_progressMeter, &m_map, true);
+    m_progressMeter.Done();
+    if (_error->PendingError()) {
+        return false;
+    }
 
-    QLabel *m_installedCountLabel;
-};
+    // Open the cache file
+    m_cache = new pkgCache(m_map);
+    m_policy = new pkgPolicy(m_cache);
+    if (!ReadPinFile(*m_policy)) {
+        return false;
+    }
 
-#endif
+    if (_error->PendingError()) {
+        return false;
+    }
+
+    m_depCache = new pkgDepCache(m_cache, m_policy);
+    m_depCache->Init(&m_progressMeter);
+
+    if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
+        return false;
+    }
+}
+
+pkgDepCache *Cache::depCache()
+{
+    return m_depCache;
+}
+
+pkgSourceList *Cache::list()
+{
+    return m_list;
+}
+
+}

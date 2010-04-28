@@ -93,23 +93,24 @@ qapttest::qapttest()
     m_shortDescriptionLabel = new QLabel(vbox);
     m_longDescriptionLabel = new QLabel(vbox);
 
-    updateLabels();
-    setCentralWidget(m_stack);
-
-    // Package count and installed package count in the sidebar
-    QLabel* packageCountLabel = new QLabel(this);
-
-    packageCountLabel->setText(i18np("%1 package available",
+    // Package count and installed package count in the statusbar
+    m_packageCountLabel = new QLabel(this);
+    m_packageCountLabel->setText(i18np("%1 package available",
                                      "%1 packages available",
                                      m_backend->packageCount()));
-    QLabel* installedCountLabel = new QLabel(this);
-    installedCountLabel->setText(i18np("(%1 package installed)",
+
+    m_installedCountLabel = new QLabel(this);
+    m_installedCountLabel->setText(i18np("(%1 package installed)",
                                      "(%1 packages installed)",
                                      // Yay for flags!
                                      m_backend->packageCount(QApt::Package::Installed)));
+
     statusBar()->addWidget(packageCountLabel);
-    statusBar()->addWidget(installedCountLabel);
+    statusBar()->addWidget(m_installedCountLabel);
     statusBar()->show();
+
+    updateLabels();
+    setCentralWidget(m_stack);
 
     // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
 //     m_group = m_backend->group("kde");
@@ -217,8 +218,15 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
 
 void qapttest::cacheUpdateFinished()
 {
+    m_packageCountLabel->setText(i18np("%1 package available",
+                                     "%1 packages available",
+                                     m_backend->packageCount()));
+
+    m_installedCountLabel->setText(i18np("(%1 package installed)",
+                                     "(%1 packages installed)",
+                                     // Yay for flags!
+                                     m_backend->packageCount(QApt::Package::Installed)));
     m_stack->setCurrentWidget(m_mainWidget);
-    m_backend->reloadCache();
 }
 
 #include "qapttest.moc"

@@ -1,5 +1,6 @@
 set(qapt_SRCS
     backend.cpp
+    cache.cpp
     package.cpp
     group.cpp
     )
@@ -13,6 +14,7 @@ add_subdirectory(worker)
 
 set(qapt_HDRS
     backend.h
+    cache.h
     package.h
     group.h
     globals.h
@@ -39,6 +41,7 @@ install(TARGETS qapt
 
 install(FILES
     backend.h
+    cache.h
     package.h
     group.h
     globals.h

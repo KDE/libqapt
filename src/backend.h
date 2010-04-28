@@ -28,6 +28,7 @@
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/policy.h>
 
+#include "cache.h"
 #include "package.h"
 #include "group.h"
 #include "globals.h"
@@ -65,14 +66,9 @@ public:
       */
     virtual ~Backend();
 
-    OpProgress m_progressMeter;
-    MMap *m_map;
-
-    pkgCache *m_cache;
+    Cache *m_cache;
     pkgPolicy *m_policy;
 
-    pkgDepCache *m_depCache;
-    pkgSourceList *m_list;
     pkgRecords *m_records;
 
     /**
@@ -94,7 +90,7 @@ public:
      * @return @c true if initialization was successful
      * @return @c false if there was a problem initializing
      */
-    bool reloadCache();
+    void reloadCache();
 
     /**
      * Returns a pointer to the internal package source list. Mainly used for
