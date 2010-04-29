@@ -8,6 +8,7 @@ set(qapt_worker_SRCS
     main.cpp
     worker.cpp
     workeracquire.cpp
+    workerinstallprogress.cpp
 )
 
 qt4_add_dbus_adaptor(qapt_worker_SRCS

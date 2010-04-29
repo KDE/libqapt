@@ -18,82 +18,34 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "cache.h"
+#ifndef WORKERINSTALLPROGRESS_H
+#define WORKERINSTALLPROGRESS_H
 
-#include <apt-pkg/error.h>
-#include <apt-pkg/sourcelist.h>
-#include <apt-pkg/pkgcachegen.h>
-#include <apt-pkg/configuration.h>
-#include <apt-pkg/policy.h>
+#include <QtCore/QObject>
 
-namespace QApt {
+#include <apt-pkg/packagemanager.h>
 
-Cache::Cache(QObject* parent)
-        : QObject(parent)
-        , m_map(0)
-        , m_cache(0)
-        , m_policy(0)
-        , m_depCache(0)
+class WorkerInstallProgress : public QObject
 {
-    m_list = new pkgSourceList();
-}
+    Q_OBJECT
+public:
+    WorkerInstallProgress(QObject* parent);
+    ~WorkerInstallProgress();
 
-Cache::~Cache()
-{
-    delete m_list;
-    delete m_cache;
-    delete m_depCache;
-    delete m_map;
-}
+    pkgPackageManager::OrderResult start(pkgPackageManager *pm);
 
-bool Cache::open()
-{
-   // delete any old structures
-    if(m_depCache)
-        delete m_depCache;
-    if(m_policy)
-        delete m_policy;
-    if(m_cache)
-        delete m_cache;
+private:
+    int m_stdout;
+    int m_stderr;
+    int m_childin;
 
-    // Read the sources list
-    if (!m_list->ReadMainList()) {
-        return false;
-    }
+    pid_t m_child_id;
+    bool m_startCounting;
 
-    pkgMakeStatusCache(*m_list, m_progressMeter, &m_map, true);
-    m_progressMeter.Done();
-    if (_error->PendingError()) {
-        return false;
-    }
+    void updateInterface(int fd);
 
-    // Open the cache file
-    m_cache = new pkgCache(m_map);
-    m_policy = new pkgPolicy(m_cache);
-    if (!ReadPinFile(*m_policy)) {
-        return false;
-    }
+signals:
+    void transactionProgress(QString package, QString status, int percentage);
+};
 
-    if (_error->PendingError()) {
-        return false;
-    }
-
-    m_depCache = new pkgDepCache(m_cache, m_policy);
-    m_depCache->Init(&m_progressMeter);
-
-    if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
-        return false;
-    }
-}
-
-pkgDepCache *Cache::depCache()
-{
-    return m_depCache;
-}
-
-pkgSourceList *Cache::list()
-{
-    return m_list;
-}
-
-}
+#endif

@@ -32,6 +32,7 @@
 #include <apt-pkg/policy.h>
 
 class WorkerAcquire;
+class WorkerInstallProgress;
 
 class QAptWorker : public QCoreApplication, protected QDBusContext
 {
@@ -68,15 +69,19 @@ private Q_SLOTS:
     bool initializeApt();
     void emitDownloadProgress(int percentage);
     void emitDownloadMessage(int flag, const QString &message);
+    void emitTransactionProgress(const QString& package, const QString& status,
+                                 int percentage);
 
 Q_SIGNALS:
-    // TODO: consolodate worker* into:
+    // TODO: consolidate worker* into:
     // void workerOperationChanged(OperationType, ResultFlag);
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
     // TODO: Change to operationPercentage throughout the codebase
     void downloadProgress(int percentage);
     void downloadMessage(int flag, const QString &message);
+    void transactionProgress(const QString package, const QString status,
+                             int percentage);
 };
 
 #endif

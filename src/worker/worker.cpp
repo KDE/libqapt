@@ -44,6 +44,7 @@
 
 #include "qaptauthorization.h"
 #include "workeracquire.h"
+#include "workerinstallprogress.h"
 
 QAptWorker::QAptWorker(int &argc, char **argv)
         : QCoreApplication(argc, argv)
@@ -260,6 +261,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     pkgPackageManager *packageManager;
     packageManager = _system->CreatePM(m_depCache);
 
+    WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
+    connect(installProgress, SIGNAL(transactionProgress(const QString&, const QString&, int)),
+            this, SLOT(emitTransactionProgress(const QString&, const QString&, int)));
+
     if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
         _error->PendingError()) {
         //TODO: Notify of error
@@ -302,74 +307,12 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
-    pkgPackageManager::OrderResult res;
-    res = packageManager->DoInstallPreFork();
-    if (res == pkgPackageManager::Failed) {
-        //TODO: Notify that we failed to prepare for installation
-        return;
+    pkgPackageManager::OrderResult res = installProgress->start(packageManager);
+    if (res == pkgPackageManager::Completed) {
+        emit workerFinished("commitChanges", true);
+    } else {
+        //TODO: emit failure
     }
-
-    // File descriptors for reading dpkg --status-fd
-    int readFromChildFD[2];
-    int writeToChildFD[2];
-    if (pipe(readFromChildFD) < 0 || pipe(writeToChildFD) < 0) {
-//         cout << "Failed to create a pipe" << endl;
-        return;
-    }
-
-    m_child_pid = fork();
-    if (m_child_pid == -1) {
-        return;
-    }
-
-    if (m_child_pid == 0) {
-        close(0);
-        //cout << "FORKED: installPackages(): DoInstall" << endl;
-        // redirect writeToChildFD to stdin
-        if (dup(writeToChildFD[0]) != 0) {
-//             cerr << "QApt: dup failed duplicate pipe to stdin" << endl;
-            close(readFromChildFD[1]);
-            close(writeToChildFD[0]);
-            _exit(1);
-        }
-
-        // close Forked stdout and the read end of the pipe
-        close(1);
-
-        //TODO: Debconf
-        setenv("DEBIAN_FRONTEND", "non-interactive", 1);
-
-        // Pass the write end of the pipe to the install function
-        res = packageManager->DoInstallPostFork(readFromChildFD[1]);
-
-        // dump errors into cerr (pass it to the parent process)
-        _error->DumpErrors();
-
-        close(readFromChildFD[0]);
-        close(writeToChildFD[1]);
-        close(readFromChildFD[1]);
-        close(writeToChildFD[0]);
-
-        _exit(res);
-    }
-
-    // Make it nonblocking. Very important; otherwise
-    // when the child finishes we'll stay stuck.
-    fcntl(readFromChildFD[0], F_SETFL, O_NONBLOCK);
-
-    // Check if the child died
-    int ret;
-    while (waitpid(m_child_pid, &ret, WNOHANG) == 0) {
-        //TODO: send out a transactionMessage
-//         updateInterface(readFromChildFD[0], writeToChildFD[1]);
-    }
-
-    close(readFromChildFD[0]);
-    close(readFromChildFD[1]);
-    close(writeToChildFD[0]);
-    close(writeToChildFD[1]);
-
-    emit workerFinished("commitChanges", true);
 }
 
 void QAptWorker::emitDownloadProgress(int percentage)
@@ -380,4 +323,9 @@ void QAptWorker::emitDownloadProgress(int percentage)
 void QAptWorker::emitDownloadMessage(int flag, const QString& message)
 {
     emit downloadMessage(flag, message);
+}
+
+void QAptWorker::emitTransactionProgress(const QString& package, const QString& status, int percentage)
+{
+    emit transactionProgress(package, status, percentage);
 }

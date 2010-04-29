@@ -274,6 +274,7 @@ void Backend::commitChanges()
                break;
            case Package::ToUpgrade:
                instructionList.insert("toUpgrade", package->id());
+               qDebug() << "Upgrading:" << package->name();
                break;
            case Package::ToDowngrade:
                instructionList.insert("toDowngrade", package->id());
