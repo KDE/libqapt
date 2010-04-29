@@ -22,9 +22,6 @@
 
 #include "qaptworkeradaptor.h"
 
-#include <QDebug>
-#include <QFile>
-
 // QApt includes
 #include <libqapt/backend.h>
 
@@ -60,13 +57,11 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     new QaptworkerAdaptor(this);
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
-        qDebug() << QDBusConnection::systemBus().lastError().message();
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
 
     if (!QDBusConnection::systemBus().registerObject("/", this)) {
-        qDebug() << "unable to register service interface to dbus";
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
@@ -241,8 +236,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
                     m_depCache->SetReInstall(iter, false);
                     m_depCache->MarkDelete(iter, false);
                 } else {
-                    // Unsupported operation
-                    // TODO: Probably should emit something here
+                    // Unsupported operation. Should emit something here?
                 }
             }
         }
