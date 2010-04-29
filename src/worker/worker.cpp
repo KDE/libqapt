@@ -25,6 +25,9 @@
 #include <QDebug>
 #include <QFile>
 
+// QApt includes
+#include <libqapt/backend.h>
+
 // Apt includes
 #include <apt-pkg/error.h>
 #include <apt-pkg/configuration.h>
@@ -202,32 +205,39 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     QMap<QString, QVariant>::const_iterator mapIter = instructionList.constBegin();
 
     while (mapIter != instructionList.constEnd()) {
-        QString operation = mapIter.key();
-        int packageID = mapIter.value().toInt();
+        QString package = mapIter.key();
+        int operation = mapIter.value().toInt();
 
         // Iterate through all packages
         pkgCache::PkgIterator iter;
         for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
             // Find one with a matching ID to the one in the instructions list
-            if (iter->ID == packageID) {
+            if (iter.Name() == package) {
                 // Then mark according to the instruction
-                if (operation == "kept") {
+                if (operation == QApt::Package::Held) {
                     m_depCache->MarkKeep(iter, false);
                     m_depCache->SetReInstall(iter, false);
-                } else if (operation == "toInstall") {
+                } else if (operation == QApt::Package::ToInstall) {
                     m_depCache->MarkInstall(iter, true);
-                } else if (operation == "toReInstall") {
+                    pkgDepCache::StateCache & State = (*m_depCache)[iter];
+                    if (!State.Install() || m_depCache->BrokenCount() > 0) {
+                        pkgProblemResolver Fix(m_depCache);
+                        Fix.Clear(iter);
+                        Fix.Protect(iter);
+                        Fix.Resolve(true);
+                    }
+                } else if (operation == QApt::Package::ToReInstall) {
                     m_depCache->SetReInstall(iter, true);
-                } else if (operation == "toUpgrade") {
+                } else if (operation == QApt::Package::ToUpgrade) {
                     // The QApt Backend will handle dist-upgradish things for us
                     pkgAllUpgrade((*m_depCache));
-                } else if (operation == "toDowngrade") {
+                } else if (operation == QApt::Package::ToDowngrade) {
                     // TODO: Probably gotta set the candidate version here...
                     // needs work in QApt::Package so that we can set this anyways
-                } else if (operation == "toPurge") {
+                } else if (operation == QApt::Package::ToPurge) {
                     m_depCache->SetReInstall(iter, false);
                     m_depCache->MarkDelete(iter, true);
-                } else if (operation == "toRemove") {
+                } else if (operation == QApt::Package::ToRemove) {
                     m_depCache->SetReInstall(iter, false);
                     m_depCache->MarkDelete(iter, false);
                 } else {

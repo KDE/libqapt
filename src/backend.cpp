@@ -264,32 +264,34 @@ void Backend::commitChanges()
         switch (status) {
            case Package::ToKeep:
                if (flags & Package::Held) {
-                   instructionList.insert("held", package->id());
+                   instructionList.insert(package->name(), Package::Held);
                }
                break;
            case Package::NewInstall:
-               instructionList.insert("toInstall", package->id());
-               qDebug() << package->name();
+               instructionList.insert(package->name(), Package::ToInstall);
+               qDebug() << "Installing:" << package->name();
                break;
            case Package::ToReInstall:
-               instructionList.insert("toReInstall", package->id());
+               instructionList.insert(package->name(), Package::ToReInstall);
                break;
            case Package::ToUpgrade:
-               instructionList.insert("toUpgrade", package->id());
+               instructionList.insert(package->name(), Package::ToUpgrade);
                qDebug() << "Upgrading:" << package->name();
                break;
            case Package::ToDowngrade:
-               instructionList.insert("toDowngrade", package->id());
+               instructionList.insert(package->name(), Package::ToDowngrade);
                break;
            case Package::ToRemove:
                if(flags & Package::ToPurge) {
-                   instructionList.insert("toPurge", package->id());
+                   instructionList.insert(package->name(), Package::ToPurge);
                } else {
-                   instructionList.insert("toRemove", package->id());
+                   instructionList.insert(package->name(), Package::ToRemove);
                }
                break;
         }
     }
+
+    qDebug() << instructionList;
 
     QDBusMessage message;
     message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
@@ -306,7 +308,7 @@ void Backend::commitChanges()
 void Backend::packageChanged(Package *package)
 {
     qDebug() << "A package changed!";
-    //TODO: Reload package pointers, emit a signal so that frontends can reload
+    //TODO: Emit a signal so that frontends can reload
     // their UI's.
 }
 

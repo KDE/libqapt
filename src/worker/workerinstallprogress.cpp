@@ -94,7 +94,6 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
 
 void WorkerInstallProgress::updateInterface(int fd)
 {
-    QFile::rename("/home/jonathan/lol", "/home/jonathan/" + QString::number(fd));
     char buf[2];
     static char line[1024] = "";
 
