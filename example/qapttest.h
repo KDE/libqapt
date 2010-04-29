@@ -49,6 +49,7 @@ private Q_SLOTS:
     void cacheUpdateFinished();
     void updateDownloadProgress(int percentage);
     void updateDownloadMessage(int flag, const QString &name);
+    void updateTransactionMessage(const QString &package, const QString& message, int percentage);
 
 private:
     QApt::Backend *m_backend;
