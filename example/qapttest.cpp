@@ -146,13 +146,13 @@ void qapttest::updateLabels()
         m_packageSizeLabel->setText(i18n("<b>Download size:</b> %1", packageSize));
         m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
         m_longDescriptionLabel->setText(m_package->longDescription());
-    }
 
-    if (m_package->name() == "kpat") {
-        m_package->setInstall();
+        if (m_package->name() == "kpat") {
+            m_package->setInstall();
 
-        m_backend->markPackagesForUpgrade();
-        m_backend->commitChanges();
+            m_backend->markPackagesForUpgrade();
+            m_backend->commitChanges();
+        }
     }
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them
