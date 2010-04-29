@@ -196,6 +196,10 @@ void QAptWorker::cancelCacheUpdate()
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 {
+    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
+        return;
+    }
+
     // Parse out the argument list and mark packages for operations
     QMap<QString, QVariant>::const_iterator mapIter = instructionList.constBegin();
 
@@ -206,7 +210,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         // Iterate through all packages
         pkgCache::PkgIterator iter;
         for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
-            // Find one with a matching ID to the one in the instructions list
+            // Find one with a matching Name to the one in the instructions list
             if (iter.Name() == package) {
                 // Then mark according to the instruction
                 if (operation == QApt::Package::Held) {
@@ -241,10 +245,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             }
         }
         mapIter++;
-    }
-
-    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
-        return;
     }
 
     emit workerStarted("commitChanges");

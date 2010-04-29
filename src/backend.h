@@ -168,6 +168,7 @@ private:
     BackendPrivate *d;
 
 Q_SIGNALS:
+    void packageChanged();
     void cacheUpdateStarted();
     void cacheUpdateFinished();
     void commitChangesStarted();
@@ -202,7 +203,7 @@ public Q_SLOTS:
      * A slot that Packages use to tell the backend they've changed.
      * (Used internally by QApt::Package. You likely will never use this)
      */
-    void packageChanged(Package *package);
+    void slotPackageChanged(Package *package);
 
     void updateCache();
     void workerStarted(const QString &name);

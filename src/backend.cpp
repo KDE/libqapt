@@ -305,11 +305,10 @@ void Backend::commitChanges()
     QDBusConnection::systemBus().asyncCall(message);
 }
 
-void Backend::packageChanged(Package *package)
+void Backend::slotPackageChanged(Package *package)
 {
     qDebug() << "A package changed!";
-    //TODO: Emit a signal so that frontends can reload
-    // their UI's.
+    emit packageChanged();
 }
 
 void Backend::updateCache()
