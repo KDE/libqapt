@@ -174,6 +174,8 @@ Q_SIGNALS:
     void commitChangesFinished();
     void downloadProgress(int percentage);
     void downloadMessage(int flag, const QString &message);
+    void transactionMessage(const QString &package, const QString &status,
+                            int percentage);
 
 public Q_SLOTS:
     /**

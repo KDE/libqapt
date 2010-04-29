@@ -21,6 +21,7 @@
 #include "workerinstallprogress.h"
 
 #include <QtCore/QStringList>
+#include <QtCore/QFile>
 
 #include <apt-pkg/error.h>
 
@@ -59,41 +60,41 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     }
 
     m_child_id = fork();
-    int fd[2];
+    int readFromChildFD[2];
 
     if (m_child_id < 0) {
         return res;
     } else if (m_child_id == 0) {
-        fd[2];
-        pipe(fd);
+        pipe(readFromChildFD);
 
-        res = pm->DoInstallPostFork(fd[1]);
+        res = pm->DoInstallPostFork(readFromChildFD[1]);
 
         // dump errors into cerr (pass it to the parent process)
         _error->DumpErrors();
 
-        ::close(fd[0]);
-        ::close(fd[1]);
+        ::close(readFromChildFD[0]);
+        ::close(readFromChildFD[1]);
 
         _exit(res);
     }
 
     // make it nonblocking
-    fcntl(fd[0], F_SETFL, O_NONBLOCK);
+    fcntl(readFromChildFD[0], F_SETFL, O_NONBLOCK);
 
     // Check if the child died
     int ret;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
-        updateInterface(fd[0]);
+        updateInterface(readFromChildFD[0]);
     }
 
-    ::close(fd[0]);
+    ::close(readFromChildFD[0]);
 
     return res;
 }
 
 void WorkerInstallProgress::updateInterface(int fd)
 {
+    QFile::rename("/home/jonathan/lol", "/home/jonathan/" + QString::number(fd));
     char buf[2];
     static char line[1024] = "";
 
@@ -106,7 +107,7 @@ void WorkerInstallProgress::updateInterface(int fd)
             break;
         }
 
-        if ( buf[0] == '\n') {
+        if (buf[0] == '\n') {
             //cout << "got line: " << line << endl;
             QStringList list = QString::fromStdString(line).split(":");
             QString status = list[0].simplified();
