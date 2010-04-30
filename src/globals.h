@@ -29,6 +29,37 @@ namespace QApt
 
 namespace Globals
 {
+    enum WorkerEvent {
+        InvalidEvent            = 0,
+        CacheUpdateStarted      = 1,
+        CacheUpdateFinished     = 2,
+        CommitChangesStarted    = 3,
+        CommitChangesFinished   = 4,
+        PackageDownloadStarted  = 5,
+        PackageDownloadFinished = 6,
+    };
+
+    enum WorkerQuestion {
+        InvalidQuestion = 0,
+        ConfFilePrompt  = 1,
+        DebconfPrompt   = 2,
+        MediaChange     = 3
+    };
+
+    enum ErrorCode {
+        UnknownError   = 0,
+        InitError      = 1,
+        LockError      = 2,
+        DiskSpaceError = 3,
+        FetchError     = 4,
+        CommitError    = 5
+    };
+
+    enum WarningCode {
+        UnknownWarning = 0,
+        SizeMismatch   = 1
+    };
+
     enum FetchType {
         DownloadFetch = 1,
         HitFetch = 2,
