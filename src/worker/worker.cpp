@@ -23,7 +23,7 @@
 #include "qaptworkeradaptor.h"
 
 // QApt includes
-#include <libqapt/backend.h>
+#include <../backend.h>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -166,6 +166,7 @@ void QAptWorker::unlock()
 void QAptWorker::updateCache()
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+        emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
         return;
     }
 
@@ -175,6 +176,7 @@ void QAptWorker::updateCache()
     if (!_config->FindB("Debug::NoLocking", false)) {
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
+            emit errorOccurred(QApt::Globals::LockError, QVariantMap());
             emit workerFinished("update", false);
         }
     }
@@ -189,6 +191,8 @@ void QAptWorker::updateCache()
 void QAptWorker::cancelCacheUpdate()
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+        emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
+        emit workerFinished("update", false);
         return;
     }
     m_acquireStatus->requestCancel();
@@ -197,6 +201,7 @@ void QAptWorker::cancelCacheUpdate()
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
+        emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
         return;
     }
 
@@ -255,7 +260,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     {
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
         if (_error->PendingError() == true) {
-            // TODO: Send error about not being able to lock
+            emit errorOccurred(QApt::Globals::LockError, QVariantMap());
+            emit workerFinished("commitChanges", false);
             return;
         }
     }
@@ -271,7 +277,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
         _error->PendingError()) {
-        //TODO: Notify of error
+        QVariantMap args;
+        args["ErrorString"] = QString(_error->PendingError());
+        emit errorOccurred(QApt::Globals::FetchError, args);
+        emit workerFinished("commitChanges", false);
         return;
     }
 
@@ -288,7 +297,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     struct statvfs Buf;
     string OutputDir = _config->FindDir("Dir::Cache::Archives");
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
-        //TODO: emit "can't calculate free space" error
+        emit errorOccurred(QApt::Globals::DiskSpaceError, QVariantMap());
+        emit workerFinished("commitChanges", false);
         return;
     }
     if (unsigned(Buf.f_bfree) < (FetchBytes - FetchPBytes)/Buf.f_bsize)
@@ -299,13 +309,17 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         {
 //             return _error->Error("You don't have enough free space in %s.",
 //                         OutputDir.c_str());
-            // TODO: emit space error
+            QVariantMap args;
+            args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
+            emit errorOccurred(QApt::Globals::DiskSpaceError, args);
+            emit workerFinished("commitChanges", false);
             return;
         }
     }
 
     if (fetcher.Run() != pkgAcquire::Continue) {
-        //TODO: Notify of fetching error
+        // Our fetcher will report progress for itself
+        emit workerFinished("commitChanges", false);
         return;
     }
 
@@ -315,7 +329,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (res == pkgPackageManager::Completed) {
         emit workerFinished("commitChanges", true);
     } else {
-        //TODO: emit failure
+        emit workerFinished("commitChanges", false);
     }
 }
 

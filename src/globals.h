@@ -19,8 +19,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef GLOBALSH
-#define GLOBALSH
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 #include <QtCore/QFlags>
 
@@ -36,7 +36,7 @@ namespace Globals
         CommitChangesStarted    = 3,
         CommitChangesFinished   = 4,
         PackageDownloadStarted  = 5,
-        PackageDownloadFinished = 6,
+        PackageDownloadFinished = 6
     };
 
     enum WorkerQuestion {
@@ -52,8 +52,10 @@ namespace Globals
         LockError      = 2,
         DiskSpaceError = 3,
         FetchError     = 4,
-        CommitError    = 5
+        CommitError    = 5,
+        AuthError      = 6
     };
+    Q_DECLARE_FLAGS(Errors, ErrorCode);
 
     enum WarningCode {
         UnknownWarning = 0,
@@ -61,6 +63,7 @@ namespace Globals
     };
 
     enum FetchType {
+        InvalidFetch = 0,
         DownloadFetch = 1,
         HitFetch = 2,
         IgnoredFetch = 3
