@@ -324,11 +324,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
     pkgPackageManager::OrderResult res = installProgress->start(packageManager);
-    if (res == pkgPackageManager::Completed) {
-        emit workerFinished("commitChanges", true);
-    } else {
-        emit workerFinished("commitChanges", false);
-    }
+    bool success = (res == pkgPackageManager::Completed);
+    emit workerFinished("commitChanges", success);
 }
 
 void QAptWorker::emitDownloadProgress(int percentage)
