@@ -290,7 +290,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     double DebBytes = fetcher.TotalNeeded();
     if (DebBytes != m_depCache->DebSize())
     {
-        //TODO: emit mismatch warning
+        //TODO: emit mismatch warning. Need to decide on a warning signal.
     }
 
     /* Check for enough free space */
@@ -307,8 +307,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         if (statfs(OutputDir.c_str(), &Stat) != 0 ||
             unsigned(Stat.f_type)            != RAMFS_MAGIC)
         {
-//             return _error->Error("You don't have enough free space in %s.",
-//                         OutputDir.c_str());
             QVariantMap args;
             args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
             emit errorOccurred(QApt::Globals::DiskSpaceError, args);

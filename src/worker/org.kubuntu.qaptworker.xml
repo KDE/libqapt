@@ -20,6 +20,11 @@
       <arg name="status" type="s" direction="out"/>
       <arg name="percentage" type="i" direction="out"/>
     </signal>
+    <signal name="errorOccurred">
+      <arg name="code" type="i" direction="out"/>
+      <arg name="details" type="a{sv}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out1" value="QVariantMap"/>
+    </signal>
     <method name="updateCache">
     </method>
     <method name="cancelCacheUpdate">
