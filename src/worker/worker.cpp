@@ -297,7 +297,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     struct statvfs Buf;
     string OutputDir = _config->FindDir("Dir::Cache::Archives");
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
-        emit errorOccurred(QApt::Globals::DiskSpaceError, QVariantMap());
+        QVariantMap args;
+        args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
+        emit errorOccurred(QApt::Globals::DiskSpaceError, args);
         emit workerFinished("commitChanges", false);
         return;
     }
@@ -316,7 +318,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     }
 
     if (fetcher.Run() != pkgAcquire::Continue) {
-        // Our fetcher will report progress for itself
+        // Our fetcher will report errors for itself
         emit workerFinished("commitChanges", false);
         return;
     }
