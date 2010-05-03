@@ -22,6 +22,7 @@
 #define BACKEND_H
 
 #include <QtCore/QSet>
+#include <QtCore/QVariantList>
 
 #include <apt-pkg/progress.h>
 #include <apt-pkg/sourcelist.h>
@@ -168,6 +169,7 @@ private:
     BackendPrivate *d;
 
 Q_SIGNALS:
+    void errorOccurred(int flag, QVariantMap args);
     void packageChanged();
     void cacheUpdateStarted();
     void cacheUpdateFinished();
