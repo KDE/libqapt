@@ -59,21 +59,38 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
         return res;
     }
 
-    m_child_id = fork();
     int readFromChildFD[2];
+    int writeToChildFD[2];
 
-    if (m_child_id < 0) {
+    //Initialize both pipes
+    if (pipe(readFromChildFD) < 0 || pipe(writeToChildFD) < 0) {
+        return res;
+    }
+
+    m_child_id = fork();
+    if (m_child_id == -1) {
         return res;
     } else if (m_child_id == 0) {
-        pipe(readFromChildFD);
+        close(0);
+
+        if (dup(writeToChildFD[0]) != 0) {
+            close(readFromChildFD[1]);
+            close(writeToChildFD[0]);
+            _exit(1);
+        }
+
+        // close Forked stdout and the read end of the pipe
+        close(1);
 
         res = pm->DoInstallPostFork(readFromChildFD[1]);
 
         // dump errors into cerr (pass it to the parent process)
         _error->DumpErrors();
 
-        ::close(readFromChildFD[0]);
-        ::close(readFromChildFD[1]);
+        close(readFromChildFD[0]);
+        close(writeToChildFD[1]);
+        close(readFromChildFD[1]);
+        close(writeToChildFD[0]);
 
         _exit(res);
     }
@@ -87,7 +104,10 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
         updateInterface(readFromChildFD[0]);
     }
 
-    ::close(readFromChildFD[0]);
+    close(readFromChildFD[0]);
+    close(readFromChildFD[1]);
+    close(writeToChildFD[0]);
+    close(writeToChildFD[1]);
 
     return res;
 }
@@ -100,9 +120,11 @@ void WorkerInstallProgress::updateInterface(int fd)
     while (1) {
         // This algorithm should be improved (it's the same as the rpm one ;)
         int len = read(fd, buf, 1);
+        
 
         // nothing was read
         if (len < 1) {
+            QFile::rename("/home/jonathan/lol", "/home/jonathan/lol2");
             break;
         }
 
