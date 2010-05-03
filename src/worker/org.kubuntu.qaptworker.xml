@@ -21,9 +21,9 @@
       <arg name="percentage" type="i" direction="out"/>
     </signal>
     <signal name="errorOccurred">
-      <arg name="code" type="i" direction="out"/>
-      <arg name="details" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out1" value="QVariantMap"/>
+        <arg type="i" direction="out" />
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
+        <arg type="a{sv}" direction="out" />
     </signal>
     <method name="updateCache">
     </method>
