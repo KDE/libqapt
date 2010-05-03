@@ -320,7 +320,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     }
 
     if (fetcher.Run() != pkgAcquire::Continue) {
-        // Our fetcher will report errors for itself
+        // Our fetcher will report errors for itself, but we have to send the
+        // finished signal
         emit workerFinished("commitChanges", false);
         return;
     }
