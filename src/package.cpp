@@ -473,7 +473,7 @@ void Package::setAuto(bool flag)
 void Package::setKeep()
 {
     m_depCache->MarkKeep(*m_packageIter, false);
-    m_backend->slotPackageChanged(this);
+    m_backend->packageChanged(this);
     setReInstall(false);
 }
 
@@ -490,13 +490,13 @@ void Package::setInstall()
         Fix.Resolve(true);
     }
 
-    m_backend->slotPackageChanged(this);
+    m_backend->packageChanged(this);
 }
 
 void Package::setReInstall(bool flag)
 {
     m_depCache->SetReInstall(*m_packageIter, flag);
-    m_backend->slotPackageChanged(this);
+    m_backend->packageChanged(this);
 }
 
 
@@ -514,7 +514,7 @@ void Package::setRemove(bool purge)
     m_depCache->SetReInstall(*m_packageIter, false);
     m_depCache->MarkDelete(*m_packageIter, purge);
 
-    m_backend->slotPackageChanged(this);
+    m_backend->packageChanged(this);
 }
 
 }

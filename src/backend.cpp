@@ -305,7 +305,7 @@ void Backend::commitChanges()
     QDBusConnection::systemBus().asyncCall(message);
 }
 
-void Backend::slotPackageChanged(Package *package)
+void Backend::packageChanged(Package *package)
 {
     qDebug() << "A package changed!";
     emit packageChanged();

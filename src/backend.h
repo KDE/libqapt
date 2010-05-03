@@ -203,7 +203,7 @@ public Q_SLOTS:
      * A slot that Packages use to tell the backend they've changed.
      * (Used internally by QApt::Package. You likely will never use this)
      */
-    void slotPackageChanged(Package *package);
+    void packageChanged(Package *package);
 
     void updateCache();
     void workerStarted(const QString &name);
