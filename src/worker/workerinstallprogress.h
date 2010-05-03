@@ -21,7 +21,7 @@
 #ifndef WORKERINSTALLPROGRESS_H
 #define WORKERINSTALLPROGRESS_H
 
-#include <QtCore/QObject>
+#include <QtCore/QVariantMap>
 
 #include <apt-pkg/packagemanager.h>
 
@@ -46,6 +46,7 @@ private:
 
 signals:
     void transactionProgress(QString package, QString status, int percentage);
+    void commitError(int code, const QVariantMap &details);
 };
 
 #endif

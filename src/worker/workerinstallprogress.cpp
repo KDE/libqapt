@@ -20,8 +20,11 @@
 
 #include "workerinstallprogress.h"
 
+#include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
+
+#include <../globals.h>
 
 #include <apt-pkg/error.h>
 
@@ -141,7 +144,9 @@ void WorkerInstallProgress::updateInterface(int fd)
             }
 
             if (status.contains("pmerror")) {
-                //TODO: emit error (str)
+                QVariantMap args;
+                args["ErrorMessage"] = QString(package % ": " % str);
+                emit commitError(QApt::Globals::CommitError, args);
             } else if (status.contains("pmconffile")) {
                 //TODO: Conffile handling
             } else {
@@ -150,7 +155,7 @@ void WorkerInstallProgress::updateInterface(int fd)
 
             int percentage = (percent.toInt()/100);
 
-            emit transactionProgress(package, status, percentage);
+            emit transactionProgress(package, str, percentage);
             // clean-up
             line[0] = 0;
         } else {
@@ -159,5 +164,3 @@ void WorkerInstallProgress::updateInterface(int fd)
         }
     }
 }
-
-

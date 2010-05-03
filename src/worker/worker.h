@@ -72,6 +72,7 @@ private Q_SLOTS:
     void emitDownloadMessage(int flag, const QString &message);
     void emitTransactionProgress(const QString& package, const QString& status,
                                  int percentage);
+    void emitErrorOccurred(int code, const QVariantMap&);
 
 Q_SIGNALS:
     // TODO: consolidate worker* into:
@@ -83,7 +84,6 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
     void transactionProgress(const QString package, const QString status,
                              int percentage);
-
     void errorOccurred(int code, const QVariantMap &details);
 };
 

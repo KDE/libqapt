@@ -272,6 +272,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     packageManager = _system->CreatePM(m_depCache);
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
+    connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
+            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
     connect(installProgress, SIGNAL(transactionProgress(const QString&, const QString&, int)),
             this, SLOT(emitTransactionProgress(const QString&, const QString&, int)));
 
@@ -343,4 +345,9 @@ void QAptWorker::emitDownloadMessage(int flag, const QString& message)
 void QAptWorker::emitTransactionProgress(const QString& package, const QString& status, int percentage)
 {
     emit transactionProgress(package, status, percentage);
+}
+
+void QAptWorker::emitErrorOccurred(int code, const QVariantMap& details)
+{
+    emit errorOccurred(code, details);
 }
