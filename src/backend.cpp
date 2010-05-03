@@ -58,7 +58,7 @@ Backend::Backend()
         , m_records(0)
 {
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "errorOccurred", this, SLOT(errorOccurred(int, QVariantMap)));
+                                "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerStarted", this, SLOT(workerStarted(const QString&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",

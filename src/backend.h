@@ -169,7 +169,7 @@ private:
     BackendPrivate *d;
 
 Q_SIGNALS:
-    void errorOccurred(int flag, QVariantMap args);
+    void errorOccurred(int code, const QVariantMap &args);
     void packageChanged();
     void cacheUpdateStarted();
     void cacheUpdateFinished();
