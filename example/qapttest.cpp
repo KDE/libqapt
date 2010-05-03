@@ -46,7 +46,9 @@ qapttest::qapttest()
     m_backend->init();
 
     connect(m_backend, SIGNAL(cacheUpdateStarted()), this, SLOT(cacheUpdateStarted()));
-    connect(m_backend, SIGNAL(cacheUpdateFinished()), this, SLOT(cacheUpdateFinished()));
+    connect(m_backend, SIGNAL(cacheUpdateFinished()), this, SLOT(operationFinished()));
+    connect(m_backend, SIGNAL(commitChangesStarted()), this, SLOT(commitChangesStarted()));
+    connect(m_backend, SIGNAL(commitChangesFinished()), this, SLOT(operationFinished()));
     connect(m_backend, SIGNAL(downloadProgress(int)), this, SLOT(updateDownloadProgress(int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
@@ -193,6 +195,13 @@ void qapttest::cacheUpdateStarted()
     connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelCacheUpdate()));
 }
 
+
+void qapttest::commitChangesStarted()
+{
+    m_cacheUpdateWidget->clear();
+    m_stack->setCurrentWidget(m_cacheUpdateWidget);
+}
+
 void qapttest::updateDownloadProgress(int percentage)
 {
     m_cacheUpdateWidget->setTotalProgress(percentage);
@@ -223,7 +232,7 @@ void qapttest::updateTransactionMessage(const QString &package, const QString& m
     kDebug() << package << message << percentage;
 }
 
-void qapttest::cacheUpdateFinished()
+void qapttest::operationFinished()
 {
     m_packageCountLabel->setText(i18np("%1 package available",
                                      "%1 packages available",

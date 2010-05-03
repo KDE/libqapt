@@ -46,7 +46,8 @@ private Q_SLOTS:
     void updateLabels();
     void updateCache();
     void cacheUpdateStarted();
-    void cacheUpdateFinished();
+    void commitChangesStarted();
+    void operationFinished();
     void updateDownloadProgress(int percentage);
     void updateDownloadMessage(int flag, const QString &name);
     void updateTransactionMessage(const QString &package, const QString& message, int percentage);
