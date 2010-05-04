@@ -132,8 +132,7 @@ void WorkerInstallProgress::updateInterface(int fd)
         }
 
         if (buf[0] == '\n') {
-            //cout << "got line: " << line << endl;
-            QStringList list = QString::fromStdString(line).split(":");
+            QStringList list = QString::fromStdString(line).split(':');
             QString status = list[0].simplified();
             QString package = list[1].simplified();
             QString percent = list[2].simplified();

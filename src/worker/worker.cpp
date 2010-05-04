@@ -280,7 +280,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
         _error->PendingError()) {
-        QVariantMap args;
         // WorkerAcquire emits its own error messages; just end the operation
         emit workerFinished("commitChanges", false);
         return;
