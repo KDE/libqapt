@@ -45,7 +45,7 @@ private:
     void updateInterface(int fd);
 
 signals:
-    void transactionProgress(QString status, int percentage);
+    void commitProgress(QString status, int percentage);
     void commitError(int code, const QVariantMap &details);
 };
 

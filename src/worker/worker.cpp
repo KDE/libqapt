@@ -275,8 +275,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
     connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
             this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
-    connect(installProgress, SIGNAL(transactionProgress(const QString&, int)),
-            this, SLOT(emitTransactionProgress(const QString&, int)));
+    connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
+            this, SLOT(emitCommitProgress(const QString&, int)));
 
     if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
         _error->PendingError()) {
@@ -342,9 +342,9 @@ void QAptWorker::emitDownloadMessage(int flag, const QString& message)
     emit downloadMessage(flag, message);
 }
 
-void QAptWorker::emitTransactionProgress(const QString& status, int percentage)
+void QAptWorker::emitCommitProgress(const QString& status, int percentage)
 {
-    emit transactionProgress(status, percentage);
+    emit commitProgress(status, percentage);
 }
 
 void QAptWorker::emitErrorOccurred(int code, const QVariantMap& details)

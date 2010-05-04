@@ -50,7 +50,7 @@ private Q_SLOTS:
     void operationFinished();
     void updateDownloadProgress(int percentage);
     void updateDownloadMessage(int flag, const QString &name);
-    void updateTransactionMessage(const QString& message, int percentage);
+    void updateCommitProgress(const QString& message, int percentage);
 
 private:
     QApt::Backend *m_backend;

@@ -153,7 +153,7 @@ void WorkerInstallProgress::updateInterface(int fd)
             int percentage = (percent.toInt()/100);
 
             //TODO: rename to commitProgress
-            emit transactionProgress(str, percentage);
+            emit commitProgress(str, percentage);
             // clean-up
             line[0] = 0;
         } else {
