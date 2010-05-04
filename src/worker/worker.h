@@ -75,8 +75,9 @@ private Q_SLOTS:
     void emitErrorOccurred(int code, const QVariantMap&);
 
 Q_SIGNALS:
-    // TODO: consolidate worker* into:
-    // void workerOperationChanged(OperationType, ResultFlag);
+    // TODO: Add signals to indicate worker operation type
+    // in between workerStarted and Finished. (e.g. committing is an operation
+    // that involves both a downloading state and a committing state)
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
     void downloadProgress(int percentage);
