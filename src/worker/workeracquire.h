@@ -22,6 +22,7 @@
 #define WORKERACQUIRE_H
 
 #include <QtCore/QEventLoop>
+#include <QtCore/QVariantMap>
 
 #include <apt-pkg/acquire.h>
 
@@ -54,10 +55,10 @@ private:
     bool m_canceled;
 
 signals:
+    void fetchError(int code, const QVariantMap &details);
     void mediaChangeRequest(const QString &media, const QString &drive);
     void downloadProgress(int percentage);
     void downloadSubProgress(int percentage);
-    // TODO: Set fetch type in downloadMessage, (Get, Hit, Ign, etc like in apt-get)
     void downloadMessage(int flag, const QString &message);
 };
 

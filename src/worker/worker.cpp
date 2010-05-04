@@ -196,6 +196,7 @@ void QAptWorker::cancelCacheUpdate()
         return;
     }
     m_acquireStatus->requestCancel();
+    emit workerFinished("update", false);
 }
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
@@ -280,8 +281,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
         _error->PendingError()) {
         QVariantMap args;
-        args["ErrorString"] = QString(_error->PendingError());
-        emit errorOccurred(QApt::Globals::FetchError, args);
+        // WorkerAcquire emits its own error messages; just end the operation
         emit workerFinished("commitChanges", false);
         return;
     }

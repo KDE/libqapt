@@ -82,6 +82,10 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
+        QVariantMap args;
+        args["FailedItem"] = QString(item.Owner->ErrorText.c_str());
+        args["ErrorText"] = QString(item.Description.c_str());
+        emit fetchError(QApt::Globals::FetchError, args);
         //TODO: emit error
         _error->Error("Error %s\n  %s",
                   item.Description.c_str(),
