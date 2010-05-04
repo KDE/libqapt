@@ -123,11 +123,9 @@ void WorkerInstallProgress::updateInterface(int fd)
     while (1) {
         // This algorithm should be improved (it's the same as the rpm one ;)
         int len = read(fd, buf, 1);
-        
 
         // nothing was read
         if (len < 1) {
-            QFile::rename("/home/jonathan/lol", "/home/jonathan/lol2");
             break;
         }
 
@@ -154,7 +152,8 @@ void WorkerInstallProgress::updateInterface(int fd)
 
             int percentage = (percent.toInt()/100);
 
-            emit transactionProgress(package, str, percentage);
+            //TODO: rename to commitProgress
+            emit transactionProgress(str, percentage);
             // clean-up
             line[0] = 0;
         } else {

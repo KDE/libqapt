@@ -70,7 +70,7 @@ private Q_SLOTS:
     bool initializeApt();
     void emitDownloadProgress(int percentage);
     void emitDownloadMessage(int flag, const QString &message);
-    void emitTransactionProgress(const QString& package, const QString& status,
+    void emitTransactionProgress(const QString& status,
                                  int percentage);
     void emitErrorOccurred(int code, const QVariantMap&);
 
@@ -82,7 +82,7 @@ Q_SIGNALS:
     // TODO: Change to operationPercentage throughout the codebase
     void downloadProgress(int percentage);
     void downloadMessage(int flag, const QString &message);
-    void transactionProgress(const QString package, const QString status,
+    void transactionProgress(const QString status,
                              int percentage);
     void errorOccurred(int code, const QVariantMap &details);
 };

@@ -52,8 +52,8 @@ qapttest::qapttest()
     connect(m_backend, SIGNAL(downloadProgress(int)), this, SLOT(updateDownloadProgress(int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
-    connect(m_backend, SIGNAL(transactionMessage(const QString&, const QString&, int)),
-            this, SLOT(updateTransactionMessage(const QString&, const QString&, int)));
+    connect(m_backend, SIGNAL(transactionMessage(const QString&, int)),
+            this, SLOT(updateTransactionMessage(const QString&, int)));
 
     m_stack = new QStackedWidget(this);
 
@@ -227,9 +227,9 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
     m_cacheUpdateWidget->addItem(fullMessage);
 }
 
-void qapttest::updateTransactionMessage(const QString &package, const QString& message, int percentage)
+void qapttest::updateTransactionMessage(const QString& message, int percentage)
 {
-    kDebug() << package << message << percentage;
+    kDebug() << message << percentage;
 }
 
 void qapttest::operationFinished()

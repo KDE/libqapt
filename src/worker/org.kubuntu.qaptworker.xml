@@ -16,14 +16,13 @@
       <arg name="message" type="s" direction="out"/>
     </signal>
     <signal name="transactionProgress">
-      <arg name="package" type="s" direction="out"/>
       <arg name="status" type="s" direction="out"/>
       <arg name="percentage" type="i" direction="out"/>
     </signal>
     <signal name="errorOccurred">
-        <arg type="i" direction="out" />
-        <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
-        <arg type="a{sv}" direction="out" />
+      <arg name="code" type="i" direction="out"/>
+      <arg name="details" type="a{sv}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
     <method name="updateCache">
     </method>
