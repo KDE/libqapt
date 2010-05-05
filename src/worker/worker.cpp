@@ -75,6 +75,12 @@ QAptWorker::QAptWorker(int &argc, char **argv)
             this, SLOT(emitDownloadMessage(int, const QString&)));
 }
 
+QAptWorker::~QAptWorker()
+{
+    delete m_cache;
+    delete m_records;
+}
+
 bool QAptWorker::initializeApt()
 {
     if (!pkgInitConfig(*_config)) {
@@ -97,11 +103,6 @@ bool QAptWorker::initializeApt()
     m_records = new pkgRecords(*depCache);
 
     return true;
-}
-
-QAptWorker::~QAptWorker()
-{
-    delete m_cache;
 }
 
 bool QAptWorker::lock()
