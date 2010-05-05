@@ -27,6 +27,8 @@
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusMessage>
 
+#include <../cache.h>
+
 #include <apt-pkg/progress.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/pkgrecords.h>
@@ -44,15 +46,10 @@ public:
 
     virtual ~QAptWorker();
 
-    OpProgress m_progressMeter;
-    MMap *m_map;
-
-    pkgCache *m_cache;
+    QApt::Cache *m_cache;
     pkgPolicy *m_policy;
-
-    pkgDepCache *m_depCache;
-    pkgSourceList *m_list;
     pkgRecords *m_records;
+
     bool m_locked;
     WorkerAcquire *m_acquireStatus;
 

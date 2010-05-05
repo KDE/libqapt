@@ -23,7 +23,8 @@
 #include "qaptworkeradaptor.h"
 
 // QApt includes
-#include <../backend.h>
+#include <../globals.h>
+#include <../package.h>
 
 // Apt includes
 #include <apt-pkg/error.h>
@@ -48,10 +49,8 @@
 
 QAptWorker::QAptWorker(int &argc, char **argv)
         : QCoreApplication(argc, argv)
-        , m_progressMeter()
         , m_cache(0)
-        , m_policy(0)
-        , m_depCache(0)
+        , m_records(0)
         , m_locked(false)
 {
     new QaptworkerAdaptor(this);
@@ -78,8 +77,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
 bool QAptWorker::initializeApt()
 {
-    m_list = new pkgSourceList;
-
     if (!pkgInitConfig(*_config)) {
         return false;
     }
@@ -90,58 +87,21 @@ bool QAptWorker::initializeApt()
         return false;
     }
 
-   // delete any old structures
-    if(m_depCache)
-        delete m_depCache;
-    if(m_policy)
-        delete m_policy;
-    if(m_cache)
-        delete m_cache;
+    delete m_cache;
+    m_cache = new QApt::Cache(this);
+    m_cache->open();
 
-    // Read the sources list
-    if (!m_list->ReadMainList()) {
-        return false;
-    }
+    pkgDepCache *depCache = m_cache->depCache();
 
-    pkgMakeStatusCache(*m_list, m_progressMeter, 0, true);
-    m_progressMeter.Done();
-
-    // Open the cache file
-    FileFd File;
-    File.Open(_config->FindFile("Dir::Cache::pkgcache"), FileFd::ReadOnly);
-    if (_error->PendingError()) {
-        return false;
-    }
-
-   m_map = new MMap(File, MMap::Public | MMap::ReadOnly);
-   if (_error->PendingError())
-      return false;
-
-    // Open the cache file
-    m_cache = new pkgCache(m_map);
-    m_policy = new pkgPolicy(m_cache);
-    m_records = new pkgRecords(*m_cache);
-    if (!ReadPinFile(*m_policy)) {
-        return false;
-    }
-
-    if (_error->PendingError()) {
-        return false;
-    }
-
-    m_depCache = new pkgDepCache(m_cache, m_policy);
-    m_depCache->Init(&m_progressMeter);
-
-    if (m_depCache->DelCount() != 0 || m_depCache->InstCount() != 0) {
-        return false;
-    }
+    delete m_records;
+    m_records = new pkgRecords(*depCache);
 
     return true;
 }
 
 QAptWorker::~QAptWorker()
 {
-    delete m_list;
+    delete m_cache;
 }
 
 bool QAptWorker::lock()
@@ -183,7 +143,7 @@ void QAptWorker::updateCache()
 
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
-        bool result = ListUpdate(*m_acquireStatus, *m_list);
+        bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
         emit workerFinished("update", result);
     }
 }
@@ -215,36 +175,36 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
         // Iterate through all packages
         pkgCache::PkgIterator iter;
-        for (iter = m_depCache->PkgBegin(); iter.end() != true; iter++) {
+        for (iter = m_cache->depCache()->PkgBegin(); iter.end() != true; iter++) {
             // Find one with a matching Name to the one in the instructions list
             if (iter.Name() == package) {
                 // Then mark according to the instruction
                 if (operation == QApt::Package::Held) {
-                    m_depCache->MarkKeep(iter, false);
-                    m_depCache->SetReInstall(iter, false);
+                    m_cache->depCache()->MarkKeep(iter, false);
+                    m_cache->depCache()->SetReInstall(iter, false);
                 } else if (operation == QApt::Package::ToInstall) {
-                    m_depCache->MarkInstall(iter, true);
-                    pkgDepCache::StateCache & State = (*m_depCache)[iter];
-                    if (!State.Install() || m_depCache->BrokenCount() > 0) {
-                        pkgProblemResolver Fix(m_depCache);
+                    m_cache->depCache()->MarkInstall(iter, true);
+                    pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
+                    if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
+                        pkgProblemResolver Fix(m_cache->depCache());
                         Fix.Clear(iter);
                         Fix.Protect(iter);
                         Fix.Resolve(true);
                     }
                 } else if (operation == QApt::Package::ToReInstall) {
-                    m_depCache->SetReInstall(iter, true);
+                    m_cache->depCache()->SetReInstall(iter, true);
                 } else if (operation == QApt::Package::ToUpgrade) {
                     // The QApt Backend will handle dist-upgradish things for us
-                    pkgAllUpgrade((*m_depCache));
+                    pkgAllUpgrade((*m_cache->depCache()));
                 } else if (operation == QApt::Package::ToDowngrade) {
                     // TODO: Probably gotta set the candidate version here...
                     // needs work in QApt::Package so that we can set this anyways
                 } else if (operation == QApt::Package::ToPurge) {
-                    m_depCache->SetReInstall(iter, false);
-                    m_depCache->MarkDelete(iter, true);
+                    m_cache->depCache()->SetReInstall(iter, false);
+                    m_cache->depCache()->MarkDelete(iter, true);
                 } else if (operation == QApt::Package::ToRemove) {
-                    m_depCache->SetReInstall(iter, false);
-                    m_depCache->MarkDelete(iter, false);
+                    m_cache->depCache()->SetReInstall(iter, false);
+                    m_cache->depCache()->MarkDelete(iter, false);
                 } else {
                     // Unsupported operation. Should emit something here?
                 }
@@ -270,7 +230,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     pkgAcquire fetcher(m_acquireStatus);
 
     pkgPackageManager *packageManager;
-    packageManager = _system->CreatePM(m_depCache);
+    packageManager = _system->CreatePM(m_cache->depCache());
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
     connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
@@ -278,7 +238,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
             this, SLOT(emitCommitProgress(const QString&, int)));
 
-    if (!packageManager->GetArchives(&fetcher, m_list, m_records) ||
+    if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
         _error->PendingError()) {
         // WorkerAcquire emits its own error messages; just end the operation
         emit workerFinished("commitChanges", false);
@@ -289,7 +249,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     double FetchBytes = fetcher.FetchNeeded();
     double FetchPBytes = fetcher.PartialPresent();
     double DebBytes = fetcher.TotalNeeded();
-    if (DebBytes != m_depCache->DebSize())
+    if (DebBytes != m_cache->depCache()->DebSize())
     {
         //TODO: emit mismatch warning. Need to decide on a warning signal.
     }
