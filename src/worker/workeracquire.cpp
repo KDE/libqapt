@@ -86,10 +86,6 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         args["FailedItem"] = QString(item.Owner->ErrorText.c_str());
         args["ErrorText"] = QString(item.Description.c_str());
         emit fetchError(QApt::Globals::FetchError, args);
-        //TODO: emit error
-        _error->Error("Error %s\n  %s",
-                  item.Description.c_str(),
-                  item.Owner->ErrorText.c_str());
     }
 
     Update = true;
