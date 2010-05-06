@@ -46,6 +46,7 @@ qapttest::qapttest()
     m_backend = new QApt::Backend();
     m_backend->init();
 
+    connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
     connect(m_backend, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
     connect(m_backend, SIGNAL(downloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
@@ -109,23 +110,15 @@ qapttest::qapttest()
     upgradeButton->setIcon(KIcon("system-software-update"));
     connect(upgradeButton, SIGNAL(clicked()), this, SLOT(upgrade()));
 
-    // Package count and installed package count in the statusbar
+    // Package count labels in the statusbar
     m_packageCountLabel = new QLabel(this);
-    m_packageCountLabel->setText(i18np("%1 package available",
-                                     "%1 packages available",
-                                     m_backend->packageCount()));
-
-    m_installedCountLabel = new QLabel(this);
-    m_installedCountLabel->setText(i18np("(%1 package installed)",
-                                     "(%1 packages installed)",
-                                     // Yay for flags!
-                                     m_backend->packageCount(QApt::Package::Installed)));
-
+    m_changedPackagesLabel = new QLabel(this);
     statusBar()->addWidget(m_packageCountLabel);
-    statusBar()->addWidget(m_installedCountLabel);
+    statusBar()->addWidget(m_changedPackagesLabel);
     statusBar()->show();
 
     updateLabels();
+    updateStatusBar();
     setCentralWidget(m_stack);
 
     // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
@@ -289,18 +282,20 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
 void qapttest::updateCommitProgress(const QString& message, int percentage)
 {
     m_commitWidget->setLabelText(message);
+    qDebug() << message;
 }
 
 void qapttest::updateStatusBar()
 {
-    m_packageCountLabel->setText(i18np("%1 package available",
-                                 "%1 packages available",
-                                 m_backend->packageCount()));
+    m_packageCountLabel->setText(i18n("%1 Installed, %2 upgradeable, %3 available",
+                                      m_backend->packageCount(QApt::Package::Installed),
+                                      m_backend->packageCount(QApt::Package::Upgradeable),
+                                      m_backend->packageCount()));
 
-    m_installedCountLabel->setText(i18np("(%1 package installed)",
-                                         "(%1 packages installed)",
-                                         // Yay for flags!
-                                         m_backend->packageCount(QApt::Package::Installed)));
+    m_changedPackagesLabel->setText(i18n("%1 To install, %2 to upgrade, %3 to remove",
+                                         m_backend->packageCount(QApt::Package::ToInstall),
+                                         m_backend->packageCount(QApt::Package::ToUpgrade),
+                                         m_backend->packageCount(QApt::Package::ToRemove)));
 }
 
 #include "qapttest.moc"
