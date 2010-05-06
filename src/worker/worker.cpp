@@ -222,6 +222,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
         if (_error->PendingError() == true) {
             emit errorOccurred(QApt::Globals::LockError, QVariantMap());
+            emit workerEvent(QApt::Globals::PackageDownloadFinished);
             emit workerFinished(false);
             return;
         }
@@ -235,6 +236,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
         _error->PendingError()) {
         // WorkerAcquire emits its own error messages; just end the operation
+        emit workerEvent(QApt::Globals::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }
@@ -275,6 +277,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (fetcher.Run() != pkgAcquire::Continue) {
         // Our fetcher will report errors for itself, but we have to send the
         // finished signal
+        emit workerEvent(QApt::Globals::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }

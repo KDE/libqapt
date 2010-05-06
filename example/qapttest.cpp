@@ -203,8 +203,12 @@ void qapttest::workerEvent(int code)
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
         case QApt::Globals::PackageDownloadFinished:
+            updateStatusBar();
+            m_stack->setCurrentWidget(m_mainWidget);
             break;
         case QApt::Globals::CommitChangesStarted:
+            m_cacheUpdateWidget->clear();
+            m_stack->setCurrentWidget(m_cacheUpdateWidget);
             break;
         case QApt::Globals::CommitChangesFinished:
             updateStatusBar();
