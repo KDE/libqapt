@@ -222,7 +222,7 @@ void qapttest::workerEvent(int code)
 
 void qapttest::updateDownloadProgress(int percentage, int speed, int ETA)
 {
-    m_cacheUpdateWidget->setTotalProgress(percentage);
+    m_cacheUpdateWidget->setTotalProgress(percentage, speed, ETA);
 }
 
 void qapttest::updateDownloadMessage(int flag, const QString &message)

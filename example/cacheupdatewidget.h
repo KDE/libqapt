@@ -43,7 +43,7 @@ public:
 
     void clear();
     void addItem(const QString &message);
-    void setTotalProgress(int percentage);
+    void setTotalProgress(int percentage, int speed, int ETA);
     void setHeaderText(const QString &text);
 
 private:
@@ -51,6 +51,7 @@ private:
     QListView *m_downloadView;
     QStandardItemModel *m_downloadModel;
     QProgressBar *m_totalProgress;
+    QLabel *m_downloadLabel;
     QPushButton *m_cancelButton;
 
 private Q_SLOTS:

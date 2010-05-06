@@ -27,7 +27,8 @@
 #include <QStandardItemModel>
 
 #include <KIcon>
-#include <KLocalizedString>
+#include <KGlobal>
+#include <KLocale>
 
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     : KVBox(parent)
@@ -39,7 +40,9 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     m_downloadModel = new QStandardItemModel();
     m_downloadView->setModel(m_downloadModel);
 
+    m_downloadLabel = new QLabel(this);
     m_totalProgress = new QProgressBar(this);
+
     m_cancelButton = new QPushButton(this);
     m_cancelButton->setText(i18n("Cancel"));
     m_cancelButton->setIcon(KIcon("dialog-cancel"));
@@ -69,9 +72,22 @@ void CacheUpdateWidget::addItem(const QString &message)
     m_downloadView->scrollTo(m_downloadModel->indexFromItem(n));
 }
 
-void CacheUpdateWidget::setTotalProgress(int percentage)
+void CacheUpdateWidget::setTotalProgress(int percentage, int speed, int ETA)
 {
     m_totalProgress->setValue(percentage);
+
+    QString downloadSpeed = KGlobal::locale()->formatByteSize(speed);
+
+    QString timeRemaining;
+    int ETAMilliseconds = ETA * 1000;
+
+    if (ETAMilliseconds =< 0 || ETAMilliseconds > 14*24*60*60) {
+        // If ETA is less than zero or bigger than 2 weeks
+        timeRemaining = i18n("Unknown time");
+    } else {
+        timeRemaining = KGlobal::locale()->formatDuration(ETAMilliseconds);
+    }
+    m_downloadLabel->setText(i18n("Download Rate: %1/s - %2 remaining", downloadSpeed, timeRemaining));
 }
 
 void CacheUpdateWidget::cancelButtonPressed()
