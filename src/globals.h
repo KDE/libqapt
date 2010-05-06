@@ -31,10 +31,12 @@ namespace Globals
 {
     enum WorkerEvent {
         InvalidEvent            = 0,
-        DownloadStarted         = 1,
-        DownloadFinished        = 2,
-        CommitChangesStarted    = 3,
-        CommitChangesFinished   = 4,
+        CacheUpdateStarted      = 1,
+        CacheUpdateFinished     = 2,
+        PackageDownloadStarted  = 3,
+        PackageDownloadFinished = 4,
+        CommitChangesStarted    = 5,
+        CommitChangesFinished   = 6,
     };
 
     enum WorkerQuestion {

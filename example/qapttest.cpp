@@ -188,19 +188,23 @@ void qapttest::updateCache()
 void qapttest::workerEvent(int code)
 {
     switch (code) {
-        case QApt::Globals::DownloadStarted:
+        case QApt::Globals::CacheUpdateStarted:
             m_cacheUpdateWidget->clear();
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
-        case QApt::Globals::DownloadFinished:
+        case QApt::Globals::CacheUpdateFinished:
             updateStatusBar();
             m_stack->setCurrentWidget(m_mainWidget);
             break;
-        case QApt::Globals::CommitChangesStarted:
+        case QApt::Globals::PackageDownloadStarted:
             m_cacheUpdateWidget->clear();
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
+            break;
+        case QApt::Globals::PackageDownloadFinished:
+            break;
+        case QApt::Globals::CommitChangesStarted:
             break;
         case QApt::Globals::CommitChangesFinished:
             updateStatusBar();

@@ -132,7 +132,7 @@ void QAptWorker::updateCache()
     }
 
     emit workerStarted();
-    emit workerEvent(QApt::Globals::DownloadStarted);
+    emit workerEvent(QApt::Globals::CacheUpdateStarted);
     // Lock the list directory
     FileFd Lock;
     if (!_config->FindB("Debug::NoLocking", false)) {
@@ -149,7 +149,7 @@ void QAptWorker::updateCache()
         emit workerFinished(result);
     }
 
-    emit workerEvent(QApt::Globals::DownloadFinished);
+    emit workerEvent(QApt::Globals::CacheUpdateFinished);
 }
 
 void QAptWorker::cancelDownload()
@@ -213,7 +213,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     }
 
     emit workerStarted();
-    emit workerEvent(QApt::Globals::DownloadStarted);
+    emit workerEvent(QApt::Globals::PackageDownloadStarted);
 
     // Lock the archive directory
     FileFd Lock;
@@ -279,7 +279,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         return;
     }
 
-    emit workerEvent(QApt::Globals::DownloadFinished);
+    emit workerEvent(QApt::Globals::PackageDownloadFinished);
     emit workerEvent(QApt::Globals::CommitChangesStarted);
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
