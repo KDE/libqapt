@@ -257,6 +257,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         QVariantMap args;
         args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
         emit errorOccurred(QApt::Globals::DiskSpaceError, args);
+        emit workerEvent(QApt::Globals::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }
@@ -269,6 +270,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             QVariantMap args;
             args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
             emit errorOccurred(QApt::Globals::DiskSpaceError, args);
+            emit workerEvent(QApt::Globals::PackageDownloadFinished);
             emit workerFinished(false);
             return;
         }
