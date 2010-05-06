@@ -42,6 +42,7 @@ Cache::~Cache()
 {
     delete m_list;
     delete m_cache;
+    delete m_policy;
     delete m_depCache;
     delete m_map;
 }
@@ -49,12 +50,9 @@ Cache::~Cache()
 bool Cache::open()
 {
    // delete any old structures
-    if(m_depCache)
-        delete m_depCache;
-    if(m_policy)
-        delete m_policy;
-    if(m_cache)
-        delete m_cache;
+    delete m_depCache;
+    delete m_policy;
+    delete m_cache;
 
     // Read the sources list
     if (!m_list->ReadMainList()) {
