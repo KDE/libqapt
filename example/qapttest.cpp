@@ -63,22 +63,21 @@ qapttest::qapttest()
 
     m_stack->setCurrentWidget(m_mainWidget);
 
-    KHBox *hbox = new KHBox(m_mainWidget);
-    layout->addWidget(hbox);
+    KHBox *topHBox = new KHBox(m_mainWidget);
+    layout->addWidget(topHBox);
 
-    m_lineEdit = new KLineEdit(hbox);
+    m_lineEdit = new KLineEdit(topHBox);
     m_lineEdit->setText("kdelibs5");
     m_lineEdit->setClearButtonShown(true);
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(updateLabels()));
 
-    QPushButton *pushButton = new QPushButton(hbox);
-    pushButton->setText(i18n("Update Listing"));
-    pushButton->setIcon(KIcon("system-software-update"));
-    connect(pushButton, SIGNAL(clicked()), this, SLOT(updateLabels()));
-    QPushButton *cachePushButton = new QPushButton(hbox);
-    cachePushButton->setIcon(KIcon("dialog-password"));
-    cachePushButton->setText(i18n("Update Software Lists"));
-    connect(cachePushButton, SIGNAL(clicked()), this, SLOT(updateCache()));
+    QPushButton *showButton = new QPushButton(topHBox);
+    showButton->setText(i18n("Show"));
+    showButton->setIcon(KIcon("layer-visible-on"));
+    connect(showButton, SIGNAL(clicked()), this, SLOT(updateLabels()));
+
+    m_actionButton = new QPushButton(topHBox);
+    connect(m_actionButton, SIGNAL(clicked()), this, SLOT(commitAction()));
 
     KVBox *vbox = new KVBox(m_mainWidget);
     layout->addWidget(vbox);
@@ -93,6 +92,19 @@ qapttest::qapttest()
     m_packageSizeLabel = new QLabel(vbox);
     m_shortDescriptionLabel = new QLabel(vbox);
     m_longDescriptionLabel = new QLabel(vbox);
+
+    KHBox *bottomHBox = new KHBox(m_mainWidget);
+    layout->addWidget(bottomHBox);
+    
+    QPushButton *cacheButton = new QPushButton(bottomHBox);
+    cacheButton->setText(i18n("Update Cache"));
+    cacheButton->setIcon(KIcon("view-refresh"));
+    connect(cacheButton, SIGNAL(clicked()), this, SLOT(updateCache()));
+
+    QPushButton *upgradeButton = new QPushButton(bottomHBox);
+    upgradeButton->setText(i18n("Upgrade System"));
+    upgradeButton->setIcon(KIcon("system-software-update"));
+    connect(upgradeButton, SIGNAL(clicked()), this, SLOT(upgrade()));
 
     // Package count and installed package count in the statusbar
     m_packageCountLabel = new QLabel(this);
@@ -146,11 +158,17 @@ void qapttest::updateLabels()
         m_shortDescriptionLabel->setText(i18n("<b>Description:</b> %1", m_package->shortDescription()));
         m_longDescriptionLabel->setText(m_package->longDescription());
 
-        if (m_package->name() == "kpat") {
-            m_package->setInstall();
+        if (!m_package->isInstalled()) {
+            m_actionButton->setText("Install Package");
+            m_actionButton->setIcon(KIcon("list-add"));
+        } else {
+            m_actionButton->setText("Remove Package");
+            m_actionButton->setIcon(KIcon("list-remove"));
+        }
 
-            m_backend->markPackagesForUpgrade();
-            m_backend->commitChanges();
+        if (m_package->state() & QApt::Package::Upgradeable) {
+            m_actionButton->setText("Upgrade Package");
+            m_actionButton->setIcon(KIcon("system-software-update"));
         }
     }
 
@@ -183,6 +201,27 @@ void qapttest::updateLabels()
 void qapttest::updateCache()
 {
     m_backend->updateCache();
+}
+
+void qapttest::upgrade()
+{
+    m_backend->markPackagesForUpgrade();
+    m_backend->commitChanges();
+}
+
+void qapttest::commitAction()
+{
+    if (!m_package->isInstalled()) {
+        m_package->setInstall();
+    } else {
+        m_package->setRemove();
+    }
+
+    if (m_package->state() & QApt::Package::Upgradeable) {
+        m_package->setInstall();
+    }
+
+    m_backend->commitChanges();
 }
 
 void qapttest::workerEvent(int code)

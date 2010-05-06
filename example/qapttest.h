@@ -27,6 +27,7 @@
 #include <../src/backend.h>
 
 class QLabel;
+class QPushButton;
 class QStackedWidget;
 
 class KToggleAction;
@@ -45,6 +46,8 @@ public:
 private Q_SLOTS:
     void updateLabels();
     void updateCache();
+    void commitAction();
+    void upgrade();
     void workerEvent(int code);
     void updateDownloadProgress(int percentage, int speed, int ETA);
     void updateDownloadMessage(int flag, const QString &name);
@@ -60,6 +63,7 @@ private:
     QWidget *m_mainWidget;
     CacheUpdateWidget *m_cacheUpdateWidget;
     KLineEdit *m_lineEdit;
+    QPushButton *m_actionButton;
     QLabel *m_nameLabel;
     QLabel *m_sectionLabel;
     QLabel *m_originLabel;

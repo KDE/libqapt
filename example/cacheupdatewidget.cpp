@@ -81,7 +81,7 @@ void CacheUpdateWidget::setTotalProgress(int percentage, int speed, int ETA)
     QString timeRemaining;
     int ETAMilliseconds = ETA * 1000;
 
-    if (ETAMilliseconds =< 0 || ETAMilliseconds > 14*24*60*60) {
+    if (ETAMilliseconds <= 0 || ETAMilliseconds > 14*24*60*60) {
         // If ETA is less than zero or bigger than 2 weeks
         timeRemaining = i18n("Unknown time");
     } else {
