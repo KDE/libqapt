@@ -190,6 +190,7 @@ void qapttest::workerEvent(int code)
     switch (code) {
         case QApt::Globals::CacheUpdateStarted:
             m_cacheUpdateWidget->clear();
+            m_cacheUpdateWidget->setHeaderText(i18n("<b>Updating software sources</b>"));
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
@@ -199,6 +200,7 @@ void qapttest::workerEvent(int code)
             break;
         case QApt::Globals::PackageDownloadStarted:
             m_cacheUpdateWidget->clear();
+            m_cacheUpdateWidget->setHeaderText(i18n("<b>Downloading Packages</b>"));
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
@@ -208,6 +210,7 @@ void qapttest::workerEvent(int code)
             break;
         case QApt::Globals::CommitChangesStarted:
             m_cacheUpdateWidget->clear();
+            m_cacheUpdateWidget->setHeaderText(i18n("<b>Committing Changes</b>"));
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             break;
         case QApt::Globals::CommitChangesFinished:

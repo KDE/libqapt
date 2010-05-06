@@ -27,6 +27,7 @@
 
 #include <KVBox>
 
+class QLabel;
 class QListView;
 class QProgressBar;
 class QStandardItemModel;
@@ -43,8 +44,10 @@ public:
     void clear();
     void addItem(const QString &message);
     void setTotalProgress(int percentage);
+    void setHeaderText(const QString &text);
 
 private:
+    QLabel *m_headerLabel;
     QListView *m_downloadView;
     QStandardItemModel *m_downloadModel;
     QProgressBar *m_totalProgress;

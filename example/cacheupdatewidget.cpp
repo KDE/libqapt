@@ -32,8 +32,7 @@
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     : KVBox(parent)
 {
-    QLabel *label = new QLabel(this);
-    label->setText(i18n("<b>Updating software sources</b>"));
+    m_headerLabel = new QLabel(this);
 
     m_downloadView = new QListView(this);
 
@@ -55,6 +54,11 @@ void CacheUpdateWidget::clear()
 {
     m_downloadModel->clear();
     m_totalProgress->setValue(0);
+}
+
+void CacheUpdateWidget::setHeaderText(const QString &text)
+{
+    m_headerLabel->setText(text);
 }
 
 void CacheUpdateWidget::addItem(const QString &message)
