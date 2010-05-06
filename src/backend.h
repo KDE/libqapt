@@ -206,10 +206,18 @@ public Q_SLOTS:
      */
     void packageChanged(Package *package);
 
+    /**
+     * Checks for and downloads new package source lists.
+     */
     void updateCache();
     void workerStarted(const QString &name);
     void workerFinished(const QString &name, bool result);
-    void cancelCacheUpdate();
+
+    /**
+     * Cancels download operations initialized by the updateCache() or
+     * commitChanges() functions.
+     */
+    void cancelDownload();
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

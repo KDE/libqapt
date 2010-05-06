@@ -192,7 +192,7 @@ void qapttest::cacheUpdateStarted()
 {
     m_cacheUpdateWidget->clear();
     m_stack->setCurrentWidget(m_cacheUpdateWidget);
-    connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelCacheUpdate()));
+    connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
 }
 
 

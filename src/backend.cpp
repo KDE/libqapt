@@ -346,13 +346,13 @@ void Backend::workerFinished(const QString &name, bool result)
     }
 }
 
-void Backend::cancelCacheUpdate()
+void Backend::cancelDownload()
 {
     QDBusMessage message;
     message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
               "/",
               "org.kubuntu.qaptworker",
-              QLatin1String("cancelCacheUpdate"));
+              QLatin1String("cancelDownload"));
     QDBusConnection::systemBus().asyncCall(message);
 }
 

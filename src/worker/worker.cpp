@@ -149,13 +149,8 @@ void QAptWorker::updateCache()
     }
 }
 
-void QAptWorker::cancelCacheUpdate()
+void QAptWorker::cancelDownload()
 {
-    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
-        emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
-        emit workerFinished("update", false);
-        return;
-    }
     m_acquireStatus->requestCancel();
     emit workerFinished("update", false);
 }

@@ -58,7 +58,7 @@ private:
 
 public Q_SLOTS:
     void updateCache();
-    void cancelCacheUpdate();
+    void cancelDownload();
     void commitChanges(QMap<QString, QVariant>);
 
 private Q_SLOTS:

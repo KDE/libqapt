@@ -26,7 +26,7 @@
     </signal>
     <method name="updateCache">
     </method>
-    <method name="cancelCacheUpdate">
+    <method name="cancelDownload">
     </method>
     <method name="commitChanges">
       <arg type="a{sv}" direction="in"/>
