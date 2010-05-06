@@ -198,8 +198,14 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
                 } else if (operation == QApt::Package::ToReInstall) {
                     m_cache->depCache()->SetReInstall(iter, true);
                 } else if (operation == QApt::Package::ToUpgrade) {
-                    // The QApt Backend will handle dist-upgradish things for us
-                    pkgAllUpgrade((*m_cache->depCache()));
+                    m_cache->depCache()->MarkInstall(iter, true);
+                    pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
+                    if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
+                        pkgProblemResolver Fix(m_cache->depCache());
+                        Fix.Clear(iter);
+                        Fix.Protect(iter);
+                        Fix.Resolve(true);
+                    }
                 } else if (operation == QApt::Package::ToDowngrade) {
                     // TODO: Probably gotta set the candidate version here...
                     // needs work in QApt::Package so that we can set this anyways
