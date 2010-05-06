@@ -158,7 +158,6 @@ void QAptWorker::updateCache()
 void QAptWorker::cancelDownload()
 {
     m_acquireStatus->requestCancel();
-    emit workerFinished(false);
 }
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
