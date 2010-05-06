@@ -18,67 +18,25 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTTEST_H
-#define QAPTTEST_H
+#ifndef COMMITWIDGET_H
+#define COMMITWIDGET_H
 
-
-#include <KMainWindow>
-
-#include <../src/backend.h>
+#include <KVBox>
 
 class QLabel;
-class QPushButton;
-class QStackedWidget;
 
-class KToggleAction;
-class KLineEdit;
-
-class CacheUpdateWidget;
-class CommitWidget;
-
-class qapttest : public KMainWindow
+class CommitWidget : public KVBox
 {
     Q_OBJECT
 public:
-    qapttest();
+    CommitWidget(QWidget *parent = 0);
+    ~CommitWidget();
 
-    virtual ~qapttest();
-
-private Q_SLOTS:
-    void updateLabels();
-    void updateCache();
-    void commitAction();
-    void upgrade();
-    void workerEvent(int code);
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateDownloadMessage(int flag, const QString &name);
-    void updateCommitProgress(const QString& message, int percentage);
-    void updateStatusBar();
+    void setLabelText(const QString &text);
+    void clear();
 
 private:
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
-    QApt::Group *m_group;
-
-    QStackedWidget *m_stack;
-    QWidget *m_mainWidget;
-    CacheUpdateWidget *m_cacheUpdateWidget;
-    CommitWidget *m_commitWidget;
-    KLineEdit *m_lineEdit;
-    QPushButton *m_actionButton;
-    QLabel *m_nameLabel;
-    QLabel *m_sectionLabel;
-    QLabel *m_originLabel;
-    QLabel *m_installedSizeLabel;
-    QLabel *m_maintainerLabel;
-    QLabel *m_sourceLabel;
-    QLabel *m_versionLabel;
-    QLabel *m_packageSizeLabel;
-    QLabel *m_shortDescriptionLabel;
-    QLabel *m_longDescriptionLabel;
-
-    QLabel *m_installedCountLabel;
-    QLabel *m_packageCountLabel;
+    QLabel *m_commitLabel;
 };
 
 #endif

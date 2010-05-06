@@ -35,6 +35,7 @@
 #include <KVBox>
 
 #include "cacheupdatewidget.h"
+#include "commitwidget.h"
 
 qapttest::qapttest()
     : KMainWindow()
@@ -60,6 +61,8 @@ qapttest::qapttest()
 
     m_cacheUpdateWidget = new CacheUpdateWidget(m_stack);
     m_stack->addWidget(m_cacheUpdateWidget);
+    m_commitWidget = new CommitWidget(m_stack);
+    m_stack->addWidget(m_commitWidget);
 
     m_stack->setCurrentWidget(m_mainWidget);
 
@@ -248,9 +251,8 @@ void qapttest::workerEvent(int code)
             m_stack->setCurrentWidget(m_mainWidget);
             break;
         case QApt::Globals::CommitChangesStarted:
-            m_cacheUpdateWidget->clear();
-            m_cacheUpdateWidget->setHeaderText(i18n("<b>Committing Changes</b>"));
-            m_stack->setCurrentWidget(m_cacheUpdateWidget);
+            m_commitWidget->clear();
+            m_stack->setCurrentWidget(m_commitWidget);
             break;
         case QApt::Globals::CommitChangesFinished:
             updateStatusBar();
@@ -286,7 +288,7 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
 
 void qapttest::updateCommitProgress(const QString& message, int percentage)
 {
-    kDebug() << message << percentage;
+    m_commitWidget->setLabelText(message);
 }
 
 void qapttest::updateStatusBar()

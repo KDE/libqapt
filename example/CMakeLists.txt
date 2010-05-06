@@ -9,6 +9,7 @@ set(qapttest_SRCS
     main.cpp
     qapttest.cpp
     cacheupdatewidget.cpp
+    commitwidget.cpp
  )
 
 include( FindPkgConfig )
