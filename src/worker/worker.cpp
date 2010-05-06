@@ -131,28 +131,29 @@ void QAptWorker::updateCache()
         return;
     }
 
-    emit workerStarted("update");
+    emit workerStarted();
+    emit workerEvent(QApt::Globals::DownloadStarted);
     // Lock the list directory
     FileFd Lock;
     if (!_config->FindB("Debug::NoLocking", false)) {
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
             emit errorOccurred(QApt::Globals::LockError, QVariantMap());
-            emit workerFinished("update", false);
+            emit workerFinished(false);
         }
     }
 
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
-        emit workerFinished("update", result);
+        emit workerFinished(result);
     }
 }
 
 void QAptWorker::cancelDownload()
 {
     m_acquireStatus->requestCancel();
-    emit workerFinished("update", false);
+    emit workerFinished(false);
 }
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
@@ -209,7 +210,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         mapIter++;
     }
 
-    emit workerStarted("commitChanges");
+    emit workerStarted();
+    emit workerEvent(QApt::Globals::DownloadStarted);
 
     // Lock the archive directory
     FileFd Lock;
@@ -218,7 +220,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
         if (_error->PendingError() == true) {
             emit errorOccurred(QApt::Globals::LockError, QVariantMap());
-            emit workerFinished("commitChanges", false);
+            emit workerFinished(false);
             return;
         }
     }
@@ -228,16 +230,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     pkgPackageManager *packageManager;
     packageManager = _system->CreatePM(m_cache->depCache());
 
-    WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
-    connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
-            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
-    connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
-            this, SLOT(emitCommitProgress(const QString&, int)));
-
     if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
         _error->PendingError()) {
         // WorkerAcquire emits its own error messages; just end the operation
-        emit workerFinished("commitChanges", false);
+        emit workerFinished(false);
         return;
     }
 
@@ -257,7 +253,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         QVariantMap args;
         args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
         emit errorOccurred(QApt::Globals::DiskSpaceError, args);
-        emit workerFinished("commitChanges", false);
+        emit workerFinished(false);
         return;
     }
     if (unsigned(Buf.f_bfree) < (FetchBytes - FetchPBytes)/Buf.f_bsize)
@@ -269,7 +265,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             QVariantMap args;
             args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
             emit errorOccurred(QApt::Globals::DiskSpaceError, args);
-            emit workerFinished("commitChanges", false);
+            emit workerFinished(false);
             return;
         }
     }
@@ -277,15 +273,25 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (fetcher.Run() != pkgAcquire::Continue) {
         // Our fetcher will report errors for itself, but we have to send the
         // finished signal
-        emit workerFinished("commitChanges", false);
+        emit workerFinished(false);
         return;
     }
+
+    emit workerEvent(QApt::Globals::DownloadFinished);
+    emit workerEvent(QApt::Globals::CommitChangesStarted);
+
+    WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
+    connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
+            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+    connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
+            this, SLOT(emitCommitProgress(const QString&, int)));
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
     pkgPackageManager::OrderResult res = installProgress->start(packageManager);
     bool success = (res == pkgPackageManager::Completed);
-    emit workerFinished("commitChanges", success);
+    emit workerEvent(QApt::Globals::CommitChangesFinished);
+    emit workerFinished(success);
 }
 
 void QAptWorker::emitDownloadProgress(int percentage)

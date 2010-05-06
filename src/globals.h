@@ -31,12 +31,10 @@ namespace Globals
 {
     enum WorkerEvent {
         InvalidEvent            = 0,
-        CacheUpdateStarted      = 1,
-        CacheUpdateFinished     = 2,
+        DownloadStarted         = 1,
+        DownloadFinished        = 2,
         CommitChangesStarted    = 3,
         CommitChangesFinished   = 4,
-        PackageDownloadStarted  = 5,
-        PackageDownloadFinished = 6
     };
 
     enum WorkerQuestion {
@@ -47,13 +45,14 @@ namespace Globals
     };
 
     enum ErrorCode {
-        UnknownError   = 0,
-        InitError      = 1,
-        LockError      = 2,
-        DiskSpaceError = 3,
-        FetchError     = 4,
-        CommitError    = 5,
-        AuthError      = 6
+        UnknownError      = 0,
+        InitError         = 1,
+        LockError         = 2,
+        DiskSpaceError    = 3,
+        FetchError        = 4,
+        CommitError       = 5,
+        AuthError         = 6,
+        WorkerDisappeared = 7
     };
     Q_DECLARE_FLAGS(Errors, ErrorCode);
 

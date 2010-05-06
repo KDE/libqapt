@@ -46,6 +46,7 @@ namespace QApt {
 class BackendPrivate
 {
 public:
+    QDBusServiceWatcher *watcher;
     // The canonical list of all unique, non-virutal package objects
     Package::List packages;
     // Set of group names extracted from our packages
@@ -60,22 +61,16 @@ Backend::Backend()
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerStarted", this, SLOT(workerStarted(const QString&)));
+                                "workerStarted", this, SLOT(workerStarted()));
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "workerEvent", this, SLOT(emitWorkerEvent(int)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerFinished", this, SLOT(workerFinished(const QString&, bool)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(downloadProgress(int)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "commitProgress", this, SLOT(commitProgress(const QString&, int)));
 
-    QDBusServiceWatcher *watcher = new QDBusServiceWatcher(this);
-    watcher->setConnection(QDBusConnection::systemBus());
-    watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
-    watcher->addWatchedService("org.kubuntu.qaptworker");
-    connect(watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-            SLOT(serviceOwnerChanged(QString, QString, QString)));
+    d->watcher = new QDBusServiceWatcher(this);
+    d->watcher->setConnection(QDBusConnection::systemBus());
+    d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
+    d->watcher->addWatchedService("org.kubuntu.qaptworker");
 }
 
 Backend::~Backend()
@@ -323,26 +318,38 @@ void Backend::updateCache()
     QDBusConnection::systemBus().asyncCall(message);
 }
 
-void Backend::workerStarted(const QString &name)
+void Backend::workerStarted()
 {
-    if (name == "update") {
-        qDebug() << "Cache Update Started!";
-        emit cacheUpdateStarted();
-    } else if (name == "commitChanges") {
-        qDebug() << "Install/remove operation Started!";
-        emit commitChangesStarted();
-    }
+    connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
+            this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "downloadProgress", this, SLOT(downloadProgress(int)));
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "commitProgress", this, SLOT(commitProgress(const QString&, int)));
 }
 
-void Backend::workerFinished(const QString &name, bool result)
+void Backend::emitWorkerEvent(int code)
 {
-    qDebug() << "Worker Finished!";
-    if (name == "update") {
+    emit workerEvent(code);
+}
+
+void Backend::workerFinished(bool result)
+{
+    disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
+               this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+
+    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "downloadProgress", this, SLOT(downloadProgress(int)));
+    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
+    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "commitProgress", this, SLOT(commitProgress(const QString&, int)));
+
+    if (result) {
         reloadCache();
-        emit cacheUpdateFinished();
-    } else if (name == "commitChanges") {
-        reloadCache();
-        emit commitChangesFinished();
     }
 }
 
@@ -366,8 +373,8 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
         qDebug() << "It looks like our worker got lost";
 
         // Ok, something got screwed. Report and flee
-        // emit errorOccurred((int) Aqpm::Globals::WorkerDisappeared, QVariantMap());
-        // workerResult(false);
+        emit errorOccurred((int) QApt::Globals::WorkerDisappeared, QVariantMap());
+        workerFinished(false);
     }
 }
 

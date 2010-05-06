@@ -171,10 +171,7 @@ private:
 Q_SIGNALS:
     void errorOccurred(int code, const QVariantMap &args);
     void packageChanged();
-    void cacheUpdateStarted();
-    void cacheUpdateFinished();
-    void commitChangesStarted();
-    void commitChangesFinished();
+    void workerEvent(int code);
     void downloadProgress(int percentage);
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString &status, int percentage);
@@ -210,8 +207,6 @@ public Q_SLOTS:
      * Checks for and downloads new package source lists.
      */
     void updateCache();
-    void workerStarted(const QString &name);
-    void workerFinished(const QString &name, bool result);
 
     /**
      * Cancels download operations initialized by the updateCache() or
@@ -221,6 +216,9 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    void workerStarted();
+    void emitWorkerEvent(int code);
+    void workerFinished(bool result);
 };
 
 }

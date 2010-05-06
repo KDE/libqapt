@@ -2,10 +2,11 @@
 <node>
   <interface name="org.kubuntu.qaptworker">
     <signal name="workerStarted">
-      <arg name="name" type="s" direction="out"/>
+    </signal>
+    <signal name="workerEvent">
+      <arg name="code" type="i" direction="out"/>
     </signal>
     <signal name="workerFinished">
-      <arg name="name" type="s" direction="out"/>
       <arg name="result" type="b" direction="out"/>
     </signal>
     <signal name="downloadProgress">

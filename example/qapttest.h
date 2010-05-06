@@ -45,12 +45,11 @@ public:
 private Q_SLOTS:
     void updateLabels();
     void updateCache();
-    void cacheUpdateStarted();
-    void commitChangesStarted();
-    void operationFinished();
+    void workerEvent(int code);
     void updateDownloadProgress(int percentage);
     void updateDownloadMessage(int flag, const QString &name);
     void updateCommitProgress(const QString& message, int percentage);
+    void updateStatusBar();
 
 private:
     QApt::Backend *m_backend;

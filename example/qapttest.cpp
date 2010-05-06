@@ -45,10 +45,7 @@ qapttest::qapttest()
     m_backend = new QApt::Backend();
     m_backend->init();
 
-    connect(m_backend, SIGNAL(cacheUpdateStarted()), this, SLOT(cacheUpdateStarted()));
-    connect(m_backend, SIGNAL(cacheUpdateFinished()), this, SLOT(operationFinished()));
-    connect(m_backend, SIGNAL(commitChangesStarted()), this, SLOT(commitChangesStarted()));
-    connect(m_backend, SIGNAL(commitChangesFinished()), this, SLOT(operationFinished()));
+    connect(m_backend, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
     connect(m_backend, SIGNAL(downloadProgress(int)), this, SLOT(updateDownloadProgress(int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
@@ -188,18 +185,36 @@ void qapttest::updateCache()
     m_backend->updateCache();
 }
 
-void qapttest::cacheUpdateStarted()
+void qapttest::workerEvent(int code)
 {
-    m_cacheUpdateWidget->clear();
-    m_stack->setCurrentWidget(m_cacheUpdateWidget);
-    connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
-}
+    switch (code) {
+        case QApt::Globals::DownloadStarted:
+            m_cacheUpdateWidget->clear();
+            m_stack->setCurrentWidget(m_cacheUpdateWidget);
+            connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
+            break;
+        case QApt::Globals::DownloadFinished:
+            m_packageCountLabel->setText(i18np("%1 package available",
+                                         "%1 packages available",
+                                         m_backend->packageCount()));
 
+            m_installedCountLabel->setText(i18np("(%1 package installed)",
+                                                 "(%1 packages installed)",
+                                                 // Yay for flags!
+                                                 m_backend->packageCount(QApt::Package::Installed)));
+            m_stack->setCurrentWidget(m_mainWidget);
+            break;
+            break;
+        case QApt::Globals::CommitChangesStarted:
+            m_cacheUpdateWidget->clear();
+            m_stack->setCurrentWidget(m_cacheUpdateWidget);
+            connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
+            break;
+        case QApt::Globals::CommitChangesFinished:
 
-void qapttest::commitChangesStarted()
-{
-    m_cacheUpdateWidget->clear();
-    m_stack->setCurrentWidget(m_cacheUpdateWidget);
+            m_stack->setCurrentWidget(m_mainWidget);
+            break;
+    }
 }
 
 void qapttest::updateDownloadProgress(int percentage)
@@ -211,7 +226,7 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
 {
     QString fullMessage;
 
-    switch(flag) {
+    switch (flag) {
       case QApt::Globals::DownloadFetch:
           fullMessage = i18n("Downloading: %1", message);
           break;
@@ -232,17 +247,16 @@ void qapttest::updateCommitProgress(const QString& message, int percentage)
     kDebug() << message << percentage;
 }
 
-void qapttest::operationFinished()
+void qapttest::updateStatusBar()
 {
     m_packageCountLabel->setText(i18np("%1 package available",
-                                     "%1 packages available",
-                                     m_backend->packageCount()));
+                                 "%1 packages available",
+                                 m_backend->packageCount()));
 
     m_installedCountLabel->setText(i18np("(%1 package installed)",
-                                     "(%1 packages installed)",
-                                     // Yay for flags!
-                                     m_backend->packageCount(QApt::Package::Installed)));
-    m_stack->setCurrentWidget(m_mainWidget);
+                                         "(%1 packages installed)",
+                                         // Yay for flags!
+                                         m_backend->packageCount(QApt::Package::Installed)));
 }
 
 #include "qapttest.moc"
