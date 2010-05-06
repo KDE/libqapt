@@ -65,7 +65,7 @@ Backend::Backend()
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerEvent", this, SLOT(emitWorkerEvent(int)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerFinished", this, SLOT(workerFinished(const QString&, bool)));
+                                "workerFinished", this, SLOT(workerFinished(bool)));
 
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
