@@ -66,7 +66,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     }
 
     QTimer::singleShot(60000, this, SLOT(quit()));
-    initializeApt();
 
     m_acquireStatus = new WorkerAcquire;
     connect(m_acquireStatus, SIGNAL(downloadProgress(int)),
@@ -133,6 +132,8 @@ void QAptWorker::updateCache()
 
     emit workerStarted();
     emit workerEvent(QApt::Globals::CacheUpdateStarted);
+
+    initializeApt();
     // Lock the list directory
     FileFd Lock;
     if (!_config->FindB("Debug::NoLocking", false)) {
@@ -166,6 +167,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
         return;
     }
+
+    initializeApt();
 
     // Parse out the argument list and mark packages for operations
     QMap<QString, QVariant>::const_iterator mapIter = instructionList.constBegin();
