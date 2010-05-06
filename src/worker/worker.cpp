@@ -139,6 +139,7 @@ void QAptWorker::updateCache()
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
             emit errorOccurred(QApt::Globals::LockError, QVariantMap());
+            emit workerEvent(QApt::Globals::CacheUpdateFinished);
             emit workerFinished(false);
         }
     }
@@ -146,10 +147,12 @@ void QAptWorker::updateCache()
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
+        emit workerEvent(QApt::Globals::CacheUpdateFinished);
         emit workerFinished(result);
     }
 
     emit workerEvent(QApt::Globals::CacheUpdateFinished);
+    emit workerFinished(false);
 }
 
 void QAptWorker::cancelDownload()
