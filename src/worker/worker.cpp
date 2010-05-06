@@ -68,8 +68,8 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     QTimer::singleShot(60000, this, SLOT(quit()));
 
     m_acquireStatus = new WorkerAcquire;
-    connect(m_acquireStatus, SIGNAL(downloadProgress(int)),
-            this, SLOT(emitDownloadProgress(int)));
+    connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
+            this, SLOT(emitDownloadProgress(int, int, int)));
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(emitDownloadMessage(int, const QString&)));
 }
@@ -305,9 +305,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     emit workerFinished(success);
 }
 
-void QAptWorker::emitDownloadProgress(int percentage)
+void QAptWorker::emitDownloadProgress(int percentage, int speed, int ETA)
 {
-    emit downloadProgress(percentage);
+    emit downloadProgress(percentage, speed, ETA);
 }
 
 void QAptWorker::emitDownloadMessage(int flag, const QString& message)

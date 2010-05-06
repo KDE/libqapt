@@ -46,7 +46,7 @@ qapttest::qapttest()
     m_backend->init();
 
     connect(m_backend, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
-    connect(m_backend, SIGNAL(downloadProgress(int)), this, SLOT(updateDownloadProgress(int)));
+    connect(m_backend, SIGNAL(downloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
     connect(m_backend, SIGNAL(commitProgress(const QString&, int)),
@@ -217,7 +217,7 @@ void qapttest::workerEvent(int code)
     }
 }
 
-void qapttest::updateDownloadProgress(int percentage)
+void qapttest::updateDownloadProgress(int percentage, int speed, int ETA)
 {
     m_cacheUpdateWidget->setTotalProgress(percentage);
 }

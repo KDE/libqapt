@@ -65,7 +65,7 @@ private Q_SLOTS:
     bool lock();
     void unlock();
     bool initializeApt();
-    void emitDownloadProgress(int percentage);
+    void emitDownloadProgress(int percentage, int speed, int ETA);
     void emitDownloadMessage(int flag, const QString &message);
     void emitCommitProgress(const QString& status,
                                  int percentage);
@@ -75,7 +75,7 @@ Q_SIGNALS:
     void workerStarted();
     void workerEvent(int code);
     void workerFinished(bool result);
-    void downloadProgress(int percentage);
+    void downloadProgress(int percentage, int speed, int ETA);
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);

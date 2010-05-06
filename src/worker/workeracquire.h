@@ -57,8 +57,8 @@ private:
 signals:
     void fetchError(int code, const QVariantMap &details);
     void mediaChangeRequest(const QString &media, const QString &drive);
-    void downloadProgress(int percentage);
-    void downloadSubProgress(int percentage);
+    void downloadProgress(int percentage, int speed, int ETA);
+    void downloadSubProgress(const QString &package, int percentage);
     void downloadMessage(int flag, const QString &message);
 };
 

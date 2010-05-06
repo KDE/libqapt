@@ -46,7 +46,7 @@ private Q_SLOTS:
     void updateLabels();
     void updateCache();
     void workerEvent(int code);
-    void updateDownloadProgress(int percentage);
+    void updateDownloadProgress(int percentage, int speed, int ETA);
     void updateDownloadMessage(int flag, const QString &name);
     void updateCommitProgress(const QString& message, int percentage);
     void updateStatusBar();

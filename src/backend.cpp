@@ -324,7 +324,7 @@ void Backend::workerStarted()
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(downloadProgress(int)));
+                                "downloadProgress", this, SLOT(downloadProgress(int, int, int)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
@@ -342,7 +342,7 @@ void Backend::workerFinished(bool result)
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
     QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(downloadProgress(int)));
+                                "downloadProgress", this, SLOT(downloadProgress(int, int, int)));
     QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
     QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",

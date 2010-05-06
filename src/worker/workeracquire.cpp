@@ -117,7 +117,16 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
     int percentage = int(int((CurrentBytes + CurrentItems)*100.0)/int(TotalBytes+TotalItems));
-    emit downloadProgress(percentage);
+
+    int ETA = (int)((TotalBytes - CurrentBytes) / CurrentCPS);
+    // if the ETA is greater than two weeks, show unknown time
+    if (ETA > 14*24*60*60) {
+        ETA = 0;
+    }
+
+    int speed = CurrentCPS;
+
+    emit downloadProgress(percentage, speed, ETA);
 
     Update = false;
 

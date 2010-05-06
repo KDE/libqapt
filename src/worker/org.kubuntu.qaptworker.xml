@@ -11,6 +11,8 @@
     </signal>
     <signal name="downloadProgress">
       <arg name="percentage" type="i" direction="out"/>
+      <arg name="speed" type="i" direction="out"/>
+      <arg name="ETA" type="i" direction="out"/>
     </signal>
     <signal name="downloadMessage">
       <arg name="flag" type="i" direction="out"/>

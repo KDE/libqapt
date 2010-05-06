@@ -172,7 +172,7 @@ Q_SIGNALS:
     void errorOccurred(int code, const QVariantMap &args);
     void packageChanged();
     void workerEvent(int code);
-    void downloadProgress(int percentage);
+    void downloadProgress(int percentage, int speed, int ETA);
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString &status, int percentage);
 
