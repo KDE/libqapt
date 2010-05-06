@@ -148,6 +148,8 @@ void QAptWorker::updateCache()
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
         emit workerFinished(result);
     }
+
+    emit workerEvent(QApt::Globals::DownloadFinished);
 }
 
 void QAptWorker::cancelDownload()

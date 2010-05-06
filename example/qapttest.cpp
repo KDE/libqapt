@@ -194,16 +194,8 @@ void qapttest::workerEvent(int code)
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
         case QApt::Globals::DownloadFinished:
-            m_packageCountLabel->setText(i18np("%1 package available",
-                                         "%1 packages available",
-                                         m_backend->packageCount()));
-
-            m_installedCountLabel->setText(i18np("(%1 package installed)",
-                                                 "(%1 packages installed)",
-                                                 // Yay for flags!
-                                                 m_backend->packageCount(QApt::Package::Installed)));
+            updateStatusBar();
             m_stack->setCurrentWidget(m_mainWidget);
-            break;
             break;
         case QApt::Globals::CommitChangesStarted:
             m_cacheUpdateWidget->clear();
@@ -211,7 +203,7 @@ void qapttest::workerEvent(int code)
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
         case QApt::Globals::CommitChangesFinished:
-
+            updateStatusBar();
             m_stack->setCurrentWidget(m_mainWidget);
             break;
     }
