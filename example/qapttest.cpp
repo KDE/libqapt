@@ -201,7 +201,7 @@ void qapttest::updateCache()
 
 void qapttest::upgrade()
 {
-    m_backend->markPackagesForUpgrade();
+    m_backend->markPackagesForDistUpgrade();
     m_backend->commitChanges();
 }
 
