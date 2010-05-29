@@ -181,12 +181,6 @@ void qapttest::updateLabels()
         // kDebug() << "Package is installed!!!";
     // }
 
-    // Another flag usage example
-    // int state = m_package->state();
-    // if (state & QApt::Package::Upgradeable) {
-        // kDebug() << "Package is upgradeable!!!";
-    // }
-
 }
 
 void qapttest::updateCache()
