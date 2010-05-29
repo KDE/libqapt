@@ -176,11 +176,6 @@ void qapttest::updateLabels()
         // kDebug() << "reverse dependency: " << name;
     // }
 
-    // QApt::Package::List  upgradeablePackages = m_backend->upgradeablePackages();
-    // foreach (QApt::Package *package, upgradeablePackages) {
-            // kDebug() << "Upgradeable packages: " << package->name();
-    // }
-
     // A convenient way to check the install status of a package
     // if (m_package->isInstalled()) {
         // kDebug() << "Package is installed!!!";
