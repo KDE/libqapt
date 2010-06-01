@@ -29,7 +29,7 @@ class WorkerInstallProgress : public QObject
 {
     Q_OBJECT
 public:
-    WorkerInstallProgress(QObject* parent);
+    WorkerInstallProgress(QObject *parent);
     ~WorkerInstallProgress();
 
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);

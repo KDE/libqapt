@@ -20,8 +20,9 @@
 
 #include "workeracquire.h"
 
-#include <QtCore/QDebug>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDebug>
+#include <QtCore/QEventLoop>
 
 #include <apt-pkg/error.h>
 #include <apt-pkg/acquire-item.h>

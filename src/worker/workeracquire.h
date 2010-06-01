@@ -21,12 +21,13 @@
 #ifndef WORKERACQUIRE_H
 #define WORKERACQUIRE_H
 
-#include <QtCore/QEventLoop>
 #include <QtCore/QVariantMap>
 
 #include <apt-pkg/acquire.h>
 
 #include "globals.h"
+
+class QEventLoop;
 
 class WorkerAcquire : public QObject, public pkgAcquireStatus
 {
