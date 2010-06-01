@@ -43,7 +43,7 @@ public:
      /**
       * Default constructor
       */
-    Cache(QObject* parent);
+    explicit Cache(QObject* parent);
 
      /**
       * Default destructor

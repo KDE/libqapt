@@ -59,7 +59,7 @@ public:
      /**
       * Default constructor
       */
-    Backend();
+    explicit Backend();
 
      /**
       * Default destructor
