@@ -39,6 +39,7 @@ public:
         , m_cache(0)
         , m_policy(0)
         , m_depCache(0)
+        , m_list(new pkgSourceList)
     {
     }
 
@@ -65,9 +66,6 @@ Cache::Cache(QObject* parent)
         : QObject(parent)
         , d_ptr(new CachePrivate)
 {
-    Q_D(Cache);
-
-    d->m_list = new pkgSourceList();
 }
 
 Cache::~Cache()
