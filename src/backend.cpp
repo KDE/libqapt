@@ -46,17 +46,26 @@ namespace QApt {
 class BackendPrivate
 {
 public:
+    BackendPrivate() : m_cache(0), m_records(0) {}
+    ~BackendPrivate()
+    {
+        delete m_cache;
+        delete m_records;
+    }
     QDBusServiceWatcher *watcher;
     // The canonical list of all unique, non-virutal package objects
     Package::List packages;
     // Set of group names extracted from our packages
     QSet<Group*> groups;
+
+    Cache *m_cache;
+    pkgPolicy *m_policy;
+
+    pkgRecords *m_records;
 };
 
 Backend::Backend()
         : d(new BackendPrivate)
-        , m_cache(0)
-        , m_records(0)
 {
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));
@@ -75,8 +84,6 @@ Backend::Backend()
 
 Backend::~Backend()
 {
-    delete m_cache;
-    delete m_records;
 }
 
 bool Backend::init()
@@ -98,14 +105,14 @@ bool Backend::init()
 
 void Backend::reloadCache()
 {
-    delete m_cache;
-    m_cache = new Cache(this);
-    m_cache->open();
+    delete d->m_cache;
+    d->m_cache = new Cache(this);
+    d->m_cache->open();
 
-    pkgDepCache *depCache = m_cache->depCache();
+    pkgDepCache *depCache = d->m_cache->depCache();
 
-    delete m_records;
-    m_records = new pkgRecords(*depCache);
+    delete d->m_records;
+    d->m_records = new pkgRecords(*depCache);
 
     foreach(Package *package, d->packages) {
         package->deleteLater();
@@ -127,7 +134,7 @@ void Backend::reloadCache()
             continue; // Exclude virtual packages.
         }
 
-        Package *pkg = new Package(this, depCache, m_records, iter);
+        Package *pkg = new Package(this, depCache, d->m_records, iter);
         d->packages.insert(count++, pkg);
 
         if (iter.Section()) {
@@ -145,7 +152,7 @@ void Backend::reloadCache()
 
 pkgSourceList *Backend::packageSourceList()
 {
-    return m_cache->list();
+    return d->m_cache->list();
 }
 
 Package *Backend::package(const QString &name)
@@ -223,13 +230,13 @@ Group::List Backend::availableGroups()
 void Backend::markPackagesForUpgrade()
 {
     // TODO: Should say something if there's an error?
-    pkgAllUpgrade(*m_cache->depCache());
+    pkgAllUpgrade(*d->m_cache->depCache());
 }
 
 void Backend::markPackagesForDistUpgrade()
 {
     // TODO: Should say something if there's an error?
-    pkgDistUpgrade(*m_cache->depCache());
+    pkgDistUpgrade(*d->m_cache->depCache());
 }
 
 void Backend::markPackageForInstall(const QString &name)

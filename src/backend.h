@@ -67,11 +67,6 @@ public:
       */
     virtual ~Backend();
 
-    Cache *m_cache;
-    pkgPolicy *m_policy;
-
-    pkgRecords *m_records;
-
     /**
      * Initializes the Apt database for usage. Sets up everything the backend
      * will need to perform all operations. Please note that you @b _MUST_ call
