@@ -30,7 +30,7 @@
 
 #include <KDebug>
 #include <KIcon>
-#include <KLocalizedString>
+#include <KLocale>
 #include <KWindowSystem>
 
 #include <libqapt/globals.h>
@@ -157,7 +157,11 @@ void QAptBatch::workerEvent(int code)
             show(); // In case no download was necessary
             break;
         case QApt::Globals::CommitChangesFinished:
-            setLabelText(i18np("Package successfully installed", "Packages successfully installed", m_packages.size()));
+            if (m_mode = install) {
+                setLabelText(i18np("Package successfully installed", "Packages successfully installed", m_packages.size()));
+            } else if (m_mode = uninstall) {
+                setLabelText(i18np("Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
+            }
             progressBar()->setValue(100);
             break;
     }
@@ -191,8 +195,11 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
 
 void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 {
+    QString downloadSpeed = KGlobal::locale()->formatByteSize(speed);
+
+    setLabelText(i18n("Downloading package information %1/s", downloadSpeed));
     progressBar()->setValue(percentage);
-    //TODO: speed, ETA
+    //TODO: ETA
 }
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)

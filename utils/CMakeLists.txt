@@ -7,4 +7,4 @@ include(KDE4Defaults)
 
 # find_package(QApt REQUIRED)
 
-add_subdirectory(src)
+add_subdirectory(qapt-batch)
