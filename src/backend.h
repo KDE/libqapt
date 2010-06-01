@@ -199,7 +199,7 @@ Q_SIGNALS:
     /**
      * Emitted whenever an item has been downloaded
      *
-     * @param flag Status code (is a QApt::Global enum member)
+     * @param flag Fetch type (is a QApt::Global enum member)
      * @param message Usually the URI of the item that's being downloaded
      */
     void downloadMessage(int flag, const QString &message);
