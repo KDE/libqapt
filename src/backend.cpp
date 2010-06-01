@@ -164,8 +164,8 @@ Package *Backend::package(const QString &name)
     }
 
     // FIXME: Need some type of fake package to return here if all else fails.
-    // Otherwise, make sure you don't give this function invalid data. Sucks,
-    // I know...
+    // Otherwise, make sure you don't give this function invalid data.
+    // Sucks, I know...
     qDebug() << "Porked!";
     return 0;
 }

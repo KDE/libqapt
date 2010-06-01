@@ -68,7 +68,7 @@ public:
     virtual ~Backend();
 
     /**
-     * Initializes the Apt database for usage. Sets up everything the backend
+     * Initializes the Apt database for usage. It sets up everything the backend
      * will need to perform all operations. Please note that you @b _MUST_ call
      * this function before doing any further operations in the backend, or else
      * risk encountering undefined behavior.
@@ -79,18 +79,16 @@ public:
     bool init();
 
     /**
-     * Re-initializes the apt database by calling init().
-     * You would normally call this if you expected some external program to
-     * change the package cache while the cache was not locked.
+     * Repopulates the internal package cache, package list, and group list.
+     * Mostly used internally, like after an update or a package installation
+     * or removal.
      *
-     * @return @c true if initialization was successful
-     * @return @c false if there was a problem initializing
      */
     void reloadCache();
 
     /**
      * Returns a pointer to the internal package source list. Mainly used for
-     * internal purposes
+     * internal purposes.
      *
      * @return @c pkgSourceList The package source list used by the backend
      */
@@ -103,7 +101,8 @@ public:
      * that a package with the name you specified, as the library currently
      * does not have a null package to return in the case where a package
      * with the specified name doesn't exists, and returns nothing, resulting
-     * in a crash
+     * in a crash. For the moment, you'll want to check your Package objects to
+     * see if they are null before trying to access them.
      *
      * @param name name used to specify the package returned
      *
@@ -121,8 +120,12 @@ public:
     int packageCount();
 
     /**
-     * Essentially the same as the above function, but you can specify the
-     * PackageState that you want the Backend to count packages for.
+
+     * Queries the backend for the total number of packages in the Apt
+     * database, discarding no-longer-existing packages that linger on in the
+     * status cache (That have a version of 0)
+     *
+     * @param states The package state(s) for which you wish to count packages for
      *
      * @return The total number of packages of the given PackageState in the Apt database
      */
@@ -164,11 +167,51 @@ private:
     BackendPrivate *d;
 
 Q_SIGNALS:
+    /**
+     * Emitted whenever a backend error occurs.
+     *
+     * @param code Error code (is a QApt::Global enum member)
+     * @param args A QVariant map containing info about the error, if available
+     */
     void errorOccurred(int code, const QVariantMap &args);
+
+    /**
+     * Emitted whenever a package changes state. Useful for knowning when to
+     * react to state changes.
+     */
     void packageChanged();
+
+    /**
+     * Emitted whenever a backend event occurs.
+     *
+     * @param code Event code (is a QApt::Global enum member)
+     */
     void workerEvent(int code);
+
+    /**
+     * Emitted while the QApt Worker is downloading packages.
+     *
+     * @param percentage Total percent complete
+     * @param speed Current download speed in bytes
+     * @param ETA Current estimated download time
+     */
     void downloadProgress(int percentage, int speed, int ETA);
+
+    /**
+     * Emitted whenever an item has been downloaded
+     *
+     * @param flag Status code (is a QApt::Global enum member)
+     * @param message Usually the URI of the item that's being downloaded
+     */
     void downloadMessage(int flag, const QString &message);
+
+    /**
+     * Emits the progress of a current package installation/removal/
+     * operation.
+     *
+     * @param status Current status retreived from dpkg
+     * @param percentage Total percent complete
+     */
     void commitProgress(const QString &status, int percentage);
 
 public Q_SLOTS:
@@ -184,7 +227,19 @@ public Q_SLOTS:
      */
     void markPackagesForDistUpgrade();
 
+    /**
+     * Marks a package for install.
+     *
+     * @param name The name of the package to be installed
+     */
     void markPackageForInstall(const QString &name);
+
+    /**
+     * Marks a package for removal.
+     *
+     * @param name The name of the package to be removed
+     * @param purge Whether or not to purge config files for the package
+     */
     void markPackageForRemoval(const QString &name, bool purge);
 
     /**
