@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef CACHE_H
-#define CACHE_H
+#ifndef QAPT_CACHE_H
+#define QAPT_CACHE_H
 
 #include <QtCore/QObject>
 

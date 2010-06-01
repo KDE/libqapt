@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef BACKEND_H
-#define BACKEND_H
+#ifndef QAPT_BACKEND_H
+#define QAPT_BACKEND_H
 
 #include <QtCore/QSet>
 #include <QtCore/QVariantList>

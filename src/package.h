@@ -19,8 +19,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef PACKAGE_H
-#define PACKAGE_H
+#ifndef QAPT_PACKAGE_H
+#define QAPT_PACKAGE_H
 
 #include <QtCore/QObject>
 
