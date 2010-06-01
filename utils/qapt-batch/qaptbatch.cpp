@@ -34,8 +34,8 @@
 #include <KMessageBox>
 #include <KWindowSystem>
 
-#include <libqapt/globals.h>
-#include <libqapt/package.h>
+#include <../../src/globals.h>
+#include <../../src/package.h>
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     : KProgressDialog()
