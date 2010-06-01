@@ -23,18 +23,18 @@
 
 #include <QtCore/QObject>
 
-#include <apt-pkg/depcache.h>
-#include <apt-pkg/sourcelist.h>
-#include <apt-pkg/pkgsystem.h>
-
 class pkgCache;
+class pkgDepCache;
 class pkgPolicy;
+class pkgSourceList;
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
  */
 namespace QApt {
+
+class CachePrivate;
 
 class Cache : public QObject
 {
@@ -50,19 +50,16 @@ public:
       */
     virtual ~Cache();
 
-    OpProgress m_progressMeter;
-    MMap *m_map;
-
-    pkgCache *m_cache;
-    pkgPolicy *m_policy;
-
-    pkgDepCache *m_depCache;
-    pkgSourceList *m_list;
-
 public Q_SLOTS:
     bool open();
     pkgDepCache *depCache();
     pkgSourceList *list();
+
+protected:
+    CachePrivate *const d_ptr;
+
+private:
+    Q_DECLARE_PRIVATE(Cache);
 };
 
 }
