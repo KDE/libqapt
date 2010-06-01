@@ -22,17 +22,12 @@
 #define QAPTWORKER_H
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QVariantList>
 #include <QtDBus/QDBusContext>
-#include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusMessage>
 
 #include <../cache.h>
 
-#include <apt-pkg/progress.h>
-#include <apt-pkg/sourcelist.h>
-#include <apt-pkg/pkgrecords.h>
-#include <apt-pkg/policy.h>
+class pkgPolicy;
+class pkgRecords;
 
 class WorkerAcquire;
 class WorkerInstallProgress;

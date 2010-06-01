@@ -16,7 +16,7 @@
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
- ***************************************************************************/ 
+ ***************************************************************************/
 
 #include "worker.h"
 
@@ -27,19 +27,25 @@
 #include <../package.h>
 
 // Apt includes
-#include <apt-pkg/error.h>
+#include <apt-pkg/algorithms.h>
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/depcache.h>
-#include <apt-pkg/pkgsystem.h>
+#include <apt-pkg/error.h>
 #include <apt-pkg/fileutl.h>
-#include <apt-pkg/pkgcachegen.h>
 #include <apt-pkg/init.h>
-#include <apt-pkg/algorithms.h>
+#include <apt-pkg/pkgcachegen.h>
+#include <apt-pkg/pkgrecords.h>
+#include <apt-pkg/pkgsystem.h>
+#include <apt-pkg/policy.h>
 
 #include <sys/statvfs.h>
 #include <sys/statfs.h>
 #include <sys/wait.h>
 #include <sys/fcntl.h>
+
+// Qt includes
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusMessage>
 
 #define RAMFS_MAGIC     0x858458f6
 
