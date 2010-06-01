@@ -21,11 +21,10 @@
 #ifndef QAPTBATCH_H
 #define QAPTBATCH_H
 
-//Qt includes
+// KDE includes
 #include <KProgressDialog>
 
-// KDE includes
-#include <KVBox>
+class KVBox;
 
 class QDBusServiceWatcher;
 class QLabel;

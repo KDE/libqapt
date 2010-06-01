@@ -74,6 +74,7 @@ int main(int argc, char **argv)
     KApplication app;
 
     QAptBatch *batchInstaller = new QAptBatch(mode, packages, winId);
+    Q_UNUSED(batchInstaller);
 
     return app.exec();
 }
