@@ -31,6 +31,7 @@
 #include <KDebug>
 #include <KIcon>
 #include <KLocale>
+#include <KMessageBox>
 #include <KWindowSystem>
 
 #include <libqapt/globals.h>
@@ -183,14 +184,16 @@ void QAptBatch::workerFinished(bool success)
 
 void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
+    Q_UNUSED(name);
     if (oldOwner.isEmpty()) {
         return; // Don't care, just appearing
     }
 
     if (newOwner.isEmpty()) {
-        qDebug() << "It looks like our worker got lost";
-
-        //TODO: KMessageBox saying worker died
+        KMessageBox::sorry(0, i18n("It appears that the QApt worker has either crashed "
+                                   "or disappeared. Please report a bug to the QApt maintainers"),
+                           i18n("Unexpected error"));
+        close();
     }
 }
 
@@ -205,7 +208,9 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)
 {
-    progressBar()->setValue(percentage);
+    //FIXME: Percentage busted in libqapt
+    //progressBar()->setValue(percentage);
+    progressBar()->setValue(0);
     setLabelText(message);
 }
 
