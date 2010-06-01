@@ -143,6 +143,7 @@ void QAptBatch::workerEvent(int code)
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
         case QApt::Globals::PackageDownloadStarted:
+            kDebug() << "downloading packages";
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             setWindowTitle(i18n("Downloading Packages"));
             setLabelText(i18n("Downloading packages"));
@@ -157,9 +158,9 @@ void QAptBatch::workerEvent(int code)
             show(); // In case no download was necessary
             break;
         case QApt::Globals::CommitChangesFinished:
-            if (m_mode = install) {
+            if (m_mode == "install") {
                 setLabelText(i18np("Package successfully installed", "Packages successfully installed", m_packages.size()));
-            } else if (m_mode = uninstall) {
+            } else if (m_mode == "uninstall") {
                 setLabelText(i18np("Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
