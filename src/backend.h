@@ -29,10 +29,9 @@
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/policy.h>
 
-#include "cache.h"
-#include "package.h"
-#include "group.h"
 #include "globals.h"
+#include "group.h"
+#include "package.h"
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this

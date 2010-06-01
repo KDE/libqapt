@@ -41,6 +41,8 @@
 #include <apt-pkg/cachefile.h>
 #include <apt-pkg/init.h>
 
+#include "cache.h"
+
 namespace QApt {
 
 class BackendPrivate
