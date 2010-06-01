@@ -48,6 +48,7 @@ include_directories(
     )
 
 add_subdirectory(src)
+add_subdirectory(utils)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig
