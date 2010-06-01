@@ -224,7 +224,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     }
 
     emit workerStarted();
-    emit workerEvent(QApt::Globals::PackageDownloadStarted);
 
     // Lock the archive directory
     FileFd Lock;
@@ -233,12 +232,12 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
         if (_error->PendingError() == true) {
             emit errorOccurred(QApt::Globals::LockError, QVariantMap());
-            emit workerEvent(QApt::Globals::PackageDownloadFinished);
             emit workerFinished(false);
             return;
         }
     }
 
+    emit workerEvent(QApt::Globals::PackageDownloadStarted);
     pkgAcquire fetcher(m_acquireStatus);
 
     pkgPackageManager *packageManager;
