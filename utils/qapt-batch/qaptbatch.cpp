@@ -59,13 +59,13 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     m_watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
     m_watcher->addWatchedService("org.kubuntu.qaptworker");
 
-    kDebug() << m_mode;
-
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
     } else if (m_mode == "uninstall") {
         commitChanges(QApt::Package::ToRemove);
     } else if (m_mode == "update") {
+        //FIXME: Really need to block until we have auth here, since
+        // otherwise we get a blank KProgressDialog popping up behind us
         QDBusMessage message;
         message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
                   "/",
@@ -118,7 +118,6 @@ void QAptBatch::cancelDownload()
 
 void QAptBatch::workerStarted()
 {
-    kDebug() << "worker started";
     connect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
@@ -193,6 +192,7 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
         KMessageBox::sorry(0, i18n("It appears that the QApt worker has either crashed "
                                    "or disappeared. Please report a bug to the QApt maintainers"),
                            i18n("Unexpected error"));
+        workerFinished(false);
         close();
     }
 }
