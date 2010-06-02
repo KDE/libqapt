@@ -163,7 +163,7 @@ pkgSourceList *Backend::packageSourceList()
     return d->m_cache->list();
 }
 
-Package *Backend::package(const QString &name)
+Package *Backend::package(const QString &name) const
 {
     Q_D(const Backend);
 
@@ -189,7 +189,7 @@ int Backend::packageCount()
     return packageCount;
 }
 
-int Backend::packageCount(const Package::PackageStates &states)
+int Backend::packageCount(const Package::PackageStates &states) const
 {
     Q_D(const Backend);
 
@@ -204,14 +204,14 @@ int Backend::packageCount(const Package::PackageStates &states)
     return packageCount;
 }
 
-Package::List Backend::availablePackages()
+Package::List Backend::availablePackages() const
 {
     Q_D(const Backend);
 
     return d->packages;
 }
 
-Package::List Backend::upgradeablePackages()
+Package::List Backend::upgradeablePackages() const
 {
     Q_D(const Backend);
 
@@ -229,7 +229,7 @@ Package::List Backend::upgradeablePackages()
     return upgradeablePackages;
 }
 
-Group *Backend::group(const QString &name)
+Group *Backend::group(const QString &name) const
 {
     Q_D(const Backend);
 
@@ -240,7 +240,7 @@ Group *Backend::group(const QString &name)
     }
 }
 
-Group::List Backend::availableGroups()
+Group::List Backend::availableGroups() const
 {
     Q_D(const Backend);
 

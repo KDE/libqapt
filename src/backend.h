@@ -107,7 +107,7 @@ public:
      *
      * @return A @c Package defined by the specified name
      */
-    Package *package(const QString &name);
+    Package *package(const QString &name) const;
 
     /**
      * Queries the backend for the total number of packages in the Apt
@@ -128,7 +128,7 @@ public:
      *
      * @return The total number of packages of the given PackageState in the Apt database
      */
-    int packageCount(const Package::PackageStates &states);
+    int packageCount(const Package::PackageStates &states) const;
 
     /**
      * Queries the backend for a list of all available packages, which is
@@ -137,14 +137,14 @@ public:
      *
      * \return A @c Package::List of all available packages in the Apt database
      */
-    Package::List availablePackages();
+    Package::List availablePackages() const;
 
     /**
      * Queries the backend for a list of all upgradeable packages
      *
      * \return A @c Package::List of all upgradeable packages in the Apt database
      */
-    Package::List upgradeablePackages();
+    Package::List upgradeablePackages() const;
 
     /**
      * Queries the backend for a Group object for the specified name.
@@ -153,14 +153,14 @@ public:
      *
      * @return A @c Group defined by the specified name
      */
-    Group *group(const QString &name);
+    Group *group(const QString &name) const;
 
     /**
      * Queries the backend for a list of all available groups
      *
      * \return A @c Group::List of all available groups in the Apt database
      */
-    Group::List availableGroups();
+    Group::List availableGroups() const;
 
 protected:
     BackendPrivate *const d_ptr;
