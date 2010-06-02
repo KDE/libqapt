@@ -222,6 +222,7 @@ void QAptBatch::workerEvent(int code)
             break;
         case QApt::Globals::CommitChangesStarted:
             setWindowTitle(i18n("Installing Packages"));
+            showButton(Cancel, false); //Committing changes is uninterruptable (safely, that is)
             show(); // In case no download was necessary
             break;
         case QApt::Globals::CommitChangesFinished:
