@@ -70,6 +70,7 @@ Cache::Cache(QObject* parent)
 
 Cache::~Cache()
 {
+    delete d_ptr;
 }
 
 bool Cache::open()

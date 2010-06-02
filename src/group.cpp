@@ -31,18 +31,22 @@ class GroupPrivate
 
 Group::Group(QObject* parent, const QString &name)
         : QObject(parent)
-        , d(new GroupPrivate)
+        , d_ptr(new GroupPrivate)
 {
+    Q_D(Group);
+
     d->name = name;
 }
 
 Group::~Group()
 {
-    delete d;
+    delete d_ptr;
 }
 
 QString Group::name() const
 {
+    Q_D(const Group);
+
     return d->name;
 }
 

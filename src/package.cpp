@@ -40,18 +40,19 @@ class PackagePrivate
 Package::Package(QApt::Backend* parent, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
         : QObject(parent)
-        , d(new PackagePrivate())
+        , d_ptr(new PackagePrivate())
         , m_backend(parent)
         , m_depCache(depCache)
         , m_records(records)
 {
+    Q_D(Package);
     m_packageIter = new pkgCache::PkgIterator(packageIter);
     d->state = state();
 }
 
 Package::~Package()
 {
-    delete d;
+    delete d_ptr;
     delete m_packageIter;
 }
 
@@ -134,6 +135,8 @@ QString Package::homepage() const
 
 QString Package::version() const
 {
+    Q_D(const Package);
+
     if ((*m_packageIter)->CurrentVer == 0) {
         pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
         if (d->state & NotInstallable) {
@@ -158,6 +161,8 @@ QString Package::installedVersion() const
 
 QString Package::availableVersion() const
 {
+    Q_D(const Package);
+
     QString availableVersion;
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     if (d->state & NotInstallable) {
@@ -233,6 +238,8 @@ QString Package::origin() const
 
 QString Package::component() const
 {
+    Q_D(const Package);
+
     QString res;
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
@@ -254,6 +261,8 @@ QString Package::component() const
 
 qint32 Package::installedSize() const
 {
+    Q_D(const Package);
+
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
 
     // If we are installed
@@ -272,6 +281,8 @@ qint32 Package::installedSize() const
 
 qint32 Package::downloadSize() const
 {
+    Q_D(const Package);
+
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     if (d->state & NotInstallable) {
         return -1;
@@ -366,6 +377,8 @@ int Package::state()
 
 bool Package::isInstalled()
 {
+    Q_D(Package);
+
     if (d->state & Installed) {
         return true;
     } else {
@@ -375,6 +388,8 @@ bool Package::isInstalled()
 
 bool Package::isValid()
 {
+    Q_D(Package);
+
     if (d->state & NotInstallable) {
         return false;
     } else {
@@ -416,6 +431,8 @@ QStringList Package::requiredByList()
 
 QStringList Package::providesList()
 {
+    Q_D(const Package);
+
     QStringList provides;
 
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
@@ -434,6 +451,8 @@ QStringList Package::providesList()
 
 bool Package::isTrusted()
 {
+    Q_D(Package);
+
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
     Ver = State.CandidateVerIter(*m_depCache);
@@ -458,6 +477,8 @@ bool Package::isTrusted()
 
 bool Package::wouldBreak()
 {
+    Q_D(Package);
+
     if ((d->state & ToRemove) || (!(d->state & Installed) && (d->state & ToKeep))) {
         return false;
     }
@@ -479,6 +500,8 @@ void Package::setKeep()
 
 void Package::setInstall()
 {
+    Q_D(Package);
+
     m_depCache->MarkInstall(*m_packageIter, true);
 
     // FIXME: can't we get rid of it here?

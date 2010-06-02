@@ -162,8 +162,11 @@ public:
      */
     Group::List availableGroups();
 
+protected:
+    BackendPrivate *const d_ptr;
+
 private:
-    BackendPrivate *d;
+    Q_DECLARE_PRIVATE(Backend);
 
 Q_SIGNALS:
     /**

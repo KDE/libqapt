@@ -67,8 +67,10 @@ public:
 };
 
 Backend::Backend()
-        : d(new BackendPrivate)
+        : d_ptr(new BackendPrivate)
 {
+    Q_D(Backend);
+
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
@@ -107,6 +109,8 @@ bool Backend::init()
 
 void Backend::reloadCache()
 {
+    Q_D(Backend);
+
     delete d->m_cache;
     d->m_cache = new Cache(this);
     d->m_cache->open();
@@ -154,11 +158,15 @@ void Backend::reloadCache()
 
 pkgSourceList *Backend::packageSourceList()
 {
+    Q_D(const Backend);
+
     return d->m_cache->list();
 }
 
 Package *Backend::package(const QString &name)
 {
+    Q_D(const Backend);
+
     foreach (Package *package, d->packages) {
         if (package->name() == name) {
             return package;
@@ -174,6 +182,8 @@ Package *Backend::package(const QString &name)
 
 int Backend::packageCount()
 {
+    Q_D(const Backend);
+
     int packageCount = d->packages.size();
 
     return packageCount;
@@ -181,6 +191,8 @@ int Backend::packageCount()
 
 int Backend::packageCount(const Package::PackageStates &states)
 {
+    Q_D(const Backend);
+
     int packageCount = 0;
 
     foreach(Package *package, d->packages) {
@@ -194,11 +206,15 @@ int Backend::packageCount(const Package::PackageStates &states)
 
 Package::List Backend::availablePackages()
 {
+    Q_D(const Backend);
+
     return d->packages;
 }
 
 Package::List Backend::upgradeablePackages()
 {
+    Q_D(const Backend);
+
     Package::List upgradeablePackages;
 
     foreach (Package *package, d->packages) {
@@ -215,6 +231,8 @@ Package::List Backend::upgradeablePackages()
 
 Group *Backend::group(const QString &name)
 {
+    Q_D(const Backend);
+
     foreach (Group *group, d->groups) {
         if (group->name() == name) {
             return group;
@@ -224,6 +242,8 @@ Group *Backend::group(const QString &name)
 
 Group::List Backend::availableGroups()
 {
+    Q_D(const Backend);
+
     Group::List groupList = d->groups.toList();
 
     return groupList;
@@ -231,12 +251,16 @@ Group::List Backend::availableGroups()
 
 void Backend::markPackagesForUpgrade()
 {
+    Q_D(Backend);
+
     // TODO: Should say something if there's an error?
     pkgAllUpgrade(*d->m_cache->depCache());
 }
 
 void Backend::markPackagesForDistUpgrade()
 {
+    Q_D(Backend);
+
     // TODO: Should say something if there's an error?
     pkgDistUpgrade(*d->m_cache->depCache());
 }
@@ -255,6 +279,8 @@ void Backend::markPackageForRemoval(const QString &name, bool purge)
 
 void Backend::commitChanges()
 {
+    Q_D(Backend);
+
     QMap<QString, QVariant> instructionList;
 
     foreach (Package *package, d->packages) {
@@ -329,6 +355,8 @@ void Backend::updateCache()
 
 void Backend::workerStarted()
 {
+    Q_D(Backend);
+
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
@@ -347,6 +375,8 @@ void Backend::emitWorkerEvent(int code)
 
 void Backend::workerFinished(bool result)
 {
+    Q_D(Backend);
+
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 

@@ -18,17 +18,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPT_GROUP_H
-#define QAPT_GROUP_H
+#ifndef GROUP_H
+#define GROUP_H
 
 #include <QtCore/QObject>
 
 #include "package.h"
 
-/**
- * The QApt namespace is the main namespace for LibQApt. All classes in this
- * library fall under this namespace.
- */
 namespace QApt {
 
 /**
@@ -49,7 +45,7 @@ public:
    /**
     * Default constructor
     */
-    Group(QObject* parent, const QString &name);
+    explicit Group(QObject* parent, const QString &name);
 
    /**
     * Default destructor
@@ -68,12 +64,11 @@ public:
      */
     QString name() const;
 
+protected:
+    GroupPrivate *const d_ptr;
+
 private:
-    /**
-     * Pointer to the GroupPrivate class that contains all of Group's private
-     * members
-     */
-    GroupPrivate * const d;
+    Q_DECLARE_PRIVATE(Group);
 
 };
 

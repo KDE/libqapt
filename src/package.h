@@ -367,12 +367,11 @@ public:
     };
     Q_DECLARE_FLAGS(UpdateImportances, UpdateImportance)
 
+protected:
+    PackagePrivate *const d_ptr;
+
 private:
-    /**
-     * Pointer to the GroupPrivate class that contains all of Group's private
-     * members
-     */
-    PackagePrivate * const d;
+    Q_DECLARE_PRIVATE(Package);
 };
 
 }
