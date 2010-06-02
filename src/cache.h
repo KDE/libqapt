@@ -28,10 +28,6 @@ class pkgDepCache;
 class pkgPolicy;
 class pkgSourceList;
 
-/**
- * The QApt namespace is the main namespace for LibQApt. All classes in this
- * library fall under this namespace.
- */
 namespace QApt {
 
 class CachePrivate;

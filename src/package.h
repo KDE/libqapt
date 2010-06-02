@@ -28,10 +28,6 @@
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/depcache.h>
 
-/**
- * The QApt namespace is the main namespace for LibQApt. All classes in this
- * library fall under this namespace.
- */
 namespace QApt {
 
 /**
