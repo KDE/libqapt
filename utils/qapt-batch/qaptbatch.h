@@ -46,6 +46,7 @@ private:
     QLabel *m_progressLabel;
 
 private Q_SLOTS:
+    void workerDBusCall(QLatin1String name, QList<QVariant> &args);
     void commitChanges(int mode);
     void cancelDownload();
     void workerStarted();

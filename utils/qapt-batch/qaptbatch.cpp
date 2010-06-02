@@ -66,12 +66,8 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     } else if (m_mode == "update") {
         //FIXME: Really need to block until we have auth here, since
         // otherwise we get a blank KProgressDialog popping up behind us
-        QDBusMessage message;
-        message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-                  "/",
-                  "org.kubuntu.qaptworker",
-                  QLatin1String("updateCache"));
-        QDBusConnection::systemBus().asyncCall(message);
+        QList<QVariant> args;
+        workerDBusCall(QLatin1String("updateCache"), args);
     }
 
     if (winId != 0) {
@@ -86,6 +82,19 @@ QAptBatch::~QAptBatch()
 {
 }
 
+void QAptBatch::workerDBusCall(QLatin1String name, QList<QVariant> &args)
+{
+    QDBusMessage message;
+    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
+              "/",
+              "org.kubuntu.qaptworker",
+              name);
+    if (!args.isEmpty()) {
+        message.setArguments(args);
+    }
+    QDBusConnection::systemBus().asyncCall(message);
+}
+
 void QAptBatch::commitChanges(int mode)
 {
     QMap<QString, QVariant> instructionList;
@@ -94,26 +103,16 @@ void QAptBatch::commitChanges(int mode)
         instructionList.insert(package, mode);
     }
 
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              QLatin1String("commitChanges"));
 
     QList<QVariant> args;
     args << QVariant(instructionList);
-    message.setArguments(args);
-    QDBusConnection::systemBus().asyncCall(message);
+    workerDBusCall(QLatin1String("commitChanges"), args);
 }
 
 void QAptBatch::cancelDownload()
 {
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              QLatin1String("cancelDownload"));
-    QDBusConnection::systemBus().asyncCall(message);
+    QList<QVariant> args;
+    workerDBusCall(QLatin1String("cancelDownload"), args);
 }
 
 void QAptBatch::workerStarted()
