@@ -266,9 +266,9 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
 
 void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 {
-    QString downloadSpeed = KGlobal::locale()->formatByteSize(speed);
+    QString downloadSpeed = i18nc("Download rate", "at %1/s", KGlobal::locale()->formatByteSize(speed));
 
-    setLabelText(i18n("Downloading package information %1/s", downloadSpeed));
+    setLabelText(i18n("Downloading package information %1", downloadSpeed));
     progressBar()->setValue(percentage);
     //TODO: ETA
 }
