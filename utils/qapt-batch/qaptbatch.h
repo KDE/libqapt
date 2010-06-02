@@ -53,6 +53,7 @@ private Q_SLOTS:
     void cancelDownload();
     void workerStarted();
     void errorOccurred(int code, const QVariantMap &args);
+    void raiseErrorMessage(const QString &text, const QString &title);
     void workerEvent(int event);
     void workerFinished(bool result);
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

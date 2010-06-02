@@ -129,11 +129,62 @@ void QAptBatch::workerStarted()
 }
 void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 {
+    QString text;
+    QString title;
+    QString drive;
+    QString failedItem;
+    QString errorText;
     switch(code) {
+        case QApt::Globals::InitError:
+            text = i18n("The package system could not be initialized, your "
+                        "configuration may be broken.");
+            title = i18n("Initialization error");
+            raiseErrorMessage(text, title);
+            break;
         case QApt::Globals::LockError:
-            kDebug() << "John Locke error!";
+            text = i18n("Another application seems to be using the package "
+                        "system at this time. You must close all other package "
+                        "managers before you will be able to install or remove "
+                        "any packages.");
+            title = i18n("Unable to obtain package system lock");
+            raiseErrorMessage(text, title);
+            break;
+        case QApt::Globals::DiskSpaceError:
+            drive = args["DirectoryString"].toString();
+            text = i18n("You do not have enough disk space in the directory "
+                        "at %1 to continue with this operation.", drive);
+            title = i18n("Low disk space");
+            raiseErrorMessage(text, title);
+            break;
+        case QApt::Globals::CommitError:
+            failedItem = args["FailedItem"].toString();
+            errorText = args["ErrorText"].toString();
+            text = i18n("An error occurred while committing changes.");
+
+            if (!failedItem.isEmpty() && !errorText.isEmpty()) {
+                text.append("\n\n");
+                text.append(failedItem);
+                text.append('\n');
+                text.append(errorText);
+            }
+
+            title = i18n("Commit error");
+            raiseErrorMessage(text, title);
+            break;
+        case QApt::Globals::AuthError:
+            text = i18n("This operation cannot continue since proper "
+                                "authorization was not provided");
+            title = i18n("Authentication error");
+            raiseErrorMessage(text, title);
             break;
     }
+}
+
+void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
+{
+    KMessageBox::sorry(0, text, title);
+    workerFinished(false);
+    close();
 }
 
 void QAptBatch::workerEvent(int code)
@@ -196,11 +247,11 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
     }
 
     if (newOwner.isEmpty()) {
-        KMessageBox::sorry(0, i18n("It appears that the QApt worker has either crashed "
-                                   "or disappeared. Please report a bug to the QApt maintainers"),
-                           i18n("Unexpected error"));
-        workerFinished(false);
-        close();
+        QString text = i18n("It appears that the QApt worker has either crashed "
+                            "or disappeared. Please report a bug to the QApt maintainers");
+        QString title = i18n("Unexpected error");
+
+        raiseErrorMessage(text, title);
     }
 }
 
