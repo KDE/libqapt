@@ -54,15 +54,16 @@ public:
         delete m_cache;
         delete m_records;
     }
+    // Watches DBus for our worker appearing/disappearing
     QDBusServiceWatcher *watcher;
     // The canonical list of all unique, non-virutal package objects
     Package::List packages;
     // Set of group names extracted from our packages
     QSet<Group*> groups;
 
+    // Pointer to the apt cache object
     Cache *m_cache;
     pkgPolicy *m_policy;
-
     pkgRecords *m_records;
 };
 
@@ -317,6 +318,7 @@ void Backend::commitChanges()
                if(flags & Package::ToPurge) {
                    instructionList.insert(package->name(), Package::ToPurge);
                } else {
+                   qDebug() << "Removing:" << package->name();
                    instructionList.insert(package->name(), Package::ToRemove);
                }
                break;

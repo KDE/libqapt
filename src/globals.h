@@ -19,8 +19,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef QAPT_GLOBALS_H
+#define QAPT_GLOBALS_H
 
 #include <QtCore/QFlags>
 

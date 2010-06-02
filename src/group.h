@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef GROUP_H
-#define GROUP_H
+#ifndef QAPT_GROUP_H
+#define QAPT_GROUP_H
 
 #include <QtCore/QObject>
 
