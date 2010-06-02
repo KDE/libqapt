@@ -397,7 +397,7 @@ bool Package::isValid()
     }
 }
 
-QStringList Package::dependencyList(bool useCanidateVersion)
+QStringList Package::dependencyList(bool useCanidateVersion) const
 {
     // TODO: Stub, won't return anything.
     QStringList dependsList;
@@ -418,7 +418,7 @@ QStringList Package::dependencyList(bool useCanidateVersion)
     return dependsList;
 }
 
-QStringList Package::requiredByList()
+QStringList Package::requiredByList() const
 {
     QStringList reverseDependsList;
 
@@ -429,7 +429,7 @@ QStringList Package::requiredByList()
     return reverseDependsList;
 }
 
-QStringList Package::providesList()
+QStringList Package::providesList() const
 {
     Q_D(const Package);
 

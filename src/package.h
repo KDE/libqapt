@@ -263,7 +263,7 @@ public:
     *
     * \return A list of packages that this package depends on as a @c QStringList
     */
-    QStringList dependencyList(bool useCandidateVersion);
+    QStringList dependencyList(bool useCandidateVersion) const;
 
    /**
     * Member function that returns a list of the names of all the packages
@@ -273,7 +273,7 @@ public:
     *
     * \return A list of packages that depend on this package as a @c QStringList
     */
-    QStringList requiredByList();
+    QStringList requiredByList() const;
 
    /**
     * Member function that returns a list of the names of all the virtual
@@ -283,7 +283,7 @@ public:
     *
     * \return A list of packages that this package provides as a @c QStringList
     */
-    QStringList providesList();
+    QStringList providesList() const;
 
    /**
     * Member function that returns whether or not the package is signed with a
