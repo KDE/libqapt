@@ -127,6 +127,14 @@ void QAptBatch::workerStarted()
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "commitProgress", this, SLOT(updateCommitProgress(const QString&, int)));
 }
+void QAptBatch::errorOccurred(int code, const QVariantMap &args)
+{
+    switch(code) {
+        case QApt::Globals::LockError:
+            kDebug() << "John Locke error!";
+            break;
+    }
+}
 
 void QAptBatch::workerEvent(int code)
 {

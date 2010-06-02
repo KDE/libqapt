@@ -21,6 +21,8 @@
 #ifndef QAPTBATCH_H
 #define QAPTBATCH_H
 
+//Qt includes
+
 // KDE includes
 #include <KProgressDialog>
 
@@ -50,6 +52,7 @@ private Q_SLOTS:
     void commitChanges(int mode);
     void cancelDownload();
     void workerStarted();
+    void errorOccurred(int code, const QVariantMap &args);
     void workerEvent(int event);
     void workerFinished(bool result);
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
