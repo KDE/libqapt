@@ -50,10 +50,11 @@ public:
       */
     virtual ~Cache();
 
-public Q_SLOTS:
-    bool open();
     pkgDepCache *depCache();
     pkgSourceList *list();
+
+public Q_SLOTS:
+    bool open();
 
 protected:
     CachePrivate *const d_ptr;
