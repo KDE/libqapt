@@ -210,9 +210,8 @@ void QAptBatch::workerEvent(int code)
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
         case QApt::Globals::PackageDownloadStarted:
-            kDebug() << "downloading packages";
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
-            setWindowTitle(i18n("Downloading Packages"));
+            setWindowTitle(i18n("Downloading"));
             setLabelText(i18n("Downloading packages"));
             show();
             break;
@@ -221,14 +220,16 @@ void QAptBatch::workerEvent(int code)
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
         case QApt::Globals::CommitChangesStarted:
-            setWindowTitle(i18n("Installing Packages"));
+            setWindowTitle(i18n("Installing"));
             showButton(Cancel, false); //Committing changes is uninterruptable (safely, that is)
             show(); // In case no download was necessary
             break;
         case QApt::Globals::CommitChangesFinished:
             if (m_mode == "install") {
+                setWindowTitle(i18n("Installation complete"));
                 setLabelText(i18np("Package successfully installed", "Packages successfully installed", m_packages.size()));
             } else if (m_mode == "uninstall") {
+                setWindowTitle(i18n("Removal complete"));
                 setLabelText(i18np("Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
