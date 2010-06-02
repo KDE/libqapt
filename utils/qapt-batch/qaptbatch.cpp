@@ -59,13 +59,20 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     m_watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
     m_watcher->addWatchedService("org.kubuntu.qaptworker");
 
+    // Would be nice if KProgressDialog didn't auto-show after a time,
+    // else we could just not show it until something happens. But as
+    // it stands it'll usually pop up while the user is typing in his
+    // password. We shouldn't have a blank dialog, hence the below.
+    setLabelText(i18n("Waiting for authorization"));
+    progressBar()->setMinimum(0);
+    progressBar()->setMaximum(0);
+    show();
+
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
     } else if (m_mode == "uninstall") {
         commitChanges(QApt::Package::ToRemove);
     } else if (m_mode == "update") {
-        //FIXME: Really need to block until we have auth here, since
-        // otherwise we get a blank KProgressDialog popping up behind us
         QList<QVariant> args;
         workerDBusCall(QLatin1String("updateCache"), args);
     }
@@ -117,6 +124,8 @@ void QAptBatch::cancelDownload()
 
 void QAptBatch::workerStarted()
 {
+    // Reset the progresbar's maximum to default
+    progressBar()->setMaximum(100);
     connect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
@@ -173,7 +182,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             break;
         case QApt::Globals::AuthError:
             text = i18n("This operation cannot continue since proper "
-                                "authorization was not provided");
+                        "authorization was not provided");
             title = i18n("Authentication error");
             raiseErrorMessage(text, title);
             break;
