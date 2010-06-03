@@ -25,15 +25,15 @@
 #include <KLocale>
 
 static const char description[] =
-    I18N_NOOP("A batch installer using QApt");
+    I18N_NOOP2("@info", "A batch installer using QApt");
 
 static const char version[] = "0.1";
 
 int main(int argc, char **argv)
 {
-    KAboutData about("qaptbatch", 0, ki18n("QApt Batch Installer"), version, ki18n(description),
-                     KAboutData::License_GPL, ki18n("(C) 2010 Jonathan Thomas"), KLocalizedString(), 0, "echidnaman@kubuntu.org");
-    about.addAuthor( ki18n("Jonathan Thomas"), KLocalizedString(), "echidnaman@kubuntu.org" );
+    KAboutData about("qaptbatch", 0, ki18nc("@title", "QApt Batch Installer"), version, ki18nc("@info", description),
+                     KAboutData::License_GPL, ki18nc("@info:credit", "(C) 2010 Jonathan Thomas"), KLocalizedString(), 0, "echidnaman@kubuntu.org");
+    about.addAuthor( ki18nc("@info:credit", "Jonathan Thomas"), KLocalizedString(), "echidnaman@kubuntu.org" );
     about.setProgramIconName("applications-other");
     KCmdLineArgs::init(argc, argv, &about);
 
