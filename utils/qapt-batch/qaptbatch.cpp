@@ -204,7 +204,7 @@ void QAptBatch::workerEvent(int code)
     switch (code) {
         case QApt::Globals::CacheUpdateStarted:
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
-            setWindowTitle(i18nc("@title:window", "Refreshing package information"));
+            setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
             setLabelText(i18nc("@info:status", "Downloading package information"));
             show();
             break;
@@ -229,10 +229,10 @@ void QAptBatch::workerEvent(int code)
             break;
         case QApt::Globals::CommitChangesFinished:
             if (m_mode == "install") {
-                setWindowTitle(i18nc("@title:window", "Installation complete"));
+                setWindowTitle(i18nc("@title:window", "Installation Complete"));
                 setLabelText(i18ncp("@label", "Package successfully installed", "Packages successfully installed", m_packages.size()));
             } else if (m_mode == "uninstall") {
-                setWindowTitle(i18nc("@title:window", "Removal complete"));
+                setWindowTitle(i18nc("@title:window", "Removal Complete"));
                 setLabelText(i18ncp("@label", "Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
@@ -266,7 +266,7 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
         // can't really tell us, can it?
         QString text = i18nc("@label", "It appears that the QApt worker has either crashed "
                             "or disappeared. Please report a bug to the QApt maintainers");
-        QString title = i18nc("@title:window", "Unexpected error");
+        QString title = i18nc("@title:window", "Unexpected Error");
 
         raiseErrorMessage(text, title);
     }
@@ -278,7 +278,8 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
     QString downloadSpeed;
     if (speed != 0) {
-        downloadSpeed = i18nc("@info:progress Download rate", "at %1/s", KGlobal::locale()->formatByteSize(speed));
+        downloadSpeed = i18nc("@info:progress Download rate",
+                              "at %1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
     QString downloadLabel;
