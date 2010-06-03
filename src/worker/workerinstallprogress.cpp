@@ -150,9 +150,12 @@ void WorkerInstallProgress::updateInterface(int fd)
                 m_startCounting = true;
             }
 
-            int percentage = (percent.toInt()/100);
+            if (percent.contains('.')) {
+                QStringList percentList = percent.split('.');
+                percent = percentList[0];
+            }
+            int percentage = percent.toInt();
 
-            //TODO: rename to commitProgress
             emit commitProgress(str, percentage);
             // clean-up
             line[0] = 0;

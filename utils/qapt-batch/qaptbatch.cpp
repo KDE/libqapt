@@ -302,9 +302,7 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)
 {
-    //FIXME: Percentage busted in libqapt
-    //progressBar()->setValue(percentage);
-    progressBar()->setValue(0);
+    progressBar()->setValue(percentage);
     setLabelText(message);
 }
 
