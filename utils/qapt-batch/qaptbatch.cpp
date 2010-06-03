@@ -64,7 +64,7 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     // If auth happens before this, we will manually show when progress happens
     setMinimumDuration(10000);
     // Set this in case we auto-show before auth
-    setLabelText(i18n("Waiting for authorization"));
+    setLabelText(i18nc("@label", "Waiting for authorization"));
     progressBar()->setMinimum(0);
     progressBar()->setMaximum(0);
 
@@ -144,30 +144,33 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
     QString errorText;
     switch(code) {
         case QApt::Globals::InitError:
-            text = i18n("The package system could not be initialized, your "
-                        "configuration may be broken.");
-            title = i18n("Initialization error");
+            text = i18nc("@label",
+                         "The package system could not be initialized, your "
+                         "configuration may be broken.");
+            title = i18nc("@title:window", "Initialization error");
             raiseErrorMessage(text, title);
             break;
         case QApt::Globals::LockError:
-            text = i18n("Another application seems to be using the package "
-                        "system at this time. You must close all other package "
-                        "managers before you will be able to install or remove "
-                        "any packages.");
-            title = i18n("Unable to obtain package system lock");
+            text = i18nc("@label",
+                         "Another application seems to be using the package "
+                         "system at this time. You must close all other package "
+                         "managers before you will be able to install or remove "
+                         "any packages.");
+            title = i18nc("@title:window", "Unable to obtain package system lock");
             raiseErrorMessage(text, title);
             break;
         case QApt::Globals::DiskSpaceError:
             drive = args["DirectoryString"].toString();
-            text = i18n("You do not have enough disk space in the directory "
-                        "at %1 to continue with this operation.", drive);
-            title = i18n("Low disk space");
+            text = i18nc("@label",
+                         "You do not have enough disk space in the directory "
+                         "at %1 to continue with this operation.", drive);
+            title = i18nc("@title:window", "Low disk space");
             raiseErrorMessage(text, title);
             break;
         case QApt::Globals::CommitError:
             failedItem = args["FailedItem"].toString();
             errorText = args["ErrorText"].toString();
-            text = i18n("An error occurred while committing changes.");
+            text = i18nc("@label", "An error occurred while committing changes.");
 
             if (!failedItem.isEmpty() && !errorText.isEmpty()) {
                 text.append("\n\n");
@@ -176,13 +179,14 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
                 text.append(errorText);
             }
 
-            title = i18n("Commit error");
+            title = i18nc("@title:window", "Commit error");
             raiseErrorMessage(text, title);
             break;
         case QApt::Globals::AuthError:
-            text = i18n("This operation cannot continue since proper "
-                        "authorization was not provided");
-            title = i18n("Authentication error");
+            text = i18nc("@label",
+                         "This operation cannot continue since proper "
+                         "authorization was not provided");
+            title = i18nc("@title:window", "Authentication error");
             raiseErrorMessage(text, title);
             break;
     }
@@ -200,18 +204,18 @@ void QAptBatch::workerEvent(int code)
     switch (code) {
         case QApt::Globals::CacheUpdateStarted:
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
-            setWindowTitle(i18n("Refreshing package information"));
-            setLabelText(i18n("Downloading package information"));
+            setWindowTitle(i18nc("@title:window", "Refreshing package information"));
+            setLabelText(i18nc("@info:status", "Downloading package information"));
             show();
             break;
         case QApt::Globals::CacheUpdateFinished:
-            setLabelText(i18n("Package information successfully refreshed"));
+            setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
         case QApt::Globals::PackageDownloadStarted:
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
-            setWindowTitle(i18n("Downloading"));
-            setLabelText(i18n("Downloading packages"));
+            setWindowTitle(i18nc("@title:window", "Downloading"));
+            setLabelText(i18nc("@info:status", "Downloading packages"));
             show();
             break;
         case QApt::Globals::PackageDownloadFinished:
@@ -219,17 +223,17 @@ void QAptBatch::workerEvent(int code)
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
         case QApt::Globals::CommitChangesStarted:
-            setWindowTitle(i18n("Installing"));
+            setWindowTitle(i18nc("@title:window", "Installing"));
             showButton(Cancel, false); //Committing changes is uninterruptable (safely, that is)
             show(); // In case no download was necessary
             break;
         case QApt::Globals::CommitChangesFinished:
             if (m_mode == "install") {
-                setWindowTitle(i18n("Installation complete"));
-                setLabelText(i18np("Package successfully installed", "Packages successfully installed", m_packages.size()));
+                setWindowTitle(i18nc("@title:window", "Installation complete"));
+                setLabelText(i18ncp("@label", "Package successfully installed", "Packages successfully installed", m_packages.size()));
             } else if (m_mode == "uninstall") {
-                setWindowTitle(i18n("Removal complete"));
-                setLabelText(i18np("Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
+                setWindowTitle(i18nc("@title:window", "Removal complete"));
+                setLabelText(i18ncp("@label", "Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
             break;
@@ -260,9 +264,9 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
     if (newOwner.isEmpty()) {
         // Normally we'd handle this in errorOccurred, but if the worker dies it
         // can't really tell us, can it?
-        QString text = i18n("It appears that the QApt worker has either crashed "
+        QString text = i18nc("@label", "It appears that the QApt worker has either crashed "
                             "or disappeared. Please report a bug to the QApt maintainers");
-        QString title = i18n("Unexpected error");
+        QString title = i18nc("@title:window", "Unexpected error");
 
         raiseErrorMessage(text, title);
     }
@@ -274,17 +278,18 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
     QString downloadSpeed;
     if (speed != 0) {
-        downloadSpeed = i18nc("Download rate", "at %1/s", KGlobal::locale()->formatByteSize(speed));
+        downloadSpeed = i18nc("@info:progress Download rate", "at %1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
     QString downloadLabel;
 
     if (m_mode == "update") {
-        downloadLabel = i18n("Downloading package information %1", downloadSpeed);
+        downloadLabel = i18nc("@info:status", "Downloading package information %1", downloadSpeed);
     } else {
-        downloadLabel = i18np("Downloading package file %1",
-                              "Downloading package files %1",
-                              downloadSpeed, m_packages.count());
+        downloadLabel = i18ncp("@info:status",
+                               "Downloading package file %1",
+                               "Downloading package files %1",
+                               downloadSpeed, m_packages.count());
     }
 
     progressBar()->setValue(percentage);
@@ -294,8 +299,9 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
     // Greater than zero and less than 2 weeks
     if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {
-        timeRemaining = i18nc("Remaining time label", "\n\n%1 remaining",
-                              KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
+        timeRemaining = i18ncp("@info:progress",
+                               "Remaining time label", "\n\n%1 remaining",
+                               KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
     }
 
     labelText = QString(downloadLabel + timeRemaining);
