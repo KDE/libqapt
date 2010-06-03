@@ -28,6 +28,7 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
+#include <apt-pkg/acquire-item.h>
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
@@ -286,6 +287,28 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             QVariantMap args;
             args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
             emit errorOccurred(QApt::Globals::DiskSpaceError, args);
+            emit workerEvent(QApt::Globals::PackageDownloadFinished);
+            emit workerFinished(false);
+            return;
+        }
+    }
+
+    QStringList untrustedPackages;
+    for (pkgAcquire::ItemIterator I = fetcher.ItemsBegin(); I < fetcher.ItemsEnd(); ++I)
+    {
+        if (!(*I)->IsTrusted())
+        {
+            untrustedPackages << QString::fromStdString((*I)->ShortDesc());
+        }
+    }
+
+    if (!untrustedPackages.isEmpty()) {
+        QVariantMap args;
+        args["UntrustedItems"] = untrustedPackages;
+
+        if (_config->FindB("APT::Get::AllowUnauthenticated", false) == true) {
+        } else {
+            emit errorOccurred(QApt::Globals::UntrustedError, args);
             emit workerEvent(QApt::Globals::PackageDownloadFinished);
             emit workerFinished(false);
             return;

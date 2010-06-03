@@ -40,10 +40,11 @@ namespace Globals
     };
 
     enum WorkerQuestion {
-        InvalidQuestion = 0,
-        ConfFilePrompt  = 1,
-        DebconfPrompt   = 2,
-        MediaChange     = 3
+        InvalidQuestion  = 0,
+        ConfFilePrompt   = 1,
+        DebconfPrompt    = 2,
+        MediaChange      = 3,
+        InstallUntrusted = 4
     };
 
     enum ErrorCode {
@@ -54,7 +55,8 @@ namespace Globals
         FetchError        = 4,
         CommitError       = 5,
         AuthError         = 6,
-        WorkerDisappeared = 7
+        WorkerDisappeared = 7,
+        UntrustedError    = 8
     };
     Q_DECLARE_FLAGS(Errors, ErrorCode);
 
