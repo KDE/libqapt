@@ -137,9 +137,10 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 {
     QString text;
     QString title;
-    QString drive;
     QString failedItem;
     QString errorText;
+    QString drive;
+
     switch(code) {
         case QApt::Globals::InitError:
             text = i18nc("@label",
@@ -185,6 +186,31 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
                          "This operation cannot continue since proper "
                          "authorization was not provided");
             title = i18nc("@title:window", "Authentication error");
+            raiseErrorMessage(text, title);
+            break;
+        case QApt::Globals::UntrustedError:
+            // SUPER FIXME: Support multiple untrusted packages
+            QStringList untrustedItems = args["UntrustedItems"].toStringList();
+            if (untrustedItems.size() == 1) {
+                text = i18nc("@label",
+                             "The %1 package has not been verified by its author. "
+                             "Downloading untrusted packages has been disallowed "
+                             "by your current configuration.",
+                             untrustedItems.first());
+            } else if (untrustedItems.size() > 1) {
+                QString failedItemString;
+                foreach (const QString &string, untrustedItems) {
+                    failedItemString.append("- " + string + '\n');
+                }
+                text = i18nc("@label",
+                             "The following packages have not been verified by "
+                             "their authors:"
+                             "\n%1\n"
+                             "Downloading untrusted packages has "
+                             "been disallowed by your current configuration.",
+                             failedItemString);
+            }
+            title = i18nc("@title:window", "Untrusted Packages");
             raiseErrorMessage(text, title);
             break;
     }
