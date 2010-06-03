@@ -59,10 +59,11 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     m_watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
     m_watcher->addWatchedService("org.kubuntu.qaptworker");
 
-    // Would be nice if KProgressDialog didn't auto-show after a time,
-    // else we could just not show it until something happens. But as
-    // it stands it'll usually pop up while the user is typing in his
-    // password. We shouldn't have a blank dialog, hence the below.
+    // Delay auto-show to 10 seconds. We can't disable it entirely, and after
+    // 10 seconds people may need a reminder, or something to say we haven't died
+    // If auth happens before this, we will manually show when progress happens
+    setMinimumDuration(10000);
+    // Set this in case we auto-show before auth
     setLabelText(i18n("Waiting for authorization"));
     progressBar()->setMinimum(0);
     progressBar()->setMaximum(0);
@@ -259,6 +260,8 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
     }
 
     if (newOwner.isEmpty()) {
+        // Normally we'd handle this in errorOccurred, but if the worker dies it
+        // can't really tell us, can it?
         QString text = i18n("It appears that the QApt worker has either crashed "
                             "or disappeared. Please report a bug to the QApt maintainers");
         QString title = i18n("Unexpected error");
