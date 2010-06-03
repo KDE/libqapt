@@ -239,6 +239,7 @@ void QAptBatch::workerEvent(int code)
 
 void QAptBatch::workerFinished(bool success)
 {
+    Q_UNUSED(success);
     disconnect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
