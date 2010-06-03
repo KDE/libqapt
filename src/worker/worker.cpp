@@ -314,6 +314,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     bool success = (res == pkgPackageManager::Completed);
     emit workerEvent(QApt::Globals::CommitChangesFinished);
     emit workerFinished(success);
+
+    delete installProgress;
+    installProgress = 0;
 }
 
 // Slot -> slot relaying breaks after 3 or so relays, so we have to re-emit here
