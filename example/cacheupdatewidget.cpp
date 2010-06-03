@@ -85,7 +85,7 @@ void CacheUpdateWidget::setTotalProgress(int percentage, int speed, int ETA)
         // If ETA is less than zero or bigger than 2 weeks
         timeRemaining = i18n("Unknown time");
     } else {
-        timeRemaining = KGlobal::locale()->formatDuration(ETAMilliseconds);
+        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
     }
     m_downloadLabel->setText(i18n("Download Rate: %1/s - %2 remaining", downloadSpeed, timeRemaining));
 }
