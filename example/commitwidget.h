@@ -24,6 +24,7 @@
 #include <KVBox>
 
 class QLabel;
+class QProgressBar;
 
 class CommitWidget : public KVBox
 {
@@ -33,10 +34,12 @@ public:
     ~CommitWidget();
 
     void setLabelText(const QString &text);
+    void setProgress(int percentage);
     void clear();
 
 private:
     QLabel *m_commitLabel;
+    QProgressBar *m_progressBar;
 };
 
 #endif

@@ -22,11 +22,13 @@
 
 //Qt
 #include <QLabel>
+#include <QProgressBar>
 
 CommitWidget::CommitWidget(QWidget *parent)
     : KVBox(parent)
 {
     m_commitLabel = new QLabel(this);
+    m_progressBar = new QProgressBar(this);
 }
 
 CommitWidget::~CommitWidget()
@@ -38,9 +40,15 @@ void CommitWidget::setLabelText(const QString &text)
     m_commitLabel->setText(text);
 }
 
+void CommitWidget::setProgress(int percentage)
+{
+    m_progressBar->setValue(percentage);
+}
+
 void CommitWidget::clear()
 {
     m_commitLabel->setText(QString());
+    m_progressBar->setValue(0);
 }
 
 #include "commitwidget.moc"

@@ -271,6 +271,7 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
 void qapttest::updateCommitProgress(const QString& message, int percentage)
 {
     m_commitWidget->setLabelText(message);
+    m_commitWidget->setProgress(percentage);
     qDebug() << message;
 }
 
