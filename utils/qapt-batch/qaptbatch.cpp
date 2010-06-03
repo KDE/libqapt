@@ -65,8 +65,7 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     setMinimumDuration(10000);
     // Set this in case we auto-show before auth
     setLabelText(i18nc("@label", "Waiting for authorization"));
-    progressBar()->setMinimum(0);
-    progressBar()->setMaximum(0);
+    progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
 
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
@@ -108,7 +107,6 @@ void QAptBatch::commitChanges(int mode)
     foreach (const QString &package, m_packages) {
         instructionList.insert(package, mode);
     }
-
 
     QList<QVariant> args;
     args << QVariant(instructionList);
@@ -230,10 +228,14 @@ void QAptBatch::workerEvent(int code)
         case QApt::Globals::CommitChangesFinished:
             if (m_mode == "install") {
                 setWindowTitle(i18nc("@title:window", "Installation Complete"));
-                setLabelText(i18ncp("@label", "Package successfully installed", "Packages successfully installed", m_packages.size()));
+                setLabelText(i18ncp("@label",
+                                    "Package successfully installed",
+                                    "Packages successfully installed", m_packages.size()));
             } else if (m_mode == "uninstall") {
                 setWindowTitle(i18nc("@title:window", "Removal Complete"));
-                setLabelText(i18ncp("@label", "Package successfully uninstalled", "Packages successfully uninstalled", m_packages.size()));
+                setLabelText(i18ncp("@label",
+                                    "Package successfully uninstalled",
+                                    "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
             break;
