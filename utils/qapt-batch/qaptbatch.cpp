@@ -81,7 +81,6 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
         KWindowSystem::setMainWindow(this, winId);
     }
 
-    setWindowIcon(KIcon("applications-other"));
     setAutoClose(false);
 }
 
