@@ -268,14 +268,37 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
 
 void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 {
+    QString labelText;
+
     QString downloadSpeed;
     if (speed != 0) {
         downloadSpeed = i18nc("Download rate", "at %1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
-    setLabelText(i18n("Downloading package information %1", downloadSpeed));
+    QString downloadLabel;
+
+    if (m_mode == "update") {
+        downloadLabel = i18n("Downloading package information %1", downloadSpeed);
+    } else {
+        downloadLabel = i18np("Downloading package file %1",
+                              "Downloading package files %1",
+                              downloadSpeed, m_packages.count());
+    }
+
     progressBar()->setValue(percentage);
-    //TODO: ETA
+
+    QString timeRemaining;
+    int ETAMilliseconds = ETA * 1000;
+    kDebug() << ETAMilliseconds;
+
+    // Greater than zero and less than 2 weeks
+    if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {
+        timeRemaining = i18nc("Remaining time label", "\n\n%1 remaining",
+                              KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
+    }
+
+    labelText = QString(downloadLabel + timeRemaining);
+    setLabelText(labelText);
 }
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)
