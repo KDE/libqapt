@@ -299,8 +299,7 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
     // Greater than zero and less than 2 weeks
     if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {
-        timeRemaining = i18ncp("@info:progress",
-                               "Remaining time label", "\n\n%1 remaining",
+        timeRemaining = i18nc("@info:progress Remaining time label", "\n\n%1 remaining",
                                KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
     }
 
