@@ -316,6 +316,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     emit workerFinished(success);
 }
 
+// Slot -> slot relaying breaks after 3 or so relays, so we have to re-emit here
+// if our apps ever want to get them
+
 void QAptWorker::emitDownloadProgress(int percentage, int speed, int ETA)
 {
     emit downloadProgress(percentage, speed, ETA);

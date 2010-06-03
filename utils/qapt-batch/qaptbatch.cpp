@@ -67,7 +67,6 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     setLabelText(i18n("Waiting for authorization"));
     progressBar()->setMinimum(0);
     progressBar()->setMaximum(0);
-    show();
 
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
