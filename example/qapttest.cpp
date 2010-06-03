@@ -37,7 +37,7 @@
 #include "cacheupdatewidget.h"
 #include "commitwidget.h"
 
-qapttest::qapttest()
+QAptTest::QAptTest()
     : KMainWindow()
     , m_stack(0)
 {
@@ -99,7 +99,7 @@ qapttest::qapttest()
 
     KHBox *bottomHBox = new KHBox(m_mainWidget);
     layout->addWidget(bottomHBox);
-    
+
     QPushButton *cacheButton = new QPushButton(bottomHBox);
     cacheButton->setText(i18n("Update Cache"));
     cacheButton->setIcon(KIcon("view-refresh"));
@@ -129,11 +129,11 @@ qapttest::qapttest()
 //     }
 }
 
-qapttest::~qapttest()
+QAptTest::~QAptTest()
 {
 }
 
-void qapttest::updateLabels()
+void QAptTest::updateLabels()
 {
     m_package = m_backend->package(m_lineEdit->text());
 
@@ -183,18 +183,18 @@ void qapttest::updateLabels()
 
 }
 
-void qapttest::updateCache()
+void QAptTest::updateCache()
 {
     m_backend->updateCache();
 }
 
-void qapttest::upgrade()
+void QAptTest::upgrade()
 {
     m_backend->markPackagesForDistUpgrade();
     m_backend->commitChanges();
 }
 
-void qapttest::commitAction()
+void QAptTest::commitAction()
 {
     if (!m_package->isInstalled()) {
         m_package->setInstall();
@@ -209,7 +209,7 @@ void qapttest::commitAction()
     m_backend->commitChanges();
 }
 
-void qapttest::workerEvent(int code)
+void QAptTest::workerEvent(int code)
 {
     switch (code) {
         case QApt::Globals::CacheUpdateStarted:
@@ -243,12 +243,12 @@ void qapttest::workerEvent(int code)
     }
 }
 
-void qapttest::updateDownloadProgress(int percentage, int speed, int ETA)
+void QAptTest::updateDownloadProgress(int percentage, int speed, int ETA)
 {
     m_cacheUpdateWidget->setTotalProgress(percentage, speed, ETA);
 }
 
-void qapttest::updateDownloadMessage(int flag, const QString &message)
+void QAptTest::updateDownloadMessage(int flag, const QString &message)
 {
     QString fullMessage;
 
@@ -268,14 +268,14 @@ void qapttest::updateDownloadMessage(int flag, const QString &message)
     m_cacheUpdateWidget->addItem(fullMessage);
 }
 
-void qapttest::updateCommitProgress(const QString& message, int percentage)
+void QAptTest::updateCommitProgress(const QString& message, int percentage)
 {
     m_commitWidget->setLabelText(message);
     m_commitWidget->setProgress(percentage);
     qDebug() << message;
 }
 
-void qapttest::updateStatusBar()
+void QAptTest::updateStatusBar()
 {
     m_packageCountLabel->setText(i18n("%1 Installed, %2 upgradeable, %3 available",
                                       m_backend->packageCount(QApt::Package::Installed),

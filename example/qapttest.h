@@ -36,13 +36,13 @@ class KLineEdit;
 class CacheUpdateWidget;
 class CommitWidget;
 
-class qapttest : public KMainWindow
+class QAptTest : public KMainWindow
 {
     Q_OBJECT
 public:
-    qapttest();
+    QAptTest();
 
-    virtual ~qapttest();
+    virtual ~QAptTest();
 
 private Q_SLOTS:
     void updateLabels();

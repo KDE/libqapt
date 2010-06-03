@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 
     KApplication app;
 
-    qapttest *widget = new qapttest;
+    QAptTest *widget = new QAptTest;
 
     widget->show();
     return app.exec();
