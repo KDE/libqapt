@@ -306,7 +306,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         QVariantMap args;
         args["UntrustedItems"] = untrustedPackages;
 
-        if (_config->FindB("APT::Get::AllowUnauthenticated", false) == true) {
+        if (_config->FindB("APT::Get::AllowUnauthenticated", true) == true) {
+            // TODO: Need a question API to ask whether or not user wants to continue
+            QFile::rename("/home/jonathan/lol", "/home/jonathan/lol2");
         } else {
             emit errorOccurred(QApt::Globals::UntrustedError, args);
             emit workerEvent(QApt::Globals::PackageDownloadFinished);
