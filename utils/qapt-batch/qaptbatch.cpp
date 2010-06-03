@@ -289,7 +289,6 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
     QString timeRemaining;
     int ETAMilliseconds = ETA * 1000;
-    kDebug() << ETAMilliseconds;
 
     // Greater than zero and less than 2 weeks
     if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {

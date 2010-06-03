@@ -21,8 +21,6 @@
 #ifndef QAPTBATCH_H
 #define QAPTBATCH_H
 
-//Qt includes
-
 // KDE includes
 #include <KProgressDialog>
 
