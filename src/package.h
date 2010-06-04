@@ -70,12 +70,6 @@ public:
     typedef QList<Package*> List;
 
    /**
-    * Pointer to the Apt package iterator passed to us by the constructor
-    */
-    pkgCache::PkgIterator *m_packageIter;
-
-
-   /**
     * Member function that returns the name of the package
     *
     * \return The name of the package as a @c QString
