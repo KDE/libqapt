@@ -24,6 +24,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
+#include <QDebug>
 
 #include <apt-pkg/algorithms.h>
 
@@ -68,7 +69,7 @@ QString Package::name() const
 
     QString name = QString(d->packageIter->Name());
 
-    if (!name.isNull()) {
+    if (!name.isEmpty()) {
         return name;
     } else {
         return QString();
@@ -90,7 +91,7 @@ QString Package::section() const
 
     QString section = QString(d->packageIter->Section());
 
-    if (!section.isNull()) {
+    if (!section.isEmpty()) {
         return section;
     } else {
         return QString();
@@ -134,6 +135,7 @@ QString Package::maintainer() const
     if (!ver.end()) {
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromStdString(parser.Maintainer());
+        // FIXME: QLabel interprets < and > as html tags and cuts off the email address
         return maintainer;
     }
     return maintainer;
