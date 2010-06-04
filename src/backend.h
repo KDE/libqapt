@@ -32,6 +32,7 @@
 #include "globals.h"
 #include "group.h"
 #include "package.h"
+#include "qaptbackendadaptor.h"
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
@@ -55,6 +56,7 @@ class BackendPrivate;
 class Backend : public QObject
 {
     Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptbackend")
 public:
      /**
       * Default constructor
