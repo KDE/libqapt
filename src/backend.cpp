@@ -23,11 +23,7 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
-#include <QtDBus/QDBusMessage>
-#include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusPendingCall>
-#include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusServiceWatcher>
 
 // Apt includes
@@ -42,6 +38,7 @@
 #include <apt-pkg/init.h>
 
 #include "cache.h"
+#include "workerdbus.h" // OrgKubuntuQaptworkerInterface
 
 namespace QApt {
 
@@ -61,6 +58,8 @@ public:
     // Set of group names extracted from our packages
     QSet<Group*> groups;
 
+    OrgKubuntuQaptworkerInterface *worker;
+
     // Pointer to the apt cache object
     Cache *m_cache;
     pkgPolicy *m_policy;
@@ -72,14 +71,15 @@ Backend::Backend()
 {
     Q_D(Backend);
 
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerStarted", this, SLOT(workerStarted()));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerEvent", this, SLOT(workerEvent(int)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerFinished", this, SLOT(workerFinished(bool)));
+    d->worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
+                                                  "/", QDBusConnection::systemBus(),
+                                                  this);
+
+    connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
+            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
+    connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
+    connect(d->worker, SIGNAL(workerEvent(int)), this, SIGNAL(workerEvent(int)));
+    connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
 
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
@@ -327,16 +327,7 @@ void Backend::commitChanges()
 
     qDebug() << instructionList;
 
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              QLatin1String("commitChanges"));
-
-    QList<QVariant> args;
-    args << QVariant(instructionList);
-    message.setArguments(args);
-    QDBusConnection::systemBus().asyncCall(message);
+    d->worker->commitChanges(instructionList);
 }
 
 void Backend::packageChanged(Package *package)
@@ -347,12 +338,9 @@ void Backend::packageChanged(Package *package)
 
 void Backend::updateCache()
 {
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              QLatin1String("updateCache"));
-    QDBusConnection::systemBus().asyncCall(message);
+    Q_D(Backend);
+
+    d->worker->updateCache();
 }
 
 void Backend::workerStarted()
@@ -362,14 +350,14 @@ void Backend::workerStarted()
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(downloadProgress(int, int, int)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "commitProgress", this, SLOT(commitProgress(const QString&, int)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerQuestion", this, SLOT(workerQuestion(int, const QVariantMap&)));
+    connect(d->worker, SIGNAL(downloadProgress(int, int, int)),
+            this, SIGNAL(downloadProgress(int, int, int)));
+    connect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
+            this, SIGNAL(downloadMessage(int, const QString&)));
+    connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
+            this, SIGNAL(commitProgress(const QString&, int)));
+    connect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
+            this, SIGNAL(workerQuestion(int, const QVariantMap&)));
 }
 
 void Backend::workerFinished(bool result)
@@ -379,14 +367,14 @@ void Backend::workerFinished(bool result)
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(downloadProgress(int, int, int)));
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "commitProgress", this, SLOT(commitProgress(const QString&, int)));
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerQuestion", this, SLOT(workerQuestion(int, const QVariantMap&)));
+    disconnect(d->worker, SIGNAL(downloadProgress(int, int, int)),
+               this, SIGNAL(downloadProgress(int, int, int)));
+    disconnect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
+               this, SIGNAL(downloadMessage(int, const QString&)));
+    disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),
+               this, SIGNAL(commitProgress(const QString&, int)));
+    disconnect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
+               this, SIGNAL(workerQuestion(int, const QVariantMap&)));
 
     if (result) {
         reloadCache();
@@ -395,26 +383,16 @@ void Backend::workerFinished(bool result)
 
 void Backend::cancelDownload()
 {
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              QLatin1String("cancelDownload"));
-    QDBusConnection::systemBus().asyncCall(message);
+    Q_D(Backend);
+
+    d->worker->cancelDownload();
 }
 
 void Backend::workerResponse(const QVariantMap &response)
 {
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              QLatin1String("workerQuestionResponse"));
+    Q_D(Backend);
 
-    QList<QVariant> args;
-    args << QVariant(response);
-    message.setArguments(args);
-    QDBusConnection::systemBus().asyncCall(message);
+    d->worker->workerQuestionResponse(response);
 }
 
 

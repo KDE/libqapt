@@ -32,7 +32,6 @@
 #include "globals.h"
 #include "group.h"
 #include "package.h"
-#include "qaptbackendadaptor.h"
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
