@@ -34,6 +34,9 @@ namespace QApt {
 class PackagePrivate
 {
     public:
+        QApt::Backend *backend;
+        pkgRecords *records;
+        pkgDepCache *depCache;
         int state;
 };
 
@@ -41,12 +44,12 @@ Package::Package(QApt::Backend* parent, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
         : QObject(parent)
         , d_ptr(new PackagePrivate())
-        , m_backend(parent)
-        , m_depCache(depCache)
-        , m_records(records)
 {
     Q_D(Package);
     m_packageIter = new pkgCache::PkgIterator(packageIter);
+    d->backend = parent;
+    d->records= records;
+    d->depCache = depCache;
     d->state = state();
 }
 
@@ -87,9 +90,11 @@ QString Package::section() const
 
 QString Package::sourcePackage() const
 {
+    Q_D(const Package);
+
     QString sourcePackage;
-    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
-    pkgRecords::Parser &rec=m_records->Lookup(ver.FileList());
+    pkgCache::VerIterator ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
+    pkgRecords::Parser &rec=d->records->Lookup(ver.FileList());
     sourcePackage = QString::fromStdString(rec.SourcePkg());
 
     return sourcePackage;
@@ -97,11 +102,13 @@ QString Package::sourcePackage() const
 
 QString Package::shortDescription() const
 {
+    Q_D(const Package);
+
     QString shortDescription;
-    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    pkgCache::VerIterator ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
-        pkgRecords::Parser & parser = m_records->Lookup(Desc.FileList());
+        pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
         shortDescription = QString::fromStdString(parser.ShortDesc());
         return shortDescription;
     }
@@ -111,10 +118,12 @@ QString Package::shortDescription() const
 
 QString Package::maintainer() const
 {
+    Q_D(const Package);
+
     QString maintainer;
-    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    pkgCache::VerIterator ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
-        pkgRecords::Parser & parser = m_records->Lookup(ver.FileList());
+        pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromStdString(parser.Maintainer());
         return maintainer;
     }
@@ -123,10 +132,12 @@ QString Package::maintainer() const
 
 QString Package::homepage() const
 {
+    Q_D(const Package);
+
     QString homepage;
-    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    pkgCache::VerIterator ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
-        pkgRecords::Parser & parser = m_records->Lookup(ver.FileList());
+        pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         homepage = QString::fromStdString(parser.Homepage());
         return homepage;
     }
@@ -138,11 +149,11 @@ QString Package::version() const
     Q_D(const Package);
 
     if ((*m_packageIter)->CurrentVer == 0) {
-        pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+        pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
         if (d->state & NotInstallable) {
             return QString();
         } else {
-            return QString::fromStdString(State.CandidateVerIter(*m_depCache).VerStr());
+            return QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
         }
     } else {
         return QString::fromStdString(m_packageIter->CurrentVer().VerStr());
@@ -164,19 +175,21 @@ QString Package::availableVersion() const
     Q_D(const Package);
 
     QString availableVersion;
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
     if (d->state & NotInstallable) {
         return QString();
     }
 
-    availableVersion = QString::fromStdString(State.CandidateVerIter(*m_depCache).VerStr());
+    availableVersion = QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
     return availableVersion;
 }
 
 QString Package::priority() const
 {
+    Q_D(const Package);
+
     QString priority;
-    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    pkgCache::VerIterator ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
     if (ver != 0) {
         priority = QString::fromStdString(ver.PriorityType());
         return priority;
@@ -208,12 +221,14 @@ QStringList Package::installedFilesList() const
 
 QString Package::longDescription() const
 {
+    Q_D(const Package);
+
     QString longDescription;
-    pkgCache::VerIterator ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    pkgCache::VerIterator ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
 
     if (!ver.end()) {
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
-        pkgRecords::Parser & parser = m_records->Lookup(Desc.FileList());
+        pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
         longDescription = QString::fromStdString(parser.LongDesc());
         // Dpkg uses a line with a space and a dot to mark a double newline.
         // It's not really human-readable, though, so remove it.
@@ -226,7 +241,9 @@ QString Package::longDescription() const
 
 QString Package::origin() const
 {
-    pkgCache::VerIterator Ver = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+    Q_D(const Package);
+
+    pkgCache::VerIterator Ver = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
 
     if(!Ver.end()) {
          pkgCache::VerFileIterator VF = Ver.FileList();
@@ -242,11 +259,11 @@ QString Package::component() const
 
     QString res;
     pkgCache::VerIterator Ver;
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
     if (d->state & NotInstallable) {
         return QString();
     }
-    Ver = State.CandidateVerIter(*m_depCache);
+    Ver = State.CandidateVerIter(*d->depCache);
     pkgCache::VerFileIterator VF = Ver.FileList();
     pkgCache::PkgFileIterator File = VF.File();
 
@@ -270,12 +287,12 @@ qint32 Package::installedSize() const
         return ver->InstalledSize;
     // Else we aren't installed
     } else {
-        pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+        pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
         if (d->state & NotInstallable) {
             // Nonexistent package
             return -1;
         }
-        return State.CandidateVerIter(*m_depCache)->InstalledSize;
+        return State.CandidateVerIter(*d->depCache)->InstalledSize;
     }
 }
 
@@ -283,19 +300,21 @@ qint32 Package::downloadSize() const
 {
     Q_D(const Package);
 
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
     if (d->state & NotInstallable) {
         return -1;
     }
 
-    return State.CandidateVerIter(*m_depCache)->Size;
+    return State.CandidateVerIter(*d->depCache)->Size;
 }
 
 int Package::state()
 {
+    Q_D(const Package);
+
     int packageState = 0;
 
-    pkgDepCache::StateCache &stateCache = (*m_depCache)[*m_packageIter];
+    pkgDepCache::StateCache &stateCache = (*d->depCache)[*m_packageIter];
     pkgCache::VerIterator ver = m_packageIter->CurrentVer();
 
     if (stateCache.Install()) {
@@ -352,7 +371,7 @@ int Package::state()
     }
 
     if (stateCache.CandidateVer == 0 ||
-        !stateCache.CandidateVerIter(*m_depCache).Downloadable()) {
+        !stateCache.CandidateVerIter(*d->depCache).Downloadable()) {
         packageState |= NotInstallable;
     }
 
@@ -399,15 +418,17 @@ bool Package::isValid()
 
 QStringList Package::dependencyList(bool useCanidateVersion) const
 {
+    Q_D(const Package);
+
     // TODO: Stub, won't return anything.
     QStringList dependsList;
     pkgCache::VerIterator current;
 
     if(!useCanidateVersion) {
-        current = (*m_depCache)[*m_packageIter].InstVerIter(*m_depCache);
+        current = (*d->depCache)[*m_packageIter].InstVerIter(*d->depCache);
     }
     if(useCanidateVersion || current.end()) {
-        current = (*m_depCache)[*m_packageIter].CandidateVerIter(*m_depCache);
+        current = (*d->depCache)[*m_packageIter].CandidateVerIter(*d->depCache);
     }
 
     // no information found
@@ -435,13 +456,13 @@ QStringList Package::providesList() const
 
     QStringList provides;
 
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
+    pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
     if (d->state & NotInstallable) {
         return provides;
     }
 
     for (pkgCache::PrvIterator Prv =
-         State.CandidateVerIter(*m_depCache).ProvidesList(); Prv.end() != true;
+         State.CandidateVerIter(*d->depCache).ProvidesList(); Prv.end() != true;
          Prv++) {
         provides.push_back(Prv.Name());
     }
@@ -454,13 +475,13 @@ bool Package::isTrusted()
     Q_D(Package);
 
     pkgCache::VerIterator Ver;
-    pkgDepCache::StateCache & State = (*m_depCache)[*m_packageIter];
-    Ver = State.CandidateVerIter(*m_depCache);
+    pkgDepCache::StateCache & State = (*d->depCache)[*m_packageIter];
+    Ver = State.CandidateVerIter(*d->depCache);
     if (Ver == 0) {
         return false;
     }
 
-    pkgSourceList *Sources = m_backend->packageSourceList();
+    pkgSourceList *Sources = d->backend->packageSourceList();
     for (pkgCache::VerFileIterator i = Ver.FileList(); i.end() == false; i++)
     {
         pkgIndexFile *Index;
@@ -487,14 +508,18 @@ bool Package::wouldBreak()
 
 void Package::setAuto(bool flag)
 {
-    m_depCache->MarkAuto(*m_packageIter, flag);
+    Q_D(Package);
+
+    d->depCache->MarkAuto(*m_packageIter, flag);
 }
 
 
 void Package::setKeep()
 {
-    m_depCache->MarkKeep(*m_packageIter, false);
-    m_backend->packageChanged(this);
+    Q_D(Package);
+
+    d->depCache->MarkKeep(*m_packageIter, false);
+    d->backend->packageChanged(this);
     setReInstall(false);
 }
 
@@ -502,30 +527,34 @@ void Package::setInstall()
 {
     Q_D(Package);
 
-    m_depCache->MarkInstall(*m_packageIter, true);
+    d->depCache->MarkInstall(*m_packageIter, true);
 
     // FIXME: can't we get rid of it here?
     // if there is something wrong, try to fix it
-    if (!d->state & ToInstall || m_depCache->BrokenCount() > 0) {
-        pkgProblemResolver Fix(m_depCache);
+    if (!d->state & ToInstall || d->depCache->BrokenCount() > 0) {
+        pkgProblemResolver Fix(d->depCache);
         Fix.Clear(*m_packageIter);
         Fix.Protect(*m_packageIter);
         Fix.Resolve(true);
     }
 
-    m_backend->packageChanged(this);
+    d->backend->packageChanged(this);
 }
 
 void Package::setReInstall(bool flag)
 {
-    m_depCache->SetReInstall(*m_packageIter, flag);
-    m_backend->packageChanged(this);
+    Q_D(Package);
+
+    d->depCache->SetReInstall(*m_packageIter, flag);
+    d->backend->packageChanged(this);
 }
 
 
 void Package::setRemove(bool purge)
 {
-    pkgProblemResolver Fix(m_depCache);
+    Q_D(Package);
+
+    pkgProblemResolver Fix(d->depCache);
 
     Fix.Clear(*m_packageIter);
     Fix.Protect(*m_packageIter);
@@ -534,10 +563,10 @@ void Package::setRemove(bool purge)
     Fix.InstallProtect();
     Fix.Resolve(true);
 
-    m_depCache->SetReInstall(*m_packageIter, false);
-    m_depCache->MarkDelete(*m_packageIter, purge);
+    d->depCache->SetReInstall(*m_packageIter, false);
+    d->depCache->MarkDelete(*m_packageIter, purge);
 
-    m_backend->packageChanged(this);
+    d->backend->packageChanged(this);
 }
 
 }

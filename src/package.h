@@ -69,22 +69,6 @@ public:
     */
     typedef QList<Package*> List;
 
-
-   /**
-    * Pointer to the parent object passed to us by the constructor
-    */
-    QApt::Backend *m_backend;
-
-   /**
-    * Pointer to the Apt dependency cache passed to us by the constructor
-    */
-    pkgDepCache *m_depCache;
-
-   /**
-    * Pointer to the Apt package records passed to us by the constructor
-    */
-    pkgRecords *m_records;
-
    /**
     * Pointer to the Apt package iterator passed to us by the constructor
     */
