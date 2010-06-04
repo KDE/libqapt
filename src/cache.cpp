@@ -78,9 +78,9 @@ bool Cache::open()
     Q_D(Cache);
 
    // delete any old structures
-    delete d->m_depCache;
-    delete d->m_policy;
     delete d->m_cache;
+    delete d->m_policy;
+    delete d->m_depCache;
 
     // Read the sources list
     if (!d->m_list->ReadMainList()) {

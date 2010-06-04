@@ -41,6 +41,9 @@ public:
 
     virtual ~QAptWorker();
 
+private:
+    pid_t m_child_pid;
+
     QApt::Cache *m_cache;
     pkgPolicy *m_policy;
     pkgRecords *m_records;
@@ -48,13 +51,11 @@ public:
     bool m_locked;
     WorkerAcquire *m_acquireStatus;
 
-private:
-    pid_t m_child_pid;
-
 public Q_SLOTS:
     void updateCache();
     void cancelDownload();
     void commitChanges(QMap<QString, QVariant>);
+    void workerQuestionResponse(const QVariantMap& response);
 
 private Q_SLOTS:
     bool lock();
@@ -64,7 +65,8 @@ private Q_SLOTS:
     void emitDownloadMessage(int flag, const QString &message);
     void emitCommitProgress(const QString& status,
                                  int percentage);
-    void emitErrorOccurred(int code, const QVariantMap&);
+    void emitErrorOccurred(int errorCode, const QVariantMap& details);
+    void emitWorkerQuestion(int questionCode, const QVariantMap& details);
 
 Q_SIGNALS:
     void workerStarted();
@@ -74,6 +76,7 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);
+    void workerQuestion(int questionCode, const QVariantMap& details);
 };
 
 #endif

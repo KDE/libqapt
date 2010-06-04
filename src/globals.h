@@ -41,11 +41,12 @@ namespace Globals
 
     enum WorkerQuestion {
         InvalidQuestion  = 0,
-        ConfFilePrompt   = 1,
-        DebconfPrompt    = 2,
+        ConfFilePrompt   = 1, //TODO in worker
+        DebconfPrompt    = 2, //TODO in worker
         MediaChange      = 3,
-        InstallUntrusted = 4
+        InstallUntrusted = 4  //TODO in worker
     };
+    Q_DECLARE_FLAGS(Questions, WorkerQuestion);
 
     enum ErrorCode {
         UnknownError      = 0,
@@ -64,6 +65,7 @@ namespace Globals
         UnknownWarning = 0,
         SizeMismatch   = 1
     };
+    Q_DECLARE_FLAGS(Warnings, WarningCode);
 
     enum FetchType {
         InvalidFetch = 0,

@@ -170,12 +170,13 @@ private:
 
 Q_SIGNALS:
     /**
-     * Emitted whenever a backend error occurs.
+     * Emitted whenever a backend error occurs. You should listen to this
+     * signal and present the error/clean up when your app receives it.
      *
      * @param code Error code (is a QApt::Global enum member)
-     * @param args A QVariant map containing info about the error, if available
+     * @param details A QVariant map containing info about the error, if available
      */
-    void errorOccurred(int code, const QVariantMap &args);
+    void errorOccurred(int code, const QVariantMap &details);
 
     /**
      * Emitted whenever a package changes state. Useful for knowning when to
@@ -189,6 +190,18 @@ Q_SIGNALS:
      * @param code Event code (is a QApt::Global enum member)
      */
     void workerEvent(int code);
+
+    /**
+     * Emitted whenever the worker asks a question. You should listen to this
+     * signal and present the question to the user when your app receives it.
+     *
+     * You should send the response back to the worker as a QVariantMap
+     * using the workerQuestionResponse DBus signal.
+     *
+     * @param code Question code (is a QApt::Global enum member)
+     * @param details A QVariant map containing info about the question, if available
+     */
+    void workerQuestion(int questionCode, const QVariantMap &details);
 
     /**
      * Emitted while the QApt Worker is downloading packages.
@@ -265,6 +278,8 @@ public Q_SLOTS:
      * commitChanges() functions.
      */
     void cancelDownload();
+
+    void workerResponse(const QVariantMap &response);
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

@@ -368,6 +368,8 @@ void Backend::workerStarted()
                                 "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "commitProgress", this, SLOT(commitProgress(const QString&, int)));
+    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "workerQuestion", this, SLOT(workerQuestion(int, const QVariantMap&)));
 }
 
 void Backend::workerFinished(bool result)
@@ -383,6 +385,8 @@ void Backend::workerFinished(bool result)
                                 "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
     QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "commitProgress", this, SLOT(commitProgress(const QString&, int)));
+    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
+                                "workerQuestion", this, SLOT(workerQuestion(int, const QVariantMap&)));
 
     if (result) {
         reloadCache();
@@ -398,6 +402,21 @@ void Backend::cancelDownload()
               QLatin1String("cancelDownload"));
     QDBusConnection::systemBus().asyncCall(message);
 }
+
+void Backend::workerResponse(const QVariantMap &response)
+{
+    QDBusMessage message;
+    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
+              "/",
+              "org.kubuntu.qaptworker",
+              QLatin1String("workerQuestionResponse"));
+
+    QList<QVariant> args;
+    args << QVariant(response);
+    message.setArguments(args);
+    QDBusConnection::systemBus().asyncCall(message);
+}
+
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {

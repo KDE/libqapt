@@ -63,6 +63,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     new QaptworkerAdaptor(this);
 
     if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
+        // Another worker is already here, quit
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
@@ -79,6 +80,10 @@ QAptWorker::QAptWorker(int &argc, char **argv)
             this, SLOT(emitDownloadProgress(int, int, int)));
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(emitDownloadMessage(int, const QString&)));
+    connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
+            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+    connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
+            this, SLOT(emitWorkerQuestion(int, const QVariantMap&)));
 }
 
 QAptWorker::~QAptWorker()
@@ -344,6 +349,13 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     installProgress = 0;
 }
 
+void QAptWorker::workerQuestionResponse(const QVariantMap &response)
+{
+    if (m_acquireStatus) {
+        m_acquireStatus->setAnswer(response);
+    }
+}
+
 // Slot -> slot relaying breaks after 3 or so relays, so we have to re-emit here
 // if our apps ever want to get them
 
@@ -362,7 +374,12 @@ void QAptWorker::emitCommitProgress(const QString& status, int percentage)
     emit commitProgress(status, percentage);
 }
 
-void QAptWorker::emitErrorOccurred(int code, const QVariantMap& details)
+void QAptWorker::emitErrorOccurred(int errorCode, const QVariantMap& details)
 {
-    emit errorOccurred(code, details);
+    emit errorOccurred(errorCode, details);
+}
+
+void QAptWorker::emitWorkerQuestion(int questionCode, const QVariantMap& details)
+{
+    emit workerQuestion(questionCode, details);
 }

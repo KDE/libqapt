@@ -27,8 +27,6 @@
 
 #include "globals.h"
 
-class QEventLoop;
-
 class WorkerAcquire : public QObject, public pkgAcquireStatus
 {
     Q_OBJECT
@@ -50,14 +48,17 @@ public:
 
 public Q_SLOTS:
     void requestCancel();
+    void setAnswer(const QVariantMap &response);
 
 private:
-    QEventLoop *m_mediaBlock;
+    QVariantMap askQuestion(int questionCode, const QVariantMap &args);
+    QVariantMap m_questionResponse;
     bool m_canceled;
 
 signals:
-    void fetchError(int code, const QVariantMap &details);
-    void mediaChangeRequest(const QString &media, const QString &drive);
+    void fetchError(int errorCode, const QVariantMap &details);
+    void workerQuestion(int questionCode, const QVariantMap &args);
+    void answerReady();
     void downloadProgress(int percentage, int speed, int ETA);
     void downloadSubProgress(const QString &package, int percentage);
     void downloadMessage(int flag, const QString &message);

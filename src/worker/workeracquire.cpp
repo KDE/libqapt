@@ -29,7 +29,8 @@
 #include <apt-pkg/acquire-worker.h>
 
 WorkerAcquire::WorkerAcquire()
-        : m_mediaBlock(0)
+        : m_canceled(false)
+        , m_questionResponse(QVariantMap())
 {
 }
 
@@ -39,15 +40,17 @@ WorkerAcquire::~WorkerAcquire()
 
 void WorkerAcquire::Start()
 {
+    // Cleanup from old fetches
     m_canceled = false;
+
     pkgAcquireStatus::Start();
 }
 
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
-    QString message;
-    message = QString::fromStdString(item.Description);
+    QString message = QString::fromStdString(item.Description);
     emit downloadMessage((int) QApt::Globals::HitFetch, message);
+
     Update = true;
 }
 
@@ -58,8 +61,7 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
         return;
     }
 
-    QString message;
-    message = QString::fromStdString(item.Description);
+    QString message = QString::fromStdString(item.Description);
     emit downloadMessage((int) QApt::Globals::DownloadFetch, message);
 }
 
@@ -77,8 +79,7 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
 
     if (item.Owner->Status == pkgAcquire::Item::StatDone)
     {
-        QString message;
-        message = QString::fromStdString(item.Description);
+        QString message = QString::fromStdString(item.Description);
         emit downloadMessage((int) QApt::Globals::IgnoredFetch, message);
     } else {
         // an error was found (maybe 404, 403...)
@@ -99,17 +100,15 @@ void WorkerAcquire::Stop()
 
 bool WorkerAcquire::MediaChange(string Media, string Drive)
 {
-    emit mediaChangeRequest(
-        QString::fromUtf8(Media.c_str()),
-        QString::fromUtf8(Drive.c_str())
-    );
-    m_mediaBlock = new QEventLoop();
-    qDebug() << "Block waiting for media change reply";
-    bool change = (bool)m_mediaBlock->exec();
-    qDebug() << "Block finished with:" << change;
-    delete m_mediaBlock;
-    m_mediaBlock = 0;
-    return change;
+    QVariantMap args;
+    args["Media"] = QString::fromStdString(Media.c_str());
+    args["Drive"] = QString::fromStdString(Drive.c_str());
+
+    QVariantMap result = askQuestion(QApt::Globals::MediaChange, args);
+
+    bool mediaChanged = result["MediaChanged"].toBool();
+
+    return mediaChanged;
 }
 
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
@@ -137,4 +136,21 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 void WorkerAcquire::requestCancel()
 {
     m_canceled = true;
+}
+
+QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)
+{
+    QEventLoop mediaBlock;
+    connect(this, SIGNAL(answerReady()), &mediaBlock, SLOT(quit()));
+
+    emit workerQuestion(questionCode, args);
+    mediaBlock.exec(); // Process blocked, waiting for answerReady signal over dbus
+
+    return m_questionResponse;
+}
+
+void WorkerAcquire::setAnswer(const QVariantMap &answer)
+{
+    m_questionResponse = answer;
+    emit answerReady();
 }
