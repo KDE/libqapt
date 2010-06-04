@@ -77,7 +77,7 @@ Backend::Backend()
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerStarted", this, SLOT(workerStarted()));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerEvent", this, SLOT(emitWorkerEvent(int)));
+                                "workerEvent", this, SLOT(workerEvent(int)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "workerFinished", this, SLOT(workerFinished(bool)));
 
@@ -368,11 +368,6 @@ void Backend::workerStarted()
                                 "downloadMessage", this, SLOT(downloadMessage(int, const QString&)));
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "commitProgress", this, SLOT(commitProgress(const QString&, int)));
-}
-
-void Backend::emitWorkerEvent(int code)
-{
-    emit workerEvent(code);
 }
 
 void Backend::workerFinished(bool result)

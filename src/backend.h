@@ -269,7 +269,6 @@ public Q_SLOTS:
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void workerStarted();
-    void emitWorkerEvent(int code);
     void workerFinished(bool result);
 };
 
