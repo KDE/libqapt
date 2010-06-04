@@ -37,7 +37,7 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
 
     m_downloadView = new QListView(this);
 
-    m_downloadModel = new QStandardItemModel();
+    m_downloadModel = new QStandardItemModel(this);
     m_downloadView->setModel(m_downloadModel);
 
     m_downloadLabel = new QLabel(this);
