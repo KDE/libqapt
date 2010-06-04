@@ -189,7 +189,6 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             raiseErrorMessage(text, title);
             break;
         case QApt::Globals::UntrustedError:
-            // SUPER FIXME: Support multiple untrusted packages
             QStringList untrustedItems = args["UntrustedItems"].toStringList();
             if (untrustedItems.size() == 1) {
                 text = i18nc("@label",
@@ -229,7 +228,7 @@ void QAptBatch::workerEvent(int code)
         case QApt::Globals::CacheUpdateStarted:
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
-            setLabelText(i18nc("@info:status", "Downloading package information"));
+            setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
             show();
             break;
         case QApt::Globals::CacheUpdateFinished:
@@ -313,7 +312,7 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
     QString downloadLabel;
 
     if (m_mode == "update") {
-        downloadLabel = i18nc("@info:status", "Downloading package information %1", downloadSpeed);
+        downloadLabel = i18nc("@info:status", "Checking for new, removed or upgradeable packages %1", downloadSpeed);
     } else {
         downloadLabel = i18ncp("@info:status",
                                "Downloading package file %1",
