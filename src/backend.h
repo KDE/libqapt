@@ -55,7 +55,6 @@ class BackendPrivate;
 class Backend : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptbackend")
 public:
      /**
       * Default constructor

@@ -249,7 +249,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         }
     }
 
-    emit workerEvent(QApt::Globals::PackageDownloadStarted);
     pkgAcquire fetcher(m_acquireStatus);
 
     pkgPackageManager *packageManager;
@@ -257,7 +256,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
         _error->PendingError()) {
-        // WorkerAcquire emits its own error messages; just end the operation
+        emit errorOccurred(QApt::Globals::FetchError, QVariantMap());
         emit workerEvent(QApt::Globals::PackageDownloadFinished);
         emit workerFinished(false);
         return;
@@ -313,7 +312,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
         if (_config->FindB("APT::Get::AllowUnauthenticated", true) == true) {
             // TODO: Need a question API to ask whether or not user wants to continue
-            QFile::rename("/home/jonathan/lol", "/home/jonathan/lol2");
+            
         } else {
             emit errorOccurred(QApt::Globals::UntrustedError, args);
             emit workerEvent(QApt::Globals::PackageDownloadFinished);
@@ -321,6 +320,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             return;
         }
     }
+
+    emit workerEvent(QApt::Globals::PackageDownloadStarted);
 
     if (fetcher.Run() != pkgAcquire::Continue) {
         // Our fetcher will report errors for itself, but we have to send the
