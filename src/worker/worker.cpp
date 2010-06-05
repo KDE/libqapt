@@ -257,7 +257,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
         _error->PendingError()) {
         emit errorOccurred(QApt::Globals::FetchError, QVariantMap());
-        emit workerEvent(QApt::Globals::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }
@@ -278,7 +277,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         QVariantMap args;
         args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
         emit errorOccurred(QApt::Globals::DiskSpaceError, args);
-        emit workerEvent(QApt::Globals::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }
@@ -291,7 +289,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             QVariantMap args;
             args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
             emit errorOccurred(QApt::Globals::DiskSpaceError, args);
-            emit workerEvent(QApt::Globals::PackageDownloadFinished);
             emit workerFinished(false);
             return;
         }
@@ -315,7 +312,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             
         } else {
             emit errorOccurred(QApt::Globals::UntrustedError, args);
-            emit workerEvent(QApt::Globals::PackageDownloadFinished);
             emit workerFinished(false);
             return;
         }
