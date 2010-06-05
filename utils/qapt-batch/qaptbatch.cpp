@@ -166,6 +166,15 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Low disk space");
             raiseErrorMessage(text, title);
             break;
+        case QApt::Globals::FetchError:
+            failedItem = args["FailedItem"].toString();
+            errorText = args["ErrorText"].toString();
+            text = i18nc("@label",
+                         "Failed to download %1\n"
+                         "%2", failedItem, errorText);
+            title = i18nc("@title:window", "Download failed");
+            raiseErrorMessage(text, title);
+            break;
         case QApt::Globals::CommitError:
             failedItem = args["FailedItem"].toString();
             errorText = args["ErrorText"].toString();
