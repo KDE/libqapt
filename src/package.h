@@ -333,14 +333,6 @@ public:
     };
     Q_DECLARE_FLAGS(PackageStates, PackageState)
 
-    enum UpdateImportance {
-        UnknownImportance = 1,//
-        NormalImportance = 2,//
-        CriticalImportance = 3,//
-        SecurityImportance = 4//
-    };
-    Q_DECLARE_FLAGS(UpdateImportances, UpdateImportance)
-
 protected:
     PackagePrivate *const d_ptr;
 

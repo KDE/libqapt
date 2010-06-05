@@ -74,6 +74,14 @@ namespace Globals
         IgnoredFetch = 3
     };
     Q_DECLARE_FLAGS(FetchTypes, FetchType)
+
+    enum UpdateImportance {
+        UnknownImportance = 1,//
+        NormalImportance = 2,//
+        CriticalImportance = 3,//
+        SecurityImportance = 4//
+    };
+    Q_DECLARE_FLAGS(UpdateImportances, UpdateImportance)
 };
 
 }
