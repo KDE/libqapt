@@ -24,7 +24,7 @@ qt4_wrap_cpp(qapt_SRCS ${qapt_HDRS})
 
 qt4_add_dbus_interface(qapt_SRCS
                        worker/org.kubuntu.qaptworker.xml
-                       worker)
+                       workerdbus)
 
 add_library(qapt SHARED ${qapt_SRCS})
 set_target_properties(qapt PROPERTIES

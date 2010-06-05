@@ -24,7 +24,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtDBus/QDBusContext>
 
-#include <../cache.h>
+#include "../cache.h"
 
 class pkgPolicy;
 class pkgRecords;
