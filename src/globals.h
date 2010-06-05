@@ -46,7 +46,6 @@ namespace Globals
         MediaChange      = 3,
         InstallUntrusted = 4  //TODO in worker
     };
-    Q_DECLARE_FLAGS(Questions, WorkerQuestion);
 
     enum ErrorCode {
         UnknownError      = 0,
@@ -59,13 +58,11 @@ namespace Globals
         WorkerDisappeared = 7,
         UntrustedError    = 8
     };
-    Q_DECLARE_FLAGS(Errors, ErrorCode);
 
     enum WarningCode {
         UnknownWarning = 0,
         SizeMismatch   = 1
     };
-    Q_DECLARE_FLAGS(Warnings, WarningCode);
 
     enum FetchType {
         InvalidFetch = 0,
@@ -73,7 +70,6 @@ namespace Globals
         HitFetch = 2,
         IgnoredFetch = 3
     };
-    Q_DECLARE_FLAGS(FetchTypes, FetchType)
 
     enum UpdateImportance {
         UnknownImportance = 1,//
@@ -81,7 +77,6 @@ namespace Globals
         CriticalImportance = 3,//
         SecurityImportance = 4//
     };
-    Q_DECLARE_FLAGS(UpdateImportances, UpdateImportance)
 };
 
 }

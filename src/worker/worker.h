@@ -63,8 +63,7 @@ private Q_SLOTS:
     bool initializeApt();
     void emitDownloadProgress(int percentage, int speed, int ETA);
     void emitDownloadMessage(int flag, const QString &message);
-    void emitCommitProgress(const QString& status,
-                                 int percentage);
+    void emitCommitProgress(const QString& status, int percentage);
     void emitErrorOccurred(int errorCode, const QVariantMap& details);
     void emitWorkerQuestion(int questionCode, const QVariantMap& details);
 
