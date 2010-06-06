@@ -47,7 +47,7 @@ QAptTest::QAptTest()
     m_backend->init();
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
-    connect(m_backend, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
+    connect(m_backend, SIGNAL(workerEvent(QApt::Globals::WorkerEvent)), this, SLOT(workerEvent(QApt::Globals::WorkerEvent)));
     connect(m_backend, SIGNAL(downloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
@@ -209,9 +209,9 @@ void QAptTest::commitAction()
     m_backend->commitChanges();
 }
 
-void QAptTest::workerEvent(int code)
+void QAptTest::workerEvent(QApt::Globals::WorkerEvent event)
 {
-    switch (code) {
+    switch (event) {
         case QApt::Globals::CacheUpdateStarted:
             m_cacheUpdateWidget->clear();
             m_cacheUpdateWidget->setHeaderText(i18n("<b>Updating software sources</b>"));

@@ -76,9 +76,9 @@ Backend::Backend()
                                                   this);
 
     connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
-            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
+            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
     connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
-    connect(d->worker, SIGNAL(workerEvent(int)), this, SIGNAL(workerEvent(int)));
+    connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
     connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
 
     d->watcher = new QDBusServiceWatcher(this);
@@ -357,7 +357,7 @@ void Backend::workerStarted()
     connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
             this, SIGNAL(commitProgress(const QString&, int)));
     connect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SIGNAL(workerQuestion(int, const QVariantMap&)));
+            this, SLOT(emitWorkerQuestion(int, const QVariantMap&)));
 }
 
 void Backend::workerFinished(bool result)
@@ -395,6 +395,20 @@ void Backend::workerResponse(const QVariantMap &response)
     d->worker->workerQuestionResponse(response);
 }
 
+void Backend::emitErrorOccurred(int errorCode, const QVariantMap &details)
+{
+    emit errorOccurred((Globals::ErrorCode) errorCode, details);
+}
+
+void Backend::emitWorkerEvent(int event)
+{
+    emit workerEvent((Globals::WorkerEvent) event);
+}
+
+void Backend::emitWorkerQuestion(int question, const QVariantMap &details)
+{
+    emit workerQuestion((Globals::WorkerQuestion) question, details);
+}
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
@@ -406,7 +420,7 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
         qDebug() << "It looks like our worker got lost";
 
         // Ok, something got screwed. Report and flee
-        emit errorOccurred((int) QApt::Globals::WorkerDisappeared, QVariantMap());
+        emit errorOccurred(QApt::Globals::WorkerDisappeared, QVariantMap());
         workerFinished(false);
     }
 }

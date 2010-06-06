@@ -177,7 +177,7 @@ Q_SIGNALS:
      * @param code Error code (is a QApt::Global enum member)
      * @param details A QVariant map containing info about the error, if available
      */
-    void errorOccurred(int code, const QVariantMap &details);
+    void errorOccurred(QApt::Globals::ErrorCode error, const QVariantMap &details);
 
     /**
      * Emitted whenever a package changes state. Useful for knowning when to
@@ -190,7 +190,7 @@ Q_SIGNALS:
      *
      * @param code Event code (is a QApt::Global enum member)
      */
-    void workerEvent(int code);
+    void workerEvent(QApt::Globals::WorkerEvent event);
 
     /**
      * Emitted whenever the worker asks a question. You should listen to this
@@ -202,7 +202,7 @@ Q_SIGNALS:
      * @param code Question code (is a QApt::Global enum member)
      * @param details A QVariant map containing info about the question, if available
      */
-    void workerQuestion(int questionCode, const QVariantMap &details);
+    void workerQuestion(QApt::Globals::WorkerQuestion question, const QVariantMap &details);
 
     /**
      * Emitted while the QApt Worker is downloading packages.
@@ -286,6 +286,10 @@ private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void workerStarted();
     void workerFinished(bool result);
+
+    void emitErrorOccurred(int errorCode, const QVariantMap &details);
+    void emitWorkerEvent(int event);
+    void emitWorkerQuestion(int question, const QVariantMap &details);
 };
 
 }
