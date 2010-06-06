@@ -93,6 +93,7 @@ Backend::~Backend()
 
 bool Backend::init()
 {
+    Q_D(Backend);
     if (!pkgInitConfig(*_config)) {
         return false;
     }
@@ -103,6 +104,7 @@ bool Backend::init()
         return false;
     }
 
+    d->m_cache = new Cache(this);
     reloadCache();
 
     return true;
@@ -112,8 +114,6 @@ void Backend::reloadCache()
 {
     Q_D(Backend);
 
-    delete d->m_cache;
-    d->m_cache = new Cache(this);
     d->m_cache->open();
 
     pkgDepCache *depCache = d->m_cache->depCache();
