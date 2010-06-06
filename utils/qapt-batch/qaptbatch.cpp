@@ -42,8 +42,6 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     , m_watcher(0)
     , m_mode(mode)
     , m_packages(packages)
-    , m_vbox(0)
-    , m_progressLabel(0)
 {
     QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
                                 "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));

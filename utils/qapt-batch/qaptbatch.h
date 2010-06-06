@@ -24,10 +24,7 @@
 // KDE includes
 #include <KProgressDialog>
 
-class KVBox;
-
 class QDBusServiceWatcher;
-class QLabel;
 
 class QAptBatch : public KProgressDialog
 {
@@ -41,9 +38,6 @@ private:
     QDBusServiceWatcher *m_watcher;
     QString m_mode;
     QStringList m_packages;
-
-    KVBox *m_vbox;
-    QLabel *m_progressLabel;
 
 private Q_SLOTS:
     void workerDBusCall(QLatin1String name, QList<QVariant> &args);
