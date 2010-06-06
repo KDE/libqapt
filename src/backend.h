@@ -174,7 +174,7 @@ Q_SIGNALS:
      * Emitted whenever a backend error occurs. You should listen to this
      * signal and present the error/clean up when your app receives it.
      *
-     * @param code Error code (is a QApt::Global enum member)
+     * @param error QApt::Globals::ErrorCode enum member indicating error type
      * @param details A QVariant map containing info about the error, if available
      */
     void errorOccurred(QApt::Globals::ErrorCode error, const QVariantMap &details);
@@ -188,7 +188,7 @@ Q_SIGNALS:
     /**
      * Emitted whenever a backend event occurs.
      *
-     * @param code Event code (is a QApt::Global enum member)
+     * @param event A QApt::Globals::WorkerEvent enum member indicating event type
      */
     void workerEvent(QApt::Globals::WorkerEvent event);
 
@@ -199,7 +199,7 @@ Q_SIGNALS:
      * You should send the response back to the worker as a QVariantMap
      * using the workerQuestionResponse DBus signal.
      *
-     * @param code Question code (is a QApt::Global enum member)
+     * @param question A QApt::Globals::WorkerQuestion enum member indicating question type
      * @param details A QVariant map containing info about the question, if available
      */
     void workerQuestion(QApt::Globals::WorkerQuestion question, const QVariantMap &details);
