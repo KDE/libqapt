@@ -24,6 +24,7 @@
 // KDE includes
 #include <KProgressDialog>
 
+class OrgKubuntuQaptworkerInterface;
 class QDBusServiceWatcher;
 
 class QAptBatch : public KProgressDialog
@@ -35,14 +36,13 @@ public:
     virtual ~QAptBatch();
 
 private:
+    OrgKubuntuQaptworkerInterface *m_worker;
     QDBusServiceWatcher *m_watcher;
     QString m_mode;
     QStringList m_packages;
 
 private Q_SLOTS:
-    void workerDBusCall(QLatin1String name, QList<QVariant> &args);
     void commitChanges(int mode);
-    void cancelDownload();
     void workerStarted();
     void errorOccurred(int code, const QVariantMap &args);
     void raiseErrorMessage(const QString &text, const QString &title);

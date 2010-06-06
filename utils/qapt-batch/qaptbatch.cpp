@@ -22,11 +22,7 @@
 
 // Qt includes
 #include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusMessage>
-#include <QtDBus/QDBusPendingCall>
 #include <QtDBus/QDBusServiceWatcher>
-#include <QtGui/QLabel>
-#include <QtGui/QVBoxLayout>
 
 #include <KDebug>
 #include <KIcon>
@@ -36,21 +32,23 @@
 
 #include "../../src/globals.h"
 #include "../../src/package.h"
+#include "../../src/workerdbus.h"
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     : KProgressDialog()
+    , m_worker(0)
     , m_watcher(0)
     , m_mode(mode)
     , m_packages(packages)
 {
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "errorOccurred", this, SLOT(errorOccurred(int, const QVariantMap&)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerStarted", this, SLOT(workerStarted()));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerEvent", this, SLOT(workerEvent(int)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "workerFinished", this, SLOT(workerFinished(bool)));
+    m_worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
+                                                  "/", QDBusConnection::systemBus(),
+                                                  this);
+    connect(m_worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
+            this, SLOT(errorOccurred(int, const QVariantMap&)));
+    connect(m_worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
+    connect(m_worker, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
+    connect(m_worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
 
     m_watcher = new QDBusServiceWatcher(this);
     m_watcher->setConnection(QDBusConnection::systemBus());
@@ -70,8 +68,7 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     } else if (m_mode == "uninstall") {
         commitChanges(QApt::Package::ToRemove);
     } else if (m_mode == "update") {
-        QList<QVariant> args;
-        workerDBusCall(QLatin1String("updateCache"), args);
+        m_worker->updateCache();
     }
 
     if (winId != 0) {
@@ -85,19 +82,6 @@ QAptBatch::~QAptBatch()
 {
 }
 
-void QAptBatch::workerDBusCall(QLatin1String name, QList<QVariant> &args)
-{
-    QDBusMessage message;
-    message = QDBusMessage::createMethodCall("org.kubuntu.qaptworker",
-              "/",
-              "org.kubuntu.qaptworker",
-              name);
-    if (!args.isEmpty()) {
-        message.setArguments(args);
-    }
-    QDBusConnection::systemBus().asyncCall(message);
-}
-
 void QAptBatch::commitChanges(int mode)
 {
     QMap<QString, QVariant> instructionList;
@@ -106,15 +90,7 @@ void QAptBatch::commitChanges(int mode)
         instructionList.insert(package, mode);
     }
 
-    QList<QVariant> args;
-    args << QVariant(instructionList);
-    workerDBusCall(QLatin1String("commitChanges"), args);
-}
-
-void QAptBatch::cancelDownload()
-{
-    QList<QVariant> args;
-    workerDBusCall(QLatin1String("cancelDownload"), args);
+    m_worker->commitChanges(instructionList);
 }
 
 void QAptBatch::workerStarted()
@@ -124,12 +100,10 @@ void QAptBatch::workerStarted()
     connect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(updateDownloadProgress(int, int, int)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadMessage", this, SLOT(updateDownloadMessage(int, const QString&)));
-    QDBusConnection::systemBus().connect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "commitProgress", this, SLOT(updateCommitProgress(const QString&, int)));
+    connect(m_worker, SIGNAL(downloadProgress(int, int, int)),
+            this, SLOT(updateDownloadProgress(int, int, int)));
+    connect(m_worker, SIGNAL(commitProgress(const QString&, int)),
+            this, SLOT(updateCommitProgress(const QString&, int)));
 }
 void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 {
@@ -233,7 +207,7 @@ void QAptBatch::workerEvent(int code)
 {
     switch (code) {
         case QApt::CacheUpdateStarted:
-            connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
+            connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
             setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
             show();
@@ -243,14 +217,14 @@ void QAptBatch::workerEvent(int code)
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
         case QApt::PackageDownloadStarted:
-            connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
+            connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Downloading"));
             setLabelText(i18nc("@info:status", "Downloading packages"));
             show();
             break;
         case QApt::PackageDownloadFinished:
             setAllowCancel(false);
-            disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
+            disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             break;
         case QApt::CommitChangesStarted:
             setWindowTitle(i18nc("@title:window", "Installing"));
@@ -280,12 +254,10 @@ void QAptBatch::workerFinished(bool success)
     disconnect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadProgress", this, SLOT(updateDownloadProgress(int, int, int)));
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "downloadMessage", this, SLOT(updateDownloadMessage(int, const QString&)));
-    QDBusConnection::systemBus().disconnect("org.kubuntu.qaptworker", "/", "org.kubuntu.qaptworker",
-                                "commitProgress", this, SLOT(updateCommitProgress(const QString&, int)));
+    connect(m_worker, SIGNAL(downloadProgress(int, int, int)),
+            this, SLOT(updateDownloadProgress(int, int, int)));
+    connect(m_worker, SIGNAL(commitProgress(const QString&, int)),
+            this, SLOT(updateCommitProgress(const QString&, int)));
 }
 
 void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
