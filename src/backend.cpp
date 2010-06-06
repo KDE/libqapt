@@ -374,7 +374,7 @@ void Backend::workerFinished(bool result)
     disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),
                this, SIGNAL(commitProgress(const QString&, int)));
     disconnect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
-               this, SIGNAL(workerQuestion(int, const QVariantMap&)));
+               this, SLOT(emitWorkerQuestion(int, const QVariantMap&)));
 
     if (result) {
         reloadCache();
