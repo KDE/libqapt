@@ -121,14 +121,9 @@ void Backend::reloadCache()
     delete d->m_records;
     d->m_records = new pkgRecords(*depCache);
 
-    foreach(Package *package, d->packages) {
-        package->deleteLater();
-    }
+    qDeleteAll(d->packages);
+    qDeleteAll(d->groups);
     d->packages.clear();
-
-    foreach(Group *group, d->groups) {
-        group->deleteLater();
-    }
     d->groups.clear();
 
     // Populate internal package cache
