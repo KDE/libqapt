@@ -52,11 +52,6 @@ public:
     */
     virtual ~Group();
 
-   /**
-    * Defines the Group::List type, which is a QList of Groups
-    */
-    typedef QList<Group*> List;
-
     /**
      * Member function that returns the name of the group
      *

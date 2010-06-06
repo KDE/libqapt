@@ -127,16 +127,16 @@ public:
      * essentially all packages, excluding now-nonexistent packages that have
      * a version of 0.
      *
-     * \return A @c Package::List of all available packages in the Apt database
+     * \return A @c PackageList of all available packages in the Apt database
      */
-    Package::List availablePackages() const;
+    PackageList availablePackages() const;
 
     /**
      * Queries the backend for a list of all upgradeable packages
      *
-     * \return A @c Package::List of all upgradeable packages in the Apt database
+     * \return A @c PackageList of all upgradeable packages in the Apt database
      */
-    Package::List upgradeablePackages() const;
+    PackageList upgradeablePackages() const;
 
     /**
      * Queries the backend for a Group object for the specified name.
@@ -150,9 +150,9 @@ public:
     /**
      * Queries the backend for a list of all available groups
      *
-     * \return A @c Group::List of all available groups in the Apt database
+     * \return A @c GroupList of all available groups in the Apt database
      */
-    Group::List availableGroups() const;
+    GroupList availableGroups() const;
 
 protected:
     BackendPrivate *const d_ptr;
@@ -174,10 +174,10 @@ Q_SIGNALS:
      * Emitted whenever a backend error occurs. You should listen to this
      * signal and present the error/clean up when your app receives it.
      *
-     * @param error QApt::Globals::ErrorCode enum member indicating error type
+     * @param error QApt::ErrorCode enum member indicating error type
      * @param details A QVariant map containing info about the error, if available
      */
-    void errorOccurred(QApt::Globals::ErrorCode error, const QVariantMap &details);
+    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
 
     /**
      * Emitted whenever a package changes state. Useful for knowning when to
@@ -188,9 +188,9 @@ Q_SIGNALS:
     /**
      * Emitted whenever a backend event occurs.
      *
-     * @param event A QApt::Globals::WorkerEvent enum member indicating event type
+     * @param event A QApt::WorkerEvent enum member indicating event type
      */
-    void workerEvent(QApt::Globals::WorkerEvent event);
+    void workerEvent(QApt::WorkerEvent event);
 
     /**
      * Emitted whenever the worker asks a question. You should listen to this
@@ -199,10 +199,10 @@ Q_SIGNALS:
      * You should send the response back to the worker as a QVariantMap
      * using the workerQuestionResponse DBus signal.
      *
-     * @param question A QApt::Globals::WorkerQuestion enum member indicating question type
+     * @param question A QApt::WorkerQuestion enum member indicating question type
      * @param details A QVariant map containing info about the question, if available
      */
-    void workerQuestion(QApt::Globals::WorkerQuestion question, const QVariantMap &details);
+    void workerQuestion(QApt::WorkerQuestion question, const QVariantMap &details);
 
     /**
      * Emitted while the QApt Worker is downloading packages.

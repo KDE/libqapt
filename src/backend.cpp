@@ -54,7 +54,7 @@ public:
     // Watches DBus for our worker appearing/disappearing
     QDBusServiceWatcher *watcher;
     // The canonical list of all unique, non-virutal package objects
-    Package::List packages;
+    PackageList packages;
     // Set of group names extracted from our packages
     QSet<Group*> groups;
 
@@ -205,18 +205,18 @@ int Backend::packageCount(const Package::PackageStates &states) const
     return packageCount;
 }
 
-Package::List Backend::availablePackages() const
+PackageList Backend::availablePackages() const
 {
     Q_D(const Backend);
 
     return d->packages;
 }
 
-Package::List Backend::upgradeablePackages() const
+PackageList Backend::upgradeablePackages() const
 {
     Q_D(const Backend);
 
-    Package::List upgradeablePackages;
+    PackageList upgradeablePackages;
 
     foreach (Package *package, d->packages) {
         if (package->state() & Package::Upgradeable) {
@@ -241,11 +241,11 @@ Group *Backend::group(const QString &name) const
     }
 }
 
-Group::List Backend::availableGroups() const
+GroupList Backend::availableGroups() const
 {
     Q_D(const Backend);
 
-    Group::List groupList = d->groups.toList();
+    GroupList groupList = d->groups.toList();
 
     return groupList;
 }
@@ -397,17 +397,17 @@ void Backend::workerResponse(const QVariantMap &response)
 
 void Backend::emitErrorOccurred(int errorCode, const QVariantMap &details)
 {
-    emit errorOccurred((Globals::ErrorCode) errorCode, details);
+    emit errorOccurred((ErrorCode) errorCode, details);
 }
 
 void Backend::emitWorkerEvent(int event)
 {
-    emit workerEvent((Globals::WorkerEvent) event);
+    emit workerEvent((WorkerEvent) event);
 }
 
 void Backend::emitWorkerQuestion(int question, const QVariantMap &details)
 {
-    emit workerQuestion((Globals::WorkerQuestion) question, details);
+    emit workerQuestion((WorkerQuestion) question, details);
 }
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
@@ -420,7 +420,7 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
         qDebug() << "It looks like our worker got lost";
 
         // Ok, something got screwed. Report and flee
-        emit errorOccurred(QApt::Globals::WorkerDisappeared, QVariantMap());
+        emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
         workerFinished(false);
     }
 }

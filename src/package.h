@@ -65,11 +65,6 @@ public:
     virtual ~Package();
 
    /**
-    * Defines the Package::List type, which is a QList of Packages
-    */
-    typedef QList<Package*> List;
-
-   /**
     * Member function that returns the name of the package
     *
     * \return The name of the package as a @c QString

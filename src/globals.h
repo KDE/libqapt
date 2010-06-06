@@ -26,9 +26,18 @@
 
 namespace QApt
 {
+   class Package;
+   class Group;
+   /**
+    * Defines the PackageList type, which is a QList of Packages
+    */
+    typedef QList<Package*> PackageList;
 
-namespace Globals
-{
+   /**
+    * Defines the GroupList type, which is a QList of Groups
+    */
+    typedef QList<Group*> GroupList;
+
     enum WorkerEvent {
         InvalidEvent            = 0,
         CacheUpdateStarted      = 1,
@@ -77,7 +86,6 @@ namespace Globals
         CriticalImportance = 3,//
         SecurityImportance = 4//
     };
-};
 
 }
 

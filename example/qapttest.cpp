@@ -47,7 +47,7 @@ QAptTest::QAptTest()
     m_backend->init();
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
-    connect(m_backend, SIGNAL(workerEvent(QApt::Globals::WorkerEvent)), this, SLOT(workerEvent(QApt::Globals::WorkerEvent)));
+    connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)), this, SLOT(workerEvent(QApt::WorkerEvent)));
     connect(m_backend, SIGNAL(downloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
@@ -123,7 +123,7 @@ QAptTest::QAptTest()
 
     // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
 //     m_group = m_backend->group("kde");
-//     QApt::Package::List packageList = m_group->packages();
+//     QApt::PackageList packageList = m_group->packages();
 //     foreach (QApt::Package *package, packageList) {
 //             kDebug() << package->name();
 //     }
@@ -209,34 +209,34 @@ void QAptTest::commitAction()
     m_backend->commitChanges();
 }
 
-void QAptTest::workerEvent(QApt::Globals::WorkerEvent event)
+void QAptTest::workerEvent(QApt::WorkerEvent event)
 {
     switch (event) {
-        case QApt::Globals::CacheUpdateStarted:
+        case QApt::CacheUpdateStarted:
             m_cacheUpdateWidget->clear();
             m_cacheUpdateWidget->setHeaderText(i18n("<b>Updating software sources</b>"));
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
-        case QApt::Globals::CacheUpdateFinished:
+        case QApt::CacheUpdateFinished:
             updateStatusBar();
             m_stack->setCurrentWidget(m_mainWidget);
             break;
-        case QApt::Globals::PackageDownloadStarted:
+        case QApt::PackageDownloadStarted:
             m_cacheUpdateWidget->clear();
             m_cacheUpdateWidget->setHeaderText(i18n("<b>Downloading Packages</b>"));
             m_stack->setCurrentWidget(m_cacheUpdateWidget);
             connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
             break;
-        case QApt::Globals::PackageDownloadFinished:
+        case QApt::PackageDownloadFinished:
             updateStatusBar();
             m_stack->setCurrentWidget(m_mainWidget);
             break;
-        case QApt::Globals::CommitChangesStarted:
+        case QApt::CommitChangesStarted:
             m_commitWidget->clear();
             m_stack->setCurrentWidget(m_commitWidget);
             break;
-        case QApt::Globals::CommitChangesFinished:
+        case QApt::CommitChangesFinished:
             updateStatusBar();
             m_stack->setCurrentWidget(m_mainWidget);
             break;
@@ -253,13 +253,13 @@ void QAptTest::updateDownloadMessage(int flag, const QString &message)
     QString fullMessage;
 
     switch (flag) {
-      case QApt::Globals::DownloadFetch:
+      case QApt::DownloadFetch:
           fullMessage = i18n("Downloading: %1", message);
           break;
-      case QApt::Globals::HitFetch:
+      case QApt::HitFetch:
           fullMessage = i18n("Checking: %1", message);
           break;
-      case QApt::Globals::IgnoredFetch:
+      case QApt::IgnoredFetch:
           fullMessage = i18n("Ignored: %1", message);
           break;
       default:

@@ -49,7 +49,7 @@ private Q_SLOTS:
     void updateCache();
     void commitAction();
     void upgrade();
-    void workerEvent(QApt::Globals::WorkerEvent event);
+    void workerEvent(QApt::WorkerEvent event);
     void updateDownloadProgress(int percentage, int speed, int ETA);
     void updateDownloadMessage(int flag, const QString &name);
     void updateCommitProgress(const QString& message, int percentage);

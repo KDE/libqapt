@@ -34,8 +34,8 @@
 #include <KMessageBox>
 #include <KWindowSystem>
 
-#include <../../src/globals.h>
-#include <../../src/package.h>
+#include "../../src/globals.h"
+#include "../../src/package.h"
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     : KProgressDialog()
@@ -142,14 +142,14 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
     QString drive;
 
     switch(code) {
-        case QApt::Globals::InitError:
+        case QApt::InitError:
             text = i18nc("@label",
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
             raiseErrorMessage(text, title);
             break;
-        case QApt::Globals::LockError:
+        case QApt::LockError:
             text = i18nc("@label",
                          "Another application seems to be using the package "
                          "system at this time. You must close all other package "
@@ -158,7 +158,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Unable to obtain package system lock");
             raiseErrorMessage(text, title);
             break;
-        case QApt::Globals::DiskSpaceError:
+        case QApt::DiskSpaceError:
             drive = args["DirectoryString"].toString();
             text = i18nc("@label",
                          "You do not have enough disk space in the directory "
@@ -166,7 +166,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Low disk space");
             raiseErrorMessage(text, title);
             break;
-        case QApt::Globals::FetchError:
+        case QApt::FetchError:
             failedItem = args["FailedItem"].toString();
             errorText = args["ErrorText"].toString();
             text = i18nc("@label",
@@ -175,7 +175,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Download failed");
             raiseErrorMessage(text, title);
             break;
-        case QApt::Globals::CommitError:
+        case QApt::CommitError:
             failedItem = args["FailedItem"].toString();
             errorText = args["ErrorText"].toString();
             text = i18nc("@label", "An error occurred while committing changes.");
@@ -190,14 +190,14 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Commit error");
             raiseErrorMessage(text, title);
             break;
-        case QApt::Globals::AuthError:
+        case QApt::AuthError:
             text = i18nc("@label",
                          "This operation cannot continue since proper "
                          "authorization was not provided");
             title = i18nc("@title:window", "Authentication error");
             raiseErrorMessage(text, title);
             break;
-        case QApt::Globals::UntrustedError:
+        case QApt::UntrustedError:
             QStringList untrustedItems = args["UntrustedItems"].toStringList();
             if (untrustedItems.size() == 1) {
                 text = i18nc("@label",
@@ -234,32 +234,32 @@ void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 void QAptBatch::workerEvent(int code)
 {
     switch (code) {
-        case QApt::Globals::CacheUpdateStarted:
+        case QApt::CacheUpdateStarted:
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
             setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
             show();
             break;
-        case QApt::Globals::CacheUpdateFinished:
+        case QApt::CacheUpdateFinished:
             setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
-        case QApt::Globals::PackageDownloadStarted:
+        case QApt::PackageDownloadStarted:
             connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Downloading"));
             setLabelText(i18nc("@info:status", "Downloading packages"));
             show();
             break;
-        case QApt::Globals::PackageDownloadFinished:
+        case QApt::PackageDownloadFinished:
             setAllowCancel(false);
             disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
             break;
-        case QApt::Globals::CommitChangesStarted:
+        case QApt::CommitChangesStarted:
             setWindowTitle(i18nc("@title:window", "Installing"));
             showButton(Cancel, false); //Committing changes is uninterruptable (safely, that is)
             show(); // In case no download was necessary
             break;
-        case QApt::Globals::CommitChangesFinished:
+        case QApt::CommitChangesFinished:
             if (m_mode == "install") {
                 setWindowTitle(i18nc("@title:window", "Installation Complete"));
                 setLabelText(i18ncp("@label",

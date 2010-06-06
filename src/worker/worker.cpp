@@ -23,8 +23,8 @@
 #include "qaptworkeradaptor.h"
 
 // QApt includes
-#include <../globals.h>
-#include <../package.h>
+#include "../globals.h"
+#include "../package.h"
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
@@ -138,12 +138,12 @@ void QAptWorker::unlock()
 void QAptWorker::updateCache()
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
-        emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
+        emit errorOccurred(QApt::AuthError, QVariantMap());
         return;
     }
 
     emit workerStarted();
-    emit workerEvent(QApt::Globals::CacheUpdateStarted);
+    emit workerEvent(QApt::CacheUpdateStarted);
 
     initializeApt();
     // Lock the list directory
@@ -151,8 +151,8 @@ void QAptWorker::updateCache()
     if (!_config->FindB("Debug::NoLocking", false)) {
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
-            emit errorOccurred(QApt::Globals::LockError, QVariantMap());
-            emit workerEvent(QApt::Globals::CacheUpdateFinished);
+            emit errorOccurred(QApt::LockError, QVariantMap());
+            emit workerEvent(QApt::CacheUpdateFinished);
             emit workerFinished(false);
         }
     }
@@ -160,11 +160,11 @@ void QAptWorker::updateCache()
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
-        emit workerEvent(QApt::Globals::CacheUpdateFinished);
+        emit workerEvent(QApt::CacheUpdateFinished);
         emit workerFinished(result);
     }
 
-    emit workerEvent(QApt::Globals::CacheUpdateFinished);
+    emit workerEvent(QApt::CacheUpdateFinished);
     emit workerFinished(false);
 }
 
@@ -176,7 +176,7 @@ void QAptWorker::cancelDownload()
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
-        emit errorOccurred(QApt::Globals::AuthError, QVariantMap());
+        emit errorOccurred(QApt::AuthError, QVariantMap());
         return;
     }
 
@@ -243,7 +243,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     {
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
         if (_error->PendingError() == true) {
-            emit errorOccurred(QApt::Globals::LockError, QVariantMap());
+            emit errorOccurred(QApt::LockError, QVariantMap());
             emit workerFinished(false);
             return;
         }
@@ -256,7 +256,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
         _error->PendingError()) {
-        emit errorOccurred(QApt::Globals::FetchError, QVariantMap());
+        emit errorOccurred(QApt::FetchError, QVariantMap());
         emit workerFinished(false);
         return;
     }
@@ -276,7 +276,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
         QVariantMap args;
         args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
-        emit errorOccurred(QApt::Globals::DiskSpaceError, args);
+        emit errorOccurred(QApt::DiskSpaceError, args);
         emit workerFinished(false);
         return;
     }
@@ -288,7 +288,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         {
             QVariantMap args;
             args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
-            emit errorOccurred(QApt::Globals::DiskSpaceError, args);
+            emit errorOccurred(QApt::DiskSpaceError, args);
             emit workerFinished(false);
             return;
         }
@@ -311,23 +311,23 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             // TODO: Need a question API to ask whether or not user wants to continue
             
         } else {
-            emit errorOccurred(QApt::Globals::UntrustedError, args);
+            emit errorOccurred(QApt::UntrustedError, args);
             emit workerFinished(false);
             return;
         }
     }
 
-    emit workerEvent(QApt::Globals::PackageDownloadStarted);
+    emit workerEvent(QApt::PackageDownloadStarted);
 
     if (fetcher.Run() != pkgAcquire::Continue) {
         // Our fetcher will report errors for itself, but we have to send the
         // finished signal
-        emit workerEvent(QApt::Globals::PackageDownloadFinished);
+        emit workerEvent(QApt::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }
 
-    emit workerEvent(QApt::Globals::CommitChangesStarted);
+    emit workerEvent(QApt::CommitChangesStarted);
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
     connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
@@ -339,7 +339,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     pkgPackageManager::OrderResult res = installProgress->start(packageManager);
     bool success = (res == pkgPackageManager::Completed);
-    emit workerEvent(QApt::Globals::CommitChangesFinished);
+    emit workerEvent(QApt::CommitChangesFinished);
     emit workerFinished(success);
 
     delete installProgress;

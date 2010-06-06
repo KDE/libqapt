@@ -24,8 +24,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
 
-#include <../globals.h>
-
 #include <apt-pkg/error.h>
 
 #include <sys/statvfs.h>
@@ -36,6 +34,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+
+#include "../globals.h"
 
 using namespace std;
 
@@ -143,7 +143,7 @@ void WorkerInstallProgress::updateInterface(int fd)
             if (status.contains("pmerror")) {
                 QVariantMap args;
                 args["ErrorText"] = QString(package % ": " % str);
-                emit commitError(QApt::Globals::CommitError, args);
+                emit commitError(QApt::CommitError, args);
             } else if (status.contains("pmconffile")) {
                 //TODO: Conffile handling
             } else {

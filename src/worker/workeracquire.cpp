@@ -49,7 +49,7 @@ void WorkerAcquire::Start()
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
     QString message = QString::fromStdString(item.Description);
-    emit downloadMessage((int) QApt::Globals::HitFetch, message);
+    emit downloadMessage((int) QApt::HitFetch, message);
 
     Update = true;
 }
@@ -62,7 +62,7 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
     }
 
     QString message = QString::fromStdString(item.Description);
-    emit downloadMessage((int) QApt::Globals::DownloadFetch, message);
+    emit downloadMessage((int) QApt::DownloadFetch, message);
 }
 
 void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
@@ -80,14 +80,14 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
     if (item.Owner->Status == pkgAcquire::Item::StatDone)
     {
         QString message = QString::fromStdString(item.Description);
-        emit downloadMessage((int) QApt::Globals::IgnoredFetch, message);
+        emit downloadMessage((int) QApt::IgnoredFetch, message);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
         QVariantMap args;
         args["FailedItem"] = QString(item.Description.c_str());
         args["ErrorText"] = QString(item.Owner->ErrorText.c_str());
-        emit fetchError(QApt::Globals::FetchError, args);
+        emit fetchError(QApt::FetchError, args);
     }
 
     Update = true;
@@ -104,7 +104,7 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
     args["Media"] = QString::fromStdString(Media.c_str());
     args["Drive"] = QString::fromStdString(Drive.c_str());
 
-    QVariantMap result = askQuestion(QApt::Globals::MediaChange, args);
+    QVariantMap result = askQuestion(QApt::MediaChange, args);
 
     bool mediaChanged = result["MediaChanged"].toBool();
 
