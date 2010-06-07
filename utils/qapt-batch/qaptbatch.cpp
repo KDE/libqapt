@@ -214,7 +214,7 @@ void QAptBatch::workerEvent(int code)
             break;
         case QApt::CacheUpdateFinished:
             setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
-            disconnect(this, SIGNAL(cancelClicked()), this, SLOT(cancelDownload()));
+            disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             progressBar()->setValue(100);
             break;
         case QApt::PackageDownloadStarted:

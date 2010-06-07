@@ -32,7 +32,7 @@ static const char version[] = "0.1";
 int main(int argc, char **argv)
 {
     KAboutData about("qapttest", 0, ki18n("LibQApt test"), version, ki18n(description),
-                     KAboutData::License_GPL, ki18n("(C) 2007 Jonathan Thomas"), KLocalizedString(), 0, "echidnaman@kubuntu.org");
+                     KAboutData::License_GPL, ki18n("(C) 2010 Jonathan Thomas"), KLocalizedString(), 0, "echidnaman@kubuntu.org");
     about.addAuthor( ki18n("Jonathan Thomas"), KLocalizedString(), "echidnaman@kubuntu.org" );
     KCmdLineArgs::init(argc, argv, &about);
 
