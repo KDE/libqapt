@@ -45,7 +45,7 @@ DetailsWidget::DetailsWidget(QWidget *parent)
     label1->setAlignment(Qt::AlignRight);
 
     QLabel *label2 = new QLabel(columnOne);
-    label2->setText(i18nc("@info:label Download Rate", "Speed: "));
+    label2->setText(i18nc("@info:label Download Rate", "Speed:"));
     label2->setAlignment(Qt::AlignRight);
 
     m_timeLabel = new QLabel(columnTwo);
