@@ -18,43 +18,53 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTBATCH_H
-#define QAPTBATCH_H
+#include "detailswidget.h"
+
+// Qt includes
+#include <QtGui/QGridLayout>
+#include <QtGui/QLabel>
 
 // KDE includes
-#include <KProgressDialog>
+#include <KVBox>
+#include <KLocale>
 
-class QDBusServiceWatcher;
-
-class OrgKubuntuQaptworkerInterface;
-class DetailsWidget;
-
-class QAptBatch : public KProgressDialog
+DetailsWidget::DetailsWidget(QWidget *parent)
+    : QWidget(parent)
 {
-    Q_OBJECT
-public:
-    explicit QAptBatch(QString mode, QStringList packages, int winId);
+    QGridLayout *layout = new QGridLayout(this);
 
-    virtual ~QAptBatch();
+    KVBox *columnOne = new KVBox(this);
+    KVBox *columnTwo = new KVBox(this);
 
-private:
-    OrgKubuntuQaptworkerInterface *m_worker;
-    QDBusServiceWatcher *m_watcher;
-    QString m_mode;
-    QStringList m_packages;
-    DetailsWidget *m_detailsWidget;
+    layout->addWidget(columnOne);
+    layout->addWidget(columnTwo, 0, 1);
+    setLayout(layout);
 
-private Q_SLOTS:
-    void commitChanges(int mode);
-    void workerStarted();
-    void errorOccurred(int code, const QVariantMap &args);
-    void raiseErrorMessage(const QString &text, const QString &title);
-    void workerEvent(int event);
-    void workerFinished(bool result);
-    void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    QLabel *label1 = new QLabel(columnOne);
+    label1->setText(i18nc("@info:progress Remaining time", "Remaining Time:"));
+    label1->setAlignment(Qt::AlignRight);
 
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateCommitProgress(const QString& message, int percentage);
-};
+    QLabel *label2 = new QLabel(columnOne);
+    label2->setText(i18nc("@info:progress Download Rate", "Speed: "));
+    label2->setAlignment(Qt::AlignRight);
 
-#endif
+    m_timeLabel = new QLabel(columnTwo);
+    m_speedLabel = new QLabel(columnTwo);
+}
+
+DetailsWidget::~DetailsWidget()
+{
+}
+
+void DetailsWidget::setTimeText(const QString &text)
+{
+    m_timeLabel->setText(text);
+}
+
+
+void DetailsWidget::setSpeedText(const QString &text)
+{
+    m_speedLabel->setText(text);
+}
+
+#include "detailswidget.moc"

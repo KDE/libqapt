@@ -18,43 +18,26 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef QAPTBATCH_H
-#define QAPTBATCH_H
+#ifndef DETAILSWIDGET_H
+#define DETAILSWIDGET_H
 
-// KDE includes
-#include <KProgressDialog>
+#include <QtGui/QWidget>
 
-class QDBusServiceWatcher;
+class QLabel;
 
-class OrgKubuntuQaptworkerInterface;
-class DetailsWidget;
-
-class QAptBatch : public KProgressDialog
+class DetailsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit QAptBatch(QString mode, QStringList packages, int winId);
+    explicit DetailsWidget(QWidget *parent);
+    ~DetailsWidget();
 
-    virtual ~QAptBatch();
+    void setTimeText(const QString &text);
+    void setSpeedText(const QString &text);
 
 private:
-    OrgKubuntuQaptworkerInterface *m_worker;
-    QDBusServiceWatcher *m_watcher;
-    QString m_mode;
-    QStringList m_packages;
-    DetailsWidget *m_detailsWidget;
-
-private Q_SLOTS:
-    void commitChanges(int mode);
-    void workerStarted();
-    void errorOccurred(int code, const QVariantMap &args);
-    void raiseErrorMessage(const QString &text, const QString &title);
-    void workerEvent(int event);
-    void workerFinished(bool result);
-    void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
-
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateCommitProgress(const QString& message, int percentage);
+    QLabel *m_timeLabel;
+    QLabel *m_speedLabel;
 };
 
 #endif

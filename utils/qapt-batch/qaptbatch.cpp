@@ -24,12 +24,14 @@
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusServiceWatcher>
 
+// KDE includes
 #include <KDebug>
 #include <KIcon>
 #include <KLocale>
 #include <KMessageBox>
 #include <KWindowSystem>
 
+#include "detailswidget.h"
 #include "../../src/globals.h"
 #include "../../src/package.h"
 #include "../../src/workerdbus.h"
@@ -40,6 +42,7 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     , m_watcher(0)
     , m_mode(mode)
     , m_packages(packages)
+    , m_detailsWidget(0)
 {
     m_worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
                                                   "/", QDBusConnection::systemBus(),
@@ -62,6 +65,9 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     // Set this in case we auto-show before auth
     setLabelText(i18nc("@label", "Waiting for authorization"));
     progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
+
+    m_detailsWidget = new DetailsWidget(this);
+    setDetailsWidget(m_detailsWidget);
 
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
@@ -210,17 +216,23 @@ void QAptBatch::workerEvent(int code)
             connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
             setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
+            setButtons(KDialog::Cancel | KDialog::Details);
             show();
             break;
         case QApt::CacheUpdateFinished:
             setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
             disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             progressBar()->setValue(100);
+            setButtons(KDialog::Close);
             break;
         case QApt::PackageDownloadStarted:
             connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Downloading"));
-            setLabelText(i18nc("@info:status", "Downloading packages"));
+            setLabelText(i18ncp("@info:status",
+                                "Downloading package file",
+                                "Downloading package files",
+                                m_packages.count()));
+            setButtons(KDialog::Cancel | KDialog::Details);
             show();
             break;
         case QApt::PackageDownloadFinished:
@@ -228,8 +240,10 @@ void QAptBatch::workerEvent(int code)
             disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             break;
         case QApt::CommitChangesStarted:
-            setWindowTitle(i18nc("@title:window", "Installing"));
-            showButton(Cancel, false); //Committing changes is uninterruptable (safely, that is)
+            setWindowTitle(i18nc("@title:window", "Installing Packages"));
+            m_detailsWidget->hide();
+            setButtons(KDialog::Cancel);
+            setAllowCancel(false); //Committing changes is uninterruptable (safely, that is)
             show(); // In case no download was necessary
             break;
         case QApt::CommitChangesFinished:
@@ -281,38 +295,25 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
 
 void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 {
-    QString labelText;
-
     QString downloadSpeed;
     if (speed != 0) {
         downloadSpeed = i18nc("@info:progress Download rate",
                               "at %1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
-    QString downloadLabel;
-
-    if (m_mode == "update") {
-        downloadLabel = i18nc("@info:status", "Checking for new, removed or upgradeable packages %1", downloadSpeed);
-    } else {
-        downloadLabel = i18ncp("@info:status",
-                               "Downloading package file %1",
-                               "Downloading package files %1",
-                               downloadSpeed, m_packages.count());
-    }
-
-    progressBar()->setValue(percentage);
-
     QString timeRemaining;
     int ETAMilliseconds = ETA * 1000;
 
     // Greater than zero and less than 2 weeks
     if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {
-        timeRemaining = i18nc("@info:progress Remaining time label", "\n\n%1 remaining",
-                               KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
+        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
+    } else {
+        timeRemaining = i18nc("@info:progress Remaining time", "Unknown");
     }
 
-    labelText = QString(downloadLabel + timeRemaining);
-    setLabelText(labelText);
+    progressBar()->setValue(percentage);
+    m_detailsWidget->setTimeText(timeRemaining);
+    m_detailsWidget->setSpeedText(KGlobal::locale()->formatByteSize(speed));
 }
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)

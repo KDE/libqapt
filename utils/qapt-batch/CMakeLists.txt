@@ -1,6 +1,7 @@
 set(qaptbatch_SRCS
     main.cpp
-    qaptbatch.cpp)
+    qaptbatch.cpp
+    detailswidget.cpp)
 
 include_directories(${KDE4_INCLUDES} ${QT_INCLUDES})
 
