@@ -41,11 +41,11 @@ DetailsWidget::DetailsWidget(QWidget *parent)
     setLayout(layout);
 
     QLabel *label1 = new QLabel(columnOne);
-    label1->setText(i18nc("@info:progress Remaining time", "Remaining Time:"));
+    label1->setText(i18nc("@info:label Remaining time", "Remaining Time:"));
     label1->setAlignment(Qt::AlignRight);
 
     QLabel *label2 = new QLabel(columnOne);
-    label2->setText(i18nc("@info:progress Download Rate", "Speed: "));
+    label2->setText(i18nc("@info:label Download Rate", "Speed: "));
     label2->setAlignment(Qt::AlignRight);
 
     m_timeLabel = new QLabel(columnTwo);

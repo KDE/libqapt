@@ -306,7 +306,8 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
     // Greater than zero and less than 2 weeks
     if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {
-        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
+        timeRemaining = i18nc("@info:progress Download speed in per-second", "%1/s",
+                              KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
     } else {
         timeRemaining = i18nc("@info:progress Remaining time", "Unknown");
     }
