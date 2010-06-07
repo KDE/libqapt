@@ -295,12 +295,6 @@ void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner
 
 void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 {
-    QString downloadSpeed;
-    if (speed != 0) {
-        downloadSpeed = i18nc("@info:progress Download rate",
-                              "at %1/s", KGlobal::locale()->formatByteSize(speed));
-    }
-
     QString timeRemaining;
     int ETAMilliseconds = ETA * 1000;
 
@@ -309,6 +303,12 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
         timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
     } else {
         timeRemaining = i18nc("@info:progress Remaining time", "Unknown");
+    }
+
+    QString downloadSpeed;
+    if (speed != 0) {
+        downloadSpeed = i18nc("@info:progress Download rate",
+                              "at %1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
     progressBar()->setValue(percentage);

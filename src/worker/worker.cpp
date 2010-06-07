@@ -327,6 +327,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         return;
     }
 
+    emit workerEvent(QApt::PackageDownloadFinished);
+
     emit workerEvent(QApt::CommitChangesStarted);
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
