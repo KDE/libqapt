@@ -223,6 +223,7 @@ void QAptBatch::workerEvent(int code)
             setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
             disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             progressBar()->setValue(100);
+            m_detailsWidget->hide();
             setButtons(KDialog::Close);
             break;
         case QApt::PackageDownloadStarted:
