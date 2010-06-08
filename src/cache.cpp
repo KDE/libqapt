@@ -26,7 +26,6 @@
 #include <apt-pkg/pkgcachegen.h>
 #include <apt-pkg/policy.h>
 
-
 namespace QApt {
 
 class CachePrivate

@@ -32,6 +32,7 @@
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/init.h>
 
+// QApt includes
 #include "cache.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
 

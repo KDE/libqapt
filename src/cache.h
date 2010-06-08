@@ -30,8 +30,19 @@ class pkgSourceList;
 
 namespace QApt {
 
+/**
+ * CachePrivate is a class containing all private members of the Cache class
+ */
 class CachePrivate;
 
+/**
+ * The Cache class is what handles the internal APT package cache. If you are
+ * using the Backend class, you will not need to worry about this class at all,
+ * as it has its own Cache object and handles the opening/re-opening of the
+ * internal APT cache when necessary.
+ *
+ * @author Jonathan Thomas
+ */
 class Cache : public QObject
 {
     Q_OBJECT
@@ -46,10 +57,30 @@ public:
       */
     virtual ~Cache();
 
+    /**
+     * This function returns a pointer to the interal dependency cache, which
+     * keeps track of inter-package dependencies.
+     *
+     * @return A pointer to the internal @c pkgDepCache
+     */
     pkgDepCache *depCache();
+
+    /**
+     * This function returns a pointer to the interal package source list,
+     *
+     * @return A pointer to the internal @c pkgSourceList
+     */
     pkgSourceList *list();
 
 public Q_SLOTS:
+    /**
+     * This function initializes the internal package cache. It is also used
+     * to re-open the cache when the need arises. (E.g. such as an updated
+     * sources list, or a package installation or removal)
+     *
+     * @return @c true if opening succeeds
+     * @return @c false if opening fails
+     */
     bool open();
 
 protected:

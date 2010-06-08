@@ -94,7 +94,7 @@ public:
      *
      * @param name name used to specify the package returned
      *
-     * @return A @c Package defined by the specified name
+     * @return A pointer to a @c Package defined by the specified name
      */
     Package *package(const QString &name) const;
 
@@ -140,7 +140,7 @@ public:
      *
      * @param name name used to specify the group returned
      *
-     * @return A @c Group defined by the specified name
+     * @return A pointer to a @c Group defined by the specified name
      */
     Group *group(const QString &name) const;
 
