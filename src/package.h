@@ -25,8 +25,9 @@
 #include <QtCore/QObject>
 
 #include <apt-pkg/pkgcache.h>
-#include <apt-pkg/pkgrecords.h>
-#include <apt-pkg/depcache.h>
+
+class pkgRecords;
+class pkgDepCache;
 
 namespace QApt {
 

@@ -24,14 +24,11 @@
 #include <QtCore/QSet>
 #include <QtCore/QVariantList>
 
-#include <apt-pkg/progress.h>
-#include <apt-pkg/sourcelist.h>
-#include <apt-pkg/pkgrecords.h>
-#include <apt-pkg/policy.h>
-
 #include "globals.h"
 #include "group.h"
 #include "package.h"
+
+class pkgSourceList;
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
@@ -225,7 +222,7 @@ Q_SIGNALS:
      * Emits the progress of a current package installation/removal/
      * operation.
      *
-     * @param status Current status retreived from dpkg
+     * @param status Current status retrieved from dpkg
      * @param percentage Total percent complete
      */
     void commitProgress(const QString &status, int percentage);

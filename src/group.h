@@ -23,8 +23,6 @@
 
 #include <QtCore/QObject>
 
-#include "package.h"
-
 namespace QApt {
 
 /**

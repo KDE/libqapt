@@ -20,12 +20,10 @@
 
 #include "cache.h"
 
-#include <apt-pkg/configuration.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/pkgcachegen.h>
-#include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/policy.h>
 
 

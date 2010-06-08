@@ -28,13 +28,8 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
-#include <apt-pkg/error.h>
-#include <apt-pkg/configuration.h>
 #include <apt-pkg/depcache.h>
-#include <apt-pkg/pkgsystem.h>
-#include <apt-pkg/fileutl.h>
-#include <apt-pkg/pkgcachegen.h>
-#include <apt-pkg/cachefile.h>
+#include <apt-pkg/sourcelist.h>
 #include <apt-pkg/init.h>
 
 #include "cache.h"

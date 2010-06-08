@@ -21,12 +21,17 @@
 
 #include "package.h"
 
+// Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
 #include <QDebug>
 
+// Apt includes
 #include <apt-pkg/algorithms.h>
+#include <apt-pkg/depcache.h>
+#include <apt-pkg/pkgrecords.h>
+#include <apt-pkg/sourcelist.h>
 
 #include "backend.h"
 
