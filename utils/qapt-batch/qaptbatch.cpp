@@ -309,12 +309,12 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
     QString downloadSpeed;
     if (speed != 0) {
         downloadSpeed = i18nc("@info:progress Download rate",
-                              "at %1/s", KGlobal::locale()->formatByteSize(speed));
+                              "%1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
     progressBar()->setValue(percentage);
     m_detailsWidget->setTimeText(timeRemaining);
-    m_detailsWidget->setSpeedText(KGlobal::locale()->formatByteSize(speed));
+    m_detailsWidget->setSpeedText(downloadSpeed);
 }
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)
