@@ -44,9 +44,9 @@ DetailsWidget::DetailsWidget(QWidget *parent)
     label1->setText(i18nc("@info:label Remaining time", "Remaining Time:"));
     label1->setAlignment(Qt::AlignRight);
 
-    QLabel *label2 = new QLabel(columnOne);
-    label2->setText(i18nc("@info:label Download Rate", "Speed:"));
-    label2->setAlignment(Qt::AlignRight);
+    m_speedDescriptor = new QLabel(columnOne);
+    m_speedDescriptor->setText(i18nc("@info:label Download Rate", "Speed:"));
+    m_speedDescriptor->setAlignment(Qt::AlignRight);
 
     m_timeLabel = new QLabel(columnTwo);
     m_speedLabel = new QLabel(columnTwo);
@@ -64,7 +64,16 @@ void DetailsWidget::setTimeText(const QString &text)
 
 void DetailsWidget::setSpeedText(const QString &text)
 {
-    m_speedLabel->setText(text);
+    if(text.isEmpty()){
+        if (!m_speedDescriptor->isHidden()) {
+            m_speedDescriptor->hide();
+        }
+    } else {
+        if (m_speedDescriptor->isHidden()) {
+            m_speedDescriptor->show();
+        }
+        m_speedLabel->setText(text);
+    }
 }
 
 #include "detailswidget.moc"

@@ -38,6 +38,7 @@ public:
 private:
     QLabel *m_timeLabel;
     QLabel *m_speedLabel;
+    QLabel *m_speedDescriptor;
 };
 
 #endif
