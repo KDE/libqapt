@@ -50,7 +50,7 @@ void WorkerAcquire::Start()
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
     QString message = QString::fromStdString(item.Description);
-    emit downloadMessage((int) QApt::HitFetch, message);
+    emit downloadMessage(QApt::HitFetch, message);
 
     Update = true;
 }
@@ -63,7 +63,7 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
     }
 
     QString message = QString::fromStdString(item.Description);
-    emit downloadMessage((int) QApt::DownloadFetch, message);
+    emit downloadMessage(QApt::DownloadFetch, message);
 }
 
 void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
@@ -81,7 +81,7 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
     if (item.Owner->Status == pkgAcquire::Item::StatDone)
     {
         QString message = QString::fromStdString(item.Description);
-        emit downloadMessage((int) QApt::IgnoredFetch, message);
+        emit downloadMessage(QApt::IgnoredFetch, message);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
