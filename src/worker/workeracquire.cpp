@@ -43,6 +43,7 @@ void WorkerAcquire::Start()
 {
     // Cleanup from old fetches
     m_canceled = false;
+    m_calculatingSpeed = true;
 
     pkgAcquireStatus::Start();
 }
