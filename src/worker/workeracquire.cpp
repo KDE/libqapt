@@ -28,8 +28,12 @@
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/acquire-worker.h>
 
-WorkerAcquire::WorkerAcquire()
-        : m_canceled(false)
+#include "worker.h"
+
+WorkerAcquire::WorkerAcquire(QAptWorker *parent)
+        : QObject(parent)
+        , m_worker(parent)
+        , m_canceled(false)
         , m_calculatingSpeed(true)
         , m_questionResponse(QVariantMap())
 {
@@ -154,11 +158,12 @@ void WorkerAcquire::requestCancel()
 
 QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)
 {
-    QEventLoop mediaBlock;
-    connect(this, SIGNAL(answerReady()), &mediaBlock, SLOT(quit()));
+    m_mediaBlock = new QEventLoop;
+    connect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
+            this, SLOT(setAnswer(const QVariantMap&)));
 
     emit workerQuestion(questionCode, args);
-    mediaBlock.exec(); // Process blocked, waiting for answerReady signal over dbus
+    m_mediaBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
 
     return m_questionResponse;
 }
@@ -166,5 +171,5 @@ QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args
 void WorkerAcquire::setAnswer(const QVariantMap &answer)
 {
     m_questionResponse = answer;
-    emit answerReady();
+    m_mediaBlock->quit();
 }

@@ -75,7 +75,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
     QTimer::singleShot(60000, this, SLOT(quit()));
 
-    m_acquireStatus = new WorkerAcquire;
+    m_acquireStatus = new WorkerAcquire(this);
     connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
             this, SLOT(emitDownloadProgress(int, int, int)));
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
@@ -350,9 +350,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
 void QAptWorker::workerQuestionResponse(const QVariantMap &response)
 {
-    if (m_acquireStatus) {
-        m_acquireStatus->setAnswer(response);
-    }
+    emit answerReady(response);
 }
 
 // Slot -> slot relaying breaks after 3 or so relays, so we have to re-emit here

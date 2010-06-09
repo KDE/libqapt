@@ -27,12 +27,15 @@
 
 #include "globals.h"
 
+class QEventLoop;
+class QAptWorker;
+
 class WorkerAcquire : public QObject, public pkgAcquireStatus
 {
     Q_OBJECT
     Q_ENUMS(FetchType)
 public:
-    WorkerAcquire();
+    explicit WorkerAcquire(QAptWorker *parent);
 
     virtual ~WorkerAcquire();
 
@@ -46,20 +49,24 @@ public:
 
     bool Pulse(pkgAcquire *Owner);
 
-public Q_SLOTS:
-    void requestCancel();
-    void setAnswer(const QVariantMap &response);
-
 private:
     QVariantMap askQuestion(int questionCode, const QVariantMap &args);
+
+    QAptWorker *m_worker;
+    QEventLoop *m_mediaBlock;
     QVariantMap m_questionResponse;
     bool m_calculatingSpeed;
     bool m_canceled;
 
+public Q_SLOTS:
+    void requestCancel();
+
+private Q_SLOTS:
+    void setAnswer(const QVariantMap &response);
+
 signals:
     void fetchError(int errorCode, const QVariantMap &details);
     void workerQuestion(int questionCode, const QVariantMap &args);
-    void answerReady();
     void downloadProgress(int percentage, int speed, int ETA);
     void downloadSubProgress(const QString &package, int percentage);
     void downloadMessage(int flag, const QString &message);

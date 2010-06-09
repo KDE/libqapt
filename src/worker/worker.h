@@ -76,6 +76,7 @@ Q_SIGNALS:
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);
     void workerQuestion(int questionCode, const QVariantMap& details);
+    void answerReady(const QVariantMap& response);
 };
 
 #endif
