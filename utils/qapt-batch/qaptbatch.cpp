@@ -307,7 +307,9 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
     }
 
     QString downloadSpeed;
-    if (speed != 0) {
+    if (speed == -1) {
+        downloadSpeed = i18nc("@info:progress Download rate", "Unknown");
+    } else {
         downloadSpeed = i18nc("@info:progress Download rate",
                               "%1/s", KGlobal::locale()->formatByteSize(speed));
     }

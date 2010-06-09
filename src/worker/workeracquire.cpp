@@ -30,6 +30,7 @@
 
 WorkerAcquire::WorkerAcquire()
         : m_canceled(false)
+        , m_calculatingSpeed(true)
         , m_questionResponse(QVariantMap())
 {
 }
@@ -124,7 +125,19 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         ETA = 0;
     }
 
-    int speed = CurrentCPS;
+    int speed;
+    // m_calculatingSpeed is always set to true in the constructor since APT
+    // will always have a bit of time where it has to calculate the current
+    // speed. Once speed > 0 for the first time, it'll be set to false, and
+    // all subsequent zero values will be legitimate. APT should really do
+    // this for us, but I guess stuff might depend on the old behavior...
+    // The fail stops here.
+    if (m_calculatingSpeed && CurrentCPS <= 0) {
+        speed = -1;
+    } else {
+        m_calculatingSpeed = false;
+        speed = CurrentCPS;
+    }
 
     emit downloadProgress(percentage, speed, ETA);
 

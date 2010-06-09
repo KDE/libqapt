@@ -29,6 +29,7 @@
 #include <KIcon>
 #include <KGlobal>
 #include <KLocale>
+#include <KDebug>
 
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     : KVBox(parent)
@@ -76,18 +77,24 @@ void CacheUpdateWidget::setTotalProgress(int percentage, int speed, int ETA)
 {
     m_totalProgress->setValue(percentage);
 
-    QString downloadSpeed = KGlobal::locale()->formatByteSize(speed);
+    QString downloadSpeed;
+    if (speed < 0) {
+        downloadSpeed = i18n("Unknown speed");
+    } else {
+        downloadSpeed = i18n("Download rate: %1/s",
+                                     KGlobal::locale()->formatByteSize(speed));
+    }
 
     QString timeRemaining;
     int ETAMilliseconds = ETA * 1000;
 
     if (ETAMilliseconds <= 0 || ETAMilliseconds > 14*24*60*60) {
         // If ETA is less than zero or bigger than 2 weeks
-        timeRemaining = i18n("Unknown time");
+        timeRemaining = i18n(" - Unknown time remaining");
     } else {
-        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
+        timeRemaining = i18n(" - %1/s", KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
     }
-    m_downloadLabel->setText(i18n("Download Rate: %1/s - %2 remaining", downloadSpeed, timeRemaining));
+    m_downloadLabel->setText(downloadSpeed + timeRemaining);
 }
 
 void CacheUpdateWidget::cancelButtonPressed()

@@ -53,6 +53,7 @@ public Q_SLOTS:
 private:
     QVariantMap askQuestion(int questionCode, const QVariantMap &args);
     QVariantMap m_questionResponse;
+    bool m_calculatingSpeed;
     bool m_canceled;
 
 signals:
