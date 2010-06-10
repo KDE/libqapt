@@ -180,26 +180,19 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
         case QApt::UntrustedError:
             QStringList untrustedItems = args["UntrustedItems"].toStringList();
             if (untrustedItems.size() == 1) {
-                text = i18nc("@label",
-                             "The %1 package has not been verified by its author. "
+                text = i18ncp("@label",
+                             "The following package has not been verified by its author. "
                              "Downloading untrusted packages has been disallowed "
                              "by your current configuration.",
-                             untrustedItems.first());
-            } else if (untrustedItems.size() > 1) {
-                QString failedItemString;
-                foreach (const QString &string, untrustedItems) {
-                    failedItemString.append("- " + string + '\n');
-                }
-                text = i18nc("@label",
                              "The following packages have not been verified by "
-                             "their authors:"
-                             "\n%1\n"
+                             "their authors. "
                              "Downloading untrusted packages has "
                              "been disallowed by your current configuration.",
-                             failedItemString);
+                             untrustedItems.size());
             }
             title = i18nc("@title:window", "Untrusted Packages");
-            raiseErrorMessage(text, title);
+            KMessageBox::errorList(this, text, untrustedItems, title);
+            close();
             break;
     }
 }
@@ -249,7 +242,7 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
 
 void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 {
-    KMessageBox::sorry(0, text, title);
+    KMessageBox::error(0, text, title);
     workerFinished(false);
     close();
 }
