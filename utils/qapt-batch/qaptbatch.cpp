@@ -162,9 +162,9 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 
             if (!failedItem.isEmpty() && !errorText.isEmpty()) {
                 text.append("\n\n");
-                text.append(failedItem);
-                text.append('\n');
-                text.append(errorText);
+                text.append(i18n("File: %1", failedItem));
+                text.append("\n\n");
+                text.append(i18n("Error: %1", errorText));
             }
 
             title = i18nc("@title:window", "Commit error");
@@ -311,6 +311,7 @@ void QAptBatch::workerEvent(int code)
 
 void QAptBatch::workerFinished(bool success)
 {
+    Q_UNUSED(success);
     disconnect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
