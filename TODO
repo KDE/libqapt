@@ -2,8 +2,6 @@
 -Package search via apt-xapian
 -Make the direct output of the dpkg process available, so that advanced package managers can have a console GUI for power users
 -Add the ability to cancel package installation/removal/upgrades
--Group::List should be changed to GroupList and moved somewhere global
--Same for Package::List
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/
 ;-)
