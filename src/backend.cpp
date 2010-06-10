@@ -349,6 +349,8 @@ void Backend::workerStarted()
             this, SIGNAL(commitProgress(const QString&, int)));
     connect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
             this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
+    connect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
+            this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
 }
 
 void Backend::workerFinished(bool result)
@@ -366,6 +368,8 @@ void Backend::workerFinished(bool result)
                this, SIGNAL(commitProgress(const QString&, int)));
     disconnect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
                this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
+    disconnect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
+               this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
 
     if (result) {
         reloadCache();
@@ -389,6 +393,11 @@ void Backend::answerWorkerQuestion(const QVariantMap &response)
 void Backend::emitErrorOccurred(int errorCode, const QVariantMap &details)
 {
     emit errorOccurred((ErrorCode) errorCode, details);
+}
+
+void Backend::emitWarningOccurred(int warningCode, const QVariantMap &details)
+{
+    emit warningOccurred((WarningCode) warningCode, details);
 }
 
 void Backend::emitWorkerEvent(int event)

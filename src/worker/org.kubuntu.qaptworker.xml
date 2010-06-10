@@ -27,6 +27,11 @@
       <arg name="details" type="a{sv}" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
+    <signal name="warningOccurred">
+      <arg name="code" type="i" direction="out"/>
+      <arg name="details" type="a{sv}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
+    </signal>
     <signal name="questionOccurred">
       <arg name="questionCode" type="i" direction="out"/>
       <arg name="details" type="a{sv}" direction="out"/>

@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef WORKERDBUS_H_1276129391
-#define WORKERDBUS_H_1276129391
+#ifndef WORKERDBUS_H_1276191685
+#define WORKERDBUS_H_1276191685
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -68,6 +68,7 @@ Q_SIGNALS: // SIGNALS
     void downloadProgress(int percentage, int speed, int ETA);
     void errorOccurred(int code, const QVariantMap &details);
     void questionOccurred(int questionCode, const QVariantMap &details);
+    void warningOccurred(int code, const QVariantMap &details);
     void workerEvent(int code);
     void workerFinished(bool result);
     void workerStarted();

@@ -80,6 +80,7 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);
+    void warningOccurred(int code, const QVariantMap &details);
     void questionOccurred(int questionCode, const QVariantMap& details);
     void answerReady(const QVariantMap& response);
 };

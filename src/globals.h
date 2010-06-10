@@ -69,8 +69,8 @@ namespace QApt
     };
 
     enum WarningCode {
-        UnknownWarning = 0,
-        SizeMismatch   = 1
+        UnknownWarning        = 0,
+        SizeMismatchWarning   = 1
     };
 
     enum FetchType {

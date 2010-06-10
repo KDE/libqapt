@@ -176,6 +176,8 @@ Q_SIGNALS:
      */
     void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
 
+    void warningOccurred(QApt::WarningCode warning, const QVariantMap &details);
+
     /**
      * Emitted whenever the worker asks a question. You should listen to this
      * signal and present the question to the user when your app receives it.
@@ -285,6 +287,7 @@ private Q_SLOTS:
     void workerFinished(bool result);
 
     void emitErrorOccurred(int errorCode, const QVariantMap &details);
+    void emitWarningOccurred(int warningCode, const QVariantMap &details);
     void emitWorkerEvent(int event);
     void emitWorkerQuestionOccurred(int question, const QVariantMap &details);
 };

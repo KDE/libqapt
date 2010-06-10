@@ -269,7 +269,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     double DebBytes = fetcher.TotalNeeded();
     if (DebBytes != m_cache->depCache()->DebSize())
     {
-        //TODO: emit mismatch warning. Need to decide on a warning signal.
+        emit warningOccurred(QApt::SizeMismatchWarning, QVariantMap());
     }
 
     /* Check for enough free space */
@@ -340,7 +340,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     if (fetcher.Run() != pkgAcquire::Continue) {
         // Our fetcher will report errors for itself, but we have to send the
         // finished signal
-        emit workerEvent(QApt::PackageDownloadFinished);
         emit workerFinished(false);
         return;
     }
@@ -359,7 +358,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     pkgPackageManager::OrderResult res = installProgress->start(packageManager);
     bool success = (res == pkgPackageManager::Completed);
-    emit workerEvent(QApt::CommitChangesFinished);
+
+    if (success) {
+        emit workerEvent(QApt::CommitChangesFinished);
+    }
     emit workerFinished(success);
 
     delete installProgress;
