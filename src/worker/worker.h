@@ -59,7 +59,7 @@ public Q_SLOTS:
     void updateCache();
     void cancelDownload();
     void commitChanges(QMap<QString, QVariant>);
-    void workerQuestionResponse(const QVariantMap& response);
+    void answerWorkerQuestion(const QVariantMap& response);
 
 private Q_SLOTS:
     bool lock();
@@ -70,7 +70,7 @@ private Q_SLOTS:
     void emitDownloadMessage(int flag, const QString &message);
     void emitCommitProgress(const QString& status, int percentage);
     void emitErrorOccurred(int errorCode, const QVariantMap& details);
-    void emitWorkerQuestion(int questionCode, const QVariantMap& details);
+    void emitQuestionOccurred(int questionCode, const QVariantMap& details);
 
 Q_SIGNALS:
     void workerStarted();
@@ -80,7 +80,7 @@ Q_SIGNALS:
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);
-    void workerQuestion(int questionCode, const QVariantMap& details);
+    void questionOccurred(int questionCode, const QVariantMap& details);
     void answerReady(const QVariantMap& response);
 };
 

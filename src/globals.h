@@ -53,7 +53,7 @@ namespace QApt
         ConfFilePrompt   = 1, //TODO in worker
         DebconfPrompt    = 2, //TODO in worker
         MediaChange      = 3,
-        InstallUntrusted = 4  //TODO in worker
+        InstallUntrusted = 4
     };
 
     enum ErrorCode {

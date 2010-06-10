@@ -85,7 +85,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
             this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
     connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SLOT(emitWorkerQuestion(int, const QVariantMap&)));
+            this, SLOT(emitQuestionOccurred(int, const QVariantMap&)));
 }
 
 QAptWorker::~QAptWorker()
@@ -316,7 +316,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             connect(this, SIGNAL(answerReady(const QVariantMap&)),
                     this, SLOT(setUntrustedAnswer(const QVariantMap&)));
 
-            emitWorkerQuestion(QApt::InstallUntrusted, args);
+            emitQuestionOccurred(QApt::InstallUntrusted, args);
             m_questionBlock->exec();
 
             bool m_installUntrusted = m_questionResponse["InstallUntrusted"].toBool();
@@ -367,7 +367,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     installProgress = 0;
 }
 
-void QAptWorker::workerQuestionResponse(const QVariantMap &response)
+void QAptWorker::answerWorkerQuestion(const QVariantMap &response)
 {
     emit answerReady(response);
 }
@@ -403,7 +403,7 @@ void QAptWorker::emitErrorOccurred(int errorCode, const QVariantMap& details)
     emit errorOccurred(errorCode, details);
 }
 
-void QAptWorker::emitWorkerQuestion(int questionCode, const QVariantMap& details)
+void QAptWorker::emitQuestionOccurred(int questionCode, const QVariantMap& details)
 {
-    emit workerQuestion(questionCode, details);
+    emit questionOccurred(questionCode, details);
 }

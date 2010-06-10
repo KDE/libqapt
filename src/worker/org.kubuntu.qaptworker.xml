@@ -27,7 +27,7 @@
       <arg name="details" type="a{sv}" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
-    <signal name="workerQuestion">
+    <signal name="questionOccurred">
       <arg name="questionCode" type="i" direction="out"/>
       <arg name="details" type="a{sv}" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
@@ -40,7 +40,7 @@
       <arg type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
-    <method name="workerQuestionResponse">
+    <method name="answerWorkerQuestion">
       <arg name="response" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>

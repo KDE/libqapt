@@ -177,6 +177,18 @@ Q_SIGNALS:
     void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
 
     /**
+     * Emitted whenever the worker asks a question. You should listen to this
+     * signal and present the question to the user when your app receives it.
+     *
+     * You should send the response back to the worker as a QVariantMap
+     * using the Backend's answerWorkerQuestion() function.
+     *
+     * @param question A QApt::WorkerQuestion enum member indicating question type
+     * @param details A QVariant map containing info about the question, if available
+     */
+    void questionOccurred(QApt::WorkerQuestion question, const QVariantMap &details);
+
+    /**
      * Emitted whenever a package changes state. Useful for knowning when to
      * react to state changes.
      */
@@ -188,18 +200,6 @@ Q_SIGNALS:
      * @param event A QApt::WorkerEvent enum member indicating event type
      */
     void workerEvent(QApt::WorkerEvent event);
-
-    /**
-     * Emitted whenever the worker asks a question. You should listen to this
-     * signal and present the question to the user when your app receives it.
-     *
-     * You should send the response back to the worker as a QVariantMap
-     * using the workerQuestionResponse DBus signal.
-     *
-     * @param question A QApt::WorkerQuestion enum member indicating question type
-     * @param details A QVariant map containing info about the question, if available
-     */
-    void workerQuestion(QApt::WorkerQuestion question, const QVariantMap &details);
 
     /**
      * Emitted while the QApt Worker is downloading packages.
@@ -277,7 +277,7 @@ public Q_SLOTS:
      */
     void cancelDownload();
 
-    void workerResponse(const QVariantMap &response);
+    void answerWorkerQuestion(const QVariantMap &response);
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

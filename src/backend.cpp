@@ -348,7 +348,7 @@ void Backend::workerStarted()
     connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
             this, SIGNAL(commitProgress(const QString&, int)));
     connect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SLOT(emitWorkerQuestion(int, const QVariantMap&)));
+            this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
 }
 
 void Backend::workerFinished(bool result)
@@ -365,7 +365,7 @@ void Backend::workerFinished(bool result)
     disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),
                this, SIGNAL(commitProgress(const QString&, int)));
     disconnect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
-               this, SLOT(emitWorkerQuestion(int, const QVariantMap&)));
+               this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
 
     if (result) {
         reloadCache();
@@ -379,11 +379,11 @@ void Backend::cancelDownload()
     d->worker->cancelDownload();
 }
 
-void Backend::workerResponse(const QVariantMap &response)
+void Backend::answerWorkerQuestion(const QVariantMap &response)
 {
     Q_D(Backend);
 
-    d->worker->workerQuestionResponse(response);
+    d->worker->answerWorkerQuestion(response);
 }
 
 void Backend::emitErrorOccurred(int errorCode, const QVariantMap &details)
@@ -398,7 +398,8 @@ void Backend::emitWorkerEvent(int event)
 
 void Backend::emitWorkerQuestion(int question, const QVariantMap &details)
 {
-    emit workerQuestion((WorkerQuestion) question, details);
+    emit questionOccurred((WorkerQuestion) question, details);
+    qDebug() << "Got a question";
 }
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
