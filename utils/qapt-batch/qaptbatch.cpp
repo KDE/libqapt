@@ -106,6 +106,8 @@ void QAptBatch::workerStarted()
     connect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
+    connect(m_worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
+            this, SLOT(questionOccurred(int, const QVariantMap&)));
     connect(m_worker, SIGNAL(downloadProgress(int, int, int)),
             this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_worker, SIGNAL(commitProgress(const QString&, int)),
@@ -199,6 +201,45 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Untrusted Packages");
             raiseErrorMessage(text, title);
             break;
+    }
+}
+
+void QAptBatch::questionOccurred(int code, const QVariantMap &args)
+{
+    // show() so that closing our question dialog doesn't quit the program
+    show();
+    QVariantMap response;
+
+    if (code == QApt::InstallUntrusted) {
+        QStringList untrustedItems = args["UntrustedItems"].toStringList();
+
+        QString title = i18nc("@title:window", "Untrusted Packages");
+        QString text= i18ncp("@label",
+                     "The following package has not been verified by its "
+                     "author. Installing unverified package represents a "
+                     "security risk, as unverified packages can be a "
+                     "sign of tampering. Do you wish to continue?",
+                     "The following packages have not been verified by "
+                     "their authors. Installing unverified packages "
+                     "represents a security risk, as unverified packages "
+                     "can be a sign of tampering. Do you wish to continue?",
+                     untrustedItems.size());
+        int result = KMessageBox::No;
+        bool installUntrusted = false;
+        kDebug() << "asking";
+        result = KMessageBox::warningYesNoList(0, text,
+                                               untrustedItems, title);
+        switch (result) {
+            case KMessageBox::Yes:
+                installUntrusted = true;
+                break;
+            case KMessageBox::No:
+                installUntrusted = false;
+                break;
+        }
+        kDebug() << installUntrusted;
+        response["InstallUntrusted"] = installUntrusted;
+        m_worker->answerWorkerQuestion(response);
     }
 }
 
