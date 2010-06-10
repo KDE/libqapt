@@ -220,13 +220,13 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
         int result = KMessageBox::No;
         bool installUntrusted = false;
 
-        result = KMessageBox::warningYesNoList(0, text,
-                                               untrustedItems, title);
+        result = KMessageBox::warningContinueCancelList(0, text,
+                                                        untrustedItems, title);
         switch (result) {
-            case KMessageBox::Yes:
+            case KMessageBox::Continue:
                 installUntrusted = true;
                 break;
-            case KMessageBox::No:
+            case KMessageBox::Cancel:
                 installUntrusted = false;
                 break;
         }
