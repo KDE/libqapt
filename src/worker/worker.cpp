@@ -59,6 +59,8 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         , m_cache(0)
         , m_records(0)
         , m_locked(false)
+        , m_questionBlock(0)
+        , m_questionResponse(QVariantMap())
 {
     new QaptworkerAdaptor(this);
 
@@ -308,9 +310,26 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
         args["UntrustedItems"] = untrustedPackages;
 
         if (_config->FindB("APT::Get::AllowUnauthenticated", true) == true) {
-            // TODO: Need a question API to ask whether or not user wants to continue
-            
+            // Ask if the user really wants to install untrusted packages, if
+            // allowed in the APT config.
+            m_questionBlock = new QEventLoop;
+            connect(this, SIGNAL(answerReady(const QVariantMap&)),
+                    this, SLOT(setUntrustedAnswer(const QVariantMap&)));
+
+            emitWorkerQuestion(QApt::InstallUntrusted, args);
+            m_questionBlock->exec();
+
+            bool m_installUntrusted = m_questionResponse["InstallUntrusted"].toBool();
+            if(!m_installUntrusted) {
+                m_questionResponse = QVariantMap(); //Reset for next question
+                emit errorOccurred(QApt::UntrustedError, args);
+                emit workerFinished(false);
+                return;
+            } else {
+                m_questionResponse = QVariantMap(); //Reset for next question
+            }
         } else {
+            // If disallowed in APT config, return a fatal error
             emit errorOccurred(QApt::UntrustedError, args);
             emit workerFinished(false);
             return;
@@ -351,6 +370,14 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 void QAptWorker::workerQuestionResponse(const QVariantMap &response)
 {
     emit answerReady(response);
+}
+
+void QAptWorker::setAnswer(const QVariantMap &answer)
+{
+    disconnect(this, SIGNAL(answerReady(const QVariantMap&)),
+               this, SLOT(setAnswer(const QVariantMap&)));
+    m_questionResponse = answer;
+    m_questionBlock->quit();
 }
 
 // Slot -> slot relaying breaks after 3 or so relays, so we have to re-emit here

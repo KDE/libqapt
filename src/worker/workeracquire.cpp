@@ -170,6 +170,8 @@ QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args
 
 void WorkerAcquire::setAnswer(const QVariantMap &answer)
 {
+    disconnect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
+               this, SLOT(setAnswer(const QVariantMap&)));
     m_questionResponse = answer;
     m_mediaBlock->quit();
 }

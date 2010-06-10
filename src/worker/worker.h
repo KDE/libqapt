@@ -29,6 +29,8 @@
 class pkgPolicy;
 class pkgRecords;
 
+class QEventLoop;
+
 class WorkerAcquire;
 class WorkerInstallProgress;
 
@@ -49,7 +51,9 @@ private:
     pkgRecords *m_records;
 
     bool m_locked;
+    QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
+    QEventLoop *m_questionBlock;
 
 public Q_SLOTS:
     void updateCache();
@@ -61,6 +65,7 @@ private Q_SLOTS:
     bool lock();
     void unlock();
     bool initializeApt();
+    void setAnswer(const QVariantMap &answer);
     void emitDownloadProgress(int percentage, int speed, int ETA);
     void emitDownloadMessage(int flag, const QString &message);
     void emitCommitProgress(const QString& status, int percentage);
