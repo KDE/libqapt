@@ -142,7 +142,8 @@ void WorkerInstallProgress::updateInterface(int fd)
 
             if (status.contains("pmerror")) {
                 QVariantMap args;
-                args["ErrorText"] = QString(package % ": " % str);
+                args["FailedItem"] = QString(package);
+                args["ErrorText"] = QString(str);
                 emit commitError(QApt::CommitError, args);
             } else if (status.contains("pmconffile")) {
                 //TODO: Conffile handling
