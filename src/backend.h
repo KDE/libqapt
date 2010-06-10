@@ -286,7 +286,7 @@ private Q_SLOTS:
 
     void emitErrorOccurred(int errorCode, const QVariantMap &details);
     void emitWorkerEvent(int event);
-    void emitWorkerQuestion(int question, const QVariantMap &details);
+    void emitWorkerQuestionOccurred(int question, const QVariantMap &details);
 };
 
 }

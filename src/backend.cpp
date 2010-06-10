@@ -72,7 +72,7 @@ Backend::Backend()
                                                   this);
 
     connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
-            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+            this, SIGNAL(emitErrorOccurred(int, const QVariantMap&)));
     connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
     connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
     connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
@@ -347,7 +347,7 @@ void Backend::workerStarted()
             this, SIGNAL(downloadMessage(int, const QString&)));
     connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
             this, SIGNAL(commitProgress(const QString&, int)));
-    connect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
+    connect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
             this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
 }
 
@@ -364,7 +364,7 @@ void Backend::workerFinished(bool result)
                this, SIGNAL(downloadMessage(int, const QString&)));
     disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),
                this, SIGNAL(commitProgress(const QString&, int)));
-    disconnect(d->worker, SIGNAL(workerQuestion(int, const QVariantMap&)),
+    disconnect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
                this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
 
     if (result) {
@@ -396,7 +396,7 @@ void Backend::emitWorkerEvent(int event)
     emit workerEvent((WorkerEvent) event);
 }
 
-void Backend::emitWorkerQuestion(int question, const QVariantMap &details)
+void Backend::emitWorkerQuestionOccurred(int question, const QVariantMap &details)
 {
     emit questionOccurred((WorkerQuestion) question, details);
     qDebug() << "Got a question";

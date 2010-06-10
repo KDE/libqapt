@@ -314,7 +314,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             // allowed in the APT config.
             m_questionBlock = new QEventLoop;
             connect(this, SIGNAL(answerReady(const QVariantMap&)),
-                    this, SLOT(setUntrustedAnswer(const QVariantMap&)));
+                    this, SLOT(setAnswer(const QVariantMap&)));
 
             emitQuestionOccurred(QApt::InstallUntrusted, args);
             m_questionBlock->exec();
@@ -322,7 +322,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             bool m_installUntrusted = m_questionResponse["InstallUntrusted"].toBool();
             if(!m_installUntrusted) {
                 m_questionResponse = QVariantMap(); //Reset for next question
-                emit errorOccurred(QApt::UntrustedError, args);
                 emit workerFinished(false);
                 return;
             } else {
