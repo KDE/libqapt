@@ -203,11 +203,21 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
     show();
     QVariantMap response;
 
-    if (code == QApt::InstallUntrusted) {
+    if (code == QApt::MediaChange) {
+        QString media = args["Media"].toString();
+        QString drive = args["Drive"].toString();
+
+        QString title = i18nc("@title:window", "Media Change Required");
+        QString text = i18nc("@label", "Please insert %1 into %2", media, drive);
+
+        KMessageBox::information(0, text, title);
+        response["MediaChanged"] = true;
+        m_worker->answerWorkerQuestion(response);
+    } else if (code == QApt::InstallUntrusted) {
         QStringList untrustedItems = args["UntrustedItems"].toStringList();
 
         QString title = i18nc("@title:window", "Untrusted Packages");
-        QString text= i18ncp("@label",
+        QString text = i18ncp("@label",
                      "The following package has not been verified by its "
                      "author. Installing unverified package represents a "
                      "security risk, as unverified packages can be a "
