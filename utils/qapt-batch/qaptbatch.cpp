@@ -226,7 +226,7 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
                      untrustedItems.size());
         int result = KMessageBox::No;
         bool installUntrusted = false;
-        kDebug() << "asking";
+
         result = KMessageBox::warningYesNoList(0, text,
                                                untrustedItems, title);
         switch (result) {
@@ -237,9 +237,13 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
                 installUntrusted = false;
                 break;
         }
-        kDebug() << installUntrusted;
+
         response["InstallUntrusted"] = installUntrusted;
         m_worker->answerWorkerQuestion(response);
+
+        if(!installUntrusted) {
+            close();
+        }
     }
 }
 
@@ -307,14 +311,13 @@ void QAptBatch::workerEvent(int code)
 
 void QAptBatch::workerFinished(bool success)
 {
-    Q_UNUSED(success);
     disconnect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    connect(m_worker, SIGNAL(downloadProgress(int, int, int)),
-            this, SLOT(updateDownloadProgress(int, int, int)));
-    connect(m_worker, SIGNAL(commitProgress(const QString&, int)),
-            this, SLOT(updateCommitProgress(const QString&, int)));
+    disconnect(m_worker, SIGNAL(downloadProgress(int, int, int)),
+               this, SLOT(updateDownloadProgress(int, int, int)));
+    disconnect(m_worker, SIGNAL(commitProgress(const QString&, int)),
+               this, SLOT(updateCommitProgress(const QString&, int)));
 }
 
 void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
