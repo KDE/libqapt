@@ -72,7 +72,7 @@ Backend::Backend()
                                                   this);
 
     connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
-            this, SIGNAL(emitErrorOccurred(int, const QVariantMap&)));
+            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
     connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
     connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
     connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
