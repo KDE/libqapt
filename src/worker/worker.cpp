@@ -154,7 +154,6 @@ void QAptWorker::updateCache()
         Lock.Fd(GetLock(_config->FindDir("Dir::State::Lists") + "lock"));
         if (_error->PendingError()) {
             emit errorOccurred(QApt::LockError, QVariantMap());
-            emit workerEvent(QApt::CacheUpdateFinished);
             emit workerFinished(false);
             return;
         }
