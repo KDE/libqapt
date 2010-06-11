@@ -190,44 +190,43 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     while (mapIter != instructionList.constEnd()) {
         QString package = mapIter.key();
         int operation = mapIter.value().toInt();
-
         pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(package.toStdString());
 
+        pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
+        pkgProblemResolver Fix(m_cache->depCache());
+
         // Then mark according to the instruction
-        if (operation == QApt::Package::Held) {
-            m_cache->depCache()->MarkKeep(iter, false);
-            m_cache->depCache()->SetReInstall(iter, false);
-        } else if (operation == QApt::Package::ToInstall) {
-            m_cache->depCache()->MarkInstall(iter, true);
-            pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
-            if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
-                pkgProblemResolver Fix(m_cache->depCache());
-                Fix.Clear(iter);
-                Fix.Protect(iter);
-                Fix.Resolve(true);
-            }
-        } else if (operation == QApt::Package::ToReInstall) {
-            m_cache->depCache()->SetReInstall(iter, true);
-        } else if (operation == QApt::Package::ToUpgrade) {
-            m_cache->depCache()->MarkInstall(iter, true);
-            pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
-            if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
-                pkgProblemResolver Fix(m_cache->depCache());
-                Fix.Clear(iter);
-                Fix.Protect(iter);
-                Fix.Resolve(true);
-            }
-        } else if (operation == QApt::Package::ToDowngrade) {
-            // TODO: Probably gotta set the candidate version here...
-            // needs work in QApt::Package so that we can set this anyways
-            } else if (operation == QApt::Package::ToPurge) {
-            m_cache->depCache()->SetReInstall(iter, false);
-            m_cache->depCache()->MarkDelete(iter, true);
-        } else if (operation == QApt::Package::ToRemove) {
-            m_cache->depCache()->SetReInstall(iter, false);
-            m_cache->depCache()->MarkDelete(iter, false);
-        } else {
-            // Unsupported operation. Should emit something here?
+        switch (operation) {
+            case QApt::Package::Held:
+                m_cache->depCache()->MarkKeep(iter, false);
+                m_cache->depCache()->SetReInstall(iter, false);
+                break;
+            case QApt::Package::ToUpgrade:
+            case QApt::Package::ToInstall:
+                m_cache->depCache()->MarkInstall(iter, true);
+                if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
+                    pkgProblemResolver Fix(m_cache->depCache());
+                    Fix.Clear(iter);
+                    Fix.Protect(iter);
+                    Fix.Resolve(true);
+                }
+                break;
+            case QApt::Package::ToReInstall:
+                m_cache->depCache()->SetReInstall(iter, true);
+                break;
+            case QApt::Package::ToDowngrade:
+                break;
+            case QApt::Package::ToPurge:
+                m_cache->depCache()->SetReInstall(iter, false);
+                m_cache->depCache()->MarkDelete(iter, true);
+                break;
+            case QApt::Package::ToRemove:
+                m_cache->depCache()->SetReInstall(iter, false);
+                m_cache->depCache()->MarkDelete(iter, false);
+                break;
+            default:
+                // Unsupported operation. Should emit something here?
+                break;
         }
         mapIter++;
     }
