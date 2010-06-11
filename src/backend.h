@@ -156,7 +156,7 @@ protected:
 
     /**
      * Returns a pointer to the internal package source list. Mainly used for
-     * internal purposes.
+     * internal purposes in QApt::Package.
      *
      * @return @c pkgSourceList The package source list used by the backend
      */
