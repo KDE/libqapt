@@ -136,7 +136,7 @@ public:
     PackageList upgradeablePackages() const;
 
     /**
-     * Queries the backend for a Group object for the specified name.
+     * Queries the backend for a Group object for the specified name
      *
      * @param name name used to specify the group returned
      *
@@ -279,6 +279,10 @@ public Q_SLOTS:
      */
     void cancelDownload();
 
+    /**
+     * This function should be used to return the answer the user has given
+     * to a worker question. 
+     */
     void answerWorkerQuestion(const QVariantMap &response);
 
 private Q_SLOTS:
