@@ -156,18 +156,22 @@ void QAptWorker::updateCache()
             emit errorOccurred(QApt::LockError, QVariantMap());
             emit workerEvent(QApt::CacheUpdateFinished);
             emit workerFinished(false);
+            return;
         }
     }
 
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
-        emit workerEvent(QApt::CacheUpdateFinished);
-        emit workerFinished(result);
-    }
 
-    emit workerEvent(QApt::CacheUpdateFinished);
-    emit workerFinished(false);
+        if (result) {
+            emit workerEvent(QApt::CacheUpdateFinished);
+        }
+        emit workerFinished(result);
+    } else {
+        //TODO: Error for when APT config prohibits download
+        emit workerFinished(false);
+    }
 }
 
 void QAptWorker::cancelDownload()
