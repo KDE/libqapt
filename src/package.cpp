@@ -327,7 +327,7 @@ QUrl Package::changelogUrl() const
     }
 
     QString urlBase = "http://changelogs.ubuntu.com/changelogs/pool/";
-    QUrl url = QUrl(urlBase % '/' % sourceSection % '/' % prefix % '/' %
+    QUrl url = QUrl(urlBase % sourceSection % '/' % prefix % '/' %
                     srcPackage % '/' % srcPackage % '_' % versionString % '/'
                     % "changelog");
 
