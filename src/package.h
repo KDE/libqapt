@@ -22,9 +22,11 @@
 #ifndef QAPT_PACKAGE_H
 #define QAPT_PACKAGE_H
 
-#include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #include <apt-pkg/pkgcache.h>
+
+#include "globals.h"
 
 class pkgRecords;
 class pkgDepCache;
@@ -52,7 +54,6 @@ class Package : public QObject
 {
     Q_OBJECT
     Q_ENUMS(PackageState)
-    Q_ENUMS(UpdateImportance)
 public:
    /**
     * Default constructor
@@ -178,6 +179,22 @@ public:
     * \return The archive component of the package as a @c QString
     */
     QString component() const;
+
+   /**
+    * Member function that fetches a package's changelog over the internet.
+    *
+    * \return The location of the package changelog as a @c QString
+    */
+    QUrl changelogUrl() const;
+
+   /**
+    * Member function that fetches a package's screenshot over the internet.
+    *
+    * @param type The type of screenshot to be fetched as a QApt::ScreenshotType
+    *
+    * \return The location of the package changelog as a @c QString
+    */
+    QString screenshot(QApt::ScreenshotType type) const;
 
    /**
     * Member function that returns the amount of hard drive space that this

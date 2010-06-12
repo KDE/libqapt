@@ -37,6 +37,7 @@ target_link_libraries(qapt
     ${QT_QTDBUS_LIBRARIES}
     ${QT_QTXML_LIBRARIES}
     ${QT_QTCORE_LIBRARIES}
+    ${QT_QTNETWORK_LIBRARIES}
     apt-pkg
     )
 

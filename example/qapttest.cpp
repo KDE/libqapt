@@ -166,6 +166,8 @@ void QAptTest::updateLabels()
             m_actionButton->setText("Upgrade Package");
             m_actionButton->setIcon(KIcon("system-software-update"));
         }
+
+        kDebug() << m_package->changelog();
     }
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them

@@ -86,6 +86,11 @@ namespace QApt
         SecurityImportance = 4//
     };
 
+    enum ScreenshotType {
+        UnknownType = 0,
+        Thumbnail   = 1,
+        Screenshot  = 2
+    };
 }
 
 #endif

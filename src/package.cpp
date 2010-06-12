@@ -23,7 +23,9 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
+#include <QtCore/QTemporaryFile>
 #include <QtCore/QTextStream>
 #include <QDebug>
 
@@ -292,6 +294,46 @@ QString Package::component() const
     res = QString::fromStdString(File.Component());
 
     return res;
+}
+
+QUrl Package::changelogUrl() const
+{
+    Q_D(const Package);
+
+    QString prefix;
+    QString srcPackage = sourcePackage();
+    QString sourceSection = section();
+
+    if (sourceSection.contains('/')) {
+
+    } else {
+        sourceSection = "main";
+    }
+
+    prefix = srcPackage[0];
+    if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
+        prefix = "lib" + srcPackage[3];
+    }
+
+    QString versionString;
+    if (!availableVersion().isNull()) {
+        versionString = availableVersion();
+    }
+
+    if (versionString.contains(':')) {
+        QStringList epochVersion = versionString.split(':');
+        // If the version has an epoch, take the stuff after the epoch
+        versionString = epochVersion[1];
+    }
+
+    QString urlBase = "http://changelogs.ubuntu.com/changelogs/pool/";
+    QUrl url = QUrl(urlBase % '/' % sourceSection % '/' % prefix % '/' %
+                    srcPackage % '/' % srcPackage % '_' % versionString % '/'
+                    % "changelog");
+
+    qDebug() << url;
+
+    return url;
 }
 
 qint32 Package::installedSize() const
