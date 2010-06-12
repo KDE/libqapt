@@ -194,7 +194,7 @@ public:
     *
     * \return The location of the package changelog as a @c QString
     */
-    QString screenshot(QApt::ScreenshotType type) const;
+    QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
    /**
     * Member function that returns the amount of hard drive space that this

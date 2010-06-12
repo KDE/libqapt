@@ -298,8 +298,6 @@ QString Package::component() const
 
 QUrl Package::changelogUrl() const
 {
-    Q_D(const Package);
-
     QString prefix;
     QString srcPackage = sourcePackage();
     QString sourceSection = section();
@@ -332,6 +330,23 @@ QUrl Package::changelogUrl() const
                     % "changelog");
 
     qDebug() << url;
+
+    return url;
+}
+
+QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
+{
+    QString urlBase;
+    switch (type) {
+        case QApt::Thumbnail:
+            urlBase = "http://screenshots.debian.net/thumbnail/";
+            break;
+        case QApt::Screenshot:
+            urlBase = "http://screenshots.debian.net/screenshot/";
+            break;
+    }
+
+    QUrl url = QUrl(urlBase % name());
 
     return url;
 }

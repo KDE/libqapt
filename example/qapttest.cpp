@@ -168,6 +168,7 @@ void QAptTest::updateLabels()
         }
 
         kDebug() << m_package->changelogUrl();
+        kDebug() << m_package->screenshotUrl(QApt::Thumbnail);
     }
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them
