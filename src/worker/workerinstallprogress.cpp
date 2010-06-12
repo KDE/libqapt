@@ -36,17 +36,19 @@
 #include <stdlib.h>
 
 #include "../globals.h"
+#include "worker.h"
 
 using namespace std;
 
-WorkerInstallProgress::WorkerInstallProgress(QObject* parent)
+WorkerInstallProgress::WorkerInstallProgress(QAptWorker* parent)
         : QObject(parent)
+        , m_worker(parent)
+        , m_questionResponse(QVariantMap())
+        , m_startCounting(false)
 {
     //TODO: Debconf, apt-listchanges
     setenv("DEBIAN_FRONTEND", "noninteractive", 1);
     setenv("APT_LISTCHANGES_FRONTEND", "none", 1);
-
-    m_startCounting = false;
 }
 
 WorkerInstallProgress::~WorkerInstallProgress()
@@ -104,7 +106,7 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     // Check if the child died
     int ret;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
-        updateInterface(readFromChildFD[0]);
+        updateInterface(readFromChildFD[0], writeToChildFD[1]);
     }
 
     close(readFromChildFD[0]);
@@ -115,7 +117,7 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     return res;
 }
 
-void WorkerInstallProgress::updateInterface(int fd)
+void WorkerInstallProgress::updateInterface(int fd, int writeFd)
 {
     char buf[2];
     static char line[1024] = "";
@@ -146,7 +148,27 @@ void WorkerInstallProgress::updateInterface(int fd)
                 args["ErrorText"] = QString(str);
                 emit commitError(QApt::CommitError, args);
             } else if (status.contains("pmconffile")) {
-                //TODO: Conffile handling
+                // From what I understand, the original file starts after the ' character ('\'') and
+                // goes to a second ' character. The new conf file starts at the next ' and goes to
+                // the next '.
+                QStringList strList = str.split('\'');
+                QString oldFile = strList[1];
+                QString newFile = strList[2];
+
+                QVariantMap args;
+                args["OldConfFile"] = oldFile;
+                args["NewConfFile"] = newFile;
+                //TODO: diff support
+
+                QVariantMap result = askQuestion(QApt::ConfFilePrompt, args);
+
+                bool replaceFile = result["ReplaceFile"].toBool();
+
+                if (replaceFile) {
+                    write(writeFd, "Y\n", 2);
+                } else {
+                    write(writeFd, "N\n", 2);
+                }
             } else {
                 m_startCounting = true;
             }
@@ -165,4 +187,24 @@ void WorkerInstallProgress::updateInterface(int fd)
             strcat(line, buf);
         }
     }
+}
+
+QVariantMap WorkerInstallProgress::askQuestion(int questionCode, const QVariantMap &args)
+{
+    m_questionBlock = new QEventLoop;
+    connect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
+            this, SLOT(setAnswer(const QVariantMap&)));
+
+    emit workerQuestion(questionCode, args);
+    m_questionBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
+
+    return m_questionResponse;
+}
+
+void WorkerInstallProgress::setAnswer(const QVariantMap &answer)
+{
+    disconnect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
+               this, SLOT(setAnswer(const QVariantMap&)));
+    m_questionResponse = answer;
+    m_questionBlock->quit();
 }

@@ -193,6 +193,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     while (mapIter != instructionList.constEnd()) {
         QString package = mapIter.key();
         int operation = mapIter.value().toInt();
+
+        // Find package in cache
         pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(package.toStdString());
 
         pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
@@ -350,6 +352,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
     connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
             this, SLOT(emitCommitProgress(const QString&, int)));
+    connect(installProgress, SIGNAL(workerQuestion(int, const QVariantMap&)),
+            this, SLOT(emitQuestionOccurred(int, const QVariantMap&)));
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
