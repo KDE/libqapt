@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
- *   Heavily inspired by Synaptic library code ;-)                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -50,7 +49,7 @@ namespace QApt
 
     enum WorkerQuestion {
         InvalidQuestion  = 0,
-        ConfFilePrompt   = 1, //TODO in worker
+        ConfFilePrompt   = 1,
         DebconfPrompt    = 2, //TODO in worker
         MediaChange      = 3,
         InstallUntrusted = 4
