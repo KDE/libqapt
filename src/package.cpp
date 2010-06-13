@@ -373,8 +373,6 @@ QString Package::supportedUntil()
         return QString();
     }
 
-    qDebug() << "opened file";
-
     QTextStream stream(&lsb_release);
     QString line;
     do {
@@ -393,8 +391,6 @@ QString Package::supportedUntil()
         // happens e.g. when there is no release file and is harmless
         return QString();
     }
-
-    qDebug() << "Release file exists";
 
     // read the relase file
     FileFd fd(releaseFile.toStdString(), FileFd::ReadOnly);
@@ -591,7 +587,7 @@ QStringList Package::requiredByList() const
 
     QStringList reverseDependsList;
 
-    for(pkgCache::DepIterator it = d->packageIter->RevDependsList(); it.end() != true; it++) {
+    for(pkgCache::DepIterator it = d->packageIter->RevDependsList(); it.end() != true; ++it) {
         reverseDependsList << QString::fromStdString(it.ParentPkg().Name());
     }
 
@@ -611,7 +607,7 @@ QStringList Package::providesList() const
 
     for (pkgCache::PrvIterator Prv =
          State.CandidateVerIter(*d->depCache).ProvidesList(); Prv.end() != true;
-         Prv++) {
+         ++Prv) {
         provides.push_back(Prv.Name());
     }
 
@@ -630,7 +626,7 @@ bool Package::isTrusted()
     }
 
     pkgSourceList *Sources = d->backend->packageSourceList();
-    for (pkgCache::VerFileIterator i = Ver.FileList(); i.end() == false; i++)
+    for (pkgCache::VerFileIterator i = Ver.FileList(); i.end() == false; ++i)
     {
         pkgIndexFile *Index;
         if (Sources->FindIndex(i.File(),Index) == false) {
@@ -725,9 +721,9 @@ pkgCache::PkgFileIterator Package::searchPkgFileIter(const QString &label, const
     pkgCache::VerFileIterator verFileIter;
     pkgCache::PkgFileIterator found;
 
-    for(verIter = d->packageIter->VersionList(); !verIter.end(); verIter++) {
-        for(verFileIter = verIter.FileList(); !verFileIter.end(); verFileIter++) {
-            for(found = verFileIter.File(); !found.end(); found++) {
+    for(verIter = d->packageIter->VersionList(); !verIter.end(); ++verIter) {
+        for(verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
+            for(found = verFileIter.File(); !found.end(); ++found) {
                 if(!found.end() && found.Label() &&
                   QString::fromStdString(found.Label()) == label &&
                   found.Origin() && QString::fromStdString(found.Origin()) == label &&
@@ -758,7 +754,7 @@ QString Package::getReleaseFileForOrigin(const QString &label, const QString &re
 
     if(list->FindIndex(found, index)) {
         vector<metaIndex *>::const_iterator I;
-        for(I=list->begin(); I != list->end(); I++) {
+        for(I=list->begin(); I != list->end(); ++I) {
             vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
             if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
                 string stduri = _config->FindDir("Dir::State::lists");
