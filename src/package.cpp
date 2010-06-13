@@ -551,7 +551,8 @@ bool Package::isValid()
 
 bool Package::isSupported()
 {
-    if (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")) {
+    if (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")
+        && isTrusted()) {
         return true;
     } else {
         return false;

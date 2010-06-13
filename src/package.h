@@ -245,6 +245,12 @@ public:
     */
     bool isValid();
 
+   /**
+    * Checks whether or not the package is supported by Canonical
+    *
+    * @return @c true if valid
+    * @return @c false if not invalid
+    */
     bool isSupported();
 
    /**
