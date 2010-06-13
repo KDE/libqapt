@@ -32,8 +32,14 @@
 // Apt includes
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/depcache.h>
+#include <apt-pkg/indexfile.h>
+#include <apt-pkg/init.h>
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/sourcelist.h>
+#include <apt-pkg/strutl.h>
+#include <apt-pkg/tagfile.h>
+
+#include <algorithm>
 
 #include "backend.h"
 
@@ -111,7 +117,7 @@ QString Package::sourcePackage() const
 
     QString sourcePackage;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
-    pkgRecords::Parser &rec=d->records->Lookup(ver.FileList());
+    pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
     sourcePackage = QString::fromStdString(rec.SourcePkg());
 
     return sourcePackage;
@@ -310,7 +316,7 @@ QUrl Package::changelogUrl() const
 
     prefix = srcPackage[0];
     if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
-        prefix = "lib" + srcPackage[3];
+        prefix = "lib" % srcPackage[3];
     }
 
     QString versionString;
@@ -349,6 +355,62 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
     QUrl url = QUrl(urlBase % name());
 
     return url;
+}
+
+QString Package::supportedUntil()
+{
+    if (!isSupported()) {
+        return QString();
+    }
+
+    pkgTagSection sec;
+    time_t releaseDate = -1;
+    QString release;
+
+    QFile lsb_release("/etc/lsb-release");
+    if (!lsb_release.open(QFile::ReadOnly)) {
+        // Though really, your system is screwed if this happens...
+        return QString();
+    }
+
+    qDebug() << "opened file";
+
+    QTextStream stream(&lsb_release);
+    QString line;
+    do {
+        line = stream.readLine();
+        QStringList split = line.split('=');
+        if (split[0] == "DISTRIB_CODENAME") {
+            release = split[1];
+        }
+    } while (!line.isNull());
+
+    // Canonical only provides support for Ubuntu, but we don't have to worry
+    // about Debian systems as long as we assume that this function can fail.
+    QString releaseFile = getReleaseFileForOrigin("Ubuntu", release);
+
+    if(!FileExists(releaseFile.toStdString())) {
+        // happens e.g. when there is no release file and is harmless
+        return QString();
+    }
+
+    qDebug() << "Release file exists";
+
+    // read the relase file
+    FileFd fd(releaseFile.toStdString(), FileFd::ReadOnly);
+    pkgTagFile tag(&fd);
+    tag.Step(sec);
+
+    if(!StrToTime(sec.FindS("Date"), releaseDate)) {
+        return QString();
+    }
+
+    //FIXME: Figure out how to get the value from the package record
+    const int supportTime = 18; // months
+
+    QDateTime supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
+
+    return supportEnd.toString("MMMM yyyy");
 }
 
 qint32 Package::installedSize() const
@@ -488,6 +550,15 @@ bool Package::isValid()
         return false;
     } else {
         return true;
+    }
+}
+
+bool Package::isSupported()
+{
+    if (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -644,6 +715,65 @@ void Package::setRemove(bool purge)
     d->depCache->MarkDelete(*d->packageIter, purge);
 
     d->backend->packageChanged(this);
+}
+
+pkgCache::PkgFileIterator Package::searchPkgFileIter(const QString &label, const QString &release)
+{
+    Q_D(Package);
+
+    pkgCache::VerIterator verIter;
+    pkgCache::VerFileIterator verFileIter;
+    pkgCache::PkgFileIterator found;
+
+    for(verIter = d->packageIter->VersionList(); !verIter.end(); verIter++) {
+        for(verFileIter = verIter.FileList(); !verFileIter.end(); verFileIter++) {
+            for(found = verFileIter.File(); !found.end(); found++) {
+                if(!found.end() && found.Label() &&
+                  QString::fromStdString(found.Label()) == label &&
+                  found.Origin() && QString::fromStdString(found.Origin()) == label &&
+                  found.Archive() && QString::fromStdString(found.Archive()) == release) {
+                    //cerr << "found: " << PF.FileName() << endl;
+                    return found;
+                }
+            }
+        }
+    }
+   found = pkgCache::PkgFileIterator(*d->packageIter->Cache());
+   return found;
+}
+
+QString Package::getReleaseFileForOrigin(const QString &label, const QString &release)
+{
+    Q_D(Package);
+
+    pkgIndexFile *index;
+    pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
+
+    if (found.end()) {
+        return QString();
+    }
+
+    // search for the matching meta-index
+    pkgSourceList *list = d->backend->packageSourceList();
+
+    if(list->FindIndex(found, index)) {
+        vector<metaIndex *>::const_iterator I;
+        for(I=list->begin(); I != list->end(); I++) {
+            vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
+            if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
+                string stduri = _config->FindDir("Dir::State::lists");
+                stduri += URItoFileName((*I)->GetURI());
+                stduri += "dists_";
+                stduri += (*I)->GetDist();
+                stduri += "_Release";
+
+                QString uri = QString::fromStdString(stduri);
+                return uri;
+            }
+        }
+    }
+
+    return QString();
 }
 
 }

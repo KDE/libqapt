@@ -167,8 +167,9 @@ void QAptTest::updateLabels()
             m_actionButton->setIcon(KIcon("system-software-update"));
         }
 
-        kDebug() << m_package->changelogUrl();
-        kDebug() << m_package->screenshotUrl(QApt::Thumbnail);
+//         kDebug() << m_package->changelogUrl();
+//         kDebug() << m_package->screenshotUrl(QApt::Thumbnail);
+        kDebug() << m_package->supportedUntil();
     }
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them

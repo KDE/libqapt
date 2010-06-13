@@ -23,6 +23,7 @@
 #define QAPT_PACKAGE_H
 
 #include <QtCore/QUrl>
+#include <QtCore/QDateTime>
 
 #include <apt-pkg/pkgcache.h>
 
@@ -196,6 +197,8 @@ public:
     */
     QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
+    QString supportedUntil();
+
    /**
     * Member function that returns the amount of hard drive space that this
     * package will take up once installed.
@@ -241,6 +244,8 @@ public:
     * @return @c false if not invalid
     */
     bool isValid();
+
+    bool isSupported();
 
    /**
     * Member function that returns a list of the names of all the dependencies
@@ -351,6 +356,9 @@ protected:
 
 private:
     Q_DECLARE_PRIVATE(Package);
+
+    pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release);
+    QString getReleaseFileForOrigin(const QString &label, const QString &release);
 };
 
 }
