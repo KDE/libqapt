@@ -531,32 +531,23 @@ bool Package::isInstalled()
 {
     Q_D(Package);
 
-    if (d->state & Installed) {
-        return true;
-    } else {
-        return false;
-    }
+    return (d->state & Installed);
 }
 
 bool Package::isValid()
 {
     Q_D(Package);
 
-    if (d->state & NotInstallable) {
-        return false;
-    } else {
-        return true;
-    }
+    // As long as it's not NotInstallable, it'll be valid
+    return !(d->state & NotInstallable);
 }
 
 bool Package::isSupported()
 {
-    if (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")
-        && isTrusted()) {
-        return true;
-    } else {
-        return false;
-    }
+    bool supported = (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")
+                      && isTrusted());
+
+    return supported;
 }
 
 QStringList Package::dependencyList(bool useCanidateVersion) const
