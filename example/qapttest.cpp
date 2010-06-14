@@ -170,6 +170,10 @@ void QAptTest::updateLabels()
 //         kDebug() << m_package->changelogUrl();
 //         kDebug() << m_package->screenshotUrl(QApt::Thumbnail);
         kDebug() << m_package->supportedUntil();
+        QApt::PackageList searchList = m_backend->search("kdelibs5");
+        foreach (QApt::Package *pkg, searchList) {
+            kDebug() << pkg->name();
+        }
     }
 
     // Uncomment these to see the results in Konsole; I was too lazy to make a GUI for them

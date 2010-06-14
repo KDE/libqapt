@@ -36,6 +36,7 @@ endmacro(dbus_add_activation_system_service _sources)
 find_package(Qt4 REQUIRED)
 find_package(Automoc4 REQUIRED)
 find_package(PolkitQt-1 REQUIRED)
+pkg_check_modules( EPT REQUIRED "libept >= 0.5.25" )
 
 # Find the required Libaries
 include_directories(

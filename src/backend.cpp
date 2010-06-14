@@ -32,16 +32,25 @@
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/init.h>
 
+// Ept includes (xapian search)
+#include <ept/textsearch/textsearch.h>
+
 // QApt includes
 #include "cache.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
+
+namespace ept {
+namespace textsearch {
+class TextSearch;
+}
+}
 
 namespace QApt {
 
 class BackendPrivate
 {
 public:
-    BackendPrivate() : m_cache(0), m_records(0) {}
+    BackendPrivate() : m_cache(0), m_records(0), textSearch(0) {}
     ~BackendPrivate()
     {
         delete m_cache;
@@ -60,6 +69,8 @@ public:
     Cache *m_cache;
     pkgPolicy *m_policy;
     pkgRecords *m_records;
+
+    ept::textsearch::TextSearch *textSearch;
 };
 
 Backend::Backend()
@@ -102,6 +113,7 @@ bool Backend::init()
 
     d->m_cache = new Cache(this);
     reloadCache();
+    openXapianIndex();
 
     return true;
 }
@@ -221,6 +233,101 @@ PackageList Backend::upgradeablePackages() const
     return upgradeablePackages;
 }
 
+PackageList Backend::search(const QString &unsplitSearchString) const
+{
+    Q_D(const Backend);
+
+    string s;
+    string originalSearchString = unsplitSearchString.toStdString();
+    static int qualityCutoff = 25;
+    static const int maxAltTerms = 15;
+    PackageList searchResult;
+
+    if(!d->textSearch || !d->textSearch->hasData()) {
+        return searchResult;
+    }
+
+    Xapian::Enquire enquire(d->textSearch->db());
+    Xapian::QueryParser parser;
+    Xapian::Query query = parser.parse_query(unsplitSearchString.toStdString());
+    enquire.set_query(query);
+
+    // Get a set of tags to expand the query
+    vector<string> expand = d->textSearch->expand(enquire);
+
+    // now expand the query by adding the searching string as a package
+    // name so that those searches appear erlier
+    for (int i = 0; i < originalSearchString.size(); ++i) {
+        if(isblank(originalSearchString[i])) {
+            if(s.size() > 0) {
+                expand.push_back("XP"+s);
+            }
+            s="";
+        } else
+            s+=originalSearchString[i];
+    }
+
+    // now add to the last found string
+    expand.push_back("XP"+s);
+
+    // the last string is always expanded to get better search as you
+    // type results
+    if (s.size() > 0) {
+        Xapian::TermIterator I;
+        int j = 0;
+
+        for(I = d->textSearch->db().allterms_begin(s);
+           I != d->textSearch->db().allterms_end(s);
+           ++I) {
+            expand.push_back(*I);
+            expand.push_back("XP"+*I);
+            // do not expand all alt terms, they can be huge > 100
+            // and make the search very slow
+            j++;
+            if (j > maxAltTerms) {
+                break;
+            }
+        }
+    }
+
+    // Build the expanded query
+    Xapian::Query expansion(Xapian::Query::OP_OR, expand.begin(), expand.end());
+    enquire.set_query(Xapian::Query(Xapian::Query::OP_OR, query, expansion));
+
+    // Retrieve the results
+    bool done = false;
+    int top_percent = 0;
+    for (size_t pos = 0; !done; pos += 20) {
+        Xapian::MSet matches = enquire.get_mset(pos, 20);
+        if (matches.size() < 20) {
+            done = true;
+        }
+        for (Xapian::MSetIterator i = matches.begin(); i != matches.end(); ++i) {
+            Package* pkg = package(QString::fromStdString(i.get_document().get_data()));
+            // Filter out results that apt doesn't know
+            if (!pkg) {
+                continue;
+            }
+
+            // Save the confidence interval of the top value, to use it as
+            // a reference to compute an adaptive quality cutoff
+            if (top_percent == 0) {
+                top_percent = i.get_percent();
+            }
+
+            // Stop producing if the quality goes below a cutoff point
+            if (i.get_percent() < qualityCutoff * top_percent / 100) {
+               done = true;
+               break;
+            }
+
+            searchResult.append(pkg);
+        }
+    }
+
+    return searchResult;
+}
+
 Group *Backend::group(const QString &name) const
 {
     Q_D(const Backend);
@@ -239,6 +346,47 @@ GroupList Backend::availableGroups() const
     GroupList groupList = d->groups.toList();
 
     return groupList;
+}
+
+bool Backend::xapianIndexNeedsUpdate()
+{
+    Q_D(Backend);
+
+    struct stat;
+    struct buf;
+
+    // check the xapian index
+    if(FileExists("/usr/sbin/update-apt-xapian-index") &&
+      (!d->textSearch || !d->textSearch->hasData())) {
+        return true;
+    }
+
+   // compare timestamps, rebuild everytime, its now cheap(er)
+   // because we use u-a-x-i --update
+   QDateTime statTime;
+   statTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();
+   if(d->textSearch->timestamp() < statTime.toTime_t()) {
+      return true;
+   }
+
+   return false;
+}
+
+bool Backend::openXapianIndex()
+{
+    Q_D(Backend);
+
+    if(d->textSearch) {
+        delete d->textSearch;
+    }
+
+    try {
+        d->textSearch = new ept::textsearch::TextSearch;
+    } catch (Xapian::DatabaseOpeningError) {
+        return false;
+    };
+
+    return true;
 }
 
 void Backend::markPackagesForUpgrade()

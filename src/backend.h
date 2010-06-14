@@ -136,6 +136,16 @@ public:
     PackageList upgradeablePackages() const;
 
     /**
+     * Searches through the internal package list and returns a list of packages
+     * based on the given input
+     *
+     * * @param searchString The string to narrow the search by
+     *
+     * \return A @c PackageList of all packages matching the search string
+     */
+    PackageList search(const QString &searchString) const;
+
+    /**
      * Queries the backend for a Group object for the specified name
      *
      * @param name name used to specify the group returned
@@ -151,6 +161,14 @@ public:
      */
     GroupList availableGroups() const;
 
+    /**
+     * Checks whether or not the search index needs updating
+     *
+     * \return @c true if the index needs updating
+     * \return @c false if the index doesn't need updating
+     */
+    bool xapianIndexNeedsUpdate();
+
 protected:
     BackendPrivate *const d_ptr;
 
@@ -165,6 +183,14 @@ protected:
 private:
     Q_DECLARE_PRIVATE(Backend);
     friend class Package;
+
+    /**
+     * Prepares the package search mechanism
+     *
+     * \return @c true if opening succeeded
+     * \return @c false if the opening didn't succeed
+     */
+    bool openXapianIndex();
 
 Q_SIGNALS:
     /**
