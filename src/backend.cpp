@@ -60,6 +60,7 @@ public:
     QDBusServiceWatcher *watcher;
     // The canonical list of all unique, non-virutal package objects
     PackageList packages;
+    vector<int> packagesIndex;
     // Set of group names extracted from our packages
     QSet<Group*> groups;
 
@@ -133,6 +134,10 @@ void Backend::reloadCache()
     qDeleteAll(d->groups);
     d->packages.clear();
     d->groups.clear();
+    d->packagesIndex.clear();
+
+    int packageCount = depCache->Head().PackageCount;
+    d->packagesIndex.resize(packageCount, -1);
 
     // Populate internal package cache
     int count = 0;
@@ -145,6 +150,7 @@ void Backend::reloadCache()
         }
 
         Package *pkg = new Package(this, depCache, d->m_records, iter);
+        d->packagesIndex[iter->ID] = count;
         d->packages.insert(count++, pkg);
 
         if (iter.Section()) {
@@ -167,14 +173,23 @@ pkgSourceList *Backend::packageSourceList()
     return d->m_cache->list();
 }
 
+Package *Backend::package(pkgCache::PkgIterator &iter) const
+{
+    Q_D(const Backend);
+    int index = d->packagesIndex[iter->ID];
+    if (index != -1) {
+        return d->packages[index];
+    }
+    return 0;
+}
+
 Package *Backend::package(const QString &name) const
 {
     Q_D(const Backend);
 
-    foreach (Package *package, d->packages) {
-        if (package->name() == name) {
-            return package;
-        }
+    pkgCache::PkgIterator pkg = d->m_cache->depCache()->FindPkg(name.toStdString());
+    if (pkg.end() == false) {
+        return package(pkg);
     }
 
     // FIXME: Need some type of fake package to return here if all else fails.

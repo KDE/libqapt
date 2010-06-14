@@ -192,6 +192,8 @@ private:
      */
     bool openXapianIndex();
 
+    Package *package(pkgCache::PkgIterator &iter) const;
+
 Q_SIGNALS:
     /**
      * Emitted whenever a backend error occurs. You should listen to this
