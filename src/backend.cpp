@@ -71,6 +71,10 @@ public:
     pkgPolicy *m_policy;
     pkgRecords *m_records;
 
+    // undo/redo stuff
+    QList<int> undoStack;
+    QList<int> redoStack;
+
     ept::textsearch::TextSearch *textSearch;
 };
 
@@ -195,7 +199,7 @@ Package *Backend::package(const QString &name) const
     // FIXME: Need some type of fake package to return here if all else fails.
     // Otherwise, make sure you don't give this function invalid data.
     // Sucks, I know...
-    qDebug() << "Porked!";
+    qDebug() << "Porked! " + name;
     return 0;
 }
 
@@ -238,12 +242,11 @@ PackageList Backend::upgradeablePackages() const
 
     foreach (Package *package, d->packages) {
         if (package->state() & Package::Upgradeable) {
-            if (package->state() & Package::Held) {
-                continue; // Don't count held packages
-            }
+            qDebug() << "upgradeable";
             upgradeablePackages << package;
         }
     }
+
 
     return upgradeablePackages;
 }
