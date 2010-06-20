@@ -139,6 +139,29 @@ QString Package::shortDescription() const
     return shortDescription;
 }
 
+QString Package::longDescription() const
+{
+    Q_D(const Package);
+
+    QString longDescription;
+    pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
+
+    if (!ver.end()) {
+        pkgCache::DescIterator Desc = ver.TranslatedDescription();
+        pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
+        longDescription = QString::fromStdString(parser.LongDesc());
+        // Dpkg uses a line with a space and a dot to mark a double newline.
+        // It's not really human-readable, though, so remove it.
+        longDescription.replace(QLatin1String("\n .\n"), QLatin1String("\n\n"));
+        // Apt acutally returns the whole description, we just want the
+        // extended part.
+        longDescription.remove(shortDescription() + "\n");
+        return longDescription;
+    } else {
+        return QString();
+    }
+}
+
 QString Package::maintainer() const
 {
     Q_D(const Package);
@@ -243,26 +266,6 @@ QStringList Package::installedFilesList() const
     }
 
     return installedFilesList;
-}
-
-QString Package::longDescription() const
-{
-    Q_D(const Package);
-
-    QString longDescription;
-    pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
-
-    if (!ver.end()) {
-        pkgCache::DescIterator Desc = ver.TranslatedDescription();
-        pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
-        longDescription = QString::fromStdString(parser.LongDesc());
-        // Dpkg uses a line with a space and a dot to mark a double newline.
-        // It's not really human-readable, though, so remove it.
-        longDescription.replace(QLatin1String("\n .\n"), QLatin1String("\n\n"));
-        return longDescription;
-    } else {
-        return QString();
-    }
 }
 
 QString Package::origin() const
@@ -655,8 +658,8 @@ void Package::setKeep()
     Q_D(Package);
 
     d->depCache->MarkKeep(*d->packageIter, false);
+    d->depCache->SetReInstall(*d->packageIter, false);
     d->backend->packageChanged(this);
-    setReInstall(false);
 }
 
 void Package::setInstall()
@@ -677,11 +680,11 @@ void Package::setInstall()
     d->backend->packageChanged(this);
 }
 
-void Package::setReInstall(bool flag)
+void Package::setReInstall()
 {
     Q_D(Package);
 
-    d->depCache->SetReInstall(*d->packageIter, flag);
+    d->depCache->SetReInstall(*d->packageIter, true);
     d->backend->packageChanged(this);
 }
 

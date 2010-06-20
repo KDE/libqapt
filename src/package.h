@@ -320,7 +320,7 @@ public:
     * Member function that sets whether or not the package needs
     * reinstallation, based on a boolean value passed to it.
     */
-    void setReInstall(bool flag);
+    void setReInstall();
 
    /**
     * Marks the package for removal. The boolean value sets whether or not
