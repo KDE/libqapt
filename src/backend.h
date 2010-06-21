@@ -136,6 +136,14 @@ public:
     PackageList upgradeablePackages() const;
 
     /**
+     * Queries the backend for a list of all packages that have been marked
+     * for change. (To be installed, removed, etc)
+     *
+     * \return A @c PackageList of all marked packages in the Apt database
+     */
+    PackageList markedPackages() const;
+
+    /**
      * Searches through the internal package list and returns a list of packages
      * based on the given input
      *

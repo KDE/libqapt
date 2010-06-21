@@ -251,6 +251,23 @@ PackageList Backend::upgradeablePackages() const
     return upgradeablePackages;
 }
 
+PackageList Backend::markedPackages() const
+{
+    Q_D(const Backend);
+
+    PackageList markedPackages;
+
+    foreach(Package *package, d->packages) {
+        if (package->state() & (Package::ToInstall | Package::ToReInstall |
+                                Package::ToUpgrade | Package::ToDowngrade |
+                                Package::ToRemove | Package::ToPurge)) {
+            markedPackages << package;
+            qDebug() << package->name();
+        }
+    }
+    return markedPackages;
+}
+
 PackageList Backend::search(const QString &unsplitSearchString) const
 {
     Q_D(const Backend);
