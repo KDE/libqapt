@@ -262,7 +262,6 @@ PackageList Backend::markedPackages() const
                                 Package::ToUpgrade | Package::ToDowngrade |
                                 Package::ToRemove | Package::ToPurge)) {
             markedPackages << package;
-            qDebug() << package->name();
         }
     }
     return markedPackages;
@@ -553,10 +552,6 @@ void Backend::workerFinished(bool result)
                this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
     disconnect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
                this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
-
-    if (result) {
-        reloadCache();
-    }
 }
 
 void Backend::cancelDownload()
