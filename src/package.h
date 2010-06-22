@@ -301,33 +301,6 @@ public:
     */
     bool wouldBreak();
 
-   /**
-    * Sets an unsets the auto-install flag
-    */
-    void setAuto(bool flag = true);
-
-   /**
-    * Marks the package to be kept
-    */
-    void setKeep();
-
-   /**
-    * Marks the package for installation
-    */
-    void setInstall();
-
-   /**
-    * Member function that sets whether or not the package needs
-    * reinstallation, based on a boolean value passed to it.
-    */
-    void setReInstall();
-
-   /**
-    * Marks the package for removal. The boolean value sets whether or not
-    * to purge configuration files
-    */
-    void setRemove(bool purge = false);
-
     // "//" == TODO
     enum PackageState {
         ToKeep              = 1 << 0,
@@ -356,6 +329,34 @@ public:
         InstallPolicyBroken = 1 << 23
     };
     Q_DECLARE_FLAGS(PackageStates, PackageState)
+
+public Q_SLOTS:
+   /**
+    * Sets an unsets the auto-install flag
+    */
+    void setAuto(bool flag = true);
+
+   /**
+    * Marks the package to be kept
+    */
+    void setKeep();
+
+   /**
+    * Marks the package for installation
+    */
+    void setInstall();
+
+   /**
+    * Member function that sets whether or not the package needs
+    * reinstallation, based on a boolean value passed to it.
+    */
+    void setReInstall();
+
+   /**
+    * Marks the package for removal. The boolean value sets whether or not
+    * to purge configuration files
+    */
+    void setRemove(bool purge = false);
 
 protected:
     PackagePrivate *const d_ptr;
