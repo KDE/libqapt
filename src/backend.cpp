@@ -242,7 +242,6 @@ PackageList Backend::upgradeablePackages() const
 
     foreach (Package *package, d->packages) {
         if (package->state() & Package::Upgradeable) {
-            qDebug() << "upgradeable";
             upgradeablePackages << package;
         }
     }
@@ -429,6 +428,7 @@ void Backend::markPackagesForUpgrade()
 
     // TODO: Should say something if there's an error?
     pkgAllUpgrade(*d->m_cache->depCache());
+    emit packageChanged();
 }
 
 void Backend::markPackagesForDistUpgrade()
@@ -437,6 +437,7 @@ void Backend::markPackagesForDistUpgrade()
 
     // TODO: Should say something if there's an error?
     pkgDistUpgrade(*d->m_cache->depCache());
+    emit packageChanged();
 }
 
 void Backend::markPackageForInstall(const QString &name)
