@@ -689,7 +689,7 @@ void Package::setReInstall()
 }
 
 
-void Package::setRemove(bool purge)
+void Package::setRemove()
 {
     Q_D(Package);
 
@@ -703,7 +703,26 @@ void Package::setRemove(bool purge)
     Fix.Resolve(true);
 
     d->depCache->SetReInstall(*d->packageIter, false);
-    d->depCache->MarkDelete(*d->packageIter, purge);
+    d->depCache->MarkDelete(*d->packageIter, false);
+
+    d->backend->packageChanged(this);
+}
+
+void Package::setPurge()
+{
+    Q_D(Package);
+
+    pkgProblemResolver Fix(d->depCache);
+
+    Fix.Clear(*d->packageIter);
+    Fix.Protect(*d->packageIter);
+    Fix.Remove(*d->packageIter);
+
+    Fix.InstallProtect();
+    Fix.Resolve(true);
+
+    d->depCache->SetReInstall(*d->packageIter, false);
+    d->depCache->MarkDelete(*d->packageIter, true);
 
     d->backend->packageChanged(this);
 }

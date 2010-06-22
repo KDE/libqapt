@@ -446,10 +446,10 @@ void Backend::markPackageForInstall(const QString &name)
     pkg->setInstall();
 }
 
-void Backend::markPackageForRemoval(const QString &name, bool purge)
+void Backend::markPackageForRemoval(const QString &name)
 {
     Package *pkg = package(name);
-    pkg->setRemove(purge);
+    pkg->setRemove();
 }
 
 void Backend::commitChanges()

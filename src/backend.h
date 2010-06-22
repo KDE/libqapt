@@ -289,9 +289,8 @@ public Q_SLOTS:
      * Marks a package for removal.
      *
      * @param name The name of the package to be removed
-     * @param purge Whether or not to purge config files for the package
      */
-    void markPackageForRemoval(const QString &name, bool purge);
+    void markPackageForRemoval(const QString &name);
 
     /**
      * Commits all pending package state changes that have been made.

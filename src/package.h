@@ -353,10 +353,14 @@ public Q_SLOTS:
     void setReInstall();
 
    /**
-    * Marks the package for removal. The boolean value sets whether or not
-    * to purge configuration files
+    * Marks the package for removal.
     */
-    void setRemove(bool purge = false);
+    void setRemove();
+
+   /**
+    * Marks the package for complete removal, including config files.
+    */
+    void setPurge();
 
 protected:
     PackagePrivate *const d_ptr;
