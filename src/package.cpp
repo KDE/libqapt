@@ -312,7 +312,8 @@ QUrl Package::changelogUrl() const
     QString sourceSection = section();
 
     if (sourceSection.contains('/')) {
-
+        QStringList split = sourceSection.split('/');
+        sourceSection = split[0];
     } else {
         sourceSection = "main";
     }

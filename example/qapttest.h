@@ -21,7 +21,6 @@
 #ifndef QAPTTEST_H
 #define QAPTTEST_H
 
-
 #include <KMainWindow>
 
 #include <../src/backend.h>
@@ -35,6 +34,10 @@ class KLineEdit;
 
 class CacheUpdateWidget;
 class CommitWidget;
+
+namespace DebconfKde {
+    class DebconfGui;
+}
 
 class QAptTest : public KMainWindow
 {
@@ -79,6 +82,8 @@ private:
 
     QLabel *m_changedPackagesLabel;
     QLabel *m_packageCountLabel;
+
+    DebconfKde::DebconfGui *m_debconfGui;
 };
 
 #endif
