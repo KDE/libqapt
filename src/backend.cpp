@@ -32,25 +32,24 @@
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/init.h>
 
-// Ept includes (xapian search)
-#include <ept/textsearch/textsearch.h>
+// Xapian includes
+#include <xapian.h>
 
 // QApt includes
 #include "cache.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
 
-namespace ept {
-namespace textsearch {
-class TextSearch;
-}
-}
-
 namespace QApt {
+
+struct TagFilter : public Xapian::ExpandDecider
+{
+    virtual bool operator()(const std::string &term) const { return term[0] == 'T'; }
+};
 
 class BackendPrivate
 {
 public:
-    BackendPrivate() : m_cache(0), m_records(0), textSearch(0) {}
+    BackendPrivate() : m_cache(0), m_records(0) {}
     ~BackendPrivate()
     {
         delete m_cache;
@@ -75,7 +74,8 @@ public:
     QList<int> undoStack;
     QList<int> redoStack;
 
-    ept::textsearch::TextSearch *textSearch;
+    time_t xapianTimeStamp;
+    Xapian::Database xapianDatabase;
 };
 
 Backend::Backend()
@@ -276,17 +276,25 @@ PackageList Backend::search(const QString &unsplitSearchString) const
     static const int maxAltTerms = 15;
     PackageList searchResult;
 
-    if(!d->textSearch || !d->textSearch->hasData()) {
-        return searchResult;
-    }
-
-    Xapian::Enquire enquire(d->textSearch->db());
+    Xapian::Enquire enquire(d->xapianDatabase);
     Xapian::QueryParser parser;
     Xapian::Query query = parser.parse_query(unsplitSearchString.toStdString());
     enquire.set_query(query);
 
     // Get a set of tags to expand the query
-    vector<string> expand = d->textSearch->expand(enquire);
+    Xapian::RSet rset;
+    // Get the top 5 results as 'good ones' to compute the search expansion
+    Xapian::MSet mset = enquire.get_mset(0, 5);
+    for (Xapian::MSet::iterator i = mset.begin(); i != mset.end(); ++i) {
+        rset.add_document(i);
+    }
+    // Get the expanded set, only expanding the query with tag names
+    static TagFilter tagFilter;
+    Xapian::ESet eset = enquire.get_eset(5, rset, &tagFilter);
+    vector<string> expand;
+    for (Xapian::ESetIterator i = eset.begin(); i != eset.end(); ++i) {
+        expand.push_back(*i);
+    }
 
     // now expand the query by adding the searching string as a package
     // name so that those searches appear erlier
@@ -309,8 +317,8 @@ PackageList Backend::search(const QString &unsplitSearchString) const
         Xapian::TermIterator I;
         int j = 0;
 
-        for(I = d->textSearch->db().allterms_begin(s);
-           I != d->textSearch->db().allterms_end(s);
+        for(I = d->xapianDatabase.allterms_begin(s);
+           I != d->xapianDatabase.allterms_end(s);
            ++I) {
             expand.push_back(*I);
             expand.push_back("XP"+*I);
@@ -389,8 +397,7 @@ bool Backend::xapianIndexNeedsUpdate()
     struct buf;
 
     // check the xapian index
-    if(FileExists("/usr/sbin/update-apt-xapian-index") &&
-      (!d->textSearch || !d->textSearch->hasData())) {
+    if(FileExists("/usr/sbin/update-apt-xapian-index")) {
         return true;
     }
 
@@ -398,7 +405,7 @@ bool Backend::xapianIndexNeedsUpdate()
    // because we use u-a-x-i --update
    QDateTime statTime;
    statTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();
-   if(d->textSearch->timestamp() < statTime.toTime_t()) {
+   if(d->xapianTimeStamp < statTime.toTime_t()) {
       return true;
    }
 
@@ -409,12 +416,11 @@ bool Backend::openXapianIndex()
 {
     Q_D(Backend);
 
-    if(d->textSearch) {
-        delete d->textSearch;
-    }
+    QFileInfo timeStamp("/var/lib/apt-xapian-index/update-timestamp");
+    d->xapianTimeStamp = timeStamp.lastModified().toTime_t();
 
     try {
-        d->textSearch = new ept::textsearch::TextSearch;
+        d->xapianDatabase.add_database(Xapian::Database("/var/lib/apt-xapian-index/index"));
     } catch (Xapian::DatabaseOpeningError) {
         return false;
     };

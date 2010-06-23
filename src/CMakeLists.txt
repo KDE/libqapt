@@ -38,7 +38,6 @@ target_link_libraries(qapt
     ${QT_QTXML_LIBRARIES}
     ${QT_QTCORE_LIBRARIES}
     apt-pkg
-    ept
     )
 
 install(TARGETS qapt
