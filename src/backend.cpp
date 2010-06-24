@@ -270,10 +270,13 @@ PackageList Backend::search(const QString &unsplitSearchString) const
 {
     Q_D(const Backend);
 
+    if (d->xapianTimeStamp == 0) {
+        return QApt::PackageList();
+    }
+
     string s;
     string originalSearchString = unsplitSearchString.toStdString();
     static int qualityCutoff = 25;
-    static const int maxAltTerms = 15;
     PackageList searchResult;
 
     // Doesn't follow style guidelines to ease merging with synaptic
@@ -307,8 +310,8 @@ PackageList Backend::search(const QString &unsplitSearchString) const
         Xapian::Query xpQuery = parser.parse_query(xpString);
 
         pos = 0;
-        while ( (pos = originalSearchString.find("-", pos)) != string::npos ) {
-          originalSearchString.replace(pos, 1, " ");
+        while ( (pos = originalSearchString.find('-', pos)) != string::npos ) {
+          originalSearchString.replace(pos, 1, ' ');
           pos+=1;
         }
 

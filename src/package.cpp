@@ -156,7 +156,7 @@ QString Package::longDescription() const
         rawDescription = QString::fromStdString(parser.LongDesc());
         // Apt acutally returns the whole description, we just want the
         // extended part.
-        rawDescription.remove(shortDescription() + "\n");
+        rawDescription.remove(shortDescription() + '\n');
         qDebug() << rawDescription;
         // Now we're really "raw". Sort of. ;)
 
