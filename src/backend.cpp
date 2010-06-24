@@ -276,94 +276,85 @@ PackageList Backend::search(const QString &unsplitSearchString) const
     static const int maxAltTerms = 15;
     PackageList searchResult;
 
-    Xapian::Enquire enquire(d->xapianDatabase);
-    Xapian::QueryParser parser;
-    Xapian::Query query = parser.parse_query(unsplitSearchString.toStdString());
-    enquire.set_query(query);
+    // Doesn't follow style guidelines to ease merging with synaptic
+    try {
+        int maxItems = d->xapianDatabase.get_doccount();
+        Xapian::Enquire enquire(d->xapianDatabase);
+        Xapian::QueryParser parser;
+        parser.set_database(d->xapianDatabase);
+        parser.add_prefix("name","XP");
+        parser.add_prefix("section","XS");
+        // default op is AND to narrow down the resultset
+        parser.set_default_op( Xapian::Query::OP_AND );
 
-    // Get a set of tags to expand the query
-    Xapian::RSet rset;
-    // Get the top 5 results as 'good ones' to compute the search expansion
-    Xapian::MSet mset = enquire.get_mset(0, 5);
-    for (Xapian::MSet::iterator i = mset.begin(); i != mset.end(); ++i) {
-        rset.add_document(i);
-    }
-    // Get the expanded set, only expanding the query with tag names
-    static TagFilter tagFilter;
-    Xapian::ESet eset = enquire.get_eset(5, rset, &tagFilter);
-    vector<string> expand;
-    for (Xapian::ESetIterator i = eset.begin(); i != eset.end(); ++i) {
-        expand.push_back(*i);
-    }
+        /* Workaround to allow searching an hyphenated package name using a prefix (name:)
+        * LP: #282995
+        * Xapian currently doesn't support wildcard for boolean prefix and
+        * doesn't handle implicit wildcards at the end of hypenated phrases.
+        *
+        * e.g searching for name:ubuntu-res will be equivalent to 'name:ubuntu res*'
+        * however 'name:(ubuntu* res*) won't return any result because the
+        * index is built with the full package name
+        */
+        // Always search for the package name
+        string xpString = "name:";
+        string::size_type pos = originalSearchString.find_first_of(" ,;");
+        if (pos > 0) {
+            xpString += originalSearchString.substr(0,pos);
+        } else {
+            xpString += originalSearchString;
+        }
+        Xapian::Query xpQuery = parser.parse_query(xpString);
 
-    // now expand the query by adding the searching string as a package
-    // name so that those searches appear erlier
-    for (int i = 0; i < originalSearchString.size(); ++i) {
-        if(isblank(originalSearchString[i])) {
-            if(s.size() > 0) {
-                expand.push_back("XP"+s);
+        pos = 0;
+        while ( (pos = originalSearchString.find("-", pos)) != string::npos ) {
+          originalSearchString.replace(pos, 1, " ");
+          pos+=1;
+        }
+
+        // Build the query
+        // apply a weight factor to XP term to increase relevancy on package name
+        Xapian::Query query = parser.parse_query(originalSearchString,
+          Xapian::QueryParser::FLAG_WILDCARD |
+          Xapian::QueryParser::FLAG_BOOLEAN |
+          Xapian::QueryParser::FLAG_PARTIAL);
+        query = Xapian::Query(Xapian::Query::OP_OR, query,
+                Xapian::Query(Xapian::Query::OP_SCALE_WEIGHT, xpQuery, 3));
+        enquire.set_query(query);
+        Xapian::MSet matches = enquire.get_mset(0, maxItems);
+
+        // Retrieve the results
+        bool done = false;
+        int top_percent = 0;
+        for (size_t pos = 0; !done; pos += 20) {
+            Xapian::MSet matches = enquire.get_mset(pos, 20);
+            if (matches.size() < 20) {
+                done = true;
             }
-            s="";
-        } else
-            s+=originalSearchString[i];
-    }
+            for (Xapian::MSetIterator i = matches.begin(); i != matches.end(); ++i) {
+                Package* pkg = package(QString::fromStdString(i.get_document().get_data()));
+                // Filter out results that apt doesn't know
+                if (!pkg) {
+                    continue;
+                }
 
-    // now add to the last found string
-    expand.push_back("XP"+s);
+                // Save the confidence interval of the top value, to use it as
+                // a reference to compute an adaptive quality cutoff
+                if (top_percent == 0) {
+                    top_percent = i.get_percent();
+                }
 
-    // the last string is always expanded to get better search as you
-    // type results
-    if (s.size() > 0) {
-        Xapian::TermIterator I;
-        int j = 0;
+                // Stop producing if the quality goes below a cutoff point
+                if (i.get_percent() < qualityCutoff * top_percent / 100) {
+                  done = true;
+                  break;
+                }
 
-        for(I = d->xapianDatabase.allterms_begin(s);
-           I != d->xapianDatabase.allterms_end(s);
-           ++I) {
-            expand.push_back(*I);
-            expand.push_back("XP"+*I);
-            // do not expand all alt terms, they can be huge > 100
-            // and make the search very slow
-            j++;
-            if (j > maxAltTerms) {
-                break;
+                searchResult.append(pkg);
             }
         }
-    }
-
-    // Build the expanded query
-    Xapian::Query expansion(Xapian::Query::OP_OR, expand.begin(), expand.end());
-    enquire.set_query(Xapian::Query(Xapian::Query::OP_OR, query, expansion));
-
-    // Retrieve the results
-    bool done = false;
-    int top_percent = 0;
-    for (size_t pos = 0; !done; pos += 20) {
-        Xapian::MSet matches = enquire.get_mset(pos, 20);
-        if (matches.size() < 20) {
-            done = true;
-        }
-        for (Xapian::MSetIterator i = matches.begin(); i != matches.end(); ++i) {
-            Package* pkg = package(QString::fromStdString(i.get_document().get_data()));
-            // Filter out results that apt doesn't know
-            if (!pkg) {
-                continue;
-            }
-
-            // Save the confidence interval of the top value, to use it as
-            // a reference to compute an adaptive quality cutoff
-            if (top_percent == 0) {
-                top_percent = i.get_percent();
-            }
-
-            // Stop producing if the quality goes below a cutoff point
-            if (i.get_percent() < qualityCutoff * top_percent / 100) {
-               done = true;
-               break;
-            }
-
-            searchResult.append(pkg);
-        }
+    } catch (const Xapian::Error & error) {
+        return QApt::PackageList();
     }
 
     return searchResult;
