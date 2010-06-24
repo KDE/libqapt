@@ -147,20 +147,43 @@ QString Package::longDescription() const
 {
     Q_D(const Package);
 
-    QString longDescription;
+    QString rawDescription;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
 
     if (!ver.end()) {
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
         pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
-        longDescription = QString::fromStdString(parser.LongDesc());
-        // Dpkg uses a line with a space and a dot to mark a double newline.
-        // It's not really human-readable, though, so remove it.
-        longDescription.replace(QLatin1String("\n .\n"), QLatin1String("\n\n"));
+        rawDescription = QString::fromStdString(parser.LongDesc());
         // Apt acutally returns the whole description, we just want the
         // extended part.
-        longDescription.remove(shortDescription() + "\n");
-        return longDescription;
+        rawDescription.remove(shortDescription() + "\n");
+        qDebug() << rawDescription;
+        // Now we're really "raw". Sort of. ;)
+
+        QString parsedDescription;
+        // Split at double newline, by "section"
+        QStringList sections = rawDescription.split("\n .");
+
+        int i;
+        for (i = 0; i < sections.count(); ++i) {
+            sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r\t" + QString::fromUtf8("\xE2\x80\xA2"));
+            // There should be no new lines within a section.
+            sections[i].remove('\n');
+            // Hack to get the lists working again.
+            sections[i].replace('\r', '\n');
+            // Merge multiple whitespace chars into one
+            sections[i].replace(QRegExp("\\ \\ +"), QString(' '));
+            // Remove the initial whitespace
+            sections[i].remove(0, 1);
+            // Append to parsedDescription
+            if (sections[i].startsWith("\n\t" + QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
+                parsedDescription += sections[i];
+            }  else {
+                parsedDescription += "\n\n" + sections[i];
+            }
+        }
+
+        return parsedDescription;
     } else {
         return QString();
     }
