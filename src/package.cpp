@@ -166,7 +166,7 @@ QString Package::longDescription() const
 
         int i;
         for (i = 0; i < sections.count(); ++i) {
-            sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r\t" + QString::fromUtf8("\xE2\x80\xA2"));
+            sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r " + QString::fromUtf8("\xE2\x80\xA2"));
             // There should be no new lines within a section.
             sections[i].remove('\n');
             // Hack to get the lists working again.
@@ -176,7 +176,7 @@ QString Package::longDescription() const
             // Remove the initial whitespace
             sections[i].remove(0, 1);
             // Append to parsedDescription
-            if (sections[i].startsWith("\n\t" + QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
+            if (sections[i].startsWith("\n " + QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
                 parsedDescription += sections[i];
             }  else {
                 parsedDescription += "\n\n" + sections[i];
