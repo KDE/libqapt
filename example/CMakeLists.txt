@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6.0)
 
 find_package(KDE4 REQUIRED)
 include(FindPkgConfig REQUIRED)
+find_package(QApt REQUIRED)
 include(KDE4Defaults)
 
 set(qapttest_SRCS

@@ -311,7 +311,7 @@ PackageList Backend::search(const QString &unsplitSearchString) const
 
         pos = 0;
         while ( (pos = originalSearchString.find('-', pos)) != string::npos ) {
-          originalSearchString.replace(pos, 1, ' ');
+          originalSearchString.replace(pos, 1, " ");
           pos+=1;
         }
 

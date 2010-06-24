@@ -53,8 +53,8 @@ add_subdirectory(utils)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig
         COMPONENT Devel )
-install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/FindQApt.cmake
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libqapt/cmake/modules/
+install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/QAptConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/QApt/
         COMPONENT Devel )
 
 # Add translations
