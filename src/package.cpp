@@ -157,8 +157,7 @@ QString Package::longDescription() const
         // Apt acutally returns the whole description, we just want the
         // extended part.
         rawDescription.remove(shortDescription() + '\n');
-        qDebug() << rawDescription;
-        // Now we're really "raw". Sort of. ;)
+        // *Now* we're really raw. Sort of. ;)
 
         QString parsedDescription;
         // Split at double newline, by "section"
