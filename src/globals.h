@@ -56,15 +56,17 @@ namespace QApt
     };
 
     enum ErrorCode {
-        UnknownError      = 0,
-        InitError         = 1,
-        LockError         = 2,
-        DiskSpaceError    = 3,
-        FetchError        = 4,
-        CommitError       = 5,
-        AuthError         = 6,
-        WorkerDisappeared = 7,
-        UntrustedError    = 8
+        UnknownError            = 0,
+        InitError               = 1,
+        LockError               = 2,
+        DiskSpaceError          = 3,
+        FetchError              = 4,
+        CommitError             = 5,
+        AuthError               = 6,
+        WorkerDisappeared       = 7,
+        UntrustedError          = 8,
+        UserCancelError         = 9,
+        DownloadDisallowedError = 10
     };
 
     enum WarningCode {

@@ -154,6 +154,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 void WorkerAcquire::requestCancel()
 {
     m_canceled = true;
+    emit fetchError(QApt::UserCancelError, QVariantMap());
 }
 
 QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)

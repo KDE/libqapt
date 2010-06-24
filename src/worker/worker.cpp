@@ -168,7 +168,7 @@ void QAptWorker::updateCache()
         }
         emit workerFinished(result);
     } else {
-        //TODO: Error for when APT config prohibits download
+        emit errorOccurred(QApt::DownloadDisallowedError, QVariantMap());
         emit workerFinished(false);
     }
 }
