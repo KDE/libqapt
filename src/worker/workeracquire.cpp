@@ -122,7 +122,12 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     // FIXME: processEvents() is dangerous. Proper threading is needed
     QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
-    int percentage = int(int((CurrentBytes + CurrentItems)*100.0)/int(TotalBytes+TotalItems));
+
+    int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
+    // work-around a stupid problem with libapt
+    if(CurrentItems == TotalItems) {
+        percentage = 100;
+    }
 
     int ETA = (int)((TotalBytes - CurrentBytes) / CurrentCPS);
     // if the ETA is greater than two weeks, show unknown time
