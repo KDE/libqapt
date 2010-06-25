@@ -100,11 +100,7 @@ QString Package::section() const
 
     QString section = QString(d->packageIter->Section());
 
-    if (!section.isEmpty()) {
-        return section;
-    } else {
-        return QString();
-    }
+    return section;
 }
 
 QString Package::sourcePackage() const
@@ -143,10 +139,10 @@ QString Package::longDescription() const
 {
     Q_D(const Package);
 
-    QString rawDescription;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
 
     if (!ver.end()) {
+        QString rawDescription;
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
         pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
         rawDescription = QString::fromStdString(parser.LongDesc());
@@ -194,7 +190,6 @@ QString Package::maintainer() const
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromStdString(parser.Maintainer());
         // FIXME: QLabel interprets < and > as html tags and cuts off the email address
-        return maintainer;
     }
     return maintainer;
 }
@@ -208,7 +203,6 @@ QString Package::homepage() const
     if (!ver.end()) {
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         homepage = QString::fromStdString(parser.Homepage());
-        return homepage;
     }
     return homepage;
 }
@@ -233,11 +227,10 @@ QString Package::installedVersion() const
 {
     Q_D(const Package);
 
-    QString installedVersion;
     if ((*d->packageIter)->CurrentVer == 0) {
         return QString();
     }
-    installedVersion = QString::fromStdString(d->packageIter->CurrentVer().VerStr());
+    QString installedVersion = QString::fromStdString(d->packageIter->CurrentVer().VerStr());
     return installedVersion;
 }
 
@@ -245,13 +238,12 @@ QString Package::availableVersion() const
 {
     Q_D(const Package);
 
-    QString availableVersion;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (d->state & NotInstallable) {
         return QString();
     }
 
-    availableVersion = QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
+    QString availableVersion = QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
     return availableVersion;
 }
 
@@ -259,10 +251,9 @@ QString Package::priority() const
 {
     Q_D(const Package);
 
-    QString priority;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (ver != 0) {
-        priority = QString::fromStdString(ver.PriorityType());
+        QString priority = QString::fromStdString(ver.PriorityType());
         return priority;
     } else {
         return QString();
@@ -272,7 +263,7 @@ QString Package::priority() const
 QStringList Package::installedFilesList() const
 {
     QStringList installedFilesList;
-    QFile infoFile("/var/lib/dpkg/info/" + name() + ".list");
+    QFile infoFile("/var/lib/dpkg/info/" % name() % ".list");
 
     if (infoFile.open(QFile::ReadOnly)) {
         QTextStream stream(&infoFile);
@@ -308,7 +299,6 @@ QString Package::component() const
 {
     Q_D(const Package);
 
-    QString res;
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (d->state & NotInstallable) {
@@ -322,7 +312,7 @@ QString Package::component() const
         return QString();
     }
 
-    res = QString::fromStdString(File.Component());
+    QString res = QString::fromStdString(File.Component());
 
     return res;
 }
@@ -340,13 +330,14 @@ QUrl Package::changelogUrl() const
         sourceSection = "main";
     }
 
-    prefix = srcPackage[0];
     if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
         prefix = "lib" % srcPackage[3];
+    } else {
+        prefix = srcPackage[0];
     }
 
     QString versionString;
-    if (!availableVersion().isNull()) {
+    if (!availableVersion().isEmpty()) {
         versionString = availableVersion();
     }
 
@@ -389,15 +380,15 @@ QString Package::supportedUntil()
         return QString();
     }
 
-    pkgTagSection sec;
-    time_t releaseDate = -1;
-    QString release;
-
     QFile lsb_release("/etc/lsb-release");
     if (!lsb_release.open(QFile::ReadOnly)) {
         // Though really, your system is screwed if this happens...
         return QString();
     }
+
+    pkgTagSection sec;
+    time_t releaseDate = -1;
+    QString release;
 
     QTextStream stream(&lsb_release);
     QString line;
