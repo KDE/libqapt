@@ -180,9 +180,9 @@ pkgSourceList *Backend::packageSourceList() const
 Package *Backend::package(pkgCache::PkgIterator &iter) const
 {
     Q_D(const Backend);
-    int index = d->packagesIndex[iter->ID];
+    int index = d->packagesIndex.at(iter->ID);
     if (index != -1) {
-        return d->packages[index];
+        return d->packages.at(index);
     }
     return 0;
 }
@@ -218,7 +218,7 @@ int Backend::packageCount(const Package::PackageStates &states) const
 
     int packageCount = 0;
 
-    foreach(Package *package, d->packages) {
+    foreach(const Package *package, d->packages) {
         if ((package->state() & states)) {
             packageCount++;
         }
@@ -458,7 +458,7 @@ void Backend::commitChanges()
 
     QMap<QString, QVariant> instructionList;
 
-    foreach (Package *package, d->packages) {
+    foreach (const Package *package, d->packages) {
         int flags = package->state();
         // Cannot have any of these flags simultaneously
         int status = flags & (Package::ToKeep |
