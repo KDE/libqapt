@@ -170,7 +170,7 @@ void Backend::reloadCache()
     }
 }
 
-pkgSourceList *Backend::packageSourceList()
+pkgSourceList *Backend::packageSourceList() const
 {
     Q_D(const Backend);
 
@@ -203,7 +203,7 @@ Package *Backend::package(const QString &name) const
     return 0;
 }
 
-int Backend::packageCount()
+int Backend::packageCount() const
 {
     Q_D(const Backend);
 

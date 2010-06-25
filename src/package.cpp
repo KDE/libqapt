@@ -374,7 +374,7 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
     return url;
 }
 
-QString Package::supportedUntil()
+QString Package::supportedUntil() const
 {
     if (!isSupported()) {
         return QString();
@@ -458,7 +458,7 @@ qint32 Package::downloadSize() const
     return State.CandidateVerIter(*d->depCache)->Size;
 }
 
-int Package::state()
+int Package::state() const
 {
     Q_D(const Package);
 
@@ -541,25 +541,25 @@ int Package::state()
         packageState |= InstallPolicyBroken;
     }
 
-   return packageState /*| _boolFlags*/;
+   return packageState;
 }
 
-bool Package::isInstalled()
+bool Package::isInstalled() const
 {
-    Q_D(Package);
+    Q_D(const Package);
 
     return (d->state & Installed);
 }
 
-bool Package::isValid()
+bool Package::isValid() const
 {
-    Q_D(Package);
+    Q_D(const Package);
 
     // As long as it's not NotInstallable, it'll be valid
     return !(d->state & NotInstallable);
 }
 
-bool Package::isSupported()
+bool Package::isSupported() const
 {
     bool supported = (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")
                       && isTrusted());
@@ -623,9 +623,9 @@ QStringList Package::providesList() const
    return provides;
 }
 
-bool Package::isTrusted()
+bool Package::isTrusted() const
 {
-    Q_D(Package);
+    Q_D(const Package);
 
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
@@ -649,9 +649,9 @@ bool Package::isTrusted()
     return false;
 }
 
-bool Package::wouldBreak()
+bool Package::wouldBreak() const
 {
-    Q_D(Package);
+    Q_D(const Package);
 
     if ((d->state & ToRemove) || (!(d->state & Installed) && (d->state & ToKeep))) {
         return false;
@@ -741,9 +741,9 @@ void Package::setPurge()
     d->backend->packageChanged(this);
 }
 
-pkgCache::PkgFileIterator Package::searchPkgFileIter(const QString &label, const QString &release)
+pkgCache::PkgFileIterator Package::searchPkgFileIter(const QString &label, const QString &release) const
 {
-    Q_D(Package);
+    Q_D(const Package);
 
     pkgCache::VerIterator verIter;
     pkgCache::VerFileIterator verFileIter;
@@ -766,9 +766,9 @@ pkgCache::PkgFileIterator Package::searchPkgFileIter(const QString &label, const
    return found;
 }
 
-QString Package::getReleaseFileForOrigin(const QString &label, const QString &release)
+QString Package::getReleaseFileForOrigin(const QString &label, const QString &release) const
 {
-    Q_D(Package);
+    Q_D(const Package);
 
     pkgIndexFile *index;
     pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);

@@ -105,7 +105,7 @@ public:
      *
      * @return The total number of packages in the Apt database
      */
-    int packageCount();
+    int packageCount() const;
 
     /**
 
@@ -186,7 +186,7 @@ protected:
      *
      * @return @c pkgSourceList The package source list used by the backend
      */
-    pkgSourceList *packageSourceList();
+    pkgSourceList *packageSourceList() const;
 
 private:
     Q_DECLARE_PRIVATE(Backend);

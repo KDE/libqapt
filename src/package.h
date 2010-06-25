@@ -197,7 +197,7 @@ public:
     */
     QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
-    QString supportedUntil();
+    QString supportedUntil() const;
 
    /**
     * Member function that returns the amount of hard drive space that this
@@ -227,7 +227,7 @@ public:
     *
     * \return The PackageState flags of the package as an @c int
     */
-    int state();
+    int state() const;
 
    /**
     * Checks whether or not the Package object is installed
@@ -235,7 +235,7 @@ public:
     * @return @c true if installed
     * @return @c false if not installed
     */
-    bool isInstalled();
+    bool isInstalled() const;
 
    /**
     * Checks whether or not the Package object is valid
@@ -243,7 +243,7 @@ public:
     * @return @c true if valid
     * @return @c false if not invalid
     */
-    bool isValid();
+    bool isValid() const;
 
    /**
     * Checks whether or not the package is supported by Canonical
@@ -251,7 +251,7 @@ public:
     * @return @c true if valid
     * @return @c false if not invalid
     */
-    bool isSupported();
+    bool isSupported() const;
 
    /**
     * Member function that returns a list of the names of all the dependencies
@@ -290,7 +290,7 @@ public:
     * @return @c true if trusted
     * @return @c false if untrusted or the package has a version of 0
     */
-    bool isTrusted();
+    bool isTrusted() const;
 
    /**
     * Member function that returns whether or not the package would break
@@ -299,7 +299,7 @@ public:
     * @return @c true if it would break
     * @return @c false otherwise
     */
-    bool wouldBreak();
+    bool wouldBreak() const;
 
     // "//" == TODO
     enum PackageState {
@@ -368,8 +368,8 @@ protected:
 private:
     Q_DECLARE_PRIVATE(Package);
 
-    pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release);
-    QString getReleaseFileForOrigin(const QString &label, const QString &release);
+    pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
+    QString getReleaseFileForOrigin(const QString &label, const QString &release) const;
 };
 
 }
