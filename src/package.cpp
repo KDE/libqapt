@@ -148,7 +148,7 @@ QString Package::longDescription() const
         rawDescription = QString::fromStdString(parser.LongDesc());
         // Apt acutally returns the whole description, we just want the
         // extended part.
-        rawDescription.remove(shortDescription() + '\n');
+        rawDescription.remove(shortDescription() % '\n');
         // *Now* we're really raw. Sort of. ;)
 
         QString parsedDescription;
@@ -157,7 +157,7 @@ QString Package::longDescription() const
 
         int i;
         for (i = 0; i < sections.count(); ++i) {
-            sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r " + QString::fromUtf8("\xE2\x80\xA2"));
+            sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r " % QString::fromUtf8("\xE2\x80\xA2"));
             // There should be no new lines within a section.
             sections[i].remove('\n');
             // Hack to get the lists working again.
@@ -167,10 +167,10 @@ QString Package::longDescription() const
             // Remove the initial whitespace
             sections[i].remove(0, 1);
             // Append to parsedDescription
-            if (sections[i].startsWith("\n " + QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
+            if (sections[i].startsWith("\n " % QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
                 parsedDescription += sections[i];
             }  else {
-                parsedDescription += "\n\n" + sections[i];
+                parsedDescription += "\n\n" % sections[i];
             }
         }
 
