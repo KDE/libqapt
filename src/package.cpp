@@ -82,11 +82,7 @@ QString Package::name() const
 
     QString name = QString(d->packageIter->Name());
 
-    if (!name.isEmpty()) {
-        return name;
-    } else {
-        return QString();
-    }
+    return name;
 }
 
 int Package::id() const
