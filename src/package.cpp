@@ -128,7 +128,7 @@ QString Package::shortDescription() const
     if (!ver.end()) {
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
         pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
-        shortDescription = QString::fromStdString(parser.ShortDesc());
+        shortDescription = QString::fromUtf8(parser.ShortDesc().data());
         return shortDescription;
     }
 
@@ -145,7 +145,7 @@ QString Package::longDescription() const
         QString rawDescription;
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
         pkgRecords::Parser & parser = d->records->Lookup(Desc.FileList());
-        rawDescription = QString::fromStdString(parser.LongDesc());
+        rawDescription = QString::fromUtf8(parser.LongDesc().data());
         // Apt acutally returns the whole description, we just want the
         // extended part.
         rawDescription.remove(shortDescription() % '\n');
