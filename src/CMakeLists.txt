@@ -36,7 +36,7 @@ target_link_libraries(qapt
     ${QT_QTDBUS_LIBRARIES}
     ${QT_QTCORE_LIBRARIES}
     apt-pkg
-    xapian
+    ${XAPIAN_LIBRARIES}
     )
 
 install(TARGETS qapt

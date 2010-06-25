@@ -36,6 +36,7 @@ endmacro(dbus_add_activation_system_service _sources)
 find_package(Qt4 REQUIRED)
 find_package(Automoc4 REQUIRED)
 find_package(PolkitQt-1 REQUIRED)
+find_package(Xapian REQUIRED)
 
 # Find the required Libaries
 include_directories(
@@ -45,6 +46,7 @@ include_directories(
     ${QT_QTCORE_INCLUDE_DIR}
     ${QT_QTDBUS_INCLUDE_DIR}
     ${POLKITQT-1_INCLUDE_DIR}
+    ${XAPIAN_INCLUDE_DIR}
     )
 
 add_subdirectory(src)
