@@ -166,9 +166,11 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 bool replaceFile = result["ReplaceFile"].toBool();
 
                 if (replaceFile) {
-                    write(writeFd, "Y\n", 2);
+                    ssize_t reply = write(writeFd, "Y\n", 2);
+                    Q_UNUSED(reply);
                 } else {
-                    write(writeFd, "N\n", 2);
+                    ssize_t reply = write(writeFd, "N\n", 2);
+                    Q_UNUSED(reply);
                 }
             } else {
                 m_startCounting = true;
