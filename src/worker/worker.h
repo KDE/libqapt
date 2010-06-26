@@ -66,12 +66,6 @@ private Q_SLOTS:
     void unlock();
     bool initializeApt();
     void setAnswer(const QVariantMap &answer);
-    void emitDownloadProgress(int percentage, int speed, int ETA);
-    void emitDownloadMessage(int flag, const QString &message);
-    void emitCommitProgress(const QString &status, int percentage);
-    void emitErrorOccurred(int errorCode, const QVariantMap &details);
-    void emitWarningOccurred(int warningCode, const QVariantMap &details);
-    void emitQuestionOccurred(int questionCode, const QVariantMap &details);
 
 Q_SIGNALS:
     void workerStarted();

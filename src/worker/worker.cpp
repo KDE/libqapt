@@ -79,15 +79,15 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 
     m_acquireStatus = new WorkerAcquire(this);
     connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
-            this, SLOT(emitDownloadProgress(int, int, int)));
+            this, SIGNAL(downloadProgress(int, int, int)));
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
-            this, SLOT(emitDownloadMessage(int, const QString&)));
+            this, SIGNAL(downloadMessage(int, const QString&)));
     connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
-            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+            this, SLOT(errorOccurred(int, const QVariantMap&)));
     connect(m_acquireStatus, SIGNAL(fetchWarning(int, const QVariantMap&)),
-            this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
+            this, SLOT(warningOccurred(int, const QVariantMap&)));
     connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SLOT(emitQuestionOccurred(int, const QVariantMap&)));
+            this, SLOT(questionOccurred(int, const QVariantMap&)));
 }
 
 QAptWorker::~QAptWorker()
@@ -317,7 +317,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
             connect(this, SIGNAL(answerReady(const QVariantMap&)),
                     this, SLOT(setAnswer(const QVariantMap&)));
 
-            emitQuestionOccurred(QApt::InstallUntrusted, args);
+            emit questionOccurred(QApt::InstallUntrusted, args);
             m_questionBlock->exec();
 
             bool m_installUntrusted = m_questionResponse["InstallUntrusted"].toBool();
@@ -382,37 +382,4 @@ void QAptWorker::setAnswer(const QVariantMap &answer)
                this, SLOT(setAnswer(const QVariantMap&)));
     m_questionResponse = answer;
     m_questionBlock->quit();
-}
-
-// Slot -> slot relaying breaks after 3 or so relays, so we have to re-emit here
-// if our apps ever want to get them
-
-void QAptWorker::emitDownloadProgress(int percentage, int speed, int ETA)
-{
-    emit downloadProgress(percentage, speed, ETA);
-}
-
-void QAptWorker::emitDownloadMessage(int flag, const QString& message)
-{
-    emit downloadMessage(flag, message);
-}
-
-void QAptWorker::emitCommitProgress(const QString& status, int percentage)
-{
-    emit commitProgress(status, percentage);
-}
-
-void QAptWorker::emitErrorOccurred(int errorCode, const QVariantMap& details)
-{
-    emit errorOccurred(errorCode, details);
-}
-
-void QAptWorker::emitWarningOccurred(int warningCode, const QVariantMap& details)
-{
-    emit warningOccurred(warningCode, details);
-}
-
-void QAptWorker::emitQuestionOccurred(int questionCode, const QVariantMap& details)
-{
-    emit questionOccurred(questionCode, details);
 }
