@@ -133,20 +133,20 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
         }
 
         if (buf[0] == '\n') {
-            QStringList list = QString::fromStdString(line).split(':');
-            QString status = list[0].simplified();
-            QString package = list[1].simplified();
-            QString percent = list[2].simplified();
-            QString str = list[3];
+            const QStringList list = QString::fromStdString(line).split(':');
+            const QString status = list.at(0).simplified();
+            const QString package = list.at(1).simplified();
+            QString percent = list.at(2).simplified();
+            const QString str = list.at(3);
 
-            if (package.isNull() || status.isNull()) {
+            if (package.isEmpty() || status.isEmpty()) {
                 continue;
             }
 
             if (status.contains("pmerror")) {
                 QVariantMap args;
-                args["FailedItem"] = QString(package);
-                args["ErrorText"] = QString(str);
+                args["FailedItem"] = package;
+                args["ErrorText"] = str;
                 emit commitError(QApt::CommitError, args);
             } else if (status.contains("pmconffile")) {
                 // From what I understand, the original file starts after the ' character ('\'') and
@@ -176,11 +176,11 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 m_startCounting = true;
             }
 
+            int percentage;
             if (percent.contains('.')) {
                 QStringList percentList = percent.split('.');
-                percent = percentList[0];
+                percentage = percentList.at(0).toInt();
             }
-            int percentage = percent.toInt();
 
             emit commitProgress(str, percentage);
             // clean-up
