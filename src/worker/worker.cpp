@@ -83,11 +83,11 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
             this, SIGNAL(downloadMessage(int, const QString&)));
     connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
-            this, SLOT(errorOccurred(int, const QVariantMap&)));
+            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
     connect(m_acquireStatus, SIGNAL(fetchWarning(int, const QVariantMap&)),
-            this, SLOT(warningOccurred(int, const QVariantMap&)));
+            this, SIGNAL(warningOccurred(int, const QVariantMap&)));
     connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SLOT(questionOccurred(int, const QVariantMap&)));
+            this, SIGNAL(questionOccurred(int, const QVariantMap&)));
 }
 
 QAptWorker::~QAptWorker()
@@ -351,11 +351,11 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
     connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
-            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
     connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
-            this, SLOT(emitCommitProgress(const QString&, int)));
+            this, SIGNAL(commitProgress(const QString&, int)));
     connect(installProgress, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SLOT(emitQuestionOccurred(int, const QVariantMap&)));
+            this, SIGNAL(questionOccurred(int, const QVariantMap&)));
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
