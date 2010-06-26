@@ -110,8 +110,6 @@ bool Backend::init()
         return false;
     }
 
-    _config->Set("Initialized", 1);
-
     if (!pkgInitSystem(*_config, _system)) {
         return false;
     }
