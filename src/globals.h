@@ -50,9 +50,8 @@ namespace QApt
     enum WorkerQuestion {
         InvalidQuestion  = 0,
         ConfFilePrompt   = 1,
-        DebconfPrompt    = 2, //TODO in worker
-        MediaChange      = 3,
-        InstallUntrusted = 4
+        MediaChange      = 2,
+        InstallUntrusted = 3
     };
 
     enum ErrorCode {
@@ -71,7 +70,8 @@ namespace QApt
 
     enum WarningCode {
         UnknownWarning        = 0,
-        SizeMismatchWarning   = 1
+        SizeMismatchWarning   = 1,
+        FetchFailedWarning    = 2
     };
 
     enum FetchType {
