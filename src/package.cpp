@@ -493,7 +493,7 @@ int Package::state() const
 
         if (stateCache.Upgradable() && stateCache.CandidateVer != NULL) {
             packageState |= Upgradeable;
-            if (stateCache.Keep()) {
+            if ((*d->packageIter)->SelectedState == pkgCache::State::Hold) {
                 packageState |= Held;
             }
       }
