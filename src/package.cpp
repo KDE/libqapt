@@ -440,7 +440,7 @@ qint32 Package::installedSize() const
         pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
         if (d->state & NotInstallable) {
             // Nonexistent package
-            return -1;
+            return qint32(-1);
         }
         return State.CandidateVerIter(*d->depCache)->InstalledSize;
     }
@@ -651,12 +651,12 @@ bool Package::isTrusted() const
 
 bool Package::wouldBreak() const
 {
-    Q_D(const Package);
+    int pkgState = state();
 
-    if ((d->state & ToRemove) || (!(d->state & Installed) && (d->state & ToKeep))) {
+    if ((pkgState & ToRemove) || (!(pkgState & Installed) && (pkgState & ToKeep))) {
         return false;
     }
-    return d->state & InstallBroken;
+    return pkgState & InstallBroken;
 }
 
 void Package::setAuto(bool flag)
@@ -684,7 +684,7 @@ void Package::setInstall()
 
     // FIXME: can't we get rid of it here?
     // if there is something wrong, try to fix it
-    if (!d->state & ToInstall || d->depCache->BrokenCount() > 0) {
+    if (!state() & ToInstall || d->depCache->BrokenCount() > 0) {
         pkgProblemResolver Fix(d->depCache);
         Fix.Clear(*d->packageIter);
         Fix.Protect(*d->packageIter);
