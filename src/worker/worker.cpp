@@ -84,6 +84,8 @@ QAptWorker::QAptWorker(int &argc, char **argv)
             this, SLOT(emitDownloadMessage(int, const QString&)));
     connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
             this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+    connect(m_acquireStatus, SIGNAL(fetchWarning(int, const QVariantMap&)),
+            this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
     connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
             this, SLOT(emitQuestionOccurred(int, const QVariantMap&)));
 }
@@ -403,6 +405,11 @@ void QAptWorker::emitCommitProgress(const QString& status, int percentage)
 void QAptWorker::emitErrorOccurred(int errorCode, const QVariantMap& details)
 {
     emit errorOccurred(errorCode, details);
+}
+
+void QAptWorker::emitWarningOccurred(int warningCode, const QVariantMap& details)
+{
+    emit warningOccurred(warningCode, details);
 }
 
 void QAptWorker::emitQuestionOccurred(int questionCode, const QVariantMap& details)

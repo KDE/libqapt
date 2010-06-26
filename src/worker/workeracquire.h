@@ -36,7 +36,6 @@ class WorkerAcquire : public QObject, public pkgAcquireStatus
     Q_ENUMS(FetchType)
 public:
     explicit WorkerAcquire(QAptWorker *parent);
-
     virtual ~WorkerAcquire();
 
     virtual void Start();
@@ -66,6 +65,7 @@ private Q_SLOTS:
 
 signals:
     void fetchError(int errorCode, const QVariantMap &details);
+    void fetchWarning(int warningCode, const QVariantMap &details);
     void workerQuestion(int questionCode, const QVariantMap &args);
     void downloadProgress(int percentage, int speed, int ETA);
     void downloadSubProgress(const QString &package, int percentage);

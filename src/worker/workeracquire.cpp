@@ -92,8 +92,8 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         // the item that got the error and the error text
         QVariantMap args;
         args["FailedItem"] = QString(item.Description.c_str());
-        args["ErrorText"] = QString(item.Owner->ErrorText.c_str());
-        emit fetchError(QApt::FetchError, args);
+        args["WarningText"] = QString(item.Owner->ErrorText.c_str());
+        emit fetchWarning(QApt::FetchFailedWarning, args);
     }
 
     Update = true;
