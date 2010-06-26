@@ -63,14 +63,14 @@ public:
      *
      * @return A pointer to the internal @c pkgDepCache
      */
-    pkgDepCache *depCache();
+    pkgDepCache *depCache() const;
 
     /**
      * This function returns a pointer to the interal package source list,
      *
      * @return A pointer to the internal @c pkgSourceList
      */
-    pkgSourceList *list();
+    pkgSourceList *list() const;
 
 public Q_SLOTS:
     /**

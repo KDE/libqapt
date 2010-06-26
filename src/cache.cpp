@@ -110,16 +110,16 @@ bool Cache::open()
     }
 }
 
-pkgDepCache *Cache::depCache()
+pkgDepCache *Cache::depCache() const
 {
-    Q_D(Cache);
+    Q_D(const Cache);
 
     return d->m_depCache;
 }
 
-pkgSourceList *Cache::list()
+pkgSourceList *Cache::list() const
 {
-    Q_D(Cache);
+    Q_D(const Cache);
 
     return d->m_list;
 }
