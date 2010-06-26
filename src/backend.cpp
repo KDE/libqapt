@@ -41,11 +41,6 @@
 
 namespace QApt {
 
-struct TagFilter : public Xapian::ExpandDecider
-{
-    virtual bool operator()(const std::string &term) const { return term[0] == 'T'; }
-};
-
 class BackendPrivate
 {
 public:
