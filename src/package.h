@@ -326,7 +326,8 @@ public:
         IsAuto              = 1 << 20,
         IsGarbage           = 1 << 21,
         NowPolicyBroken     = 1 << 22,
-        InstallPolicyBroken = 1 << 23
+        InstallPolicyBroken = 1 << 23,
+        NotInstalled        = 1 << 24
     };
     Q_DECLARE_FLAGS(PackageStates, PackageState)
 

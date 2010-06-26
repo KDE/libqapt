@@ -501,6 +501,8 @@ int Package::state() const
         if (stateCache.Downgrade()) {
             packageState |= ToDowngrade;
         }
+    } else {
+        packageState |= NotInstalled;
     }
 
     if (stateCache.NowBroken()) {
