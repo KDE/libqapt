@@ -23,9 +23,7 @@
 
 #include <QtCore/QObject>
 
-class pkgCache;
 class pkgDepCache;
-class pkgPolicy;
 class pkgSourceList;
 
 namespace QApt {
