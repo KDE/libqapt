@@ -176,7 +176,14 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Authentication error");
             raiseErrorMessage(text, title);
             break;
-        case QApt::UntrustedError:
+        case QApt::WorkerDisappeared:
+            text = i18nc("@label", "It appears that the QApt worker has either crashed "
+                         "or disappeared. Please report a bug to the QApt maintainers");
+            title = i18nc("@title:window", "Unexpected Error");
+            KMessageBox::error(this, text, title);
+            close();
+            break;
+        case QApt::UntrustedError: {
             QStringList untrustedItems = args["UntrustedItems"].toStringList();
             if (untrustedItems.size() == 1) {
                 text = i18ncp("@label",
@@ -192,6 +199,12 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             title = i18nc("@title:window", "Untrusted Packages");
             KMessageBox::errorList(this, text, untrustedItems, title);
             close();
+            break;
+        }
+        case QApt::UserCancelError:
+            // KProgressDialog handles cancel, nothing to do
+        case QApt::UnknownError:
+        default:
             break;
     }
 }
