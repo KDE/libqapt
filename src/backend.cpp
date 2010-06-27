@@ -136,7 +136,11 @@ void Backend::reloadCache()
 
     int packageCount = depCache->Head().PackageCount;
     d->packagesIndex.resize(packageCount, -1);
+
+    // Remove check when sid has >= 4.7
+    #if QT_VERSION >= 0x040700
     d->packages.reserve(packageCount);
+    #endif
 
     // Populate internal package cache
     int count = 0;

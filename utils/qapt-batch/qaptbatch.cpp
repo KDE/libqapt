@@ -213,6 +213,7 @@ void QAptBatch::warningOccurred(int warning, const QVariantMap &args)
 {
     switch (warning) {
         case QApt::SizeMismatchWarning:
+            //TODO
             break;
         case QApt::FetchFailedWarning: {
             QString failedItem = args["FailedItem"].toString();
