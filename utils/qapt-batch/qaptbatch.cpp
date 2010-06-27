@@ -203,49 +203,52 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
     show();
     QVariantMap response;
 
-    if (code == QApt::MediaChange) {
-        QString media = args["Media"].toString();
-        QString drive = args["Drive"].toString();
+    switch (code) {
+        case QApt::MediaChange: {
+            QString media = args["Media"].toString();
+            QString drive = args["Drive"].toString();
 
-        QString title = i18nc("@title:window", "Media Change Required");
-        QString text = i18nc("@label", "Please insert %1 into %2", media, drive);
+            QString title = i18nc("@title:window", "Media Change Required");
+            QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>", media, drive);
 
-        KMessageBox::information(0, text, title);
-        response["MediaChanged"] = true;
-        m_worker->answerWorkerQuestion(response);
-    } else if (code == QApt::InstallUntrusted) {
-        QStringList untrustedItems = args["UntrustedItems"].toStringList();
-
-        QString title = i18nc("@title:window", "Untrusted Packages");
-        QString text = i18ncp("@label",
-                     "The following package has not been verified by its "
-                     "author. Installing unverified package represents a "
-                     "security risk, as unverified packages can be a "
-                     "sign of tampering. Do you wish to continue?",
-                     "The following packages have not been verified by "
-                     "their authors. Installing unverified packages "
-                     "represents a security risk, as unverified packages "
-                     "can be a sign of tampering. Do you wish to continue?",
-                     untrustedItems.size());
-        int result = KMessageBox::No;
-        bool installUntrusted = false;
-
-        result = KMessageBox::warningContinueCancelList(0, text,
-                                                        untrustedItems, title);
-        switch (result) {
-            case KMessageBox::Continue:
-                installUntrusted = true;
-                break;
-            case KMessageBox::Cancel:
-                installUntrusted = false;
-                break;
+            KMessageBox::information(this, text, title);
+            response["MediaChanged"] = true;
+            m_worker->answerWorkerQuestion(response);
         }
+        case QApt::InstallUntrusted: {
+            QStringList untrustedItems = args["UntrustedItems"].toStringList();
 
-        response["InstallUntrusted"] = installUntrusted;
-        m_worker->answerWorkerQuestion(response);
+            QString title = i18nc("@title:window", "Warning - Unverified Software");
+            QString text = i18ncp("@label",
+                        "The following piece of software cannot be verified. "
+                        "<warning>Installing unverified software represents a "
+                        "security risk, as the presence of unverifiable software "
+                        "can be a sign of tampering.</warning> Do you wish to continue?",
+                        "The following pieces of software cannot be authenticated. "
+                        "<warning>Installing unverified software represents a "
+                        "security risk, as the presence of unverifiable software "
+                        "can be a sign of tampering.</warning> Do you wish to continue?",
+                        untrustedItems.size());
+            int result = KMessageBox::Cancel;
+            bool installUntrusted = false;
 
-        if(!installUntrusted) {
-            close();
+            result = KMessageBox::warningContinueCancelList(this, text,
+                                                            untrustedItems, title);
+            switch (result) {
+                case KMessageBox::Continue:
+                    installUntrusted = true;
+                    break;
+                case KMessageBox::Cancel:
+                    installUntrusted = false;
+                    break;
+            }
+
+            response["InstallUntrusted"] = installUntrusted;
+            m_worker->answerWorkerQuestion(response);
+
+            if (!installUntrusted) {
+                close();
+            }
         }
     }
 }
