@@ -515,7 +515,9 @@ int Package::state() const
         packageState |= ResidualConfig;
     }
 
-    if (!stateCache.CandidateVerIter(*d->depCache).Downloadable()) {
+    if (stateCache.CandidateVer == 0) {
+        packageState |= NotDownloadable;
+    } else if (!stateCache.CandidateVerIter(*d->depCache).Downloadable()) {
         packageState |= NotDownloadable;
     }
 
