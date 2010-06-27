@@ -213,7 +213,7 @@ QString Package::version() const
 
     if ((*d->packageIter)->CurrentVer == 0) {
         pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
-        if (d->state & NotInstallable) {
+        if (State.CandidateVer == 0) {
             return QString();
         } else {
             return QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
@@ -239,7 +239,7 @@ QString Package::availableVersion() const
     Q_D(const Package);
 
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
-    if (d->state & NotInstallable) {
+    if (State.CandidateVer == 0) {
         return QString();
     }
 
@@ -301,7 +301,7 @@ QString Package::component() const
 
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
-    if (d->state & NotInstallable) {
+    if (State.CandidateVer == 0) {
         return QString();
     }
     Ver = State.CandidateVerIter(*d->depCache);
@@ -432,17 +432,10 @@ qint32 Package::installedSize() const
 
     pkgCache::VerIterator ver = d->packageIter->CurrentVer();
 
-    // If we are installed
-    if (d->state & Installed) {
-        return ver->InstalledSize;
-    // Else we aren't installed
+    if (!ver.end()) {
+        return qint32(ver->InstalledSize);
     } else {
-        pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
-        if (d->state & NotInstallable) {
-            // Nonexistent package
-            return qint32(-1);
-        }
-        return State.CandidateVerIter(*d->depCache)->InstalledSize;
+        return qint32(-1);
     }
 }
 
@@ -451,11 +444,11 @@ qint32 Package::downloadSize() const
     Q_D(const Package);
 
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
-    if (d->state & NotInstallable) {
-        return -1;
+    if (State.CandidateVer == 0) {
+        return qint32(-1);
     }
 
-    return State.CandidateVerIter(*d->depCache)->Size;
+    return qint32(State.CandidateVerIter(*d->depCache)->Size);
 }
 
 int Package::state() const
@@ -522,9 +515,8 @@ int Package::state() const
         packageState |= ResidualConfig;
     }
 
-    if (stateCache.CandidateVer == 0 ||
-        !stateCache.CandidateVerIter(*d->depCache).Downloadable()) {
-        packageState |= NotInstallable;
+    if (!stateCache.CandidateVerIter(*d->depCache).Downloadable()) {
+        packageState |= NotDownloadable;
     }
 
     if (stateCache.Flags & pkgCache::Flag::Auto) {
@@ -551,14 +543,6 @@ bool Package::isInstalled() const
     Q_D(const Package);
 
     return (d->state & Installed);
-}
-
-bool Package::isValid() const
-{
-    Q_D(const Package);
-
-    // As long as it's not NotInstallable, it'll be valid
-    return !(d->state & NotInstallable);
 }
 
 bool Package::isSupported() const
@@ -609,12 +593,12 @@ QStringList Package::providesList() const
 {
     Q_D(const Package);
 
-    QStringList provides;
-
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
-    if (d->state & NotInstallable) {
-        return provides;
+    if (State.CandidateVer == 0) {
+        return QStringList();
     }
+
+    QStringList provides;
 
     for (pkgCache::PrvIterator Prv =
          State.CandidateVerIter(*d->depCache).ProvidesList(); Prv.end() != true;

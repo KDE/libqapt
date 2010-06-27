@@ -238,14 +238,6 @@ public:
     bool isInstalled() const;
 
    /**
-    * Checks whether or not the Package object is valid
-    *
-    * @return @c true if valid
-    * @return @c false if not invalid
-    */
-    bool isValid() const;
-
-   /**
     * Checks whether or not the package is supported by Canonical
     *
     * @return @c true if valid
@@ -319,7 +311,7 @@ public:
         Pinned              = 1 << 13,//
         New                 = 1 << 14,//
         ResidualConfig      = 1 << 15,
-        NotInstallable      = 1 << 16,
+        NotDownloadable     = 1 << 16,
         ToPurge             = 1 << 17,
         IsImportant         = 1 << 18,
         OverrideVersion     = 1 << 19,//
