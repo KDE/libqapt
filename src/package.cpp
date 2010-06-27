@@ -52,7 +52,6 @@ class PackagePrivate
         pkgDepCache *depCache;
         pkgRecords *records;
         pkgCache::PkgIterator *packageIter;
-        int state;
 };
 
 Package::Package(QApt::Backend* parent, pkgDepCache *depCache,
@@ -68,7 +67,6 @@ Package::Package(QApt::Backend* parent, pkgDepCache *depCache,
     d->backend = parent;
     d->records= records;
     d->depCache = depCache;
-    d->state = state();
 }
 
 Package::~Package()
@@ -544,7 +542,7 @@ bool Package::isInstalled() const
 {
     Q_D(const Package);
 
-    return (d->state & Installed);
+    return (state() & Installed);
 }
 
 bool Package::isSupported() const
