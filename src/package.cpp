@@ -52,7 +52,65 @@ class PackagePrivate
         pkgDepCache *depCache;
         pkgRecords *records;
         pkgCache::PkgIterator *packageIter;
+
+        pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
+        QString getReleaseFileForOrigin(const QString &label, const QString &release) const;
 };
+
+pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label, const QString &release) const
+{
+    pkgCache::VerIterator verIter;
+    pkgCache::VerFileIterator verFileIter;
+    pkgCache::PkgFileIterator found;
+
+    for(verIter = packageIter->VersionList(); !verIter.end(); ++verIter) {
+        for(verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
+            for(found = verFileIter.File(); !found.end(); ++found) {
+                if(!found.end() && found.Label() &&
+                  QString::fromStdString(found.Label()) == label &&
+                  found.Origin() && QString::fromStdString(found.Origin()) == label &&
+                  found.Archive() && QString::fromStdString(found.Archive()) == release) {
+                    //cerr << "found: " << PF.FileName() << endl;
+                    return found;
+                }
+            }
+        }
+    }
+   found = pkgCache::PkgFileIterator(*packageIter->Cache());
+   return found;
+}
+
+QString PackagePrivate::getReleaseFileForOrigin(const QString &label, const QString &release) const
+{
+    pkgIndexFile *index;
+    pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
+
+    if (found.end()) {
+        return QString();
+    }
+
+    // search for the matching meta-index
+    pkgSourceList *list = backend->packageSourceList();
+
+    if(list->FindIndex(found, index)) {
+        vector<metaIndex *>::const_iterator I;
+        for(I=list->begin(); I != list->end(); ++I) {
+            vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
+            if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
+                string stduri = _config->FindDir("Dir::State::lists");
+                stduri += URItoFileName((*I)->GetURI());
+                stduri += "dists_";
+                stduri += (*I)->GetDist();
+                stduri += "_Release";
+
+                QString uri = QString::fromStdString(stduri);
+                return uri;
+            }
+        }
+    }
+
+    return QString();
+}
 
 Package::Package(QApt::Backend* parent, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
@@ -374,6 +432,8 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
 
 QString Package::supportedUntil() const
 {
+    Q_D(const Package);
+
     if (!isSupported()) {
         return QString();
     }
@@ -400,7 +460,7 @@ QString Package::supportedUntil() const
 
     // Canonical only provides support for Ubuntu, but we don't have to worry
     // about Debian systems as long as we assume that this function can fail.
-    QString releaseFile = getReleaseFileForOrigin("Ubuntu", release);
+    QString releaseFile = d->getReleaseFileForOrigin("Ubuntu", release);
 
     if(!FileExists(releaseFile.toStdString())) {
         // happens e.g. when there is no release file and is harmless
@@ -725,65 +785,6 @@ void Package::setPurge()
     d->depCache->MarkDelete(*d->packageIter, true);
 
     d->backend->packageChanged(this);
-}
-
-pkgCache::PkgFileIterator Package::searchPkgFileIter(const QString &label, const QString &release) const
-{
-    Q_D(const Package);
-
-    pkgCache::VerIterator verIter;
-    pkgCache::VerFileIterator verFileIter;
-    pkgCache::PkgFileIterator found;
-
-    for(verIter = d->packageIter->VersionList(); !verIter.end(); ++verIter) {
-        for(verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
-            for(found = verFileIter.File(); !found.end(); ++found) {
-                if(!found.end() && found.Label() &&
-                  QString::fromStdString(found.Label()) == label &&
-                  found.Origin() && QString::fromStdString(found.Origin()) == label &&
-                  found.Archive() && QString::fromStdString(found.Archive()) == release) {
-                    //cerr << "found: " << PF.FileName() << endl;
-                    return found;
-                }
-            }
-        }
-    }
-   found = pkgCache::PkgFileIterator(*d->packageIter->Cache());
-   return found;
-}
-
-QString Package::getReleaseFileForOrigin(const QString &label, const QString &release) const
-{
-    Q_D(const Package);
-
-    pkgIndexFile *index;
-    pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
-
-    if (found.end()) {
-        return QString();
-    }
-
-    // search for the matching meta-index
-    pkgSourceList *list = d->backend->packageSourceList();
-
-    if(list->FindIndex(found, index)) {
-        vector<metaIndex *>::const_iterator I;
-        for(I=list->begin(); I != list->end(); ++I) {
-            vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
-            if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
-                string stduri = _config->FindDir("Dir::State::lists");
-                stduri += URItoFileName((*I)->GetURI());
-                stduri += "dists_";
-                stduri += (*I)->GetDist();
-                stduri += "_Release";
-
-                QString uri = QString::fromStdString(stduri);
-                return uri;
-            }
-        }
-    }
-
-    return QString();
 }
 
 }

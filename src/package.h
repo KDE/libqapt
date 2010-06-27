@@ -294,6 +294,7 @@ public:
     bool wouldBreak() const;
 
     // "//" == TODO
+    // TODO: Before API freeze, rename to State
     enum PackageState {
         ToKeep              = 1 << 0,
         ToInstall           = 1 << 1,
@@ -360,9 +361,6 @@ protected:
 
 private:
     Q_DECLARE_PRIVATE(Package);
-
-    pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
-    QString getReleaseFileForOrigin(const QString &label, const QString &release) const;
 };
 
 }

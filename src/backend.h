@@ -191,6 +191,7 @@ protected:
 private:
     Q_DECLARE_PRIVATE(Backend);
     friend class Package;
+    friend class PackagePrivate;
 
     /**
      * Prepares the package search mechanism
