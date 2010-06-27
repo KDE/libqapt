@@ -48,6 +48,7 @@ private Q_SLOTS:
     void commitChanges(int mode);
     void workerStarted();
     void errorOccurred(int code, const QVariantMap &args);
+    void warningOccurred(int code, const QVariantMap &args);
     void questionOccurred(int question, const QVariantMap &args);
     void raiseErrorMessage(const QString &text, const QString &title);
     void workerEvent(int event);

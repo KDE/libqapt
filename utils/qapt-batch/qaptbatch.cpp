@@ -49,6 +49,8 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
                                                   this);
     connect(m_worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
             this, SLOT(errorOccurred(int, const QVariantMap&)));
+    connect(m_worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
+            this, SLOT(warningOccurred(int, const QVariantMap&)));
     connect(m_worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
     connect(m_worker, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
     connect(m_worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
@@ -195,6 +197,27 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             close();
             break;
     }
+}
+
+void QAptBatch::warningOccurred(int warning, const QVariantMap &args)
+{
+    switch (warning) {
+        case QApt::SizeMismatchWarning:
+            break;
+        case QApt::FetchFailedWarning: {
+            QString failedItem = args["FailedItem"].toString();
+            QString warningText = args["WarningText"].toString();
+            QString text = i18nc("@label",
+                                 "Failed to download %1\n"
+                                 "%2", failedItem, warningText);
+            QString title = i18nc("@title:window", "Download Failed");
+            KMessageBox::sorry(this, text, title);
+        }
+        case QApt::UnknownWarning:
+        default:
+            break;
+    }
+
 }
 
 void QAptBatch::questionOccurred(int code, const QVariantMap &args)
@@ -365,6 +388,9 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
                               "%1/s", KGlobal::locale()->formatByteSize(speed));
     }
 
+    if (percentage == 100) {
+        --percentage;
+    }
     progressBar()->setValue(percentage);
     m_detailsWidget->setTimeText(timeRemaining);
     m_detailsWidget->setSpeedText(downloadSpeed);
@@ -372,6 +398,9 @@ void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
 
 void QAptBatch::updateCommitProgress(const QString& message, int percentage)
 {
+    if (percentage == 100) {
+        --percentage;
+    }
     progressBar()->setValue(percentage);
     setLabelText(message);
 }
