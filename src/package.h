@@ -200,6 +200,17 @@ public:
     QString supportedUntil() const;
 
    /**
+    * Member function that returns the amount of hard drive space that the
+    * currently-installed version of this package takes up.
+    * This is human-unreadable, so KDE applications may wish to run this
+    * through the KGlobal::locale()->formatByteSize() function to get a
+    * localized, human-readable number.
+    *
+    * \return The installed size of the package as a @c qint32
+    */
+    qint32 currentInstalledSize() const;
+
+   /**
     * Member function that returns the amount of hard drive space that this
     * package will take up once installed.
     * This is human-unreadable, so KDE applications may wish to run this
@@ -208,7 +219,7 @@ public:
     *
     * \return The installed size of the package as a @c qint32
     */
-    qint32 installedSize() const;
+    qint32 availableInstalledSize() const;
 
    /**
     * Member function that returns the download size of the package archive

@@ -146,7 +146,7 @@ void QAptTest::updateLabels()
         m_nameLabel->setText(i18n("<b>Package:</b> %1", m_package->name()));
         m_sectionLabel->setText(i18n("<b>Section:</b> %1", m_package->section()));
         m_originLabel->setText(i18n("<b>Origin:</b> %1", m_package->origin()));
-        QString installedSize(KGlobal::locale()->formatByteSize(m_package->installedSize()));
+        QString installedSize(KGlobal::locale()->formatByteSize(m_package->availableInstalledSize()));
         m_installedSizeLabel->setText(i18n("<b>Installed Size:</b> %1", installedSize));
         m_maintainerLabel->setText(i18n("<b>Maintainer:</b> %1", m_package->maintainer()));
         m_sourceLabel->setText(i18n("<b>Source package:</b> %1", m_package->sourcePackage()));

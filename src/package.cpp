@@ -484,7 +484,7 @@ QString Package::supportedUntil() const
     return supportEnd.toString("MMMM yyyy");
 }
 
-qint32 Package::installedSize() const
+qint32 Package::currentInstalledSize() const
 {
     Q_D(const Package);
 
@@ -495,6 +495,17 @@ qint32 Package::installedSize() const
     } else {
         return qint32(-1);
     }
+}
+
+qint32 Package::availableInstalledSize() const
+{
+    Q_D(const Package);
+
+    pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
+    if (State.CandidateVer == 0) {
+        return qint32(-1);
+    }
+    return qint32(State.CandidateVerIter(*d->depCache)->InstalledSize);
 }
 
 qint32 Package::downloadSize() const
