@@ -4,6 +4,12 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )
 
+if ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr") # If the prefix is usr, things will not be in /usr/etc/
+    set(SYSCONF_INSTALL_DIR "/etc") # ...but rather in /etc
+else ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+    set(SYSCONF_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/etc") # Otherwise, trust the prefix
+endif ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+
 set(qapt_worker_SRCS
     main.cpp
     worker.cpp
@@ -33,5 +39,5 @@ install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
 
-install(FILES org.kubuntu.qaptworker.conf DESTINATION /etc/dbus-1/system.d)
+install(FILES org.kubuntu.qaptworker.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d/)
 install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
