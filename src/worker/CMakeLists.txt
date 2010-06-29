@@ -25,7 +25,7 @@ automoc4_add_executable(qaptworker
 # see our worker is pretty small :D
 target_link_libraries(qaptworker
     ${QT_QTCORE_LIBRARY}
-    polkit-qt-core-1
+    ${POLKITQT-1_CORE_LIBRARY}
     qapt
 )
 
