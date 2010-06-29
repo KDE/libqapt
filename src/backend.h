@@ -22,7 +22,7 @@
 #define QAPT_BACKEND_H
 
 #include <QtCore/QSet>
-#include <QtCore/QVariantList>
+#include <QtCore/QVariantMap>
 
 #include "globals.h"
 #include "group.h"
@@ -117,7 +117,7 @@ public:
      *
      * @return The total number of packages of the given PackageState in the Apt database
      */
-    int packageCount(const Package::PackageStates &states) const;
+    int packageCount(const Package::States &states) const;
 
     /**
      * Queries the backend for a list of all available packages, which is

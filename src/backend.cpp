@@ -211,7 +211,7 @@ int Backend::packageCount() const
     return packageCount;
 }
 
-int Backend::packageCount(const Package::PackageStates &states) const
+int Backend::packageCount(const Package::States &states) const
 {
     Q_D(const Backend);
 

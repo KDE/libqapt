@@ -22,6 +22,7 @@
 #ifndef QAPT_PACKAGE_H
 #define QAPT_PACKAGE_H
 
+#include <QtCore/QFlags>
 #include <QtCore/QUrl>
 #include <QtCore/QDateTime>
 
@@ -51,10 +52,9 @@ class Backend;
  *
  * @author Jonathan Thomas
  */
-class Package : public QObject
+class Package
 {
-    Q_OBJECT
-    Q_ENUMS(PackageState)
+
 public:
    /**
     * Default constructor
@@ -304,38 +304,6 @@ public:
     */
     bool wouldBreak() const;
 
-    // "//" == TODO
-    // TODO: Before API freeze, rename to State
-    enum PackageState {
-        ToKeep              = 1 << 0,
-        ToInstall           = 1 << 1,
-        NewInstall          = 1 << 2,
-        ToReInstall         = 1 << 3,
-        ToUpgrade           = 1 << 4,
-        ToDowngrade         = 1 << 5,
-        ToRemove            = 1 << 6,
-        Held                = 1 << 7,
-        Installed           = 1 << 8,
-        Upgradeable         = 1 << 9,
-        NowBroken           = 1 << 10,
-        InstallBroken       = 1 << 11,
-        Orphaned            = 1 << 12,//
-        Pinned              = 1 << 13,//
-        New                 = 1 << 14,//
-        ResidualConfig      = 1 << 15,
-        NotDownloadable     = 1 << 16,
-        ToPurge             = 1 << 17,
-        IsImportant         = 1 << 18,
-        OverrideVersion     = 1 << 19,//
-        IsAuto              = 1 << 20,
-        IsGarbage           = 1 << 21,
-        NowPolicyBroken     = 1 << 22,
-        InstallPolicyBroken = 1 << 23,
-        NotInstalled        = 1 << 24
-    };
-    Q_DECLARE_FLAGS(PackageStates, PackageState)
-
-public Q_SLOTS:
    /**
     * Sets an unsets the auto-install flag
     */
@@ -367,11 +335,38 @@ public Q_SLOTS:
     */
     void setPurge();
 
-protected:
-    PackagePrivate *const d_ptr;
+    // "//" == TODO
+    enum State {
+        ToKeep              = 1 << 0,
+        ToInstall           = 1 << 1,
+        NewInstall          = 1 << 2,
+        ToReInstall         = 1 << 3,
+        ToUpgrade           = 1 << 4,
+        ToDowngrade         = 1 << 5,
+        ToRemove            = 1 << 6,
+        Held                = 1 << 7,
+        Installed           = 1 << 8,
+        Upgradeable         = 1 << 9,
+        NowBroken           = 1 << 10,
+        InstallBroken       = 1 << 11,
+        Orphaned            = 1 << 12,//
+        Pinned              = 1 << 13,//
+        New                 = 1 << 14,//
+        ResidualConfig      = 1 << 15,
+        NotDownloadable     = 1 << 16,
+        ToPurge             = 1 << 17,
+        IsImportant         = 1 << 18,
+        OverrideVersion     = 1 << 19,//
+        IsAuto              = 1 << 20,
+        IsGarbage           = 1 << 21,
+        NowPolicyBroken     = 1 << 22,
+        InstallPolicyBroken = 1 << 23,
+        NotInstalled        = 1 << 24
+    };
+    Q_DECLARE_FLAGS(States, State);
 
 private:
-    Q_DECLARE_PRIVATE(Package);
+    PackagePrivate *const d;
 };
 
 }
