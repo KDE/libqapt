@@ -153,8 +153,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 // goes to a second ' character. The new conf file starts at the next ' and goes to
                 // the next '.
                 QStringList strList = str.split('\'');
-                QString oldFile = strList[1];
-                QString newFile = strList[2];
+                QString oldFile = strList.at(1);
+                QString newFile = strList.at(2);
 
                 QVariantMap args;
                 args["OldConfFile"] = oldFile;

@@ -102,8 +102,6 @@ bool QAptWorker::initializeApt()
         return false;
     }
 
-    _config->Set("Initialized", 1);
-
     if (!pkgInitSystem(*_config, _system)) {
         return false;
     }
@@ -193,11 +191,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
     QMap<QString, QVariant>::const_iterator mapIter = instructionList.constBegin();
 
     while (mapIter != instructionList.constEnd()) {
-        QString package = mapIter.key();
         int operation = mapIter.value().toInt();
 
         // Find package in cache
-        pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(package.toStdString());
+        pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(mapIter.key().toStdString());
 
         pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
         pkgProblemResolver Fix(m_cache->depCache());
