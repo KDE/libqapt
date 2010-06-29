@@ -116,8 +116,6 @@ Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
         : d(new PackagePrivate())
 {
-    
-
     // Passing the pkgIter by pointer from Backend results in a crash
     // the first time you try to call a method needing it :(
     d->packageIter = new pkgCache::PkgIterator(packageIter);
@@ -133,8 +131,6 @@ Package::~Package()
 
 QString Package::name() const
 {
-    
-
     QString name = QString(d->packageIter->Name());
 
     return name;
@@ -142,8 +138,6 @@ QString Package::name() const
 
 int Package::id() const
 {
-
-
     int id = (*d->packageIter)->ID;
 
     return id;
@@ -151,8 +145,6 @@ int Package::id() const
 
 QString Package::section() const
 {
-
-
     QString section = QString(d->packageIter->Section());
 
     return section;
@@ -160,8 +152,6 @@ QString Package::section() const
 
 QString Package::sourcePackage() const
 {
-
-
     QString sourcePackage;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
@@ -176,8 +166,6 @@ QString Package::sourcePackage() const
 
 QString Package::shortDescription() const
 {
-
-
     QString shortDescription;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
@@ -192,8 +180,6 @@ QString Package::shortDescription() const
 
 QString Package::longDescription() const
 {
-
-
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
 
     if (!ver.end()) {
@@ -237,8 +223,6 @@ QString Package::longDescription() const
 
 QString Package::maintainer() const
 {
-
-
     QString maintainer;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
@@ -251,8 +235,6 @@ QString Package::maintainer() const
 
 QString Package::homepage() const
 {
-
-
     QString homepage;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
@@ -264,8 +246,6 @@ QString Package::homepage() const
 
 QString Package::version() const
 {
-
-
     if ((*d->packageIter)->CurrentVer == 0) {
         pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
         if (State.CandidateVer == 0) {
@@ -280,8 +260,6 @@ QString Package::version() const
 
 QString Package::installedVersion() const
 {
-
-
     if ((*d->packageIter)->CurrentVer == 0) {
         return QString();
     }
@@ -291,8 +269,6 @@ QString Package::installedVersion() const
 
 QString Package::availableVersion() const
 {
-
-
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
         return QString();
@@ -304,8 +280,6 @@ QString Package::availableVersion() const
 
 QString Package::priority() const
 {
-
-
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (ver != 0) {
         QString priority = QString::fromStdString(ver.PriorityType());
@@ -338,8 +312,6 @@ QStringList Package::installedFilesList() const
 
 QString Package::origin() const
 {
-
-
     pkgCache::VerIterator Ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
 
     if(!Ver.end()) {
@@ -352,8 +324,6 @@ QString Package::origin() const
 
 QString Package::component() const
 {
-
-
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
@@ -375,14 +345,14 @@ QString Package::component() const
 QUrl Package::changelogUrl() const
 {
     QString prefix;
-    QString srcPackage = sourcePackage();
+    const QString srcPackage = sourcePackage();
     QString sourceSection = section();
 
     if (sourceSection.contains('/')) {
         QStringList split = sourceSection.split('/');
-        sourceSection = split[0];
+        sourceSection = split.at(0);
     } else {
-        sourceSection = "main";
+        sourceSection = QString("main");
     }
 
     if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
@@ -431,8 +401,6 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
 
 QString Package::supportedUntil() const
 {
-
-
     if (!isSupported()) {
         return QString();
     }
@@ -485,8 +453,6 @@ QString Package::supportedUntil() const
 
 qint32 Package::currentInstalledSize() const
 {
-
-
     pkgCache::VerIterator ver = d->packageIter->CurrentVer();
 
     if (!ver.end()) {
@@ -498,8 +464,6 @@ qint32 Package::currentInstalledSize() const
 
 qint32 Package::availableInstalledSize() const
 {
-
-
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
         return qint32(-1);
@@ -509,8 +473,6 @@ qint32 Package::availableInstalledSize() const
 
 qint32 Package::downloadSize() const
 {
-
-
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
         return qint32(-1);
@@ -521,8 +483,6 @@ qint32 Package::downloadSize() const
 
 int Package::state() const
 {
-
-
     int packageState = 0;
 
     pkgDepCache::StateCache &stateCache = (*d->depCache)[*d->packageIter];
@@ -610,8 +570,6 @@ int Package::state() const
 
 bool Package::isInstalled() const
 {
-
-
     return (state() & Installed);
 }
 
@@ -625,8 +583,6 @@ bool Package::isSupported() const
 
 QStringList Package::dependencyList(bool useCanidateVersion) const
 {
-
-
     // TODO: Stub, won't return anything.
     QStringList dependsList;
     pkgCache::VerIterator current;
@@ -648,8 +604,6 @@ QStringList Package::dependencyList(bool useCanidateVersion) const
 
 QStringList Package::requiredByList() const
 {
-
-
     QStringList reverseDependsList;
 
     for(pkgCache::DepIterator it = d->packageIter->RevDependsList(); it.end() != true; ++it) {
@@ -661,8 +615,6 @@ QStringList Package::requiredByList() const
 
 QStringList Package::providesList() const
 {
-
-
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
         return QStringList();
@@ -681,8 +633,6 @@ QStringList Package::providesList() const
 
 bool Package::isTrusted() const
 {
-
-
     pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     Ver = State.CandidateVerIter(*d->depCache);
@@ -717,16 +667,12 @@ bool Package::wouldBreak() const
 
 void Package::setAuto(bool flag)
 {
-
-
     d->depCache->MarkAuto(*d->packageIter, flag);
 }
 
 
 void Package::setKeep()
 {
-
-
     d->depCache->MarkKeep(*d->packageIter, false);
     d->depCache->SetReInstall(*d->packageIter, false);
     d->backend->packageChanged(this);
@@ -734,8 +680,6 @@ void Package::setKeep()
 
 void Package::setInstall()
 {
-
-
     d->depCache->MarkInstall(*d->packageIter, true);
 
     // FIXME: can't we get rid of it here?
@@ -752,8 +696,6 @@ void Package::setInstall()
 
 void Package::setReInstall()
 {
-
-
     d->depCache->SetReInstall(*d->packageIter, true);
     d->backend->packageChanged(this);
 }
@@ -761,8 +703,6 @@ void Package::setReInstall()
 
 void Package::setRemove()
 {
-
-
     pkgProblemResolver Fix(d->depCache);
 
     Fix.Clear(*d->packageIter);
@@ -780,8 +720,6 @@ void Package::setRemove()
 
 void Package::setPurge()
 {
-
-
     pkgProblemResolver Fix(d->depCache);
 
     Fix.Clear(*d->packageIter);
