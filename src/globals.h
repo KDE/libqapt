@@ -26,16 +26,20 @@
 namespace QApt
 {
    class Package;
-   class Group;
    /**
     * Defines the PackageList type, which is a QList of Packages
     */
     typedef QList<Package*> PackageList;
 
    /**
-    * Defines the GroupList type, which is a QList of Groups
+    * Defines the GroupList type, which is really just a QString
     */
-    typedef QList<Group*> GroupList;
+    typedef QString Group;
+
+   /**
+    * Defines the GroupList type, which is a QList of Groups (QStrings)
+    */
+    typedef QStringList GroupList;
 
     enum WorkerEvent {
         InvalidEvent            = 0,

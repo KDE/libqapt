@@ -2,7 +2,6 @@ set(qapt_SRCS
     backend.cpp
     cache.cpp
     package.cpp
-    group.cpp
     )
 
 include_directories(
@@ -16,7 +15,6 @@ set(qapt_HDRS
     backend.h
     cache.h
     package.h
-    group.h
     globals.h
    )
 
@@ -46,7 +44,6 @@ install(FILES
     backend.h
     cache.h
     package.h
-    group.h
     globals.h
 
     DESTINATION

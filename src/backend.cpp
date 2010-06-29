@@ -57,7 +57,7 @@ public:
     PackageList packages;
     vector<int> packagesIndex;
     // Set of group names extracted from our packages
-    QSet<Group*> groups;
+    QSet<Group> groups;
 
     OrgKubuntuQaptworkerInterface *worker;
 
@@ -129,7 +129,6 @@ void Backend::reloadCache()
     d->m_records = new pkgRecords(*depCache);
 
     qDeleteAll(d->packages);
-    qDeleteAll(d->groups);
     d->packages.clear();
     d->groups.clear();
     d->packagesIndex.clear();
@@ -163,8 +162,7 @@ void Backend::reloadCache()
     }
 
     // Populate groups
-    foreach (const QString &groupName, groupSet) {
-        Group *group = new Group(this, groupName);
+    foreach (const QString &group, groupSet) {
         d->groups << group;
     }
 }
@@ -360,17 +358,6 @@ PackageList Backend::search(const QString &unsplitSearchString) const
     }
 
     return searchResult;
-}
-
-Group *Backend::group(const QString &name) const
-{
-    Q_D(const Backend);
-
-    foreach (Group *group, d->groups) {
-        if (group->name() == name) {
-            return group;
-        }
-    }
 }
 
 GroupList Backend::availableGroups() const

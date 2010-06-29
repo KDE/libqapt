@@ -25,7 +25,6 @@
 #include <QtCore/QVariantMap>
 
 #include "globals.h"
-#include "group.h"
 #include "package.h"
 
 class pkgSourceList;
@@ -152,15 +151,6 @@ public:
      * \return A @c PackageList of all packages matching the search string
      */
     PackageList search(const QString &searchString) const;
-
-    /**
-     * Queries the backend for a Group object for the specified name
-     *
-     * @param name name used to specify the group returned
-     *
-     * @return A pointer to a @c Group defined by the specified name
-     */
-    Group *group(const QString &name) const;
 
     /**
      * Queries the backend for a list of all available groups
