@@ -377,8 +377,6 @@ QUrl Package::changelogUrl() const
                     srcPackage % '/' % srcPackage % '_' % versionString % '/'
                     % "changelog");
 
-    qDebug() << url;
-
     return url;
 }
 

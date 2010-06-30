@@ -243,7 +243,6 @@ PackageList Backend::upgradeablePackages() const
         }
     }
 
-
     return upgradeablePackages;
 }
 
@@ -573,7 +572,6 @@ void Backend::emitWorkerEvent(int event)
 void Backend::emitWorkerQuestionOccurred(int question, const QVariantMap &details)
 {
     emit questionOccurred((WorkerQuestion) question, details);
-    qDebug() << "Got a question";
 }
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
@@ -583,8 +581,6 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
     }
 
     if (newOwner.isEmpty()) {
-        qDebug() << "It looks like our worker got lost";
-
         // Ok, something got screwed. Report and flee
         emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
         workerFinished(false);
