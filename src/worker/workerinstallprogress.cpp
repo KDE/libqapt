@@ -190,6 +190,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             strcat(line, buf);
         }
     }
+    // 30 frames per second
+    usleep(1000000/30);
 }
 
 QVariantMap WorkerInstallProgress::askQuestion(int questionCode, const QVariantMap &args)
