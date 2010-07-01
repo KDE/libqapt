@@ -46,9 +46,9 @@ WorkerInstallProgress::WorkerInstallProgress(QAptWorker* parent)
         , m_questionResponse(QVariantMap())
         , m_startCounting(false)
 {
-    //TODO: Debconf, apt-listchanges
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
     setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
+    // TODO: apt-listchanges
     setenv("APT_LISTCHANGES_FRONTEND", "none", 1);
 }
 
@@ -134,10 +134,16 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
 
         if (buf[0] == '\n') {
             const QStringList list = QString::fromStdString(line).split(':');
-            const QString status = list.at(0).simplified();
-            const QString package = list.at(1).simplified();
-            QString percent = list.at(2).simplified();
-            const QString str = list.at(3);
+            const QString status = list.at(0);
+            const QString package = list.at(1);
+            QString percent = list.at(2);
+            QString str = list.at(3);
+
+            // If str legitimately had a ':' in it (such as a package version)
+            // we need to retrieve the next string in the list.
+            if (list.count() == 5) {
+                str += QString(':' % list.at(4));
+            }
 
             if (package.isEmpty() || status.isEmpty()) {
                 continue;
