@@ -232,7 +232,7 @@ QString Package::maintainer() const
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
-        maintainer = QString::fromStdString(parser.Maintainer());
+        maintainer = QString::fromUtf8(parser.Maintainer().data());
         // FIXME: QLabel interprets < and > as html tags and cuts off the email address
     }
     return maintainer;
