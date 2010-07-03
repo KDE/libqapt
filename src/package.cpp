@@ -129,6 +129,11 @@ Package::~Package()
     delete d;
 }
 
+pkgCache::PkgIterator *Package::packageIterator() const
+{
+    return d->packageIter;
+}
+
 QString Package::name() const
 {
     QString name = QString(d->packageIter->Name());
@@ -523,7 +528,6 @@ int Package::state() const
     } else {
         packageState |= NotInstalled;
     }
-
     if (stateCache.NowBroken()) {
         packageState |= NowBroken;
     }
@@ -672,7 +676,6 @@ void Package::setAuto(bool flag)
 void Package::setKeep()
 {
     d->depCache->MarkKeep(*d->packageIter, false);
-    d->depCache->SetReInstall(*d->packageIter, false);
     d->backend->packageChanged(this);
 }
 

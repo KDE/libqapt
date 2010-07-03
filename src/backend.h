@@ -258,6 +258,36 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     /**
+     * Takes a snapshot of the current state of the package cache. (E.g.
+     * which packages are marked for removal, install, etc)
+     *
+     * \return The current state of the cache as a @c CacheState
+     */
+    CacheState currentCacheState() const;
+
+    /**
+     * Takes the current state of the cache and puts it on the undo stack
+     */
+    void saveCacheState();
+
+    /**
+     * Restores the package cache to the given state.
+     *
+     * @param state The state to restore the cache to
+     */
+    void restoreCacheState(const CacheState &state);
+
+    /**
+     * Un-performs the last action performed to the package cache
+     */
+    void undo();
+
+    /**
+     * Re-performs the last un-done action to the package cache.
+     */
+    void redo();
+
+    /**
      * Marks all upgradeable packages for upgrading, without marking new
      * packages for installation.
      */

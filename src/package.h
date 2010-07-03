@@ -68,6 +68,13 @@ public:
     virtual ~Package();
 
    /**
+    * Returns the internal APT representation of the package
+    *
+    * \return The interal package pointer as a @c pkgCache::PkgIterator
+    */
+    pkgCache::PkgIterator *packageIterator() const;
+
+   /**
     * Member function that returns the name of the package
     *
     * \return The name of the package as a @c QString

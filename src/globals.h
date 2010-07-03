@@ -22,10 +22,11 @@
 #define QAPT_GLOBALS_H
 
 #include <QtCore/QFlags>
+#include <QtCore/QList>
 
 namespace QApt
 {
-   class Package;
+    class Package;
    /**
     * Defines the PackageList type, which is a QList of Packages
     */
@@ -35,6 +36,12 @@ namespace QApt
     * Defines the GroupList type, which is really just a QString
     */
     typedef QString Group;
+
+   /**
+    * Defines the CacheState type, which is used for keeping track of package
+    * statuses.
+    */
+    typedef QList<int> CacheState;
 
    /**
     * Defines the GroupList type, which is a QList of Groups (QStrings)

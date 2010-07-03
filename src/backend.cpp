@@ -45,11 +45,11 @@ namespace QApt {
 class BackendPrivate
 {
 public:
-    BackendPrivate() : m_cache(0), m_records(0) {}
+    BackendPrivate() : cache(0), records(0) {}
     ~BackendPrivate()
     {
-        delete m_cache;
-        delete m_records;
+        delete cache;
+        delete records;
     }
     // Watches DBus for our worker appearing/disappearing
     QDBusServiceWatcher *watcher;
@@ -62,13 +62,13 @@ public:
     OrgKubuntuQaptworkerInterface *worker;
 
     // Pointer to the apt cache object
-    Cache *m_cache;
-    pkgPolicy *m_policy;
-    pkgRecords *m_records;
+    Cache *cache;
+    pkgPolicy *policy;
+    pkgRecords *records;
 
     // undo/redo stuff
-    QList<int> undoStack;
-    QList<int> redoStack;
+    QList<CacheState> undoStack;
+    QList<CacheState> redoStack;
 
     time_t xapianTimeStamp;
     Xapian::Database xapianDatabase;
@@ -110,7 +110,7 @@ bool Backend::init()
         return false;
     }
 
-    d->m_cache = new Cache(this);
+    d->cache = new Cache(this);
     reloadCache();
     openXapianIndex();
 
@@ -121,12 +121,12 @@ void Backend::reloadCache()
 {
     Q_D(Backend);
 
-    d->m_cache->open();
+    d->cache->open();
 
-    pkgDepCache *depCache = d->m_cache->depCache();
+    pkgDepCache *depCache = d->cache->depCache();
 
-    delete d->m_records;
-    d->m_records = new pkgRecords(*depCache);
+    delete d->records;
+    d->records = new pkgRecords(*depCache);
 
     qDeleteAll(d->packages);
     d->packages.clear();
@@ -151,7 +151,7 @@ void Backend::reloadCache()
             continue; // Exclude virtual packages.
         }
 
-        Package *pkg = new Package(this, depCache, d->m_records, iter);
+        Package *pkg = new Package(this, depCache, d->records, iter);
         d->packagesIndex[iter->ID] = count;
         d->packages.insert(count++, pkg);
 
@@ -171,7 +171,7 @@ pkgSourceList *Backend::packageSourceList() const
 {
     Q_D(const Backend);
 
-    return d->m_cache->list();
+    return d->cache->list();
 }
 
 Package *Backend::package(pkgCache::PkgIterator &iter) const
@@ -188,7 +188,7 @@ Package *Backend::package(const QString &name) const
 {
     Q_D(const Backend);
 
-    pkgCache::PkgIterator pkg = d->m_cache->depCache()->FindPkg(name.toStdString());
+    pkgCache::PkgIterator pkg = d->cache->depCache()->FindPkg(name.toStdString());
     if (pkg.end() == false) {
         return package(pkg);
     }
@@ -407,12 +407,101 @@ bool Backend::openXapianIndex()
     return true;
 }
 
+CacheState Backend::currentCacheState() const
+{
+    Q_D(const Backend);
+
+    CacheState state;
+    int pkgSize = d->packages.size();
+    state.reserve(pkgSize);
+    for (unsigned i = 0; i < pkgSize; ++i) {
+        state.append(d->packages[i]->state());
+    }
+
+    return state;
+}
+
+void Backend::saveCacheState()
+{
+    Q_D(Backend);
+    CacheState state = currentCacheState();
+    d->undoStack.prepend(state);
+    d->redoStack.clear();
+
+    // TODO: Configurable
+    int maxStackSize = 20;
+
+    while (d->undoStack.size() > maxStackSize) {
+        d->undoStack.removeLast();
+    }
+}
+
+void Backend::restoreCacheState(const CacheState &state)
+{
+    Q_D(Backend);
+
+    pkgDepCache *deps = d->cache->depCache();
+    pkgDepCache::ActionGroup group(*deps);
+
+    for (unsigned i = 0; i < d->packages.size(); ++i) {
+        Package *pkg = d->packages[i];
+        int flags = pkg->state();
+        int oldflags = state[i];
+
+        if (oldflags != flags) {
+            if (oldflags & Package::ToReInstall) {
+                deps->MarkInstall(*(pkg->packageIterator()), true);
+                deps->SetReInstall(*(pkg->packageIterator()), false);
+            } else if (oldflags & Package::ToInstall) {
+                deps->MarkInstall(*(pkg->packageIterator()), true);
+            } else if (oldflags & Package::ToRemove) {
+                deps->MarkDelete(*(pkg->packageIterator()), (bool)(oldflags & Package::ToPurge));
+            } else if (oldflags & Package::ToKeep) {
+                deps->MarkKeep(*(pkg->packageIterator()), false);
+            }
+            // fix the auto flag
+            deps->MarkAuto(*pkg->packageIterator(), (oldflags & Package::IsAuto));
+        }
+    }
+    emit packageChanged();
+}
+
+void Backend::undo()
+{
+    Q_D(Backend);
+
+    if (d->undoStack.isEmpty()) {
+        return;
+    }
+
+    // Place current state on redo stack
+    d->redoStack.append(currentCacheState());
+
+    CacheState state = d->undoStack.takeFirst();
+    restoreCacheState(state);
+}
+
+void Backend::redo()
+{
+    Q_D(Backend);
+
+    if (d->redoStack.isEmpty()) {
+        return;
+    }
+
+    // Place current state on undo stack
+    d->undoStack.append(currentCacheState());
+
+    CacheState state = d->redoStack.takeFirst();
+    restoreCacheState(state);
+}
+
 void Backend::markPackagesForUpgrade()
 {
     Q_D(Backend);
 
     // TODO: Should say something if there's an error?
-    pkgAllUpgrade(*d->m_cache->depCache());
+    pkgAllUpgrade(*d->cache->depCache());
     emit packageChanged();
 }
 
@@ -421,7 +510,7 @@ void Backend::markPackagesForDistUpgrade()
     Q_D(Backend);
 
     // TODO: Should say something if there's an error?
-    pkgDistUpgrade(*d->m_cache->depCache());
+    pkgDistUpgrade(*d->cache->depCache());
     emit packageChanged();
 }
 
