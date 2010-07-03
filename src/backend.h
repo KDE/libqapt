@@ -74,10 +74,25 @@ public:
     bool init();
 
     /**
+     * Queries the backend for the empty status of its undo stack
+     *
+     * @return @c true If the undo stack is empty
+     * @return @c false If the undo stack has items in it
+     */
+    bool isUndoStackEmpty() const;
+
+    /**
+     * Queries the backend for the empty status of its redo stack
+     *
+     * @return @c true If the redo stack is empty
+     * @return @c false If the redo stack has items in it
+     */
+    bool isRedoStackEmpty() const;
+
+    /**
      * Repopulates the internal package cache, package list, and group list.
      * Mostly used internally, like after an update or a package installation
      * or removal.
-     *
      */
     void reloadCache();
 
@@ -166,6 +181,15 @@ public:
      * \return @c false if the index doesn't need updating
      */
     bool xapianIndexNeedsUpdate();
+
+    /**
+     * Checks whether or not the cache has broken packages or has a null
+     * dependency cache
+     *
+     * \return @c true if the index is broken
+     * \return @c false if the index isn't broken
+     */
+    bool isBroken() const;
 
 protected:
     BackendPrivate *const d_ptr;

@@ -368,6 +368,22 @@ GroupList Backend::availableGroups() const
     return groupList;
 }
 
+bool Backend::isBroken() const
+{
+    Q_D(const Backend);
+
+    if (d->cache->depCache() == 0) {
+        return true;
+    }
+
+    // Check for broken things
+    if (d->cache->depCache()->BrokenCount() != 0) {
+        return true;
+    }
+
+    return false;
+}
+
 bool Backend::xapianIndexNeedsUpdate()
 {
     Q_D(Backend);
@@ -413,7 +429,9 @@ CacheState Backend::currentCacheState() const
 
     CacheState state;
     int pkgSize = d->packages.size();
+    #if QT_VERSION >= 0x040700
     state.reserve(pkgSize);
+    #endif
     for (unsigned i = 0; i < pkgSize; ++i) {
         state.append(d->packages[i]->state());
     }
@@ -464,6 +482,20 @@ void Backend::restoreCacheState(const CacheState &state)
         }
     }
     emit packageChanged();
+}
+
+bool Backend::isUndoStackEmpty() const
+{
+    Q_D(const Backend);
+
+    return d->undoStack.isEmpty();
+}
+
+bool Backend::isRedoStackEmpty() const
+{
+    Q_D(const Backend);
+
+    return d->redoStack.isEmpty();
 }
 
 void Backend::undo()
