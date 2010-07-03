@@ -165,6 +165,9 @@ void Backend::reloadCache()
     foreach (const QString &group, groupSet) {
         d->groups << group;
     }
+
+    d->undoStack.clear();
+    d->redoStack.clear();
 }
 
 pkgSourceList *Backend::packageSourceList() const
