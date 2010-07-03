@@ -507,7 +507,7 @@ void Backend::undo()
     }
 
     // Place current state on redo stack
-    d->redoStack.append(currentCacheState());
+    d->redoStack.prepend(currentCacheState());
 
     CacheState state = d->undoStack.takeFirst();
     restoreCacheState(state);
