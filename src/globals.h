@@ -85,6 +85,14 @@ namespace QApt
         FetchFailedWarning    = 2
     };
 
+    enum BrokenReason {
+        UnknownReason         = 0,
+        ParentNotInstallable  = 1,
+        WrongCandidateVersion = 2,
+        DepNotInstallable     = 3,
+        VirtualPackage        = 4
+    };
+
     enum FetchType {
         InvalidFetch = 0,
         DownloadFetch = 1,

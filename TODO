@@ -1,4 +1,3 @@
--Thread Backend interactions with the apt cache. While not too slow, it's slow enough to warrant the use of threading to prevent GUI blockage.
 -Make the direct output of the dpkg process available, so that advanced package managers can have a console GUI for power users
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/

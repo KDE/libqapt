@@ -25,6 +25,7 @@
 #include <QtCore/QFlags>
 #include <QtCore/QUrl>
 #include <QtCore/QDateTime>
+#include <QtCore/QVariantMap>
 
 #include <apt-pkg/pkgcache.h>
 
@@ -292,6 +293,8 @@ public:
     * \return A list of packages that this package provides as a @c QStringList
     */
     QStringList providesList() const;
+
+    QHash<int, QHash<QString, QVariantMap> > brokenReason() const;
 
    /**
     * Member function that returns whether or not the package is signed with a

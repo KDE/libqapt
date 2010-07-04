@@ -633,6 +633,114 @@ QStringList Package::providesList() const
    return provides;
 }
 
+QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
+{
+    pkgCache::DepIterator depI;
+    pkgCache::VerIterator Ver;
+    bool First = true;
+
+    QHash<QString, QVariantMap> notInstallable;
+    QHash<QString, QVariantMap> wrongCandidate;
+    QHash<QString, QVariantMap> depNotInstallable;
+    QHash<QString, QVariantMap> virtualPackage;
+
+    QHash<int, QHash<QString, QVariantMap> > failTrain;
+
+    pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
+    Ver = State.CandidateVerIter(*d->depCache);
+
+    // check if there is actually something to install
+    if (Ver == 0) {
+        QHash<QString, QVariantMap> parentNotInstallable;
+        parentNotInstallable[name()] = QVariantMap();
+        failTrain[QApt::ParentNotInstallable] = parentNotInstallable;
+        return failTrain;
+    }
+
+    for (pkgCache::DepIterator D = Ver.DependsList(); D.end() == false;) {
+        // Compute a single dependency element (glob or)
+        pkgCache::DepIterator Start;
+        pkgCache::DepIterator End;
+        D.GlobOr(Start, End);
+
+        pkgCache::PkgIterator Targ = Start.TargetPkg();
+
+        if (d->depCache->IsImportantDep(End) == false) {
+            continue;
+        }
+
+        if (((*d->depCache)[End] & pkgDepCache::DepGInstall) == pkgDepCache::DepGInstall) {
+            continue;
+        }
+
+        if (Targ->ProvidesList == 0) {
+            // Ok, not a virtual package since no provides
+            pkgCache::VerIterator Ver =  (*d->depCache)[Targ].InstVerIter(*d->depCache);
+
+            QString requiredVersion;
+            if(Start.TargetVer() != 0) {
+                requiredVersion = '(' % QString::fromStdString(Start.CompType())
+                                  % QString::fromStdString(Start.TargetVer()) % ')';
+            }
+
+            if (Ver.end() == false) {
+                // Happens when a package needs an upgraded dep, but the dep won't
+                // upgrade. Example:
+                // "apt 0.5.4 but 0.5.3 is to be installed"
+                QVariantMap failReason;
+                failReason["Relation"] = QString::fromStdString(End.DepType());
+                failReason["RequiredVersion"] = requiredVersion;
+                failReason["CandidateVersion"] = QString::fromStdString(Ver.VerStr());
+                if (Start != End) {
+                    failReason["IsFirstOr"] = true;
+                }
+
+                QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+                wrongCandidate[targetName] = failReason;
+            } else { // We have the package, but for some reason it won't be installed
+                // In this case, the required version does not exist at all
+                if ((*d->depCache)[Targ].CandidateVerIter(*d->depCache).end() == true) {
+                    QVariantMap failReason;
+                    failReason["Relation"] = QString::fromStdString(End.DepType());
+                    failReason["RequiredVersion"] = requiredVersion;
+                    if (Start != End) {
+                        failReason["IsFirstOr"] = true;
+                    }
+
+                    QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+                    depNotInstallable[targetName] = failReason;
+                } else {
+                    // Who knows why it won't be installed? Getting here means we have no good reason
+                    QVariantMap failReason;
+                    failReason["Relation"] = QString::fromStdString(End.DepType());
+                    if (Start != End) {
+                        failReason["IsFirstOr"] = true;
+                    }
+
+                    QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+                    depNotInstallable[targetName] = failReason;
+                }
+            }
+        } else {
+            // Ok, candidate has provides. We're a virtual package
+            QVariantMap failReason;
+            failReason["Relation"] = QString::fromStdString(End.DepType());
+            if (Start != End) {
+                failReason["IsFirstOr"] = true;
+            }
+
+            QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+            virtualPackage[targetName] = failReason;
+        }
+    }
+
+    failTrain[QApt::WrongCandidateVersion] = wrongCandidate;
+    failTrain[QApt::DepNotInstallable] = depNotInstallable;
+    failTrain[QApt::VirtualPackage] = virtualPackage;
+
+    return failTrain;
+}
+
 bool Package::isTrusted() const
 {
     pkgCache::VerIterator Ver;
