@@ -1,4 +1,5 @@
 -Make the direct output of the dpkg process available, so that advanced package managers can have a console GUI for power users
+-Extend the commitChanges API and the worker's capabilities to take "commit options", such as wether or not to install recommends/suggests, or to downgrade to a particular version of a package.
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/
 ;-)
