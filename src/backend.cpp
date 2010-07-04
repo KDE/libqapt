@@ -265,7 +265,7 @@ PackageList Backend::markedPackages() const
     return markedPackages;
 }
 
-PackageList Backend::search(const QString &unsplitSearchString) const
+PackageList Backend::search(const QString &searchString) const
 {
     Q_D(const Backend);
 
@@ -273,8 +273,7 @@ PackageList Backend::search(const QString &unsplitSearchString) const
         return QApt::PackageList();
     }
 
-    string s;
-    string originalSearchString = unsplitSearchString.toStdString();
+    string unsplitSearchString = searchString.toStdString();
     static int qualityCutoff = 25;
     PackageList searchResult;
 
@@ -300,61 +299,53 @@ PackageList Backend::search(const QString &unsplitSearchString) const
         */
         // Always search for the package name
         string xpString = "name:";
-        string::size_type pos = originalSearchString.find_first_of(" ,;");
+        string::size_type pos = unsplitSearchString.find_first_of(" ,;");
         if (pos > 0) {
-            xpString += originalSearchString.substr(0,pos);
+            xpString += unsplitSearchString.substr(0,pos);
         } else {
-            xpString += originalSearchString;
+            xpString += unsplitSearchString;
         }
         Xapian::Query xpQuery = parser.parse_query(xpString);
 
         pos = 0;
-        while ( (pos = originalSearchString.find('-', pos)) != string::npos ) {
-          originalSearchString.replace(pos, 1, " ");
-          pos+=1;
+        while ( (pos = unsplitSearchString.find("-", pos)) != string::npos ) {
+            unsplitSearchString.replace(pos, 1, " ");
+            pos+=1;
         }
 
         // Build the query
         // apply a weight factor to XP term to increase relevancy on package name
-        Xapian::Query query = parser.parse_query(originalSearchString,
-          Xapian::QueryParser::FLAG_WILDCARD |
-          Xapian::QueryParser::FLAG_BOOLEAN |
-          Xapian::QueryParser::FLAG_PARTIAL);
+        Xapian::Query query = parser.parse_query(unsplitSearchString,
+           Xapian::QueryParser::FLAG_WILDCARD |
+           Xapian::QueryParser::FLAG_BOOLEAN |
+           Xapian::QueryParser::FLAG_PARTIAL);
         query = Xapian::Query(Xapian::Query::OP_OR, query,
                 Xapian::Query(Xapian::Query::OP_SCALE_WEIGHT, xpQuery, 3));
         enquire.set_query(query);
         Xapian::MSet matches = enquire.get_mset(0, maxItems);
 
-        // Retrieve the results
-        bool done = false;
-        int top_percent = 0;
-        for (size_t pos = 0; !done; pos += 20) {
-            Xapian::MSet matches = enquire.get_mset(pos, 20);
-            if (matches.size() < 20) {
-                done = true;
-            }
-            for (Xapian::MSetIterator i = matches.begin(); i != matches.end(); ++i) {
-                Package* pkg = package(QString::fromStdString(i.get_document().get_data()));
-                // Filter out results that apt doesn't know
-                if (!pkg) {
-                    continue;
-                }
+      // Retrieve the results
+      int top_percent = 0;
+      for (Xapian::MSetIterator i = matches.begin(); i != matches.end(); ++i)
+      {
+         Package* pkg = package(QString::fromStdString(i.get_document().get_data()));
+         // Filter out results that apt doesn't know
+         if (!pkg)
+            continue;
 
-                // Save the confidence interval of the top value, to use it as
-                // a reference to compute an adaptive quality cutoff
-                if (top_percent == 0) {
-                    top_percent = i.get_percent();
-                }
+         // Save the confidence interval of the top value, to use it as
+         // a reference to compute an adaptive quality cutoff
+         if (top_percent == 0)
+            top_percent = i.get_percent();
 
-                // Stop producing if the quality goes below a cutoff point
-                if (i.get_percent() < qualityCutoff * top_percent / 100) {
-                  done = true;
-                  break;
-                }
+         // Stop producing if the quality goes below a cutoff point
+         if (i.get_percent() < qualityCutoff * top_percent / 100)
+         {
+            break;
+         }
 
-                searchResult.append(pkg);
-            }
-        }
+         searchResult.append(pkg);
+         }
     } catch (const Xapian::Error & error) {
         return QApt::PackageList();
     }
