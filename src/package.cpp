@@ -601,6 +601,58 @@ QStringList Package::dependencyList(bool useCanidateVersion) const
         return dependsList;
     }
 
+    for(pkgCache::DepIterator D = current.DependsList(); D.end() != true; D++) {
+        QString type;
+        bool isOr = false;
+        bool isVirtual = false;
+        bool isSatisfied = false;
+        QString name;
+        QString version;
+        QString versionCompare;
+
+        QString finalString;
+
+        // check target and or-depends status
+        pkgCache::PkgIterator Trg = D.TargetPkg();
+        if ((D->CompareOp & pkgCache::Dep::Or) == pkgCache::Dep::Or) {
+            isOr=true;
+        }
+
+        // common information
+        type = D.DepType();
+        name = Trg.Name();
+
+        // satisfied
+        if (((*d->depCache)[D] & pkgDepCache::DepGInstall) == pkgDepCache::DepGInstall) {
+            isSatisfied = true;
+        }
+        if (Trg->VersionList == 0) {
+            isVirtual = true;
+        } else {
+            version=D.TargetVer();
+            versionCompare=D.CompType();
+        }
+
+        finalString = "<b>" % type % ":</b> ";
+        if (isVirtual) {
+            finalString += "<i>" % name % "</i>";
+        } else {
+            finalString += name;
+        }
+
+        // Escape the compare operator so it won't be seen as HTML
+        if (!version.isEmpty()) {
+            QString compMarkup = QString(versionCompare);
+            finalString += " (" % compMarkup % ' ' % version % ')';
+        }
+
+        if (isOr) {
+            finalString += " |";
+        }
+
+        dependsList.append(finalString);
+    }
+
     return dependsList;
 }
 
