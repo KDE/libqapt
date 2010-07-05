@@ -146,7 +146,7 @@ void Backend::reloadCache()
     QSet<QString> groupSet;
 
     pkgCache::PkgIterator iter;
-    for (iter = depCache->PkgBegin(); iter.end() != true; iter++) {
+    for (iter = depCache->PkgBegin(); iter.end() != true; ++iter) {
         if (iter->VersionList == 0) {
             continue; // Exclude virtual packages.
         }
@@ -390,7 +390,7 @@ bool Backend::xapianIndexNeedsUpdate()
         return true;
     }
 
-   // compare timestamps, rebuild everytime, its now cheap(er)
+   // compare timestamps, rebuild every time, its now cheap(er)
    // because we use u-a-x-i --update
    QDateTime statTime;
    statTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();

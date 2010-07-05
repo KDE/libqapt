@@ -609,7 +609,7 @@ QStringList Package::dependencyList(bool useCanidateVersion) const
         return dependsList;
     }
 
-    for(pkgCache::DepIterator D = current.DependsList(); D.end() != true; D++) {
+    for(pkgCache::DepIterator D = current.DependsList(); D.end() != true; ++D) {
         QString type;
         bool isOr = false;
         bool isVirtual = false;

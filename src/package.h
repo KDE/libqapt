@@ -190,14 +190,14 @@ public:
     QString component() const;
 
    /**
-    * Member function that fetches a package's changelog over the internet.
+    * Member function that fetches a package's changelog over the Internet.
     *
     * \return The location of the package changelog as a @c QString
     */
     QUrl changelogUrl() const;
 
    /**
-    * Member function that fetches a package's screenshot over the internet.
+    * Member function that fetches a package's screenshot over the Internet.
     *
     * @param type The type of screenshot to be fetched as a QApt::ScreenshotType
     *
