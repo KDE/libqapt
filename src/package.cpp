@@ -233,7 +233,7 @@ QString Package::maintainer() const
     if (!ver.end()) {
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromUtf8(parser.Maintainer().data());
-        // FIXME: QLabel interprets < and > as html tags and cuts off the email address
+        maintainer.replace('<', "&lt;");
     }
     return maintainer;
 }
