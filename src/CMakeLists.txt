@@ -11,14 +11,17 @@ include_directories(
 
 add_subdirectory(worker)
 
-set(qapt_HDRS
+set(qapt_MOC_HDRS
     backend.h
     cache.h
-    package.h
-    globals.h
    )
 
-qt4_wrap_cpp(qapt_SRCS ${qapt_HDRS})
+set(qapt_HDRS
+    package.h
+    globals.h
+    )
+
+qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
 
 qt4_add_dbus_interface(qapt_SRCS
                        worker/org.kubuntu.qaptworker.xml
