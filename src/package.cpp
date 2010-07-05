@@ -643,6 +643,7 @@ QStringList Package::dependencyList(bool useCanidateVersion) const
         // Escape the compare operator so it won't be seen as HTML
         if (!version.isEmpty()) {
             QString compMarkup = QString(versionCompare);
+            compMarkup.replace('<', "&lt;");
             finalString += " (" % compMarkup % ' ' % version % ')';
         }
 
