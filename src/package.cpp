@@ -310,6 +310,14 @@ QStringList Package::installedFilesList() const
 
         // The first item won't be a file
         installedFilesList.removeFirst();
+
+        for (int i = 0; i < installedFilesList.size() - 1; ++i) {
+            if (installedFilesList.at(i+1).contains(installedFilesList.at(i))) {
+                installedFilesList[i] = ' ';
+            }
+        }
+
+        installedFilesList.removeAll(QChar(' '));
     }
 
     return installedFilesList;
