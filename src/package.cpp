@@ -627,7 +627,7 @@ QStringList Package::dependencyList(bool useCanidateVersion) const
         }
 
         // common information
-        type = D.DepType();
+        type = QString::fromUtf8(D.DepType());
         name = Trg.Name();
 
         // satisfied
