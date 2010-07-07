@@ -59,7 +59,7 @@ public:
     // Set of group names extracted from our packages
     QSet<Group> groups;
 
-    QHash<QString, QString> originHash;
+    QMap<QString, QString> originMap;
 
     OrgKubuntuQaptworkerInterface *worker;
 
@@ -133,7 +133,7 @@ void Backend::reloadCache()
     qDeleteAll(d->packages);
     d->packages.clear();
     d->groups.clear();
-    d->originHash.clear();
+    d->originMap.clear();
     d->packagesIndex.clear();
 
     int packageCount = depCache->Head().PackageCount;
@@ -147,8 +147,8 @@ void Backend::reloadCache()
     // Populate internal package cache
     int count = 0;
     QSet<Group> groupSet;
-    QSet<QString> originSet;
-    QSet<QString> originLabelSet;
+    QStringList originList;
+    QStringList originLabelList;
 
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); iter.end() != true; ++iter) {
@@ -170,24 +170,17 @@ void Backend::reloadCache()
 
         if(!Ver.end()) {
             pkgCache::VerFileIterator VF = Ver.FileList();
-            originSet << QString(VF.File().Origin());
-            originLabelSet << QString(VF.File().Label());
+            d->originMap[VF.File().Origin()] = VF.File().Label();
         }
+    }
+
+    if (d->originMap.contains("")) {
+        d->originMap.remove("");
     }
 
     // Populate groups
     foreach (const QString &group, groupSet) {
         d->groups << group;
-    }
-
-    // Populate origin mapping
-    QList<QString> originList = originSet.toList();
-    originList.removeAll("");
-    QList<QString> originLabelList = originLabelSet.toList();
-    originLabelList.removeAll("");
-
-    for (int i = 0; i < originSet.size()-1; ++i) {
-        d->originHash[originList.at(i)] = originLabelList.at(i);
     }
 
     d->undoStack.clear();
@@ -231,14 +224,14 @@ QStringList Backend::originLabels() const
 {
     Q_D(const Backend);
 
-    return d->originHash.values();
+    return d->originMap.values();
 }
 
 QString Backend::originLabel(const QString &origin) const
 {
     Q_D(const Backend);
 
-    QString originLabel = d->originHash[origin];
+    QString originLabel = d->originMap[origin];
 
     return originLabel;
 }
@@ -247,7 +240,7 @@ QString Backend::origin(QString originLabel) const
 {
     Q_D(const Backend);
 
-    QString origin = d->originHash.key(originLabel);
+    QString origin = d->originMap.key(originLabel);
 
     return origin;
 }
