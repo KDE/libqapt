@@ -113,12 +113,27 @@ public:
     Package *package(const QString &name) const;
 
     /**
+     * Gets a list of all package origins, as user readable strings.
+     *
+     * @return The list of human-readable origin labels
+     */
+    QStringList originLabels() const;
+
+    /**
      * Gets the human-readable name for the origin repository of the given
-     * package.
+     * the machine-readable name.
      *
      * @return The human-readable origin label
      */
-    QString originLabel(Package *package) const;
+    QString originLabel(const QString &origin) const;
+
+    /**
+     * Gets the machine-readable name for the origin repository of the given
+     * the human-readable name.
+     *
+     * @return The machine-readable origin label
+     */
+    QString origin(QString originLabel) const;
 
     /**
      * Queries the backend for the total number of packages in the Apt

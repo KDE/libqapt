@@ -187,7 +187,6 @@ void Backend::reloadCache()
     originLabelList.removeAll("");
 
     for (int i = 0; i < originSet.size()-1; ++i) {
-        qDebug() << i;
         d->originHash[originList.at(i)] = originLabelList.at(i);
     }
 
@@ -228,13 +227,29 @@ Package *Backend::package(const QString &name) const
     return 0;
 }
 
-QString Backend::originLabel(Package *package) const
+QStringList Backend::originLabels() const
 {
     Q_D(const Backend);
 
-    QString originLabel = d->originHash[package->origin()];
+    return d->originHash.values();
+}
+
+QString Backend::originLabel(const QString &origin) const
+{
+    Q_D(const Backend);
+
+    QString originLabel = d->originHash[origin];
 
     return originLabel;
+}
+
+QString Backend::origin(QString originLabel) const
+{
+    Q_D(const Backend);
+
+    QString origin = d->originHash.key(originLabel);
+
+    return origin;
 }
 
 int Backend::packageCount() const
