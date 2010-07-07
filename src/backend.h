@@ -113,6 +113,14 @@ public:
     Package *package(const QString &name) const;
 
     /**
+     * Gets the human-readable name for the origin repository of the given
+     * package.
+     *
+     * @return The human-readable origin label
+     */
+    QString originLabel(Package *package) const;
+
+    /**
      * Queries the backend for the total number of packages in the Apt
      * database, discarding no-longer-existing packages that linger on in the
      * status cache (That have a version of 0)
@@ -122,7 +130,6 @@ public:
     int packageCount() const;
 
     /**
-
      * Queries the backend for the total number of packages in the Apt
      * database, discarding no-longer-existing packages that linger on in the
      * status cache (That have a version of 0)
@@ -132,6 +139,24 @@ public:
      * @return The total number of packages of the given PackageState in the Apt database
      */
     int packageCount(const Package::States &states) const;
+
+    /**
+     * Queries the backend for the total size of the packages will be
+     * downloaded if the user commits changes. Cached packages will not show
+     * up in this count.
+     *
+     * @return The total amount that will be downloaded in bytes.
+     */
+    int downloadSize() const;
+
+    /**
+     * Queries the backend for the total disk space that will be consumed or
+     * freed once the user commits changes. Freed space will show up as a
+     * negative number.
+     *
+     * @return The total disk space to be used in bytes.
+     */
+    int installSize() const;
 
     /**
      * Queries the backend for a list of all available packages, which is

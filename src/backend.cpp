@@ -59,6 +59,8 @@ public:
     // Set of group names extracted from our packages
     QSet<Group> groups;
 
+    QHash<QString, QString> originHash;
+
     OrgKubuntuQaptworkerInterface *worker;
 
     // Pointer to the apt cache object
@@ -131,6 +133,7 @@ void Backend::reloadCache()
     qDeleteAll(d->packages);
     d->packages.clear();
     d->groups.clear();
+    d->originHash.clear();
     d->packagesIndex.clear();
 
     int packageCount = depCache->Head().PackageCount;
@@ -143,7 +146,9 @@ void Backend::reloadCache()
 
     // Populate internal package cache
     int count = 0;
-    QSet<QString> groupSet;
+    QSet<Group> groupSet;
+    QSet<QString> originSet;
+    QSet<QString> originLabelSet;
 
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); iter.end() != true; ++iter) {
@@ -155,15 +160,35 @@ void Backend::reloadCache()
         d->packagesIndex[iter->ID] = count;
         d->packages.insert(count++, pkg);
 
-        if (iter.Section()) {
-            QString name = QString::fromStdString(iter.Section());
-            groupSet << name;
+        QString group = QString::fromStdString(iter.Section());
+
+        if (!group.isEmpty()) {
+            groupSet << group;
+        }
+
+        pkgCache::VerIterator Ver = (*depCache)[iter].CandidateVerIter(*depCache);
+
+        if(!Ver.end()) {
+            pkgCache::VerFileIterator VF = Ver.FileList();
+            originSet << QString(VF.File().Origin());
+            originLabelSet << QString(VF.File().Label());
         }
     }
 
     // Populate groups
     foreach (const QString &group, groupSet) {
         d->groups << group;
+    }
+
+    // Populate origin mapping
+    QList<QString> originList = originSet.toList();
+    originList.removeAll("");
+    QList<QString> originLabelList = originLabelSet.toList();
+    originLabelList.removeAll("");
+
+    for (int i = 0; i < originSet.size()-1; ++i) {
+        qDebug() << i;
+        d->originHash[originList.at(i)] = originLabelList.at(i);
     }
 
     d->undoStack.clear();
@@ -203,6 +228,15 @@ Package *Backend::package(const QString &name) const
     return 0;
 }
 
+QString Backend::originLabel(Package *package) const
+{
+    Q_D(const Backend);
+
+    QString originLabel = d->originHash[package->origin()];
+
+    return originLabel;
+}
+
 int Backend::packageCount() const
 {
     Q_D(const Backend);
@@ -225,6 +259,31 @@ int Backend::packageCount(const Package::States &states) const
     }
 
     return packageCount;
+}
+
+int Backend::downloadSize() const
+{
+    Q_D(const Backend);
+
+    int downloadSize = d->cache->depCache()->DebSize();
+
+    pkgAcquire fetcher;
+    pkgPackageManager *PM = _system->CreatePM(d->cache->depCache());
+    if (PM->GetArchives(&fetcher, d->cache->list(), d->records)) {
+        downloadSize = fetcher.FetchNeeded();
+    }
+    delete PM;
+
+    return downloadSize;
+}
+
+int Backend::installSize() const
+{
+    Q_D(const Backend);
+
+    int installSize = d->cache->depCache()->UsrSize();
+
+    return installSize;
 }
 
 PackageList Backend::availablePackages() const
