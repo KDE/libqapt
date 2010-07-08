@@ -97,6 +97,14 @@ public:
     void reloadCache();
 
     /**
+     * Takes a snapshot of the current state of the package cache. (E.g.
+     * which packages are marked for removal, install, etc)
+     *
+     * \return The current state of the cache as a @c CacheState
+     */
+    CacheState currentCacheState() const;
+
+    /**
      * Queries the backend for a Package object for the specified name.
      * @b _WARNING_ :
      * Note that at the moment this method is unsafe to use unless you are sure
@@ -321,14 +329,6 @@ Q_SIGNALS:
     void commitProgress(const QString &status, int percentage);
 
 public Q_SLOTS:
-    /**
-     * Takes a snapshot of the current state of the package cache. (E.g.
-     * which packages are marked for removal, install, etc)
-     *
-     * \return The current state of the cache as a @c CacheState
-     */
-    CacheState currentCacheState() const;
-
     /**
      * Takes the current state of the cache and puts it on the undo stack
      */
