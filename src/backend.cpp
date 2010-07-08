@@ -269,11 +269,11 @@ int Backend::packageCount(const Package::States &states) const
     return packageCount;
 }
 
-int Backend::downloadSize() const
+double Backend::downloadSize() const
 {
     Q_D(const Backend);
 
-    int downloadSize = d->cache->depCache()->DebSize();
+    double downloadSize = d->cache->depCache()->DebSize();
 
     pkgAcquire fetcher;
     pkgPackageManager *PM = _system->CreatePM(d->cache->depCache());
@@ -285,11 +285,11 @@ int Backend::downloadSize() const
     return downloadSize;
 }
 
-int Backend::installSize() const
+double Backend::installSize() const
 {
     Q_D(const Backend);
 
-    int installSize = d->cache->depCache()->UsrSize();
+    double installSize = d->cache->depCache()->UsrSize();
 
     return installSize;
 }

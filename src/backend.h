@@ -162,7 +162,7 @@ public:
      *
      * @return The total amount that will be downloaded in bytes.
      */
-    int downloadSize() const;
+    double downloadSize() const;
 
     /**
      * Queries the backend for the total disk space that will be consumed or
@@ -171,7 +171,7 @@ public:
      *
      * @return The total disk space to be used in bytes.
      */
-    int installSize() const;
+    double installSize() const;
 
     /**
      * Queries the backend for a list of all available packages, which is
