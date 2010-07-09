@@ -286,9 +286,9 @@ QStringList Package::availableVersions() const
             pkgCache::PkgFileIterator File = VF.File();
 
             if (File->Archive != 0) {
-                versions.append(QString(Ver.VerStr()) % QString(File.Archive()));
+                versions.append(QString(Ver.VerStr()) % " (" % QString(File.Archive()) % ')');
             } else {
-                versions.append(QString(Ver.VerStr()) % QString(File.Site()));
+                versions.append(QString(Ver.VerStr()) % " (" % QString(File.Site()) % ')');
             }
         }
     }
