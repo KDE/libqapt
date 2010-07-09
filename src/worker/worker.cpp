@@ -50,6 +50,7 @@
 
 #define RAMFS_MAGIC     0x858458f6
 
+#include "debug.h"
 #include "qaptauthorization.h"
 #include "workeracquire.h"
 #include "workerinstallprogress.h"
@@ -94,6 +95,12 @@ QAptWorker::~QAptWorker()
 {
     delete m_cache;
     delete m_records;
+}
+
+void QAptWorker::setLocale(const QString &locale) const
+{
+    aptDebug() << "setLocale: locale will be set to" << locale.toAscii();
+    std::setlocale(LC_ALL, locale.toAscii());
 }
 
 bool QAptWorker::initializeApt()

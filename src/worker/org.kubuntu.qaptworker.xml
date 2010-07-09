@@ -37,6 +37,9 @@
       <arg name="details" type="a{sv}" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
+    <method name="setLocale">
+      <arg name="locale" type="s" direction="in"/>
+    </method>
     <method name="updateCache">
     </method>
     <method name="cancelDownload">

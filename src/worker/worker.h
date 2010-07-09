@@ -56,6 +56,7 @@ private:
     QEventLoop *m_questionBlock;
 
 public Q_SLOTS:
+    void setLocale(const QString &locale) const;
     void updateCache();
     void cancelDownload();
     void commitChanges(QMap<QString, QVariant>);
