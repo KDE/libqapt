@@ -938,6 +938,7 @@ void Package::setPurge()
 
 bool Package::setVersion(const QString &version)
 {
+    bool isDefault = (version == d->defaultCandVer);
     pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
     pkgCache::VerIterator Ver = Match.Find(*d->packageIter);
 
@@ -947,15 +948,13 @@ bool Package::setVersion(const QString &version)
 
     d->depCache->SetCandidateVersion(Ver);
 
-    d->state |= OverrideVersion;
+    if (isDefault) {
+        d->state &= ~OverrideVersion;
+    } else {
+        d->state |= OverrideVersion;
+    }
 
     return true;
-}
-
-void Package::unsetVersion()
-{
-    setVersion(d->defaultCandVer);
-    d->state &= ~OverrideVersion;
 }
 
 }

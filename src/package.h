@@ -355,9 +355,11 @@ public:
     */
     void setPurge();
 
+   /**
+    * Overrides the candidate version, setting it to the version string
+    *
+    */
     bool setVersion(const QString & version);
-
-    void unsetVersion();
 
     // "//" == TODO
     enum State {
