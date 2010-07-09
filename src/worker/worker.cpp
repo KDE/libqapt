@@ -183,10 +183,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     initializeApt();
 
     QVariantMap versionList;
-    if (instructionsList.contains("PackageVersions")) {
-        versionList = instructionsList["PackageVersions"].toMap();
-        instructionsList.remove("PackageVersions");
-    }
 
     // Parse out the argument list and mark packages for operations
     QVariantMap::const_iterator mapIter = instructionsList.constBegin();
@@ -195,7 +191,17 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         int operation = mapIter.value().toInt();
 
         // Find package in cache
-        pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(mapIter.key().toStdString());
+        pkgCache::PkgIterator iter;
+        QString packageString = mapIter.key();
+        QString version;
+
+        if (packageString.contains(',')) {
+            QStringList split = packageString.split(',');
+            iter = m_cache->depCache()->FindPkg(split.at(0).toStdString());
+            version = split.at(1);
+        } else {
+            iter = m_cache->depCache()->FindPkg(packageString.toStdString());
+        }
 
         pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
         pkgProblemResolver Fix(m_cache->depCache());
@@ -219,8 +225,21 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             case QApt::Package::ToReInstall:
                 m_cache->depCache()->SetReInstall(iter, true);
                 break;
-            case QApt::Package::ToDowngrade:
+            case QApt::Package::ToDowngrade: {
+                pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
+                pkgCache::VerIterator Ver = Match.Find(iter);
+
+                m_cache->depCache()->SetCandidateVersion(Ver);
+
+                m_cache->depCache()->MarkInstall(iter, true);
+                if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
+                    pkgProblemResolver Fix(m_cache->depCache());
+                    Fix.Clear(iter);
+                    Fix.Protect(iter);
+                    Fix.Resolve(true);
+                }
                 break;
+            }
             case QApt::Package::ToPurge:
                 m_cache->depCache()->SetReInstall(iter, false);
                 m_cache->depCache()->MarkDelete(iter, true);

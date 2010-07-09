@@ -38,6 +38,7 @@
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/tagfile.h>
+#include <apt-pkg/versionmatch.h>
 
 #include <algorithm>
 
@@ -52,6 +53,8 @@ class PackagePrivate
         pkgDepCache *depCache;
         pkgRecords *records;
         pkgCache::PkgIterator *packageIter;
+        QString defaultCandVer;
+        int state;
 
         pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
         QString getReleaseFileForOrigin(const QString &label, const QString &release) const;
@@ -122,6 +125,12 @@ Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
     d->backend = backend;
     d->records= records;
     d->depCache = depCache;
+    d->state = 0;
+
+    pkgDepCache::StateCache &state = (*d->depCache)[*d->packageIter];
+    if (state.CandVersion != NULL) {
+        d->defaultCandVer = state.CandVersion;
+    }
 }
 
 Package::~Package()
@@ -260,6 +269,28 @@ QString Package::version() const
         }
     } else {
         return QString::fromStdString(d->packageIter->CurrentVer().VerStr());
+    }
+}
+
+QStringList Package::availableVersions() const
+{
+    QStringList versions;
+
+    // Get available Versions.
+    for (pkgCache::VerIterator Ver = d->packageIter->VersionList();
+         Ver.end() == false; ++Ver) {
+
+        // We always take the first available version.
+        pkgCache::VerFileIterator VF = Ver.FileList();
+        if (!VF.end()) {
+            pkgCache::PkgFileIterator File = VF.File();
+
+            if (File->Archive != 0) {
+                versions.append(QString(Ver.VerStr()) % QString(File.Archive()));
+            } else {
+                versions.append(QString(Ver.VerStr()) % QString(File.Site()));
+            }
+        }
     }
 }
 
@@ -575,7 +606,7 @@ int Package::state() const
         packageState |= InstallPolicyBroken;
     }
 
-   return packageState;
+   return packageState | d->state;
 }
 
 bool Package::isInstalled() const
@@ -903,6 +934,28 @@ void Package::setPurge()
     d->depCache->MarkDelete(*d->packageIter, true);
 
     d->backend->packageChanged(this);
+}
+
+bool Package::setVersion(const QString &version)
+{
+    pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
+    pkgCache::VerIterator Ver = Match.Find(*d->packageIter);
+
+    if (Ver.end() == true) {
+        return false;
+    }
+
+    d->depCache->SetCandidateVersion(Ver);
+
+    d->state |= OverrideVersion;
+
+    return true;
+}
+
+void Package::unsetVersion()
+{
+    setVersion(d->defaultCandVer);
+    d->state &= ~OverrideVersion;
 }
 
 }

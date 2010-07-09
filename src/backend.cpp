@@ -652,7 +652,8 @@ void Backend::commitChanges()
                qDebug() << "Upgrading:" << package->name();
                break;
            case Package::ToDowngrade:
-               packageList.insert(package->name(), Package::ToDowngrade);
+               packageList.insert(package->name() % ',' % package->version(), Package::ToDowngrade);
+               qDebug() << "Downgrading:" << package->name() << package->version();
                break;
            case Package::ToRemove:
                if(flags & Package::ToPurge) {

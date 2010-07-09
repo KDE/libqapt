@@ -91,11 +91,21 @@ public:
 
    /**
     * Member function that returns the version of the package, regardless of
-    * whether it is installed or not
+    * whether it is installed or not. If not installed, it returns the version
+    * of the candidate for installation, which may not necessarily be the latest
+    * if the version has been changed with setVersion
     *
     * \return The version of the package as a @c QString
     */
     QString version() const;
+
+   /**
+    * Member function that returns a list of all available versions of the
+    * package in the form of "version, release" E.g. "0.2-0ubuntu1, maverick"
+    *
+    * \return All available versions of the package as a @c QStringList
+    */
+    QStringList availableVersions() const;
 
    /**
     * Member function that returns the section of the package
@@ -345,6 +355,10 @@ public:
     */
     void setPurge();
 
+    bool setVersion(const QString & version);
+
+    void unsetVersion();
+
     // "//" == TODO
     enum State {
         ToKeep              = 1 << 0,
@@ -366,7 +380,7 @@ public:
         NotDownloadable     = 1 << 16,
         ToPurge             = 1 << 17,
         IsImportant         = 1 << 18,
-        OverrideVersion     = 1 << 19,//
+        OverrideVersion     = 1 << 19,
         IsAuto              = 1 << 20,
         IsGarbage           = 1 << 21,
         NowPolicyBroken     = 1 << 22,
