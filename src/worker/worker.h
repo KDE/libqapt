@@ -50,7 +50,6 @@ private:
     pkgPolicy *m_policy;
     pkgRecords *m_records;
 
-    bool m_locked;
     QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
     QEventLoop *m_questionBlock;
@@ -63,8 +62,6 @@ public Q_SLOTS:
     void answerWorkerQuestion(const QVariantMap &response);
 
 private Q_SLOTS:
-    bool lock();
-    void unlock();
     bool initializeApt();
     void setAnswer(const QVariantMap &answer);
 

@@ -59,7 +59,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         : QCoreApplication(argc, argv)
         , m_cache(0)
         , m_records(0)
-        , m_locked(false)
         , m_questionBlock(0)
         , m_questionResponse(QVariantMap())
 {
@@ -123,25 +122,6 @@ bool QAptWorker::initializeApt()
     m_records = new pkgRecords(*depCache);
 
     return true;
-}
-
-bool QAptWorker::lock()
-{
-   if (m_locked)
-      return true;
-
-   m_locked = _system->Lock();
-
-   return m_locked;
-}
-
-void QAptWorker::unlock()
-{
-   if (!m_locked)
-      return;
-
-   _system->UnLock();
-   m_locked = false;
 }
 
 void QAptWorker::updateCache()
