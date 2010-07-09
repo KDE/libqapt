@@ -166,6 +166,14 @@ void QAptWorker::updateCache()
         }
     }
 
+    pkgAcquire fetcher(m_acquireStatus);
+    // Populate it with the source selection and get all Indexes
+    // (GetAll=true)
+    if (m_cache->list()->GetIndexes(&fetcher,true) == false) {
+        emit workerFinished(false);
+        return;
+    }
+
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
