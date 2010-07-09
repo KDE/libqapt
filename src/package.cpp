@@ -292,6 +292,8 @@ QStringList Package::availableVersions() const
             }
         }
     }
+
+    return versions;
 }
 
 QString Package::installedVersion() const
