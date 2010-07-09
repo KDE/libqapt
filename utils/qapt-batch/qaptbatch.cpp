@@ -71,6 +71,7 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     m_detailsWidget = new DetailsWidget(this);
     setDetailsWidget(m_detailsWidget);
 
+    m_worker->setLocale(setlocale(LC_ALL, 0));
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
     } else if (m_mode == "uninstall") {
