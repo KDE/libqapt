@@ -624,7 +624,7 @@ void Backend::commitChanges()
 {
     Q_D(Backend);
 
-    QMap<QString, QVariant> instructionList;
+    QVariantMap packageList;
 
     foreach (const Package *package, d->packages) {
         int flags = package->state();
@@ -635,46 +635,42 @@ void Backend::commitChanges()
                               Package::ToUpgrade |
                               Package::ToDowngrade |
                               Package::ToRemove);
-
         switch (status) {
            case Package::ToKeep:
                if (flags & Package::Held) {
-                   instructionList.insert(package->name(), Package::Held);
+                   packageList.insert(package->name(), Package::Held);
                }
                break;
            case Package::NewInstall:
-               instructionList.insert(package->name(), Package::ToInstall);
+               packageList.insert(package->name(), Package::ToInstall);
                qDebug() << "Installing:" << package->name();
                break;
            case Package::ToReInstall:
-               instructionList.insert(package->name(), Package::ToReInstall);
+               packageList.insert(package->name(), Package::ToReInstall);
                break;
            case Package::ToUpgrade:
-               instructionList.insert(package->name(), Package::ToUpgrade);
+               packageList.insert(package->name(), Package::ToUpgrade);
                qDebug() << "Upgrading:" << package->name();
                break;
            case Package::ToDowngrade:
-               instructionList.insert(package->name(), Package::ToDowngrade);
+               packageList.insert(package->name(), Package::ToDowngrade);
                break;
            case Package::ToRemove:
                if(flags & Package::ToPurge) {
-                   instructionList.insert(package->name(), Package::ToPurge);
+                   packageList.insert(package->name(), Package::ToPurge);
                } else {
                    qDebug() << "Removing:" << package->name();
-                   instructionList.insert(package->name(), Package::ToRemove);
+                   packageList.insert(package->name(), Package::ToRemove);
                }
                break;
         }
     }
 
-    qDebug() << instructionList;
-
-    d->worker->commitChanges(instructionList);
+    d->worker->commitChanges(packageList);
 }
 
 void Backend::packageChanged(Package *package)
 {
-    qDebug() << "A package changed!";
     emit packageChanged();
 }
 
