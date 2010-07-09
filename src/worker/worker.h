@@ -59,8 +59,8 @@ public Q_SLOTS:
     void setLocale(const QString &locale) const;
     void updateCache();
     void cancelDownload();
-    void commitChanges(QMap<QString, QVariant>);
-    void answerWorkerQuestion(const QVariantMap& response);
+    void commitChanges(QVariantMap instructionsList);
+    void answerWorkerQuestion(const QVariantMap &response);
 
 private Q_SLOTS:
     bool lock();

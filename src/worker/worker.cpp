@@ -193,7 +193,7 @@ void QAptWorker::cancelDownload()
     m_acquireStatus->requestCancel();
 }
 
-void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
+void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
         emit errorOccurred(QApt::AuthError, QVariantMap());
@@ -202,10 +202,16 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionList)
 
     initializeApt();
 
-    // Parse out the argument list and mark packages for operations
-    QMap<QString, QVariant>::const_iterator mapIter = instructionList.constBegin();
+    QVariantMap versionList;
+    if (instructionsList.contains("PackageVersions")) {
+        versionList = instructionsList["PackageVersions"].toMap();
+        instructionsList.remove("PackageVersions");
+    }
 
-    while (mapIter != instructionList.constEnd()) {
+    // Parse out the argument list and mark packages for operations
+    QVariantMap::const_iterator mapIter = instructionsList.constBegin();
+
+    while (mapIter != instructionsList.constEnd()) {
         int operation = mapIter.value().toInt();
 
         // Find package in cache
