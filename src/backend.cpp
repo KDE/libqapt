@@ -84,6 +84,7 @@ Backend::Backend()
     d->worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
                                                   "/", QDBusConnection::systemBus(),
                                                   this);
+    d->worker->setLocale(setlocale(LC_ALL, 0));
 
     connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
             this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
