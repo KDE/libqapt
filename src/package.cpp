@@ -626,7 +626,6 @@ bool Package::isSupported() const
 
 QStringList Package::dependencyList(bool useCanidateVersion) const
 {
-    // TODO: Stub, won't return anything.
     QStringList dependsList;
     pkgCache::VerIterator current;
 
