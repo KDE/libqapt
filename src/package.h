@@ -36,20 +36,17 @@ class pkgDepCache;
 
 namespace QApt {
 
+class Backend;
+
 /**
- * GroupPrivate is a class containing all private members of the Group class
+ * PackagePrivate is a class containing all private members of the Package class
  */
 class PackagePrivate;
-class Backend;
 
 /**
  * The Package class is an object for referencing a software package in the Apt
  * package database. You will be getting most of your information about your
  * packages from this class.
- * @par
- * As long as you provide pointers to your pkgDepCache, pkgRecords and
- * PkgIterator you could use this class apart from the Backend class and use it
- * as a package container in your own application
  *
  * @author Jonathan Thomas
  */
@@ -83,7 +80,8 @@ public:
     QString name() const;
 
    /**
-    * Member function that returns the unique identifier for the package
+    * Member function that returns the unique internal identifier for the
+    * package
     *
     * \return The identifier of the package as an @c int
     */
@@ -123,7 +121,7 @@ public:
     QString sourcePackage() const;
 
    /**
-    * Member function that returns the short description (or summary in
+    * Member function that returns the short description (or "summary" in
     * libapt-pkg terms) of the package
     *
     * \return The short description of the package as a @c QString
@@ -304,6 +302,21 @@ public:
     */
     QStringList providesList() const;
 
+   /**
+    * If a package is in a broke state, this function returns why the package
+    * is broken by showing all errors in the dependency cache that marking the
+    * package has caused.
+    *
+    * The format is a bit complex. The QHash contains a QHash corresponding to
+    * each QApt::BrokenReason. This internal QHash is a QString corresponding to
+    * a QVariantMap. The QString in this case is a package that is broken by this
+    * QApt::Package, and the QVariantMap contails details on why the corresponding
+    * package is broken. These details may vary based on what QApt::BrokenState
+    * the QHash corresponds to.
+    *
+    * \return A @c QHash of reasons why the package is broken, corresponding to a
+    * QApt::BrokenReason
+    */
     QHash<int, QHash<QString, QVariantMap> > brokenReason() const;
 
    /**
@@ -325,8 +338,9 @@ public:
     bool wouldBreak() const;
 
    /**
-    * Sets an unsets the auto-install flag
+    * Sets and unsets the auto-install flag
     */
+    // TODO: Split in to two functions for enable/disable before API freeze
     void setAuto(bool flag = true);
 
    /**
@@ -357,36 +371,64 @@ public:
 
    /**
     * Overrides the candidate version, setting it to the version string
-    *
     */
     bool setVersion(const QString & version);
 
     // "//" == TODO
+   /**
+    * An enumerator for various states that a @c Package may hold. A package
+    * may hold several states at once.
+    */
     enum State {
+        /// The package will not be changed
         ToKeep              = 1 << 0,
+        /// The package has been marked for install
         ToInstall           = 1 << 1,
+        /// The package is a new install, never have been installed before
         NewInstall          = 1 << 2,
+        /// The package has been marked for reinstall
         ToReInstall         = 1 << 3,
+        /// The package has been marked for upgrade
         ToUpgrade           = 1 << 4,
+        /// The package has been marked for downgrade
         ToDowngrade         = 1 << 5,
+        /// The package has been marke dfor removal
         ToRemove            = 1 << 6,
+        /// The package has been held from beinig upgraded
         Held                = 1 << 7,
+        /// The package is currently installed
         Installed           = 1 << 8,
+        /// The package is currently upgradeable
         Upgradeable         = 1 << 9,
+        /// The package is currently broken
         NowBroken           = 1 << 10,
+        /// The package's install is broken
         InstallBroken       = 1 << 11,
+        /// This package is a dependency of another package that is not installed
         Orphaned            = 1 << 12,//
+        /// The package has been manually prevented from upgrade
         Pinned              = 1 << 13,//
+        /// The package is new in the archives
         New                 = 1 << 14,//
+        /// The package still has residual config. (Was not purged)
         ResidualConfig      = 1 << 15,
+        /// The package is no longer downloadable
         NotDownloadable     = 1 << 16,
+        /// The package has been marked for purging
         ToPurge             = 1 << 17,
+        /// The package is essential for a base installation
         IsImportant         = 1 << 18,
+        /// The package has had its candidate version overridden by setVersion()
         OverrideVersion     = 1 << 19,
+        /// The package was automatically installed as a dependency
         IsAuto              = 1 << 20,
+        /// The package is invalid
         IsGarbage           = 1 << 21,
+        /// The package's policy is broken
         NowPolicyBroken     = 1 << 22,
+        /// The package's install policy is broken
         InstallPolicyBroken = 1 << 23,
+        /// The package is not installed
         NotInstalled        = 1 << 24
     };
     Q_DECLARE_FLAGS(States, State);
