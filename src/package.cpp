@@ -121,6 +121,8 @@ Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
 {
     // Passing the pkgIter by pointer from Backend results in a crash
     // the first time you try to call a method needing it :(
+    // Probably because the pointer is created inside an iterator and
+    // is very temporary.
     d->packageIter = new pkgCache::PkgIterator(packageIter);
     d->backend = backend;
     d->records= records;
