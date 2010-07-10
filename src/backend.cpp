@@ -151,7 +151,7 @@ void Backend::reloadCache()
     QStringList originLabelList;
 
     pkgCache::PkgIterator iter;
-    for (iter = depCache->PkgBegin(); iter.end() != true; ++iter) {
+    for (iter = depCache->PkgBegin(); !iter.end(); ++iter) {
         if (iter->VersionList == 0) {
             continue; // Exclude virtual packages.
         }
@@ -209,7 +209,7 @@ Package *Backend::package(const QString &name) const
     Q_D(const Backend);
 
     pkgCache::PkgIterator pkg = d->cache->depCache()->FindPkg(name.toStdString());
-    if (pkg.end() == false) {
+    if (!pkg.end()) {
         return package(pkg);
     }
 
