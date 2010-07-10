@@ -21,7 +21,6 @@
 #ifndef QAPT_BACKEND_H
 #define QAPT_BACKEND_H
 
-#include <QtCore/QSet>
 #include <QtCore/QVariantMap>
 
 #include "globals.h"
@@ -402,6 +401,28 @@ public Q_SLOTS:
      * to a worker question. 
      */
     void answerWorkerQuestion(const QVariantMap &response);
+
+    /**
+     * Writes a list of packages that have been marked for install, removal or
+     * upgrade
+     *
+     * @param path The path to save the selection list to
+     *
+     * \return @c true if saving succeeded
+     * \return @c false if the saving failed
+     */
+    bool saveSelections(const QString &path) const;
+
+    /**
+     * Reads and applies selections from a text file generated from either
+     * saveSelections() or from Synaptic
+     *
+     * @param path The path from which to read the selection list
+     *
+     * \return @c true if reading/marking succeeded
+     * \return @c false if the reading/marking failed
+     */
+    bool loadSelections(const QString &path);
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

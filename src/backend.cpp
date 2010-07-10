@@ -23,6 +23,7 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
+#include <QtCore/QTextStream>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusServiceWatcher>
 
@@ -32,6 +33,7 @@
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/policy.h>
 #include <apt-pkg/sourcelist.h>
+#include <apt-pkg/strutl.h>
 
 // Xapian includes
 #include <xapian.h>
@@ -677,6 +679,124 @@ void Backend::updateCache()
 
     d->worker->setLocale(setlocale(LC_ALL, 0));
     d->worker->updateCache();
+}
+
+bool Backend::saveSelections(const QString &path) const
+{
+    Q_D(const Backend);
+
+    QString selectionDocument;
+    for (unsigned i = 0; i < d->packages.size(); ++i) {
+        int flags = d->packages[i]->state();
+
+        if (flags & Package::ToInstall) {
+            selectionDocument.append(d->packages[i]->name() % "\t\tinstall" % '\n');
+        } else if (flags & Package::ToRemove) {
+            selectionDocument.append(d->packages[i]->name() % "\t\tdeinstall" % '\n');
+        }
+    }
+
+    if (selectionDocument.isEmpty()) {
+        return false;
+    }
+
+    QFile file(path);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        return false;
+    } else {
+        QTextStream out(&file);
+        out << selectionDocument;
+    }
+
+    return true;
+}
+
+bool Backend::loadSelections(const QString &path)
+{
+    Q_D(Backend);
+
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly)) {
+        return false;
+    }
+
+    QTextStream in(&file);
+
+    QString line;
+
+    string stdName;
+    string stdAction;
+    QString packageName;
+    QString packageAction;
+
+    QMap<QString, int> actionMap;
+    do {
+        line = in.readLine();
+        if (line.isEmpty() || line.at(0) == '#') {
+            continue;
+        }
+        line = line.simplified();
+
+        const char *C = line.toStdString().data();
+        if (!ParseQuoteWord(C, stdName)) {
+            return false;
+        }
+        packageName = QString::fromStdString(stdName);
+
+        if (!ParseQuoteWord(C, stdAction)) {
+            return false;
+        }
+        packageAction = QString::fromStdString(stdAction);
+
+        if (packageAction.at(0) == 'i') {
+            actionMap[packageName] = Package::ToInstall;
+        } else if ((packageAction.at(0) == 'd') || (packageAction.at(0) == 'u')) {
+            actionMap[packageName] = Package::ToRemove;
+        }
+    } while (!line.isNull());
+
+    if (actionMap.isEmpty()) {
+       return false;
+    }
+
+    pkgDepCache &cache = *d->cache->depCache();
+    pkgProblemResolver Fix(&cache);
+    // XXX Should protect whatever is already selected in the cache.
+
+    pkgCache::PkgIterator pkgIter;
+    QMap<QString, int>::const_iterator mapIter = actionMap.begin();
+    while (mapIter != actionMap.end()) {
+        pkgIter = d->cache->depCache()->FindPkg(mapIter.key().toStdString());
+        if (pkgIter.end()) {
+            return false;
+        }
+
+        Fix.Clear(pkgIter);
+        Fix.Protect(pkgIter);
+
+        switch (mapIter.value()) {
+           case Package::ToInstall:
+               if(_config->FindB("Volatile::SetSelectionDoReInstall",false)) {
+                   cache.SetReInstall(pkgIter, true);
+               }
+               if(_config->FindB("Volatile::SetSelectionsNoFix",false)) {
+                   cache.MarkInstall(pkgIter, false);
+               } else {
+                   cache.MarkInstall(pkgIter, true);
+               }
+               break;
+           case Package::ToRemove:
+               Fix.Remove(pkgIter);
+               cache.MarkDelete(pkgIter, false);
+               break;
+        }
+        ++mapIter;
+    }
+
+    Fix.InstallProtect();
+    Fix.Resolve(true);
+
+    return true;
 }
 
 void Backend::workerStarted()
