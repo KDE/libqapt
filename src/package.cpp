@@ -624,15 +624,15 @@ bool Package::isSupported() const
     return supported;
 }
 
-QStringList Package::dependencyList(bool useCanidateVersion) const
+QStringList Package::dependencyList(bool useCandidateVersion) const
 {
     QStringList dependsList;
     pkgCache::VerIterator current;
 
-    if(!useCanidateVersion) {
+    if(!useCandidateVersion) {
         current = (*d->depCache)[*d->packageIter].InstVerIter(*d->depCache);
     }
-    if(useCanidateVersion || current.end()) {
+    if(useCandidateVersion || current.end()) {
         current = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     }
 
