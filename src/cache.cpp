@@ -32,31 +32,31 @@ class CachePrivate
 {
 public:
     CachePrivate()
-        : m_map(0)
-        , m_cache(0)
-        , m_policy(0)
-        , m_depCache(0)
-        , m_list(new pkgSourceList)
+        : mmap(0)
+        , cache(0)
+        , policy(0)
+        , depCache(0)
+        , list(new pkgSourceList)
     {
     }
 
     virtual ~CachePrivate()
     {
-        delete m_list;
-        delete m_cache;
-        delete m_policy;
-        delete m_depCache;
-        delete m_map;
+        delete list;
+        delete cache;
+        delete policy;
+        delete depCache;
+        delete mmap;
     }
 
     OpProgress m_progressMeter;
-    MMap *m_map;
+    MMap *mmap;
 
-    pkgCache *m_cache;
-    pkgPolicy *m_policy;
+    pkgCache *cache;
+    pkgPolicy *policy;
 
-    pkgDepCache *m_depCache;
-    pkgSourceList *m_list;
+    pkgDepCache *depCache;
+    pkgSourceList *list;
 };
 
 Cache::Cache(QObject* parent)
@@ -75,26 +75,38 @@ bool Cache::open()
     Q_D(Cache);
 
    // delete any old structures
-    delete d->m_cache;
-    delete d->m_policy;
-    delete d->m_depCache;
-    delete d->m_map;
+    if (d->cache) {
+        delete d->cache;
+        d->cache = 0;
+    }
+    if (d->policy) {
+        delete d->policy;
+        d->policy = 0;
+    }
+    if (d->depCache) {
+        delete d->depCache;
+        d->depCache = 0;
+    }
+    if (d->mmap) {
+        delete d->mmap;
+        d->mmap = 0;
+    }
 
     // Read the sources list
-    if (!d->m_list->ReadMainList()) {
+    if (!d->list->ReadMainList()) {
         return false;
     }
 
-    pkgMakeStatusCache(*(d->m_list), d->m_progressMeter, &(d->m_map), true);
+    pkgMakeStatusCache(*(d->list), d->m_progressMeter, &(d->mmap), true);
     d->m_progressMeter.Done();
     if (_error->PendingError()) {
         return false;
     }
 
     // Open the cache file
-    d->m_cache = new pkgCache(d->m_map);
-    d->m_policy = new pkgPolicy(d->m_cache);
-    if (!ReadPinFile(*(d->m_policy))) {
+    d->cache = new pkgCache(d->mmap);
+    d->policy = new pkgPolicy(d->cache);
+    if (!ReadPinFile(*(d->policy))) {
         return false;
     }
 
@@ -102,10 +114,10 @@ bool Cache::open()
         return false;
     }
 
-    d->m_depCache = new pkgDepCache(d->m_cache, d->m_policy);
-    d->m_depCache->Init(&(d->m_progressMeter));
+    d->depCache = new pkgDepCache(d->cache, d->policy);
+    d->depCache->Init(&(d->m_progressMeter));
 
-    if (d->m_depCache->DelCount() != 0 || d->m_depCache->InstCount() != 0) {
+    if (d->depCache->DelCount() != 0 || d->depCache->InstCount() != 0) {
         return false;
     }
 }
@@ -114,14 +126,14 @@ pkgDepCache *Cache::depCache() const
 {
     Q_D(const Cache);
 
-    return d->m_depCache;
+    return d->depCache;
 }
 
 pkgSourceList *Cache::list() const
 {
     Q_D(const Cache);
 
-    return d->m_list;
+    return d->list;
 }
 
 }
