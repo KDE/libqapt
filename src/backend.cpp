@@ -55,7 +55,7 @@ public:
     QDBusServiceWatcher *watcher;
     // The canonical list of all unique, non-virutal package objects
     PackageList packages;
-    vector<int> packagesIndex;
+    QVector<int> packagesIndex;
     // Set of group names extracted from our packages
     QSet<Group> groups;
 
@@ -137,7 +137,7 @@ void Backend::reloadCache()
     d->packagesIndex.clear();
 
     int packageCount = depCache->Head().PackageCount;
-    d->packagesIndex.resize(packageCount, -1);
+    d->packagesIndex.resize(packageCount);
 
     // Remove check when sid has >= 4.7
     #if QT_VERSION >= 0x040700
