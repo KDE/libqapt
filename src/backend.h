@@ -106,13 +106,11 @@ public:
 
     /**
      * Queries the backend for a Package object for the specified name.
+     * 
      * @b _WARNING_ :
-     * Note that at the moment this method is unsafe to use unless you are sure
-     * that a package with the name you specified, as the library currently
-     * does not have a null package to return in the case where a package
-     * with the specified name doesn't exists, and returns nothing, resulting
-     * in a crash. For the moment, you'll want to check your Package objects to
-     * see if they are null before trying to access them.
+     * Note that if a package with a given name cannot be found, a null pointer
+     * will be returned. Also, please note that certain actions like reloading
+     * the cache may invalidate the pointer.
      *
      * @param name name used to specify the package returned
      *
