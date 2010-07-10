@@ -69,12 +69,10 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label
     for(verIter = packageIter->VersionList(); !verIter.end(); ++verIter) {
         for(verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
             for(found = verFileIter.File(); !found.end(); ++found) {
-                if(!found.end() && found.Label() &&
-                  QString::fromStdString(found.Label()) == label &&
-                  found.Origin() && QString::fromStdString(found.Origin()) == label &&
-                  found.Archive() && QString::fromStdString(found.Archive()) == release) {
-                    //cerr << "found: " << PF.FileName() << endl;
-                    return found;
+                if(found.Label() && QString::fromStdString(found.Label()) == label &&
+                   found.Origin() && QString::fromStdString(found.Origin()) == label &&
+                   found.Archive() && QString::fromStdString(found.Archive()) == release) {
+                      return found;
                 }
             }
         }
