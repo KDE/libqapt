@@ -443,20 +443,16 @@ bool Backend::isBroken() const
     return false;
 }
 
-bool Backend::xapianIndexNeedsUpdate()
+bool Backend::xapianIndexNeedsUpdate() const
 {
-    Q_D(Backend);
+    Q_D(const Backend);
 
-    struct stat;
-    struct buf;
-
-    // check the xapian index
-    if(FileExists("/usr/sbin/update-apt-xapian-index")) {
+    // We could have a xapian install, but no index yet.
+    if(FileExists("/usr/sbin/update-apt-xapian-index") && ! d->xapianDatabase) {
         return true;
     }
 
-   // compare timestamps, rebuild every time, its now cheap(er)
-   // because we use u-a-x-i --update
+   // If the cache has been modified after the xapian timestamp, we need to rebuild
    QDateTime statTime;
    statTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();
    if(d->xapianTimeStamp < statTime.toTime_t()) {

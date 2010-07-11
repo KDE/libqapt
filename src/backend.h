@@ -225,7 +225,7 @@ public:
      * \return @c true if the index needs updating
      * \return @c false if the index doesn't need updating
      */
-    bool xapianIndexNeedsUpdate();
+    bool xapianIndexNeedsUpdate() const;
 
     /**
      * Checks whether or not the cache has broken packages or has a null
