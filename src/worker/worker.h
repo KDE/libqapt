@@ -30,6 +30,7 @@ class pkgPolicy;
 class pkgRecords;
 
 class QEventLoop;
+class QProcess;
 
 class WorkerAcquire;
 class WorkerInstallProgress;
@@ -53,6 +54,7 @@ private:
     QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
     QEventLoop *m_questionBlock;
+    QProcess *m_xapianProc;
 
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
@@ -60,6 +62,7 @@ public Q_SLOTS:
     void cancelDownload();
     void commitChanges(QVariantMap instructionsList);
     void answerWorkerQuestion(const QVariantMap &response);
+    void updateXapianIndex();
 
 private Q_SLOTS:
     bool initializeApt();
@@ -76,6 +79,7 @@ Q_SIGNALS:
     void warningOccurred(int code, const QVariantMap &details);
     void questionOccurred(int questionCode, const QVariantMap& details);
     void answerReady(const QVariantMap& response);
+    void xapianUpdateProgress(int percentage);
 };
 
 #endif

@@ -450,7 +450,8 @@ bool Backend::xapianIndexNeedsUpdate() const
    // If the cache has been modified after the xapian timestamp, we need to rebuild
    QDateTime statTime;
    statTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();
-   if(d->xapianTimeStamp < statTime.toTime_t()) {
+   qDebug() << d->xapianTimeStamp << (d->xapianTimeStamp < statTime.toTime_t());
+   if (d->xapianTimeStamp < statTime.toTime_t()) {
       return true;
    }
 
@@ -788,6 +789,13 @@ bool Backend::loadSelections(const QString &path)
     Fix.Resolve(true);
 
     return true;
+}
+
+void Backend::updateXapianIndex()
+{
+    Q_D(Backend);
+
+    d->worker->updateXapianIndex();
 }
 
 void Backend::workerStarted()

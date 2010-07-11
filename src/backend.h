@@ -227,6 +227,8 @@ public:
      */
     bool xapianIndexNeedsUpdate() const;
 
+    bool openXapianIndex();
+
     /**
      * Checks whether or not the cache has broken packages or has a null
      * dependency cache
@@ -258,7 +260,6 @@ private:
      * \return @c true if opening succeeded
      * \return @c false if the opening didn't succeed
      */
-    bool openXapianIndex();
 
     Package *package(pkgCache::PkgIterator &iter) const;
 
@@ -423,6 +424,8 @@ public Q_SLOTS:
      * \return @c false if the reading/marking failed
      */
     bool loadSelections(const QString &path);
+
+    void updateXapianIndex();
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

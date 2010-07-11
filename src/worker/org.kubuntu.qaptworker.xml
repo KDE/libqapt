@@ -52,5 +52,7 @@
       <arg name="response" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
+    <method name="updateXapianIndex">
+    </method>
   </interface>
 </node>

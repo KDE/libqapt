@@ -66,6 +66,10 @@ namespace QApt
         CommitChangesStarted    = 5,
         /// The worker has finished committing changes
         CommitChangesFinished   = 6,
+        /// The worker has begun to update the xapian index
+        XapianUpdateStarted     = 7,
+        /// The worker has finished updating the xapian index
+        XapianUpdateFinished    = 8
     };
 
    /**

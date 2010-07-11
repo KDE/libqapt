@@ -45,6 +45,7 @@
 #include <sys/fcntl.h>
 
 // Qt includes
+#include <QtCore/QProcess>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusMessage>
 
@@ -98,7 +99,6 @@ QAptWorker::~QAptWorker()
 
 void QAptWorker::setLocale(const QString &locale) const
 {
-    aptDebug() << "setLocale: locale will be set to" << locale.toAscii();
     std::setlocale(LC_ALL, locale.toAscii());
 }
 
@@ -399,4 +399,17 @@ void QAptWorker::setAnswer(const QVariantMap &answer)
                this, SLOT(setAnswer(const QVariantMap&)));
     m_questionResponse = answer;
     m_questionBlock->quit();
+}
+
+void QAptWorker::updateXapianIndex()
+{
+    emit workerEvent(QApt::XapianUpdateStarted);
+    m_xapianProc = new QProcess(this);
+    QString cmd = "/usr/bin/nice /usr/bin/ionice -c3 "
+                  "/usr/sbin/update-apt-xapian-index "
+                  "--update";
+    m_xapianProc->start(cmd);
+
+    m_xapianProc->waitForFinished();
+    emit workerEvent(QApt::XapianUpdateFinished);
 }
