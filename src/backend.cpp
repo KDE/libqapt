@@ -447,11 +447,6 @@ bool Backend::xapianIndexNeedsUpdate() const
 {
     Q_D(const Backend);
 
-    // We could have a xapian install, but no index yet.
-    if(FileExists("/usr/sbin/update-apt-xapian-index") && ! d->xapianDatabase) {
-        return true;
-    }
-
    // If the cache has been modified after the xapian timestamp, we need to rebuild
    QDateTime statTime;
    statTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();
