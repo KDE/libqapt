@@ -582,7 +582,6 @@ void Backend::markPackagesForUpgrade()
 {
     Q_D(Backend);
 
-    // TODO: Should say something if there's an error?
     pkgAllUpgrade(*d->cache->depCache());
     emit packageChanged();
 }
@@ -591,7 +590,6 @@ void Backend::markPackagesForDistUpgrade()
 {
     Q_D(Backend);
 
-    // TODO: Should say something if there's an error?
     pkgDistUpgrade(*d->cache->depCache());
     emit packageChanged();
 }
