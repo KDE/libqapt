@@ -24,13 +24,15 @@
 #include <QtCore/QCoreApplication>
 #include <QtDBus/QDBusContext>
 
-#include "../cache.h"
-
 class pkgPolicy;
 class pkgRecords;
 
 class QEventLoop;
 class QProcess;
+
+namespace QApt {
+    class Cache;
+}
 
 class WorkerAcquire;
 class WorkerInstallProgress;

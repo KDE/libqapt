@@ -23,6 +23,7 @@
 #include "qaptworkeradaptor.h"
 
 // QApt includes
+#include "../cache.h"
 #include "../globals.h"
 #include "../package.h"
 
