@@ -262,7 +262,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     if (_config->FindB("Debug::NoLocking",false) == false)
     {
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
-        if (_error->PendingError() == true) {
+        if (_error->PendingError()) {
             emit errorOccurred(QApt::LockError, QVariantMap());
             emit workerFinished(false);
             return;
