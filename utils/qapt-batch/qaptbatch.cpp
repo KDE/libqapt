@@ -156,19 +156,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             raiseErrorMessage(text, title);
             break;
         case QApt::CommitError:
-            failedItem = args["FailedItem"].toString();
-            errorText = args["ErrorText"].toString();
-            text = i18nc("@label", "An error occurred while committing changes.");
-
-            if (!failedItem.isEmpty() && !errorText.isEmpty()) {
-                text.append("\n\n");
-                text.append(i18n("File: %1", failedItem));
-                text.append("\n\n");
-                text.append(i18n("Error: %1", errorText));
-            }
-
-            title = i18nc("@title:window", "Commit error");
-            raiseErrorMessage(text, title);
+            m_errorStack.append(args);
             break;
         case QApt::AuthError:
             text = i18nc("@label",
@@ -213,17 +201,17 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 void QAptBatch::warningOccurred(int warning, const QVariantMap &args)
 {
     switch (warning) {
-        case QApt::SizeMismatchWarning:
-            //TODO
-            break;
-        case QApt::FetchFailedWarning: {
-            QString failedItem = args["FailedItem"].toString();
-            QString warningText = args["WarningText"].toString();
+        case QApt::SizeMismatchWarning: {
             QString text = i18nc("@label",
-                                 "Failed to download %1\n"
-                                 "%2", failedItem, warningText);
-            QString title = i18nc("@title:window", "Download Failed");
+                                 "The size of the downloaded items did not "
+                                 "equal the expected size.");
+            QString title = i18nc("@title:window", "Size Mismatch");
             KMessageBox::sorry(this, text, title);
+            break;
+        }
+        case QApt::FetchFailedWarning: {
+            m_warningStack.append(args);
+            break;
         }
         case QApt::UnknownWarning:
         default:
@@ -306,6 +294,12 @@ void QAptBatch::workerEvent(int code)
             show();
             break;
         case QApt::CacheUpdateFinished:
+            if (m_warningStack.size() > 0) {
+                showQueuedWarnings();
+            }
+            if (m_errorStack.size() > 0) {
+                showQueuedErrors();
+            }
             setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
             disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             progressBar()->setValue(100);
@@ -334,6 +328,12 @@ void QAptBatch::workerEvent(int code)
             show(); // In case no download was necessary
             break;
         case QApt::CommitChangesFinished:
+            if (m_warningStack.size() > 0) {
+                showQueuedWarnings();
+            }
+            if (m_errorStack.size() > 0) {
+                showQueuedErrors();
+            }
             if (m_mode == "install") {
                 setWindowTitle(i18nc("@title:window", "Installation Complete"));
                 setLabelText(i18ncp("@label",
@@ -415,6 +415,37 @@ void QAptBatch::updateCommitProgress(const QString& message, int percentage)
     }
     progressBar()->setValue(percentage);
     setLabelText(message);
+}
+
+void QAptBatch::showQueuedWarnings()
+{
+    QStringList details;
+    QString text = i18nc("@label", "Unable to download the following packages:");
+    foreach (QVariantMap args, m_warningStack) {
+        QString failedItem = args["FailedItem"].toString();
+        QString warningText = args["WarningText"].toString();
+        details.append(i18nc("@label",
+                             "Failed to download %1\n"
+                             "%2\n\n", failedItem, warningText));
+    }
+    QString title = i18nc("@title:window", "Some Packages Could not be Downloaded");
+    KMessageBox::errorList(this, text, details, title);
+}
+
+void QAptBatch::showQueuedErrors()
+{
+    QStringList details;
+    QString text = i18ncp("@label", "An error occurred while applying changes:",
+                                    "The following errors occurred while applying changes:",
+                                    m_warningStack.size());
+    foreach (QVariantMap args, m_errorStack) {
+        QString failedItem = i18nc("@label Shows which package failed", "Package: %1", args["FailedItem"].toString());
+        QString errorText = i18nc("@label Shows the error", "Error: %1", args["ErrorText"].toString());
+        details.append(failedItem % "\n" % errorText);
+    }
+
+    QString title = i18nc("@title:window", "Commit error");
+    KMessageBox::errorList(this, text, details, title);
 }
 
 #include "qaptbatch.moc"

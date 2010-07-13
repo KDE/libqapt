@@ -21,6 +21,9 @@
 #ifndef QAPTBATCH_H
 #define QAPTBATCH_H
 
+// Qt includes
+#include <QVariantMap>
+
 // KDE includes
 #include <KProgressDialog>
 
@@ -42,6 +45,8 @@ private:
     QDBusServiceWatcher *m_watcher;
     QString m_mode;
     QStringList m_packages;
+    QList<QVariantMap> m_warningStack;
+    QList<QVariantMap> m_errorStack;
     DetailsWidget *m_detailsWidget;
 
 private Q_SLOTS:
@@ -50,6 +55,8 @@ private Q_SLOTS:
     void errorOccurred(int code, const QVariantMap &args);
     void warningOccurred(int code, const QVariantMap &args);
     void questionOccurred(int question, const QVariantMap &args);
+    void showQueuedWarnings();
+    void showQueuedErrors();
     void raiseErrorMessage(const QString &text, const QString &title);
     void workerEvent(int event);
     void workerFinished(bool result);
