@@ -1,9 +1,11 @@
 project(qaptbatch)
 cmake_minimum_required(VERSION 2.6.2)
 
-find_package(KDE4 REQUIRED)
+if (NOT KDE4_FOUND)
+    find_package(KDE4 REQUIRED)
+    include(KDE4Defaults)
+endif (NOT KDE4_FOUND)
 include(FindPkgConfig REQUIRED)
-include(KDE4Defaults)
 
 # find_package(QApt REQUIRED)
 

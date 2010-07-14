@@ -50,7 +50,17 @@ include_directories(
     )
 
 add_subdirectory(src)
-add_subdirectory(utils)
+
+find_package(KDE4)
+if (KDE4_FOUND)
+    include(KDE4Defaults)
+    add_subdirectory(utils)
+
+    #Do not remove or modify these.  The release script substitutes in for these
+    #comments with appropriate doc and translation directories.
+    #PO_SUBDIR
+    #DOC_SUBDIR
+endif (KDE4_FOUND)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig
@@ -58,7 +68,3 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
 install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/QAptConfig.cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/QApt/
         COMPONENT Devel )
-
-# Add translations
-# include(MacroOptionalAddSubdirectory)
-# macro_optional_add_subdirectory(po)
