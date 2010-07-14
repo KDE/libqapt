@@ -340,7 +340,6 @@ public:
    /**
     * Sets and unsets the auto-install flag
     */
-    // TODO: Split in to two functions for enable/disable before API freeze
     void setAuto(bool flag = true);
 
    /**
