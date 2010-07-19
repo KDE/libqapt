@@ -62,20 +62,21 @@ class PackagePrivate
 
 pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label, const QString &release) const
 {
-    pkgCache::VerIterator verIter;
+    pkgCache::VerIterator verIter = packageIter->VersionList();
     pkgCache::VerFileIterator verFileIter;
     pkgCache::PkgFileIterator found;
 
-    for(verIter = packageIter->VersionList(); !verIter.end(); ++verIter) {
-        for(verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
+    while (!verIter.end()) {
+        for (verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
             for(found = verFileIter.File(); !found.end(); ++found) {
-                if(found.Label() && QString::fromStdString(found.Label()) == label &&
-                   found.Origin() && QString::fromStdString(found.Origin()) == label &&
-                   found.Archive() && QString::fromStdString(found.Archive()) == release) {
+                if(QString::fromStdString(found.Label()) == label &&
+                   QString::fromStdString(found.Origin()) == label &&
+                   QString::fromStdString(found.Archive()) == release) {
                       return found;
                 }
             }
         }
+        ++verIter;
     }
    found = pkgCache::PkgFileIterator(*packageIter->Cache());
    return found;
