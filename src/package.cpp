@@ -84,7 +84,6 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label
 
 QString PackagePrivate::getReleaseFileForOrigin(const QString &label, const QString &release) const
 {
-    pkgIndexFile *index;
     pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
 
     if (found.end()) {
@@ -93,6 +92,7 @@ QString PackagePrivate::getReleaseFileForOrigin(const QString &label, const QStr
 
     // search for the matching meta-index
     pkgSourceList *list = backend->packageSourceList();
+    pkgIndexFile *index;
 
     if(list->FindIndex(found, index)) {
         vector<metaIndex *>::const_iterator I;
@@ -146,7 +146,7 @@ pkgCache::PkgIterator *Package::packageIterator() const
 
 QString Package::name() const
 {
-    QString name = QString(d->packageIter->Name());
+    QString name(d->packageIter->Name());
 
     return name;
 }
@@ -160,7 +160,7 @@ int Package::id() const
 
 QString Package::section() const
 {
-    QString section = QString(d->packageIter->Section());
+    QString section(d->packageIter->Section());
 
     return section;
 }
@@ -366,17 +366,16 @@ QString Package::origin() const
          return VF.File().Origin();
     }
 
-   return QString();
+    return QString();
 }
 
 QString Package::component() const
 {
-    pkgCache::VerIterator Ver;
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
         return QString();
     }
-    Ver = State.CandidateVerIter(*d->depCache);
+    pkgCache::VerIterator Ver = State.CandidateVerIter(*d->depCache);
     pkgCache::VerFileIterator VF = Ver.FileList();
     pkgCache::PkgFileIterator File = VF.File();
 
@@ -384,9 +383,7 @@ QString Package::component() const
         return QString();
     }
 
-    QString res = QString::fromStdString(File.Component());
-
-    return res;
+    return QString::fromStdString(File.Component());
 }
 
 QUrl Package::changelogUrl() const
