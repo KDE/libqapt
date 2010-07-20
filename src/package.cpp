@@ -161,13 +161,12 @@ int Package::id() const
 QString Package::section() const
 {
     const char *s = d->packageIter->Section();
-    QString section;
 
-    if (s != 0) {
-        section = s;
+    if (s) {
+        return QString(s);
     }
 
-    return section;
+    return QString();
 }
 
 QString Package::sourcePackage() const
