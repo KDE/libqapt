@@ -160,7 +160,12 @@ int Package::id() const
 
 QString Package::section() const
 {
-    QString section(d->packageIter->Section());
+    const char *s = d->packageIter->Section();
+    QString section;
+
+    if (s != 0) {
+        section = s;
+    }
 
     return section;
 }

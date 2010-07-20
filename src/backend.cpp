@@ -162,7 +162,7 @@ void Backend::reloadCache()
         d->packagesIndex[iter->ID] = count;
         d->packages.insert(count++, pkg);
 
-        QString group = QString::fromStdString(iter.Section());
+        QString group = pkg->section();
 
         if (!group.isEmpty()) {
             groupSet << group;
