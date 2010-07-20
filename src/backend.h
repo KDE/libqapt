@@ -118,6 +118,21 @@ public:
     Package *package(const QString &name) const;
 
     /**
+     * Queries the backend for a Package object that installs the specified
+     * file.
+     *
+     * @b _WARNING_ :
+     * Note that if a package with a given name cannot be found, a null pointer
+     * will be returned. Also, please note that certain actions like reloading
+     * the cache may invalidate the pointer.
+     *
+     * @param file The file used to search for the package
+     *
+     * @return A pointer to a @c Package defined by the specified name
+     */
+    Package *packageForFile(const QString &file) const;
+
+    /**
      * Gets a list of all package origins, as user readable strings.
      *
      * @return The list of human-readable origin labels
@@ -253,13 +268,6 @@ private:
     Q_DECLARE_PRIVATE(Backend);
     friend class Package;
     friend class PackagePrivate;
-
-    /**
-     * Prepares the package search mechanism
-     *
-     * \return @c true if opening succeeded
-     * \return @c false if the opening didn't succeed
-     */
 
     Package *package(pkgCache::PkgIterator &iter) const;
 

@@ -214,7 +214,18 @@ Package *Backend::package(const QString &name) const
     if (!pkg.end()) {
         return package(pkg);
     }
+    return 0;
+}
 
+Package *Backend::packageForFile(const QString &file) const
+{
+    Q_D(const Backend);
+
+    foreach (Package *package, d->packages) {
+        if (package->installedFilesList().contains(file)) {
+            return package;
+        }
+    }
     return 0;
 }
 
