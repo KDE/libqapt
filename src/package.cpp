@@ -53,7 +53,6 @@ class PackagePrivate
         pkgDepCache *depCache;
         pkgRecords *records;
         pkgCache::PkgIterator *packageIter;
-        QString defaultCandVer;
         int state;
 
         pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
@@ -127,11 +126,6 @@ Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
     d->records= records;
     d->depCache = depCache;
     d->state = 0;
-
-    pkgDepCache::StateCache &state = (*d->depCache)[*d->packageIter];
-    if (state.CandVersion != NULL) {
-        d->defaultCandVer = state.CandVersion;
-    }
 }
 
 Package::~Package()
@@ -233,11 +227,10 @@ QString Package::longDescription() const
                 parsedDescription += "\n\n" % sections[i];
             }
         }
-
         return parsedDescription;
-    } else {
-        return QString();
     }
+
+    return QString();
 }
 
 QString Package::maintainer() const
@@ -941,7 +934,13 @@ void Package::setPurge()
 
 bool Package::setVersion(const QString &version)
 {
-    bool isDefault = (version == d->defaultCandVer);
+    QString defaultCandVer;
+    pkgDepCache::StateCache &state = (*d->depCache)[*d->packageIter];
+    if (state.CandVersion != NULL) {
+        defaultCandVer = state.CandVersion;
+    }
+
+    bool isDefault = (version == defaultCandVer);
     pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
     pkgCache::VerIterator Ver = Match.Find(*d->packageIter);
 
