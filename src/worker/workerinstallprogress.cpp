@@ -133,7 +133,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
         }
 
         if (buf[0] == '\n') {
-            const QStringList list = QString::fromStdString(line).split(':');
+            const QStringList list = QString::fromUtf8(line).split(':');
             const QString status = list.at(0);
             const QString package = list.at(1);
             QString percent = list.at(2);
