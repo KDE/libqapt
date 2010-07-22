@@ -37,7 +37,6 @@
 
 #include "../globals.h"
 #include "worker.h"
-#include "debug.h"
 
 using namespace std;
 
