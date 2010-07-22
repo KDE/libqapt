@@ -37,6 +37,7 @@
 
 #include "../globals.h"
 #include "worker.h"
+#include "debug.h"
 
 using namespace std;
 
@@ -186,6 +187,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             if (percent.contains('.')) {
                 QStringList percentList = percent.split('.');
                 percentage = percentList.at(0).toInt();
+            } else {
+                percentage = percent.toInt();
             }
 
             emit commitProgress(str, percentage);
