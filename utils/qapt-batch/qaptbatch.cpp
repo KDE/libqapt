@@ -419,7 +419,7 @@ void QAptBatch::updateCommitProgress(const QString& message, int percentage)
 
 void QAptBatch::showQueuedWarnings()
 {
-    QStringList details;
+    QString details;
     QString text = i18nc("@label", "Unable to download the following packages:");
     foreach (const QVariantMap &args, m_warningStack) {
         QString failedItem = args["FailedItem"].toString();
@@ -429,12 +429,12 @@ void QAptBatch::showQueuedWarnings()
                              "%2\n\n", failedItem, warningText));
     }
     QString title = i18nc("@title:window", "Some Packages Could not be Downloaded");
-    KMessageBox::errorList(this, text, details, title);
+    KMessageBox::detailedError(this, text, details, title);
 }
 
 void QAptBatch::showQueuedErrors()
 {
-    QStringList details;
+    QString details;
     QString text = i18ncp("@label", "An error occurred while applying changes:",
                                     "The following errors occurred while applying changes:",
                                     m_warningStack.size());
@@ -445,7 +445,7 @@ void QAptBatch::showQueuedErrors()
     }
 
     QString title = i18nc("@title:window", "Commit error");
-    KMessageBox::errorList(this, text, details, title);
+    KMessageBox::detailedError(this, text, details, title);
 }
 
 #include "qaptbatch.moc"
