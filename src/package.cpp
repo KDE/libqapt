@@ -167,8 +167,11 @@ QString Package::sourcePackage() const
 {
     QString sourcePackage;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
-    pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
-    sourcePackage = QString::fromStdString(rec.SourcePkg());
+    if (!ver.end()) {
+        pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
+        sourcePackage = QString::fromStdString(rec.SourcePkg());
+    }
+
     // If empty, use name. (Name would equal source package in that case)
     if (sourcePackage.isEmpty()) {
         sourcePackage = name();
