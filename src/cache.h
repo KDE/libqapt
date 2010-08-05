@@ -56,15 +56,15 @@ public:
     virtual ~Cache();
 
     /**
-     * This function returns a pointer to the interal dependency cache, which
-     * keeps track of inter-package dependencies.
+     * Returns a pointer to the interal dependency cache, which keeps track of
+     * inter-package dependencies.
      *
      * @return A pointer to the internal @c pkgDepCache
      */
     pkgDepCache *depCache() const;
 
     /**
-     * This function returns a pointer to the interal package source list,
+     * Returns a pointer to the interal package source list.
      *
      * @return A pointer to the internal @c pkgSourceList
      */
@@ -72,9 +72,9 @@ public:
 
 public Q_SLOTS:
     /**
-     * This function initializes the internal package cache. It is also used
-     * to re-open the cache when the need arises. (E.g. such as an updated
-     * sources list, or a package installation or removal)
+     * Initializes the internal package cache. It is also used to re-open the
+     * cache when the need arises. (E.g. such as an updated sources list, or a
+     * package installation or removal)
      *
      * @return @c true if opening succeeds
      * @return @c false if opening fails

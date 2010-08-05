@@ -56,6 +56,11 @@ class Package
 public:
    /**
     * Default constructor
+    *
+    * @param parent The backend that this package is being made a child of
+    * @param depcache The underlying dependency cache for fetching some info
+    * @param records The underlying package records for fetching some info
+    * @param packageIter The underlying object representing the package in APT
     */
     Package(QApt::Backend* parent, pkgDepCache *depcache,
             pkgRecords *records, pkgCache::PkgIterator &packageIter);
@@ -68,237 +73,230 @@ public:
    /**
     * Returns the internal APT representation of the package
     *
-    * \return The interal package pointer as a @c pkgCache::PkgIterator
+    * \return The interal APT package pointer
     */
     pkgCache::PkgIterator *packageIterator() const;
 
    /**
-    * Member function that returns the name of the package
+    * Returns the name of the package
     *
-    * \return The name of the package as a @c QString
+    * \return The name of the package
     */
     QString name() const;
 
    /**
-    * Member function that returns the unique internal identifier for the
-    * package
+    * Returns the unique internal identifier for the package
     *
-    * \return The identifier of the package as an @c int
+    * \return The identifier of the package
     */
     int id() const;
 
    /**
-    * Member function that returns the version of the package, regardless of
-    * whether it is installed or not. If not installed, it returns the version
-    * of the candidate for installation, which may not necessarily be the latest
-    * if the version has been changed with setVersion
+    * Returns the version of the package, regardless of whether it is installed
+    * or not. If not installed, it returns the versionof the candidate for
+    * installation, which may not necessarily be the latest if the version has
+    * been changed with setVersion()
     *
-    * \return The version of the package as a @c QString
+    * \return The version of the package
+    *
+    * \sa Package::setVersion()
     */
     QString version() const;
 
    /**
-    * Member function that returns a list of all available versions of the
-    * package in the form of "version, release" E.g. "0.2-0ubuntu1, maverick"
+    * Returns a list of all available versions of the package in the form of
+    * "version, release" (E.g. "0.2-0ubuntu1, maverick")
     *
-    * \return All available versions of the package as a @c QStringList
+    * \return All available versions of the package
     */
     QStringList availableVersions() const;
 
    /**
-    * Member function that returns the section of the package
+    * Returns the categorical section where the package resides
     *
-    * \return The section of the package as a @c QString
+    * \return The section of the package
     */
     QString section() const;
 
    /**
-    * Member function that returns the source package corresponding
-    * to the package
+    * Returns the source package corresponding to the package
     *
-    * \return The source package of the package as a @c QString
+    * \return The source package of the package
     */
     QString sourcePackage() const;
 
    /**
-    * Member function that returns the short description (or "summary" in
-    * libapt-pkg terms) of the package
+    * Returns the short description (or "summary" in libapt-pkg terms) of the
+    * package
     *
-    * \return The short description of the package as a @c QString
+    * \return The short description of the package
     */
     QString shortDescription() const;
 
    /**
-    * Member function that returns the maintainer of the package
+    * Returns the maintainer of the package
     *
-    * \return The maintainer of the package as a @c QString
+    * \return The maintainer of the package
     */
     QString maintainer() const;
 
    /**
-    * Member function that returns the homepage of the package
+    * Returns the homepage of the package
     *
-    * \return The homepage of the package as a @c QString
+    * \return The homepage of the package
     */
     QString homepage() const;
 
    /**
-    * Member function that returns the installed version of the package
-    * If this package is not installed, this function will return a null
-    * QString
+    * Returns the installed version of the package.
     *
-    * \return The installed version of the package as a @c QString
+    * \return The installed version of the package. If this package is not
+    *         installed, this function will return a null @c QString
     */
     QString installedVersion() const;
 
    /**
-    * Member function that returns the newest available version of the
-    * package if it is not installed. If this package is installed, this
-    * function will return a null QString
+    * Returns the newest available version of the package if it is not
+    * installed.
     *
-    * \return The available version of the package as a @c QString
+    * \return The available version of the package. If this package is
+    *         installed, this function will return a null @c QString.
     */
     QString availableVersion() const;
 
    /**
-    * Member function that returns the priority of the package
+    * Returns the priority of the package
     *
-    * \return The priority of the package as a @c QString
+    * \return The priority of the package
     */
     QString priority() const;
 
    /**
-    * Member function that returns the file list of the package
+    * Returns the files that this package has installed. 
     *
-    * \return The file list of the package as a @c QStringList
+    * \return The file list of the package. If the package is not installed, it
+    *         will return an empty list.
     */
     QStringList installedFilesList() const;
 
    /**
-    * Member function that returns the long description of the package. Note
-    * that this also includes the summary/short description.
+    * Returns the long description of the package.
     *
-    * \return The long description of the package as a @c QString
+    * \return The long description of the package
     */
     QString longDescription() const;
 
    /**
-    * Member function that returns the origin of the package.
+    * Returns the origin of the package.
     * (Usually Ubuntu or Debian)
     *
-    * \return The origin of the package as a @c QString
+    * \return The origin of the package
     */
     QString origin() const;
 
    /**
-    * Member function that returns the archive component of the package.
+    * Returns the archive component of the package. (E.g. main, restricted,
+    * universe, contrib, etc)
     *
-    * \return The archive component of the package as a @c QString
+    * \return The archive component of the package
     */
     QString component() const;
 
    /**
-    * Member function that fetches a package's changelog over the Internet.
+    * Returns the url to the location of a package's changelog.
     *
-    * \return The location of the package changelog as a @c QString
+    * \return The location of the package's changelog
     */
     QUrl changelogUrl() const;
 
    /**
-    * Member function that fetches a package's screenshot over the Internet.
+    * Returns the url of the package's screenshot over the Internet.
     *
     * @param type The type of screenshot to be fetched as a QApt::ScreenshotType
     *
-    * \return The location of the package changelog as a @c QString
+    * \return The url of the package changelog
     */
     QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
+   /**
+    * Returns the date when Canonical's support of the package ends.
+    *
+    * \return The date that the package is supported until. If it is not
+    *         supported now, then it will return an empty QString. The date
+    *         will be localized in the "month year" format.
+    */
     QString supportedUntil() const;
 
    /**
-    * Member function that returns the amount of hard drive space that the
-    * currently-installed version of this package takes up.
+    * Returns the amount of hard drive space that the currently-installed
+    * version of this package takes up.
     * This is human-unreadable, so KDE applications may wish to run this
     * through the KGlobal::locale()->formatByteSize() function to get a
     * localized, human-readable number.
     *
-    * \return The installed size of the package as a @c qint32
+    * \return The installed size of the package
     */
     qint32 currentInstalledSize() const;
 
    /**
-    * Member function that returns the amount of hard drive space that this
-    * package will take up once installed.
+    * Returns the amount of hard drive space that this package will take up
+    * once installed.
     * This is human-unreadable, so KDE applications may wish to run this
     * through the KGlobal::locale()->formatByteSize() function to get a
     * localized, human-readable number.
     *
-    * \return The installed size of the package as a @c qint32
+    * \return The installed size of the package
     */
     qint32 availableInstalledSize() const;
 
    /**
-    * Member function that returns the download size of the package archive
-    * in bytes.
+    * Returns the download size of the package archive in bytes.
     * This is human-unreadable, so KDE applications may wish to run this
     * through the KGlobal::locale()->formatByteSize() function to get a
     * localized, human-readable number.
     *
-    * \return The installed size of the package as a @c qint32
+    * \return The installed size of the package
     */
     qint32 downloadSize() const;
 
    /**
-    * Member function that returns the state of a package, using the
-    * @b PackageState enum to define states.
+    * Returns the state of a package, using the @b PackageState enum to define
+    * states.
     *
     * \return The PackageState flags of the package as an @c int
     */
     int state() const;
 
    /**
-    * Checks whether or not the Package object is installed
-    *
-    * @return @c true if installed
-    * @return @c false if not installed
+    * Returns whether the Package is installed
     */
     bool isInstalled() const;
 
    /**
-    * Checks whether or not the package is supported by Canonical
-    *
-    * @return @c true if valid
-    * @return @c false if not invalid
+    * Returns whether the package is supported by Canonical
     */
     bool isSupported() const;
 
    /**
-    * Member function that returns a list of the names of all the dependencies
-    * of this package.
-    * I would like to see if I could figure out how to construct a Package
-    * from inside a Package and have this function return a Package::List
+    * Returns a list of the names of all the dependencies of this package.
     *
-    * \return A list of packages that this package depends on as a @c QStringList
+    * \return A list of packages that this package depends on
     */
     QStringList dependencyList(bool useCandidateVersion) const;
 
    /**
-    * Member function that returns a list of the names of all the packages
-    * that depend on this package. (Reverse dependencies)
-    * I would like to see if I could figure out how to construct a Package
-    * from inside a Package and have this function return a Package::List
+    * Returns a list of the names of all the packages that depend on this
+    * package. (Reverse dependencies)
     *
-    * \return A list of packages that depend on this package as a @c QStringList
+    * \return A list of packages that depend on this package
     */
     QStringList requiredByList() const;
 
    /**
-    * Member function that returns a list of the names of all the virtual
-    * packages that this package provides.
-    * I would like to see if I could figure out how to construct a Package
-    * from inside a Package and have this function return a Package::List
+    * Returns a list of the names of all the virtual packages that this package
+    * provides.
     *
-    * \return A list of packages that this package provides as a @c QStringList
+    * \return A list of packages that this package provides
     */
     QStringList providesList() const;
 
@@ -320,20 +318,13 @@ public:
     QHash<int, QHash<QString, QVariantMap> > brokenReason() const;
 
    /**
-    * Member function that returns whether or not the package is signed with a
-    * trusted GPG signature.
-    *
-    * @return @c true if trusted
-    * @return @c false if untrusted or the package has a version of 0
+    * Returns whether the package is signed with a trusted GPG signature.
     */
     bool isTrusted() const;
 
    /**
-    * Member function that returns whether or not the package would break
-    * the package system if changed.
-    *
-    * @return @c true if it would break
-    * @return @c false otherwise
+    * Returns whether the package would break if the current potential changes
+    * are committed
     */
     bool wouldBreak() const;
 

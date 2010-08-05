@@ -73,18 +73,13 @@ public:
     bool init();
 
     /**
-     * Queries the backend for the empty status of its undo stack
-     *
-     * @return @c true If the undo stack is empty
-     * @return @c false If the undo stack has items in it
+     * Returns whether the undo stack is empty
      */
     bool isUndoStackEmpty() const;
 
     /**
-     * Queries the backend for the empty status of its redo stack
+     * Returns whether the redo stack is empty
      *
-     * @return @c true If the redo stack is empty
-     * @return @c false If the redo stack has items in it
      */
     bool isRedoStackEmpty() const;
 
@@ -133,14 +128,14 @@ public:
     Package *packageForFile(const QString &file) const;
 
     /**
-     * Gets a list of all package origins, as user readable strings.
+     * Returns a list of all package origins, as user readable strings.
      *
      * @return The list of human-readable origin labels
      */
     QStringList originLabels() const;
 
     /**
-     * Gets the human-readable name for the origin repository of the given
+     * Returns the human-readable name for the origin repository of the given
      * the machine-readable name.
      *
      * @return The human-readable origin label
@@ -148,7 +143,7 @@ public:
     QString originLabel(const QString &origin) const;
 
     /**
-     * Gets the machine-readable name for the origin repository of the given
+     * Returns the machine-readable name for the origin repository of the given
      * the human-readable name.
      *
      * @return The machine-readable origin label
@@ -171,21 +166,21 @@ public:
      *
      * @param states The package state(s) for which you wish to count packages for
      *
-     * @return The total number of packages of the given PackageState in the Apt database
+     * @return The total number of packages of the given PackageState in the
+     *         APT database
      */
     int packageCount(const Package::States &states) const;
 
     /**
-     * Queries the backend for the total size of the packages will be
-     * downloaded if the user commits changes. Cached packages will not show
-     * up in this count.
+     * Returns the total amount of data that will be downloaded if the user
+     * commits changes. Cached packages will not show up in this count.
      *
      * @return The total amount that will be downloaded in bytes.
      */
     qint64 downloadSize() const;
 
     /**
-     * Queries the backend for the total disk space that will be consumed or
+     * Returns the total amount of disk space that will be consumed or
      * freed once the user commits changes. Freed space will show up as a
      * negative number.
      *
@@ -194,62 +189,61 @@ public:
     qint64 installSize() const;
 
     /**
-     * Queries the backend for a list of all available packages, which is
-     * essentially all packages, excluding now-nonexistent packages that have
-     * a version of 0.
+     * Returns a list of all available packages. This includes essentially all
+     * packages, excluding now-nonexistent packages that have a version of 0.
      *
      * \return A @c PackageList of all available packages in the Apt database
      */
     PackageList availablePackages() const;
 
     /**
-     * Queries the backend for a list of all upgradeable packages
+     * Returns a list of all upgradeable packages
      *
-     * \return A @c PackageList of all upgradeable packages in the Apt database
+     * \return A @c PackageList of all upgradeable packages
      */
     PackageList upgradeablePackages() const;
 
     /**
-     * Queries the backend for a list of all packages that have been marked
-     * for change. (To be installed, removed, etc)
+     * Returns a list of all packages that have been marked for change. (To be
+     * installed, removed, etc)
      *
-     * \return A @c PackageList of all marked packages in the Apt database
+     * \return A @c PackageList of all packages marked to be changed
      */
     PackageList markedPackages() const;
 
     /**
      * Searches through the internal package list and returns a list of packages
-     * based on the given input
+     * based on the given input.
      *
-     * * @param searchString The string to narrow the search by
+     * @param searchString The string to narrow the search by.
      *
-     * \return A @c PackageList of all packages matching the search string
+     * \return A @c PackageList of all packages matching the search string.
      */
     PackageList search(const QString &searchString) const;
 
     /**
-     * Queries the backend for a list of all available groups
+     * Returns a list of all available groups
      *
      * \return A @c GroupList of all available groups in the Apt database
      */
     GroupList availableGroups() const;
 
     /**
-     * Checks whether or not the search index needs updating
-     *
-     * \return @c true if the index needs updating
-     * \return @c false if the index doesn't need updating
+     * Returns whether the search index needs updating
      */
     bool xapianIndexNeedsUpdate() const;
 
+   /**
+    * Attempts to open the APT Xapian index, needed for searching
+    *
+    * \returns true if opening was successful
+    * \returns false otherwise
+    */
     bool openXapianIndex();
 
     /**
-     * Checks whether or not the cache has broken packages or has a null
-     * dependency cache
-     *
-     * \return @c true if the index is broken
-     * \return @c false if the index isn't broken
+     * Returns whether the cache has broken packages or has a null dependency
+     * cache
      */
     bool isBroken() const;
 
@@ -277,10 +271,19 @@ Q_SIGNALS:
      * signal and present the error/clean up when your app receives it.
      *
      * @param error QApt::ErrorCode enum member indicating error type
-     * @param details A QVariant map containing info about the error, if available
+     * @param details A QVariant map containing info about the error, if
+     *                available
      */
     void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
 
+    /**
+     * Emitted whenever a backend warning occurs. You should listen to this
+     * signal and present the warning when your app receives it.
+     *
+     * @param error QApt::WarningCode enum member indicating error type
+     * @param details A QVariant map containing info about the warning, if
+     *                available
+     */
     void warningOccurred(QApt::WarningCode warning, const QVariantMap &details);
 
     /**
