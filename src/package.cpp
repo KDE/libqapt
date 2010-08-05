@@ -493,34 +493,34 @@ QString Package::supportedUntil() const
     return supportEnd.toString("MMMM yyyy");
 }
 
-qint32 Package::currentInstalledSize() const
+qint64 Package::currentInstalledSize() const
 {
     pkgCache::VerIterator ver = d->packageIter->CurrentVer();
 
     if (!ver.end()) {
-        return qint32(ver->InstalledSize);
+        return qint64(ver->InstalledSize);
     } else {
-        return qint32(-1);
+        return qint64(-1);
     }
 }
 
-qint32 Package::availableInstalledSize() const
+qint64 Package::availableInstalledSize() const
 {
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
-        return qint32(-1);
+        return qint64(-1);
     }
-    return qint32(State.CandidateVerIter(*d->depCache)->InstalledSize);
+    return qint64(State.CandidateVerIter(*d->depCache)->InstalledSize);
 }
 
-qint32 Package::downloadSize() const
+qint64 Package::downloadSize() const
 {
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     if (State.CandidateVer == 0) {
-        return qint32(-1);
+        return qint64(-1);
     }
 
-    return qint32(State.CandidateVerIter(*d->depCache)->Size);
+    return qint64(State.CandidateVerIter(*d->depCache)->Size);
 }
 
 int Package::state() const

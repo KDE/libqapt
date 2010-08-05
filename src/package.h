@@ -236,7 +236,7 @@ public:
     *
     * \return The installed size of the package
     */
-    qint32 currentInstalledSize() const;
+    qint64 currentInstalledSize() const;
 
    /**
     * Returns the amount of hard drive space that this package will take up
@@ -247,7 +247,7 @@ public:
     *
     * \return The installed size of the package
     */
-    qint32 availableInstalledSize() const;
+    qint64 availableInstalledSize() const;
 
    /**
     * Returns the download size of the package archive in bytes.
@@ -257,7 +257,7 @@ public:
     *
     * \return The installed size of the package
     */
-    qint32 downloadSize() const;
+    qint64 downloadSize() const;
 
    /**
     * Returns the state of a package, using the @b PackageState enum to define
