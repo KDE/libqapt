@@ -157,15 +157,13 @@ void QAptWorker::updateCache()
     // do the work
     if (_config->FindB("APT::Get::Download",true) == true) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
-
-        if (result) {
-            emit workerEvent(QApt::CacheUpdateFinished);
-        }
         emit workerFinished(result);
     } else {
         emit errorOccurred(QApt::DownloadDisallowedError, QVariantMap());
         emit workerFinished(false);
     }
+
+    emit workerEvent(QApt::CacheUpdateFinished);
 }
 
 void QAptWorker::cancelDownload()
