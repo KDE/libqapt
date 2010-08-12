@@ -725,9 +725,8 @@ QStringList Package::providesList() const
     QStringList provides;
 
     for (pkgCache::PrvIterator Prv =
-         State.CandidateVerIter(*d->depCache).ProvidesList(); Prv.end() != true;
-         ++Prv) {
-        provides.push_back(Prv.Name());
+         State.CandidateVerIter(*d->depCache).ProvidesList(); !Prv.end(); ++Prv) {
+        provides.append(Prv.Name());
     }
 
    return provides;
@@ -744,6 +743,8 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
     QHash<QString, QVariantMap> depNotInstallable;
     QHash<QString, QVariantMap> virtualPackage;
 
+    // failTrain represents brokenness, but also the complexity of this
+    // function...
     QHash<int, QHash<QString, QVariantMap> > failTrain;
 
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
@@ -757,7 +758,7 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
         return failTrain;
     }
 
-    for (pkgCache::DepIterator D = Ver.DependsList(); D.end() == false;) {
+    for (pkgCache::DepIterator D = Ver.DependsList(); !D.end();) {
         // Compute a single dependency element (glob or)
         pkgCache::DepIterator Start;
         pkgCache::DepIterator End;
@@ -765,7 +766,7 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
 
         pkgCache::PkgIterator Targ = Start.TargetPkg();
 
-        if (d->depCache->IsImportantDep(End) == false) {
+        if (!d->depCache->IsImportantDep(End)) {
             continue;
         }
 
@@ -783,7 +784,7 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                                   % QString::fromStdString(Start.TargetVer()) % ')';
             }
 
-            if (Ver.end() == false) {
+            if (!Ver.end()) {
                 // Happens when a package needs an upgraded dep, but the dep won't
                 // upgrade. Example:
                 // "apt 0.5.4 but 0.5.3 is to be installed"
@@ -799,7 +800,7 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                 wrongCandidate[targetName] = failReason;
             } else { // We have the package, but for some reason it won't be installed
                 // In this case, the required version does not exist at all
-                if ((*d->depCache)[Targ].CandidateVerIter(*d->depCache).end() == true) {
+                if ((*d->depCache)[Targ].CandidateVerIter(*d->depCache).end()) {
                     QVariantMap failReason;
                     failReason["Relation"] = QString::fromStdString(End.DepType());
                     failReason["RequiredVersion"] = requiredVersion;
@@ -851,10 +852,10 @@ bool Package::isTrusted() const
     }
 
     pkgSourceList *Sources = d->backend->packageSourceList();
-    for (pkgCache::VerFileIterator i = Ver.FileList(); i.end() == false; ++i)
+    for (pkgCache::VerFileIterator i = Ver.FileList(); !i.end(); ++i)
     {
         pkgIndexFile *Index;
-        if (Sources->FindIndex(i.File(),Index) == false) {
+        if (!Sources->FindIndex(i.File(), Index)) {
            continue;
         }
         if (Index->IsTrusted()) {
@@ -956,7 +957,7 @@ bool Package::setVersion(const QString &version)
     pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
     pkgCache::VerIterator Ver = Match.Find(*d->packageIter);
 
-    if (Ver.end() == true) {
+    if (Ver.end()) {
         return false;
     }
 
