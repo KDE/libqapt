@@ -126,7 +126,13 @@ void Backend::reloadCache()
     Q_D(Backend);
 
     if (!d->cache->open()) {
-        emitErrorOccurred(QApt::InitError, QVariantMap());
+        QVariantMap details;
+        string message;
+        bool isError = _error->PopMessage(message);
+        if (isError) {
+            details["ErrorText"] = QString::fromStdString(message);
+        }
+        emitErrorOccurred(QApt::InitError, details);
         return;
     }
 
