@@ -621,10 +621,14 @@ bool Package::isInstalled() const
 
 bool Package::isSupported() const
 {
-    bool supported = (origin() == "Ubuntu" && (component() == "main" || component() == "restricted")
-                      && isTrusted());
+    if (origin() == "Ubuntu") {
+        QString componentString = component();
+        if ((componentString == "main" || componentString == "restricted") && isTrusted()) {
+            return true;
+        }
+    }
 
-    return supported;
+    return false;
 }
 
 QStringList Package::dependencyList(bool useCandidateVersion) const
