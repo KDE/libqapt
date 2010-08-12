@@ -708,7 +708,7 @@ QStringList Package::requiredByList() const
 {
     QStringList reverseDependsList;
 
-    for(pkgCache::DepIterator it = d->packageIter->RevDependsList(); it.end() != true; ++it) {
+    for(pkgCache::DepIterator it = d->packageIter->RevDependsList(); !it.end(); ++it) {
         reverseDependsList << QString::fromStdString(it.ParentPkg().Name());
     }
 
