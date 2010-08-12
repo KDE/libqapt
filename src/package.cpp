@@ -68,10 +68,15 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label
     while (!verIter.end()) {
         for (verFileIter = verIter.FileList(); !verFileIter.end(); ++verFileIter) {
             for(found = verFileIter.File(); !found.end(); ++found) {
-                if(QString::fromStdString(found.Label()) == label &&
-                   QString::fromStdString(found.Origin()) == label &&
-                   QString::fromStdString(found.Archive()) == release) {
-                      return found;
+                const char *verLabel = found.Label();
+                const char *verOrigin = found.Origin();
+                const char *verArchive = found.Archive();
+                if (verLabel && verOrigin && verArchive) {
+                    if(QString::fromStdString(verLabel) == label &&
+                      QString::fromStdString(verOrigin) == label &&
+                      QString::fromStdString(verArchive) == release) {
+                          return found;
+                    }
                 }
             }
         }
