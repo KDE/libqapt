@@ -125,7 +125,10 @@ void Backend::reloadCache()
 {
     Q_D(Backend);
 
-    d->cache->open();
+    if (!d->cache->open()) {
+        emitErrorOccurred(QApt::InitError, QVariantMap());
+        return;
+    }
 
     pkgDepCache *depCache = d->cache->depCache();
 
