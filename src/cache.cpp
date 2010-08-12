@@ -120,6 +120,8 @@ bool Cache::open()
     if (d->depCache->DelCount() != 0 || d->depCache->InstCount() != 0) {
         return false;
     }
+
+    return true;
 }
 
 pkgDepCache *Cache::depCache() const
