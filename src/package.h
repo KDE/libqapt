@@ -382,7 +382,7 @@ public:
         ToUpgrade           = 1 << 4,
         /// The package has been marked for downgrade
         ToDowngrade         = 1 << 5,
-        /// The package has been marke dfor removal
+        /// The package has been marked for removal
         ToRemove            = 1 << 6,
         /// The package has been held from beinig upgraded
         Held                = 1 << 7,
