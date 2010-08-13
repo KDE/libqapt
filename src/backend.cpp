@@ -101,6 +101,7 @@ Backend::Backend()
 
 Backend::~Backend()
 {
+    delete d_ptr;
 }
 
 bool Backend::init()
