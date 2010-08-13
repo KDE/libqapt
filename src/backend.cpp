@@ -21,7 +21,6 @@
 #include "backend.h"
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
 #include <QtDBus/QDBusConnection>
@@ -650,24 +649,20 @@ void Backend::commitChanges()
                break;
            case Package::NewInstall:
                packageList.insert(package->name(), Package::ToInstall);
-               qDebug() << "Installing:" << package->name();
                break;
            case Package::ToReInstall:
                packageList.insert(package->name(), Package::ToReInstall);
                break;
            case Package::ToUpgrade:
                packageList.insert(package->name(), Package::ToUpgrade);
-               qDebug() << "Upgrading:" << package->name();
                break;
            case Package::ToDowngrade:
                packageList.insert(package->name() % ',' % package->availableVersion(), Package::ToDowngrade);
-               qDebug() << "Downgrading:" << package->name() << package->availableVersion();
                break;
            case Package::ToRemove:
                if(flags & Package::ToPurge) {
                    packageList.insert(package->name(), Package::ToPurge);
                } else {
-                   qDebug() << "Removing:" << package->name();
                    packageList.insert(package->name(), Package::ToRemove);
                }
                break;
