@@ -130,7 +130,9 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            raiseErrorMessage(text, title);
+            QString details = args["ErrorText"].toString();
+            KMessageBox::detailedError(this, text, details, title);
+            KApplication::instance()->quit();
             break;
         case QApt::LockError:
             text = i18nc("@label",
