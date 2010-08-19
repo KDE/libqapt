@@ -25,6 +25,7 @@
 #include <QtDBus/QDBusServiceWatcher>
 
 // KDE includes
+#include <KApplication>
 #include <KDebug>
 #include <KIcon>
 #include <KLocale>
@@ -125,7 +126,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
     QString drive;
 
     switch(code) {
-        case QApt::InitError:
+        case QApt::InitError: {
             text = i18nc("@label",
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
@@ -134,6 +135,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             KMessageBox::detailedError(this, text, details, title);
             KApplication::instance()->quit();
             break;
+        }
         case QApt::LockError:
             text = i18nc("@label",
                          "Another application seems to be using the package "
