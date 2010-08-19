@@ -885,6 +885,7 @@ void Package::setAuto(bool flag)
 void Package::setKeep()
 {
     d->depCache->MarkKeep(*d->packageIter, false);
+    pkgFixBroken(*d->depCache);
     d->backend->packageChanged(this);
 }
 
