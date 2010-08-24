@@ -77,6 +77,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     }
 
     QTimer::singleShot(10000, this, SLOT(quit()));
+    sleep(1);
 
     m_acquireStatus = new WorkerAcquire(this);
     connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
