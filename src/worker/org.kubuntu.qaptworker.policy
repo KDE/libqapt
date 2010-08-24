@@ -11,7 +11,7 @@
     <message>Update software sources</message>
     <defaults>
       <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_active>yes</allow_active>
     </defaults>
   </action>
   <action id="org.kubuntu.qaptworker.commitChanges">
