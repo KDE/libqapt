@@ -28,8 +28,9 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
-#include <apt-pkg/init.h>
 #include <apt-pkg/depcache.h>
+#include <apt-pkg/error.h>
+#include <apt-pkg/init.h>
 #include <apt-pkg/policy.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/strutl.h>
