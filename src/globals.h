@@ -111,7 +111,9 @@ namespace QApt
         /// A pseudo-error emitted when the user cancels a download
         UserCancelError         = 9,
         /// Emitted when the APT configuration prevents downloads
-        DownloadDisallowedError = 10
+        DownloadDisallowedError = 10,
+        /// Emitted when the selected package does not exist
+        NotFoundError           = 11
     };
 
    /**

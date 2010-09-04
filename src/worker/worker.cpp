@@ -201,6 +201,11 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         } else {
             iter = m_cache->depCache()->FindPkg(packageString.toStdString());
         }
+        if (iter == 0) {
+            QVariantMap args;
+            args["NotFoundString"] = packageString;
+            emit errorOccurred(QApt::NotFoundError, args);
+        }
 
         pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
         pkgProblemResolver Fix(m_cache->depCache());

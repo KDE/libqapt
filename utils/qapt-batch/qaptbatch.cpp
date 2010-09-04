@@ -194,6 +194,17 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             close();
             break;
         }
+        case QApt::NotFoundError: {
+            QString notFoundString = args["NotFoundString"].toString();
+            text = i18nc("@label",
+                        "The package \"%1\" has not been found among your software sources. "
+                        "Therefore, it cannot be installed. ",
+                        notFoundString);
+            title = i18nc("@title:window", "Package Not Found");
+            KMessageBox::error(this, text, title);
+            close();
+            break;
+        }
         case QApt::UserCancelError:
             // KProgressDialog handles cancel, nothing to do
         case QApt::UnknownError:
