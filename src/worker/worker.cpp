@@ -205,6 +205,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             QVariantMap args;
             args["NotFoundString"] = packageString;
             emit errorOccurred(QApt::NotFoundError, args);
+            emit workerFinished(false);
+            return;
         }
 
         pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
