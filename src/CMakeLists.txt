@@ -36,7 +36,7 @@ set_target_properties(qapt PROPERTIES
 target_link_libraries(qapt
     ${QT_QTDBUS_LIBRARIES}
     ${QT_QTCORE_LIBRARIES}
-    apt-pkg
+    ${APTPKG_LIBRARIES}
     ${XAPIAN_LIBRARIES}
     )
 
