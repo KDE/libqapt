@@ -115,7 +115,16 @@ bool QAptWorker::initializeApt()
 
     delete m_cache;
     m_cache = new QApt::Cache(this);
-    m_cache->open();
+    if (!m_cache->open()) {
+        QVariantMap details;
+        string message;
+        bool isError = _error->PopMessage(message);
+        if (isError) {
+            details["ErrorText"] = QString::fromStdString(message);
+        }
+        emit errorOccurred(QApt::InitError, details);
+        return false;
+    }
 
     pkgDepCache *depCache = m_cache->depCache();
 
@@ -135,7 +144,10 @@ void QAptWorker::updateCache()
     emit workerStarted();
     emit workerEvent(QApt::CacheUpdateStarted);
 
-    initializeApt();
+    if (!initializeApt()) {
+        emit workerFinished(false);
+        return;
+    }
     // Lock the list directory
     FileFd Lock;
     if (!_config->FindB("Debug::NoLocking", false)) {
@@ -179,7 +191,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         return;
     }
 
-    initializeApt();
+    if (!initializeApt()) {
+        emit workerFinished(false);
+        return;
+    }
 
     QVariantMap versionList;
 
