@@ -52,6 +52,7 @@ include_directories(
     )
 
 add_subdirectory(src)
+add_subdirectory(includes)
 
 find_package(KDE4)
 if (KDE4_FOUND)
