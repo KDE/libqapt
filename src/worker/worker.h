@@ -74,7 +74,8 @@ Q_SIGNALS:
     void workerStarted();
     void workerEvent(int code);
     void workerFinished(bool result);
-    void downloadProgress(int percentage, int speed, int ETA);
+    void globalDownloadProgress(int percentage, int speed, int ETA);
+    void packageDownloadProgress(const QString &name, int percentage);
     void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);

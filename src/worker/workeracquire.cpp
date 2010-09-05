@@ -30,6 +30,8 @@
 
 #include "worker.h"
 
+using namespace std;
+
 WorkerAcquire::WorkerAcquire(QAptWorker *parent)
         : QObject(parent)
         , m_worker(parent)
@@ -123,16 +125,25 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
 
+    int packagePercentage = 0;
+    for (pkgAcquire::Worker *iter = Owner->WorkersBegin(); iter != 0; iter = Owner->WorkerStep(iter)) {
+        if (!iter->CurrentItem) {
+            continue;
+        }
+
+        QString package = iter->CurrentItem->ShortDesc.c_str();
+        packagePercentage = qRound(double(iter->CurrentSize * 100.0)/double(iter->TotalSize));
+
+        emit packageDownloadProgress(package, packagePercentage);
+
+        // TODO: find out if apt-pkg handles parallel downloads and handle that if it's the case
+        break;
+    }
+
     int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
     // work-around a stupid problem with libapt
     if(CurrentItems == TotalItems) {
         percentage = 100;
-    }
-
-    int ETA = (int)((TotalBytes - CurrentBytes) / CurrentCPS);
-    // if the ETA is greater than two weeks, show unknown time
-    if (ETA > 14*24*60*60) {
-        ETA = 0;
     }
 
     int speed;
@@ -149,7 +160,13 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         speed = CurrentCPS;
     }
 
-    emit downloadProgress(percentage, speed, ETA);
+    int ETA = (int)((TotalBytes - CurrentBytes) / CurrentCPS);
+    // if the ETA is greater than two weeks, show unknown time
+    if (ETA > 14*24*60*60) {
+        ETA = 0;
+    }
+
+    emit globalDownloadProgress(percentage, speed, ETA);
 
     Update = false;
 

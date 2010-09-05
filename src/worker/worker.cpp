@@ -80,8 +80,10 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     sleep(1);
 
     m_acquireStatus = new WorkerAcquire(this);
-    connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
-            this, SIGNAL(downloadProgress(int, int, int)));
+    connect(m_acquireStatus, SIGNAL(globalDownloadProgress(int, int, int)),
+            this, SIGNAL(globalDownloadProgress(int, int, int)));
+    connect(m_acquireStatus, SIGNAL(packageDownloadProgress(const QString&, int)),
+            this, SIGNAL(packageDownloadProgress(const QString&, int)));
     connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
             this, SIGNAL(downloadMessage(int, const QString&)));
     connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),

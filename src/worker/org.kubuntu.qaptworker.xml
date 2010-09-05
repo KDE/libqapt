@@ -9,10 +9,14 @@
     <signal name="workerFinished">
       <arg name="result" type="b" direction="out"/>
     </signal>
-    <signal name="downloadProgress">
+    <signal name="globalDownloadProgress">
       <arg name="percentage" type="i" direction="out"/>
       <arg name="speed" type="i" direction="out"/>
       <arg name="ETA" type="i" direction="out"/>
+    </signal>
+    <signal name="packageDownloadProgress">
+      <arg name="name" type="s" direction="out"/>
+      <arg name="percentage" type="i" direction="out"/>
     </signal>
     <signal name="downloadMessage">
       <arg name="flag" type="i" direction="out"/>

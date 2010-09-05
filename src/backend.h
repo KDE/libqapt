@@ -100,7 +100,7 @@ public:
 
     /**
      * Queries the backend for a Package object for the specified name.
-     * 
+     *
      * @b _WARNING_ :
      * Note that if a package with a given name cannot be found, a null pointer
      * will be returned. Also, please note that certain actions like reloading
@@ -318,7 +318,15 @@ Q_SIGNALS:
      * @param speed Current download speed in bytes
      * @param ETA Current estimated download time
      */
-    void downloadProgress(int percentage, int speed, int ETA);
+    void globalDownloadProgress(int percentage, int speed, int ETA);
+
+    /**
+     * Emitted while the QApt Worker is downloading packages.
+     *
+     * @param name Name of the package currently being downloaded
+     * @param percentage Percentage of the package downloaded
+     */
+    void packageDownloadProgress(const QString &name, int percentage);
 
     /**
      * Emitted whenever an item has been downloaded
@@ -410,7 +418,7 @@ public Q_SLOTS:
 
     /**
      * This function should be used to return the answer the user has given
-     * to a worker question. 
+     * to a worker question.
      */
     void answerWorkerQuestion(const QVariantMap &response);
 
