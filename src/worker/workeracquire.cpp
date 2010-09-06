@@ -148,7 +148,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 
     int speed;
     // m_calculatingSpeed is always set to true in the constructor since APT
-    // will always have a bit of time where it has to calculate the current
+    // will always have a period of time where it has to initially calulate
     // speed. Once speed > 0 for the first time, it'll be set to false, and
     // all subsequent zero values will be legitimate. APT should really do
     // this for us, but I guess stuff might depend on the old behavior...
@@ -166,7 +166,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         ETA = 0;
     }
 
-    emit globalDownloadProgress(percentage, speed, ETA);
+    emit downloadProgress(percentage, speed, ETA);
 
     Update = false;
 

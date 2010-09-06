@@ -67,7 +67,7 @@ signals:
     void fetchError(int errorCode, const QVariantMap &details);
     void fetchWarning(int warningCode, const QVariantMap &details);
     void workerQuestion(int questionCode, const QVariantMap &args);
-    void globalDownloadProgress(int percentage, int speed, int ETA);
+    void downloadProgress(int percentage, int speed, int ETA);
     void packageDownloadProgress(const QString &name, int percentage);
     void downloadMessage(int flag, const QString &message);
 };

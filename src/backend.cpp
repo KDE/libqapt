@@ -819,8 +819,8 @@ void Backend::workerStarted()
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    connect(d->worker, SIGNAL(globalDownloadProgress(int, int, int)),
-            this, SIGNAL(globalDownloadProgress(int, int, int)));
+    connect(d->worker, SIGNAL(downloadProgress(int, int, int)),
+            this, SIGNAL(downloadProgress(int, int, int)));
     connect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int)),
             this, SIGNAL(packageDownloadProgress(const QString&, int)));
     connect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
@@ -840,8 +840,8 @@ void Backend::workerFinished(bool result)
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
-    disconnect(d->worker, SIGNAL(globalDownloadProgress(int, int, int)),
-               this, SIGNAL(globalDownloadProgress(int, int, int)));
+    disconnect(d->worker, SIGNAL(downloadProgress(int, int, int)),
+               this, SIGNAL(downloadProgress(int, int, int)));
     disconnect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int)),
                this, SIGNAL(packageDownloadProgress(const QString&, int)));
     disconnect(d->worker, SIGNAL(downloadMessage(int, const QString&)),

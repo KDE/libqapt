@@ -50,7 +50,7 @@ QAptTest::QAptTest()
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
     connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)), this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_backend, SIGNAL(globalDownloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
+    connect(m_backend, SIGNAL(downloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
             this, SLOT(updateDownloadMessage(int, const QString&)));
     connect(m_backend, SIGNAL(commitProgress(const QString&, int)),

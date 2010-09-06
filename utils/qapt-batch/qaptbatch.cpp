@@ -112,7 +112,7 @@ void QAptBatch::workerStarted()
 
     connect(m_worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
             this, SLOT(questionOccurred(int, const QVariantMap&)));
-    connect(m_worker, SIGNAL(globalDownloadProgress(int, int, int)),
+    connect(m_worker, SIGNAL(downloadProgress(int, int, int)),
             this, SLOT(updateDownloadProgress(int, int, int)));
     connect(m_worker, SIGNAL(commitProgress(const QString&, int)),
             this, SLOT(updateCommitProgress(const QString&, int)));

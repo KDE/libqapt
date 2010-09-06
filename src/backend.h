@@ -312,16 +312,18 @@ Q_SIGNALS:
     void workerEvent(QApt::WorkerEvent event);
 
     /**
-     * Emitted while the QApt Worker is downloading packages.
+     * Emits total progress information while the QApt Worker is downloading
+     * packages.
      *
      * @param percentage Total percent complete
      * @param speed Current download speed in bytes
      * @param ETA Current estimated download time
      */
-    void globalDownloadProgress(int percentage, int speed, int ETA);
+    void downloadProgress(int percentage, int speed, int ETA);
 
     /**
-     * Emitted while the QApt Worker is downloading packages.
+     * Emits per-package progress information while the QApt Worker is
+     * downloading packages.
      *
      * @param name Name of the package currently being downloaded
      * @param percentage Percentage of the package downloaded
