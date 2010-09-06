@@ -39,6 +39,7 @@ WorkerAcquire::WorkerAcquire(QAptWorker *parent)
         , m_calculatingSpeed(true)
         , m_questionResponse(QVariantMap())
 {
+    MorePulses = true;
 }
 
 WorkerAcquire::~WorkerAcquire()
