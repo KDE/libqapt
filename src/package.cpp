@@ -486,7 +486,7 @@ QString Package::supportedUntil() const
     pkgTagFile tag(&fd);
     tag.Step(sec);
 
-    if(!StrToTime(sec.FindS("Date"), releaseDate)) {
+    if(!RFC1123StrToTime(sec.FindS("Date").data(), releaseDate)) {
         return QString();
     }
 
