@@ -58,6 +58,7 @@ void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
     QString message = QString::fromUtf8(item.Description.c_str());
     emit downloadMessage(QApt::HitFetch, message);
+    updateStatus(item, /*percentage*/ -1, QApt::HitFetch);
 
     Update = true;
 }
@@ -71,6 +72,7 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
 
     QString message = QString::fromUtf8(item.Description.c_str());
     emit downloadMessage(QApt::DownloadFetch, message);
+    updateStatus(item, /*percentage*/ -1, QApt::QueueFetch);
 }
 
 void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
@@ -89,6 +91,7 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
     {
         QString message = QString::fromUtf8(item.Description.c_str());
         emit downloadMessage(QApt::IgnoredFetch, message);
+        updateStatus(item, /*percentage*/ -1, QApt::IgnoredFetch);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
@@ -131,17 +134,19 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
             continue;
         }
 
-        QString package = iter->CurrentItem->ShortDesc.c_str();
         packagePercentage = qRound(double(iter->CurrentSize * 100.0)/double(iter->TotalSize));
 
-        emit packageDownloadProgress(package, packagePercentage);
+        if (iter->TotalSize > 0) {
+            updateStatus(*iter->CurrentItem, packagePercentage, QApt::DownloadFetch);
+        } else {
+            updateStatus(*iter->CurrentItem, 100, QApt::DownloadFetch);
+        }
 
-        // TODO: find out if apt-pkg handles parallel downloads and handle that if it's the case
         break;
     }
 
     int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
-    // work-around a stupid problem with libapt
+    // work-around a stupid problem with libapt-pkg
     if(CurrentItems == TotalItems) {
         percentage = 100;
     }
@@ -197,4 +202,15 @@ void WorkerAcquire::setAnswer(const QVariantMap &answer)
                this, SLOT(setAnswer(const QVariantMap&)));
     m_questionResponse = answer;
     m_mediaBlock->quit();
+}
+
+void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status)
+{
+    if (Itm.Owner->ID == 0) {
+          QString name = Itm.ShortDesc.c_str();
+          QString URI = Itm.Description.c_str();
+          qint64 size = Itm.Owner->FileSize;
+
+          emit packageDownloadProgress(name, percentage, URI, size, status);
+    }
 }

@@ -821,8 +821,8 @@ void Backend::workerStarted()
 
     connect(d->worker, SIGNAL(downloadProgress(int, int, int)),
             this, SIGNAL(downloadProgress(int, int, int)));
-    connect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int)),
-            this, SIGNAL(packageDownloadProgress(const QString&, int)));
+    connect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
+            this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
     connect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
             this, SIGNAL(downloadMessage(int, const QString&)));
     connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
@@ -842,8 +842,8 @@ void Backend::workerFinished(bool result)
 
     disconnect(d->worker, SIGNAL(downloadProgress(int, int, int)),
                this, SIGNAL(downloadProgress(int, int, int)));
-    disconnect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int)),
-               this, SIGNAL(packageDownloadProgress(const QString&, int)));
+    disconnect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
+               this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
     disconnect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
                this, SIGNAL(downloadMessage(int, const QString&)));
     disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),

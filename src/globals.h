@@ -156,7 +156,9 @@ namespace QApt
         /// A fetch that happens when the cached item equals the item on the sever
         HitFetch = 2,
         /// A fetch that happens when an item is ignored
-        IgnoredFetch = 3
+        IgnoredFetch = 3,
+        /// A fetch that really just queues an item for download
+        QueueFetch = 4
     };
 
     // Not yet used

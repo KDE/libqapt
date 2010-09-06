@@ -76,14 +76,14 @@ Q_SIGNALS:
     void workerFinished(bool result);
     // TODO QApt2: Rename globalDownloadProgress
     void downloadProgress(int percentage, int speed, int ETA);
-    void packageDownloadProgress(const QString &name, int percentage);
-    void downloadMessage(int flag, const QString &message);
+    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
+                                 double size, int flag);
+    QT_DEPRECATED void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void errorOccurred(int code, const QVariantMap &details);
     void warningOccurred(int code, const QVariantMap &details);
     void questionOccurred(int questionCode, const QVariantMap& details);
     void answerReady(const QVariantMap& response);
-    void xapianUpdateProgress(int percentage);
 };
 
 #endif

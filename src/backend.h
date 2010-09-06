@@ -327,16 +327,23 @@ Q_SIGNALS:
      *
      * @param name Name of the package currently being downloaded
      * @param percentage Percentage of the package downloaded
+     * @param URI The URI of the download location
+     * @param size The size of the download in bytes
+     * @param flag Fetch type (is a QApt::Global enum member)
      */
-    void packageDownloadProgress(const QString &name, int percentage);
+    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
+                                 double size, int flag);
 
     /**
-     * Emitted whenever an item has been downloaded
+     * Emitted whenever an item has been downloaded.
+     *
+     * This signal is deprecated. You should connect to packageDownloadProgress
+     * which provides a lot more information about the fetch.
      *
      * @param flag Fetch type (is a QApt::Global enum member)
      * @param message Usually the URI of the item that's being downloaded
      */
-    void downloadMessage(int flag, const QString &message);
+    QT_DEPRECATED void downloadMessage(int flag, const QString &message);
 
     /**
      * Emits the progress of a current package installation/removal/

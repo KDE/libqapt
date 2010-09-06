@@ -17,6 +17,9 @@
     <signal name="packageDownloadProgress">
       <arg name="name" type="s" direction="out"/>
       <arg name="percentage" type="i" direction="out"/>
+      <arg name="URI" type="s" direction="out"/>
+      <arg name="size" type="d" direction="out"/>
+      <arg name="flag" type="i" direction="out"/>
     </signal>
     <signal name="downloadMessage">
       <arg name="flag" type="i" direction="out"/>
@@ -49,7 +52,7 @@
     <method name="cancelDownload">
     </method>
     <method name="commitChanges">
-      <arg type="a{sv}" direction="in"/>
+      <arg name="instructionsList" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
     <method name="answerWorkerQuestion">

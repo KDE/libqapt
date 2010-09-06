@@ -62,13 +62,15 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void setAnswer(const QVariantMap &response);
+    void updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status);
 
 signals:
     void fetchError(int errorCode, const QVariantMap &details);
     void fetchWarning(int warningCode, const QVariantMap &details);
     void workerQuestion(int questionCode, const QVariantMap &args);
     void downloadProgress(int percentage, int speed, int ETA);
-    void packageDownloadProgress(const QString &name, int percentage);
+    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
+                                 double size, int flag);
     void downloadMessage(int flag, const QString &message);
 };
 
