@@ -306,6 +306,7 @@ void QAptBatch::workerEvent(int code)
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
             setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
             setButtons(KDialog::Cancel | KDialog::Details);
+            setButtonFocus(KDialog::Details);
             show();
             break;
         case QApt::CacheUpdateFinished:
@@ -320,6 +321,7 @@ void QAptBatch::workerEvent(int code)
             progressBar()->setValue(100);
             m_detailsWidget->hide();
             setButtons(KDialog::Close);
+            setButtonFocus(KDialog::Close);
             break;
         case QApt::PackageDownloadStarted:
             connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
@@ -329,6 +331,7 @@ void QAptBatch::workerEvent(int code)
                                 "Downloading package files",
                                 m_packages.count()));
             setButtons(KDialog::Cancel | KDialog::Details);
+            setButtonFocus(KDialog::Details);
             show();
             break;
         case QApt::PackageDownloadFinished:
@@ -361,6 +364,8 @@ void QAptBatch::workerEvent(int code)
                                     "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
+            // Really a close button, but KProgressDialog use ButtonCode Cancel
+            setButtonFocus(KDialog::Cancel);
             break;
     }
 }
