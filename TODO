@@ -1,3 +1,6 @@
+-Add package pinning file writing support to QApt Worker
+-Use apt-xapian-index's DBus interface to perform updates/builds
+-Report apt-xapian-index progress from its DBus interface
 -Make the direct output of the dpkg process available, so that advanced package managers can have a console GUI for power users
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/
