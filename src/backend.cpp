@@ -92,6 +92,7 @@ Backend::Backend()
     connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
     connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
     connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
+    connect(d->worker, SIGNAL(xapianUpdateProgress(int)), this, SIGNAL(xapianUpdateProgress(int)));
 
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());

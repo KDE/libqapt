@@ -69,6 +69,7 @@ public Q_SLOTS:
 private Q_SLOTS:
     bool initializeApt();
     void setAnswer(const QVariantMap &answer);
+    void xapianUpdateFinished(int result);
 
 Q_SIGNALS:
     void workerStarted();
@@ -84,6 +85,7 @@ Q_SIGNALS:
     void warningOccurred(int code, const QVariantMap &details);
     void questionOccurred(int questionCode, const QVariantMap& details);
     void answerReady(const QVariantMap& response);
+    void xapianUpdateProgress(int percentage);
 };
 
 #endif

@@ -161,7 +161,8 @@ void QAptWorker::updateCache()
         }
     }
 
-    pkgAcquire fetcher(m_acquireStatus);
+    pkgAcquire fetcher;
+    fetcher.Setup(m_acquireStatus);
     // Populate it with the source selection and get all Indexes
     // (GetAll=true)
     if (m_cache->list()->GetIndexes(&fetcher,true) == false) {
@@ -292,7 +293,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         }
     }
 
-    pkgAcquire fetcher(m_acquireStatus);
+    pkgAcquire fetcher;
+    fetcher.Setup(m_acquireStatus);
 
     pkgPackageManager *packageManager;
     packageManager = _system->CreatePM(m_cache->depCache());
@@ -427,12 +429,31 @@ void QAptWorker::setAnswer(const QVariantMap &answer)
 void QAptWorker::updateXapianIndex()
 {
     emit workerEvent(QApt::XapianUpdateStarted);
-    m_xapianProc = new QProcess(this);
-    QString cmd = "/usr/bin/nice /usr/bin/ionice -c3 "
-                  "/usr/sbin/update-apt-xapian-index "
-                  "--update";
-    m_xapianProc->start(cmd);
 
-    m_xapianProc->waitForFinished();
+
+    QDBusMessage m = QDBusMessage::createMethodCall("org.debian.AptXapianIndex",
+                                                    "/",
+                                                    "org.debian.AptXapianIndex",
+                                                    "update_async");
+    QVariantList dbusArgs;
+
+    dbusArgs << true << true; // first arg is force, second update_only
+    m.setArguments(dbusArgs);
+    QDBusConnection::systemBus().send(m);
+
+    QDBusConnection::systemBus().connect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
+                                         "UpdateProgress", this, SIGNAL(xapianUpdateProgress(int)));
+    QDBusConnection::systemBus().connect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
+                                         "UpdateFinished", this, SLOT(xapianUpdateFinished(int)));
+}
+
+void QAptWorker::xapianUpdateFinished(int result)
+{
+    Q_UNUSED(result);
+    QDBusConnection::systemBus().disconnect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
+                                            "UpdateProgress", this, SIGNAL(xapianUpdateProgress(int)));
+    QDBusConnection::systemBus().disconnect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
+                                            "UpdateFinished", this, SLOT(xapianUpdateFinished()));
+
     emit workerEvent(QApt::XapianUpdateFinished);
 }

@@ -44,6 +44,9 @@
       <arg name="details" type="a{sv}" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
+    <signal name="xapianUpdateProgress">
+      <arg name="percentage" type="i" direction="out"/>
+    </signal>
     <method name="setLocale">
       <arg name="locale" type="s" direction="in"/>
     </method>

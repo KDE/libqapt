@@ -354,6 +354,13 @@ Q_SIGNALS:
      */
     void commitProgress(const QString &status, int percentage);
 
+   /**
+    * Emits the progress of the Apt Xapian Indexer
+    *
+    * @param progress The progress percentage of the indexer
+    */
+    void xapianUpdateProgress(int percentage);
+
 public Q_SLOTS:
     /**
      * Takes the current state of the cache and puts it on the undo stack
