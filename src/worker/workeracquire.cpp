@@ -144,8 +144,6 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         } else {
             updateStatus(*iter->CurrentItem, 100, QApt::DownloadFetch);
         }
-
-        break;
     }
 
     int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
