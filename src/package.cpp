@@ -150,6 +150,13 @@ QString Package::name() const
     return name;
 }
 
+QLatin1String Package::latin1Name() const
+{
+    QLatin1String name(d->packageIter->Name());
+
+    return name;
+}
+
 int Package::id() const
 {
     int id = (*d->packageIter)->ID;

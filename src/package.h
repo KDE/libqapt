@@ -84,6 +84,16 @@ public:
     */
     QString name() const;
 
+    // TODO QApt2: Replace name() with latin1Name (but still call it name())
+   /**
+    * Returns the name of the package. This is the better choice over the
+    * regular name() since a QLatin1String is much cheaper to construct
+    * than a QString, since we don't have to convert from ascii
+    *
+    * \return The name of the package as a \c QLatin1String
+    */
+    QLatin1String latin1Name() const;
+
    /**
     * Returns the unique internal identifier for the package
     *
