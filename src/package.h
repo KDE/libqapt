@@ -103,9 +103,9 @@ public:
 
    /**
     * Returns the version of the package, regardless of whether it is installed
-    * or not. If not installed, it returns the versionof the candidate for
-    * installation, which may not necessarily be the latest if the version has
-    * been changed with setVersion()
+    * or not. If not installed, it returns the version of the candidate for
+    * installation, which may not necessarily be the latest. (If the version has
+    * been changed with setVersion())
     *
     * \return The version of the package
     *
