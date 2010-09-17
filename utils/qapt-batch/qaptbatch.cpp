@@ -295,7 +295,7 @@ void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 {
     KMessageBox::error(0, text, title);
     workerFinished(false);
-    close();
+    done(1);
 }
 
 void QAptBatch::workerEvent(int code)
