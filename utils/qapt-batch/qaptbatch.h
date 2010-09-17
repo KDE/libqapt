@@ -37,8 +37,8 @@ class QAptBatch : public KProgressDialog
     Q_OBJECT
 public:
     explicit QAptBatch(QString mode, QStringList packages, int winId);
-
     virtual ~QAptBatch();
+    virtual void reject();
 
 private:
     OrgKubuntuQaptworkerInterface *m_worker;
@@ -48,6 +48,7 @@ private:
     QList<QVariantMap> m_warningStack;
     QList<QVariantMap> m_errorStack;
     DetailsWidget *m_detailsWidget;
+    bool m_done;
 
 private Q_SLOTS:
     void commitChanges(int mode);

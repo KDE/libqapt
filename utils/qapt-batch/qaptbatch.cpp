@@ -44,6 +44,7 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     , m_mode(mode)
     , m_packages(packages)
     , m_detailsWidget(0)
+    , m_done(false)
 {
     m_worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
                                                   "/", QDBusConnection::systemBus(),
@@ -90,6 +91,15 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
 
 QAptBatch::~QAptBatch()
 {
+}
+
+void QAptBatch::reject()
+{
+    if (m_done) {
+        accept();
+    } else {
+        KProgressDialog::reject();
+    }
 }
 
 void QAptBatch::commitChanges(int mode)
@@ -364,6 +374,7 @@ void QAptBatch::workerEvent(int code)
                                     "Packages successfully uninstalled", m_packages.size()));
             }
             progressBar()->setValue(100);
+            m_done = true;
             // Really a close button, but KProgressDialog use ButtonCode Cancel
             setButtonFocus(KDialog::Cancel);
             break;
