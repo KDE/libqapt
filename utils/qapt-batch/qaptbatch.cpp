@@ -174,7 +174,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
                          "or disappeared. Please report a bug to the QApt maintainers");
             title = i18nc("@title:window", "Unexpected Error");
             KMessageBox::error(this, text, title);
-            close();
+            done(1);
             break;
         case QApt::UntrustedError: {
             QStringList untrustedItems = args["UntrustedItems"].toStringList();
@@ -191,7 +191,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             }
             title = i18nc("@title:window", "Untrusted Packages");
             KMessageBox::errorList(this, text, untrustedItems, title);
-            close();
+            done(1);
             break;
         }
         case QApt::NotFoundError: {
@@ -202,7 +202,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
                         notFoundString);
             title = i18nc("@title:window", "Package Not Found");
             KMessageBox::error(this, text, title);
-            close();
+            done(1);
             break;
         }
         case QApt::UserCancelError:
@@ -285,7 +285,7 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
             m_worker->answerWorkerQuestion(response);
 
             if (!installUntrusted) {
-                close();
+                done(1);
             }
         }
     }
