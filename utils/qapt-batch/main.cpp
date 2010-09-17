@@ -79,8 +79,6 @@ int main(int argc, char **argv)
             return 0;
             break;
         case QDialog::Rejected:
-            return 1;
-            break;
         default:
             return 1;
     }
