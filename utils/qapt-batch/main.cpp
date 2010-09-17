@@ -74,5 +74,14 @@ int main(int argc, char **argv)
 
     KApplication app;
     QAptBatch batchInstaller(mode, packages, winId);
-    return batchInstaller.exec();
+    switch (batchInstaller.exec()) {
+        case QDialog::Accepted:
+            return 0;
+            break;
+        case QDialog::Rejected:
+            return 1;
+            break;
+        default:
+            return 1;
+    }
 }
