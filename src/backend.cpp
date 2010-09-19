@@ -616,6 +616,23 @@ void Backend::markPackagesForDistUpgrade()
     emit packageChanged();
 }
 
+void Backend::markPackagesForAutoRemove()
+{
+    Q_D(Backend);
+
+    pkgDepCache &cache = *d->cache->depCache();
+
+    for (pkgCache::PkgIterator pkgIter = cache.PkgBegin(); !pkgIter.end(); ++pkgIter) {
+        if (cache[pkgIter].Garbage) {
+            if(pkgIter.CurrentVer() != 0 &&
+               pkgIter->CurrentState != pkgCache::State::ConfigFiles) {
+                cache.MarkDelete(pkgIter, false);
+            }
+        }
+
+    }
+}
+
 void Backend::markPackageForInstall(const QString &name)
 {
     Package *pkg = package(name);

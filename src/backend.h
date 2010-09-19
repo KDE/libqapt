@@ -396,6 +396,14 @@ public Q_SLOTS:
      */
     void markPackagesForDistUpgrade();
 
+   /**
+    * Marks all packages that are autoremoveable, as determined by APT. In
+    * general these are packages that were automatically installed that now
+    * no longer have any packages dependening on them. (Like after a
+    * library transition libqapt0 -> libqapt1)
+    */
+    void markPackagesForAutoRemove();
+
     /**
      * Marks a package for install.
      *
