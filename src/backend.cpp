@@ -631,6 +631,8 @@ void Backend::markPackagesForAutoRemove()
         }
 
     }
+
+    emit packageChanged();
 }
 
 void Backend::markPackageForInstall(const QString &name)
