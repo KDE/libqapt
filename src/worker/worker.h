@@ -69,7 +69,7 @@ public Q_SLOTS:
 private Q_SLOTS:
     bool initializeApt();
     void setAnswer(const QVariantMap &answer);
-    void xapianUpdateFinished(int result);
+    void xapianUpdateFinished(bool result);
 
 Q_SIGNALS:
     void workerStarted();

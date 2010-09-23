@@ -444,16 +444,16 @@ void QAptWorker::updateXapianIndex()
     QDBusConnection::systemBus().connect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
                                          "UpdateProgress", this, SIGNAL(xapianUpdateProgress(int)));
     QDBusConnection::systemBus().connect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
-                                         "UpdateFinished", this, SLOT(xapianUpdateFinished(int)));
+                                         "UpdateFinished", this, SLOT(xapianUpdateFinished(bool)));
 }
 
-void QAptWorker::xapianUpdateFinished(int result)
+void QAptWorker::xapianUpdateFinished(bool result)
 {
     Q_UNUSED(result);
     QDBusConnection::systemBus().disconnect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
                                             "UpdateProgress", this, SIGNAL(xapianUpdateProgress(int)));
     QDBusConnection::systemBus().disconnect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
-                                            "UpdateFinished", this, SLOT(xapianUpdateFinished()));
+                                            "UpdateFinished", this, SLOT(xapianUpdateFinished(bool)));
 
     emit workerEvent(QApt::XapianUpdateFinished);
 }
