@@ -232,7 +232,7 @@ QString Package::longDescription() const
             // Hack to get the lists working again.
             sections[i].replace('\r', '\n');
             // Merge multiple whitespace chars into one
-            sections[i].replace(QRegExp("\\ \\ +"), QString(' '));
+            sections[i].replace(QRegExp("\\ \\ +"), QChar(' '));
             // Remove the initial whitespace
             sections[i].remove(0, 1);
             // Append to parsedDescription
