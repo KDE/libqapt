@@ -52,6 +52,7 @@ private:
     QApt::Cache *m_cache;
     pkgPolicy *m_policy;
     pkgRecords *m_records;
+    bool m_systemLocked;
 
     QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
@@ -60,6 +61,8 @@ private:
 
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
+    bool lockSystem();
+    bool unlockSystem();
     void updateCache();
     void cancelDownload();
     void commitChanges(QVariantMap instructionsList);
