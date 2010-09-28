@@ -68,6 +68,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     bool initializeApt();
+    void initializeStatusWatcher();
     void setAnswer(const QVariantMap &answer);
     void xapianUpdateFinished(bool result);
 

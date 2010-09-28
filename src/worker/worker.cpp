@@ -77,21 +77,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
     }
 
     QTimer::singleShot(10000, this, SLOT(quit()));
-    sleep(1);
-
-    m_acquireStatus = new WorkerAcquire(this);
-    connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
-            this, SIGNAL(downloadProgress(int, int, int)));
-    connect(m_acquireStatus, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
-            this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
-    connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
-            this, SIGNAL(downloadMessage(int, const QString&)));
-    connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
-            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
-    connect(m_acquireStatus, SIGNAL(fetchWarning(int, const QVariantMap&)),
-            this, SIGNAL(warningOccurred(int, const QVariantMap&)));
-    connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SIGNAL(questionOccurred(int, const QVariantMap&)));
 }
 
 QAptWorker::~QAptWorker()
@@ -136,6 +121,23 @@ bool QAptWorker::initializeApt()
     return true;
 }
 
+void QAptWorker::initializeStatusWatcher()
+{
+    m_acquireStatus = new WorkerAcquire(this);
+    connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
+            this, SIGNAL(downloadProgress(int, int, int)));
+    connect(m_acquireStatus, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
+            this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
+    connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
+            this, SIGNAL(downloadMessage(int, const QString&)));
+    connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
+            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
+    connect(m_acquireStatus, SIGNAL(fetchWarning(int, const QVariantMap&)),
+            this, SIGNAL(warningOccurred(int, const QVariantMap&)));
+    connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
+            this, SIGNAL(questionOccurred(int, const QVariantMap&)));
+}
+
 void QAptWorker::updateCache()
 {
     if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
@@ -161,6 +163,7 @@ void QAptWorker::updateCache()
         }
     }
 
+    initializeStatusWatcher();
     pkgAcquire fetcher;
     fetcher.Setup(m_acquireStatus);
     // Populate it with the source selection and get all Indexes
@@ -184,7 +187,9 @@ void QAptWorker::updateCache()
 
 void QAptWorker::cancelDownload()
 {
-    m_acquireStatus->requestCancel();
+    if (m_acquireStatus) {
+        m_acquireStatus->requestCancel();
+    }
 }
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
@@ -293,6 +298,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         }
     }
 
+    initializeStatusWatcher();
     pkgAcquire fetcher;
     fetcher.Setup(m_acquireStatus);
 
