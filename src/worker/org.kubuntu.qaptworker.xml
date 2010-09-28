@@ -50,6 +50,12 @@
     <method name="setLocale">
       <arg name="locale" type="s" direction="in"/>
     </method>
+    <method name="lockSystem">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="unlockSystem">
+      <arg type="b" direction="out"/>
+    </method>
     <method name="updateCache">
     </method>
     <method name="cancelDownload">

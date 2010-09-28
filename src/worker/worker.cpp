@@ -62,6 +62,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         , m_records(0)
         , m_questionBlock(0)
         , m_questionResponse(QVariantMap())
+        , m_systemLocked(false)
 {
     new QaptworkerAdaptor(this);
 
@@ -88,6 +89,30 @@ QAptWorker::~QAptWorker()
 void QAptWorker::setLocale(const QString &locale) const
 {
     std::setlocale(LC_ALL, locale.toAscii());
+}
+
+bool QAptWorker::lockSystem()
+{
+    if (m_systemLocked) {
+        return true;
+    }
+
+    bool systemLocked = _system->Lock();
+    m_systemLocked = systemLocked;
+
+    return systemLocked;
+}
+
+bool QAptWorker::unlockSystem()
+{
+    if (!m_systemLocked) {
+        return true;
+    }
+
+    bool systemUnlocked = _system->UnLock();
+    m_systemLocked = !systemUnlocked;
+
+    return systemUnlocked;
 }
 
 bool QAptWorker::initializeApt()
@@ -291,7 +316,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     if (_config->FindB("Debug::NoLocking",false) == false)
     {
         Lock.Fd(GetLock(_config->FindDir("Dir::Cache::Archives") + "lock"));
-        if (_error->PendingError()) {
+        if (_error->PendingError() || !lockSystem()) {
             emit errorOccurred(QApt::LockError, QVariantMap());
             emit workerFinished(false);
             return;
@@ -407,6 +432,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
+    unlockSystem();
     pkgPackageManager::OrderResult res = installProgress->start(packageManager);
     bool success = (res == pkgPackageManager::Completed);
 
