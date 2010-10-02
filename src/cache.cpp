@@ -20,6 +20,8 @@
 
 #include "cache.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/sourcelist.h>
@@ -27,6 +29,17 @@
 #include <apt-pkg/policy.h>
 
 namespace QApt {
+
+class CacheBuildProgress : public OpProgress
+{
+public:
+    CacheBuildProgress(){};
+
+    virtual void Update() {
+        // Evil but Necessary, libapt-pkg not thread safe, afaict
+        QCoreApplication::processEvents();
+    }
+};
 
 class CachePrivate
 {
@@ -49,7 +62,7 @@ public:
         delete mmap;
     }
 
-    OpProgress m_progressMeter;
+    CacheBuildProgress m_progressMeter;
     MMap *mmap;
 
     pkgCache *cache;
