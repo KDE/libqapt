@@ -35,7 +35,7 @@
 #include "detailswidget.h"
 #include "../../src/globals.h"
 #include "../../src/package.h"
-#include "../../src/workerdbus.h"
+#include "workerdbus.h"
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     : KProgressDialog()

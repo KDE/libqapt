@@ -41,7 +41,7 @@ class CachePrivate;
  *
  * @author Jonathan Thomas
  */
-class Cache : public QObject
+class Q_DECL_EXPORT Cache : public QObject
 {
     Q_OBJECT
 public:
