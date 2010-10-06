@@ -262,6 +262,12 @@ protected:
      */
     pkgSourceList *packageSourceList() const;
 
+    /**
+     * Returns a pointer to the internal package cache. Mainly used for
+     * internal purposes in QApt::Package.
+     *
+     * @return @c pkgSourceList The package cache list used by the backend
+     */
     Cache *cache() const;
 
 private:

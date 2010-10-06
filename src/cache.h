@@ -73,6 +73,13 @@ public:
      */
     pkgSourceList *list() const;
 
+   /**
+    * Returns a pointer to QApt's cache of trusted package source index
+    * files. These are used by QApt::Package to determine whether or not
+    * a package is trusted
+    *
+    * @return A pointer to the trusted pkgIndexFile cache
+    */
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache() const;
 
 public Q_SLOTS:

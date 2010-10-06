@@ -244,6 +244,8 @@ public:
     * through the KGlobal::locale()->formatByteSize() function to get a
     * localized, human-readable number.
     *
+    * Returns -1 on error.
+    *
     * \return The installed size of the package
     */
     qint64 currentInstalledSize() const;
@@ -255,6 +257,8 @@ public:
     * through the KGlobal::locale()->formatByteSize() function to get a
     * localized, human-readable number.
     *
+    * Returns -1 on error.
+    *
     * \return The installed size of the package
     */
     qint64 availableInstalledSize() const;
@@ -264,6 +268,8 @@ public:
     * This is human-unreadable, so KDE applications may wish to run this
     * through the KGlobal::locale()->formatByteSize() function to get a
     * localized, human-readable number.
+    *
+    * Returns -1 on error.
     *
     * \return The installed size of the package
     */
