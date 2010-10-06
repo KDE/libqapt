@@ -763,7 +763,7 @@ bool Backend::loadSelections(const QString &path)
     QString packageName;
     QString packageAction;
 
-    QMap<QString, int> actionMap;
+    QHash<QString, int> actionMap;
     do {
         line = in.readLine();
         if (line.isEmpty() || line.at(0) == '#') {
@@ -798,7 +798,7 @@ bool Backend::loadSelections(const QString &path)
     // XXX Should protect whatever is already selected in the cache.
 
     pkgCache::PkgIterator pkgIter;
-    QMap<QString, int>::const_iterator mapIter = actionMap.begin();
+    QHash<QString, int>::const_iterator mapIter = actionMap.begin();
     while (mapIter != actionMap.end()) {
         pkgIter = d->cache->depCache()->FindPkg(mapIter.key().toStdString());
         if (pkgIter.end()) {
