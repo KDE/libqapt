@@ -229,11 +229,11 @@ QString Package::longDescription() const
         for (i = 0; i < sections.count(); ++i) {
             sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r " % QString::fromUtf8("\xE2\x80\xA2"));
             // There should be no new lines within a section.
-            sections[i].remove('\n');
+            sections[i].remove(QLatin1Char('\n'));
             // Hack to get the lists working again.
             sections[i].replace('\r', '\n');
             // Merge multiple whitespace chars into one
-            sections[i].replace(QRegExp("\\ \\ +"), QChar(' '));
+            sections[i].replace(QRegExp("\\ \\ +"), QLatin1Char(' '));
             // Remove the initial whitespace
             sections[i].remove(0, 1);
             // Append to parsedDescription
@@ -256,7 +256,7 @@ QString Package::maintainer() const
     if (!ver.end()) {
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromUtf8(parser.Maintainer().data());
-        maintainer.replace('<', "&lt;");
+        maintainer.replace(QChar('<'), QLatin1String("&lt;"));
     }
     return maintainer;
 }
@@ -624,8 +624,8 @@ int Package::state() const
 
 bool Package::isInstalled() const
 {
-    Q_D(const Package);
     pkgCache::VerIterator ver = d->packageIter->CurrentVer();
+
     return !ver.end();
 }
 
@@ -700,7 +700,7 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
         // Escape the compare operator so it won't be seen as HTML
         if (!version.isEmpty()) {
             QString compMarkup(versionCompare);
-            compMarkup.replace('<', "&lt;");
+            compMarkup.replace(QLatin1Char('<'), QLatin1String("&lt;"));
             finalString += " (" % compMarkup % ' ' % version % ')';
         }
 
