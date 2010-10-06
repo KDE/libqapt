@@ -231,13 +231,13 @@ QString Package::longDescription() const
             // There should be no new lines within a section.
             sections[i].remove(QLatin1Char('\n'));
             // Hack to get the lists working again.
-            sections[i].replace('\r', '\n');
+            sections[i].replace(QLatin1Char('\r'), QLatin1Char('\n'));
             // Merge multiple whitespace chars into one
-            sections[i].replace(QRegExp("\\ \\ +"), QLatin1Char(' '));
+            sections[i].replace(QRegExp("\\ \\ +"), QChar(' '));
             // Remove the initial whitespace
             sections[i].remove(0, 1);
             // Append to parsedDescription
-            if (sections[i].startsWith("\n " % QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
+            if (sections[i].startsWith(QLatin1String("\n ") % QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
                 parsedDescription += sections[i];
             }  else {
                 parsedDescription += "\n\n" % sections[i];
@@ -300,9 +300,11 @@ QStringList Package::availableVersions() const
             pkgCache::PkgFileIterator File = VF.File();
 
             if (File->Archive != 0) {
-                versions.append(QString(Ver.VerStr()) % " (" % QString(File.Archive()) % ')');
+                versions.append(QString(Ver.VerStr()) % QLatin1String(" (") %
+                QString(File.Archive()) % QLatin1Char(')'));
             } else {
-                versions.append(QString(Ver.VerStr()) % " (" % QString(File.Site()) % ')');
+                versions.append(QString(Ver.VerStr()) % QLatin1String(" (") %
+                QString(File.Site()) % QLatin1Char(')'));
             }
         }
     }
@@ -413,7 +415,7 @@ QUrl Package::changelogUrl() const
     }
 
     if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
-        prefix = "lib" % srcPackage[3];
+        prefix = QLatin1String("lib") % srcPackage[3];
     } else {
         prefix = srcPackage[0];
     }
@@ -429,10 +431,10 @@ QUrl Package::changelogUrl() const
         versionString = epochVersion[1];
     }
 
-    QString urlBase = "http://changelogs.ubuntu.com/changelogs/pool/";
+    QString urlBase = QLatin1String("http://changelogs.ubuntu.com/changelogs/pool/");
     QUrl url = QUrl(urlBase % sourceSection % '/' % prefix % '/' %
                     srcPackage % '/' % srcPackage % '_' % versionString % '/'
-                    % "changelog");
+                    % QLatin1String("changelog"));
 
     return url;
 }
@@ -442,10 +444,10 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
     QString urlBase;
     switch (type) {
         case QApt::Thumbnail:
-            urlBase = "http://screenshots.debian.net/thumbnail/";
+            urlBase = QLatin1String("http://screenshots.debian.net/thumbnail/");
             break;
         case QApt::Screenshot:
-            urlBase = "http://screenshots.debian.net/screenshot/";
+            urlBase = QLatin1String("http://screenshots.debian.net/screenshot/");
             break;
     }
 
@@ -633,7 +635,8 @@ bool Package::isSupported() const
 {
     if (origin() == "Ubuntu") {
         QString componentString = component();
-        if ((componentString == "main" || componentString == "restricted") && isTrusted()) {
+        if ((componentString == QLatin1String("main") ||
+             componentString == QLatin1String("restricted")) && isTrusted()) {
             return true;
         }
     }
@@ -690,9 +693,9 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
             versionCompare=D.CompType();
         }
 
-        finalString = "<b>" % type % ":</b> ";
+        finalString = QLatin1String("<b>") % type % QLatin1String(":</b> ");
         if (isVirtual) {
-            finalString += "<i>" % name % "</i>";
+            finalString += QLatin1String("<i>") % name % QLatin1String("</i>");
         } else {
             finalString += name;
         }
@@ -701,11 +704,11 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
         if (!version.isEmpty()) {
             QString compMarkup(versionCompare);
             compMarkup.replace(QLatin1Char('<'), QLatin1String("&lt;"));
-            finalString += " (" % compMarkup % ' ' % version % ')';
+            finalString += QLatin1String(" (") % compMarkup % QLatin1Char(' ') % version % QLatin1Char(')');
         }
 
         if (isOr) {
-            finalString += " |";
+            finalString += QLatin1String(" |");
         }
 
         dependsList.append(finalString);
