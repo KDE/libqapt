@@ -624,7 +624,9 @@ int Package::state() const
 
 bool Package::isInstalled() const
 {
-    return (state() & Installed);
+    Q_D(const Package);
+    pkgCache::VerIterator ver = d->packageIter->CurrentVer();
+    return !ver.end();
 }
 
 bool Package::isSupported() const
