@@ -28,6 +28,10 @@
 
 class pkgSourceList;
 
+namespace QApt {
+    class Cache;
+}
+
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
@@ -257,6 +261,8 @@ protected:
      * @return @c pkgSourceList The package source list used by the backend
      */
     pkgSourceList *packageSourceList() const;
+
+    Cache *cache() const;
 
 private:
     Q_DECLARE_PRIVATE(Backend);

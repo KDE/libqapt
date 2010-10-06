@@ -50,6 +50,7 @@ public:
         , policy(0)
         , depCache(0)
         , list(new pkgSourceList)
+        , trustCache(new QHash<pkgCache::PkgFileIterator, pkgIndexFile*>)
     {
     }
 
@@ -60,6 +61,7 @@ public:
         delete policy;
         delete depCache;
         delete mmap;
+        delete trustCache;
     }
 
     CacheBuildProgress m_progressMeter;
@@ -70,6 +72,8 @@ public:
 
     pkgDepCache *depCache;
     pkgSourceList *list;
+
+    QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache;
 };
 
 Cache::Cache(QObject* parent)
@@ -130,6 +134,8 @@ bool Cache::open()
     d->depCache = new pkgDepCache(d->cache, d->policy);
     d->depCache->Init(&(d->m_progressMeter));
 
+    d->trustCache->clear();
+
     if (d->depCache->DelCount() != 0 || d->depCache->InstCount() != 0) {
         return false;
     }
@@ -149,6 +155,13 @@ pkgSourceList *Cache::list() const
     Q_D(const Cache);
 
     return d->list;
+}
+
+QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *Cache::trustCache() const
+{
+    Q_D(const Cache);
+
+    return d->trustCache;
 }
 
 }

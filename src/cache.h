@@ -21,9 +21,12 @@
 #ifndef QAPT_CACHE_H
 #define QAPT_CACHE_H
 
-#include <QtCore/QObject>
+#include <QtCore/QHash>
+
+#include <apt-pkg/pkgcache.h>
 
 class pkgDepCache;
+class pkgIndexFile;
 class pkgSourceList;
 
 namespace QApt {
@@ -69,6 +72,8 @@ public:
      * @return A pointer to the internal @c pkgSourceList
      */
     pkgSourceList *list() const;
+
+    QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache() const;
 
 public Q_SLOTS:
     /**

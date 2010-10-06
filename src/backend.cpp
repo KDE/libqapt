@@ -207,6 +207,13 @@ pkgSourceList *Backend::packageSourceList() const
     return d->cache->list();
 }
 
+Cache *Backend::cache() const
+{
+    Q_D(const Backend);
+
+    return d->cache;
+}
+
 Package *Backend::package(pkgCache::PkgIterator &iter) const
 {
     Q_D(const Backend);

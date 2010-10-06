@@ -43,6 +43,7 @@
 #include <algorithm>
 
 #include "backend.h"
+#include "cache.h"
 
 namespace QApt {
 
@@ -859,11 +860,25 @@ bool Package::isTrusted() const
     }
 
     pkgSourceList *Sources = d->backend->packageSourceList();
+    QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache = d->backend->cache()->trustCache();
     for (pkgCache::VerFileIterator i = Ver.FileList(); !i.end(); ++i)
     {
         pkgIndexFile *Index;
-        if (!Sources->FindIndex(i.File(), Index)) {
-           continue;
+
+        //FIXME: Should be done in apt
+        QHash<pkgCache::PkgFileIterator, pkgIndexFile*>::const_iterator trustIter = trustCache->constBegin();
+        while (trustIter != trustCache->constEnd()) {
+            if (trustIter.key() == i.File()) {
+                break;
+            }
+        }
+
+        if (trustIter == trustCache->constEnd()) { // Not found
+            if (!Sources->FindIndex(i.File(), Index)) {
+              continue;
+            }
+        } else {
+            Index = trustIter.value();
         }
         if (Index->IsTrusted()) {
             return true;
