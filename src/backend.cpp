@@ -53,29 +53,35 @@ public:
         delete cache;
         delete records;
     }
-    // Watches DBus for our worker appearing/disappearing
-    QDBusServiceWatcher *watcher;
+    // Caches
     // The canonical list of all unique, non-virutal package objects
     PackageList packages;
+    // A list of each package object's ID number
     QVector<int> packagesIndex;
     // Set of group names extracted from our packages
     QSet<Group> groups;
-
+    // Cache of origin/human-readable name pairings
     QMap<QString, QString> originMap;
 
-    OrgKubuntuQaptworkerInterface *worker;
+    // Counts
+    int installedCount;
 
     // Pointer to the apt cache object
     Cache *cache;
     pkgPolicy *policy;
     pkgRecords *records;
 
-    // undo/redo stuff
+    // Undo/redo stuff
     QList<CacheState> undoStack;
     QList<CacheState> redoStack;
 
+    // Xapian
     time_t xapianTimeStamp;
     Xapian::Database xapianDatabase;
+
+    // DBus
+    QDBusServiceWatcher *watcher;
+    OrgKubuntuQaptworkerInterface *worker;
 };
 
 Backend::Backend()
@@ -148,6 +154,7 @@ void Backend::reloadCache()
     d->groups.clear();
     d->originMap.clear();
     d->packagesIndex.clear();
+    d->installedCount = 0;
 
     int packageCount = depCache->Head().PackageCount;
     d->packagesIndex.resize(packageCount);
@@ -172,6 +179,10 @@ void Backend::reloadCache()
         Package *pkg = new Package(this, depCache, d->records, iter);
         d->packagesIndex[iter->ID] = count;
         d->packages.insert(count++, pkg);
+
+        if (iter->CurrentVer) {
+            d->installedCount++;
+        }
 
         QString group = pkg->section();
 
@@ -294,6 +305,13 @@ int Backend::packageCount(const Package::States &states) const
     }
 
     return packageCount;
+}
+
+int Backend::installedCount() const
+{
+    Q_D(const Backend);
+
+    return d->installedCount;
 }
 
 qint64 Backend::downloadSize() const

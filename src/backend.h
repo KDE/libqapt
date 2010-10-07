@@ -154,8 +154,9 @@ public:
      */
     QString origin(QString originLabel) const;
 
+    // TODO QApt2: Around that time it might be wise to use qint64 for count()'s
     /**
-     * Queries the backend for the total number of packages in the Apt
+     * Queries the backend for the total number of packages in the APT
      * database, discarding no-longer-existing packages that linger on in the
      * status cache (That have a version of 0)
      *
@@ -174,6 +175,16 @@ public:
      *         APT database
      */
     int packageCount(const Package::States &states) const;
+
+    /**
+     * Queries the backend for the total number of packages in the APT
+     * database that are installed. This is quicker than using the
+     * packageCount(const Package::States &states) overload, and is
+     * the recommended way for getting an installed packages count.
+     *
+     * @return The number of installed packages in the APT database
+     */
+    int installedCount() const;
 
     /**
      * Returns the total amount of data that will be downloaded if the user
@@ -216,8 +227,14 @@ public:
     PackageList markedPackages() const;
 
     /**
-     * Searches through the internal package list and returns a list of packages
-     * based on the given input.
+     * A quick search that uses the APT Xapian index to search for packages
+     * that match the given search string. While it is quite fast in 95% of
+     * all cases, the relevancy of its results may in some cases not be 100%
+     * accurate. Irrelevant results may slip in, and some relevant results
+     * may be cut.
+     *
+     * In the future, a "slow" search that searches by exact matches for
+     * certain parameters will be implemented.
      *
      * @param searchString The string to narrow the search by.
      *
