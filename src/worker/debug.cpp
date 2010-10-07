@@ -56,7 +56,7 @@ public:
         if (!m_fileName.isEmpty()) {
             QFile outputFile(m_fileName);
             outputFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-            outputFile.write(QDateTime::currentDateTime().toString("hh:mm:ss.zzz ").toAscii());
+            outputFile.write(QDateTime::currentDateTime().toString(QLatin1String("hh:mm:ss.zzz ")).toAscii());
             outputFile.write(data, maxSize);
             outputFile.putChar('\n');
             outputFile.close();
@@ -98,7 +98,7 @@ public:
     QString logFileName() const
     {
         #warning TODO: errorLogFileName
-        return QString("/var/log/qaptworker.log");
+        return QString(QLatin1String("/var/log/qaptworker.log"));
     }
 
     QDebug stream(const QtMsgType &type)

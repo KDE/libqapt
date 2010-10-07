@@ -57,7 +57,7 @@ class PackagePrivate
         int state;
 
         pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
-        QString getReleaseFileForOrigin(const QString &label, const QString &release) const;
+        QString getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const;
 };
 
 pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label, const QString &release) const
@@ -87,7 +87,7 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label
    return found;
 }
 
-QString PackagePrivate::getReleaseFileForOrigin(const QString &label, const QString &release) const
+QString PackagePrivate::getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const
 {
     pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
 
@@ -146,7 +146,7 @@ pkgCache::PkgIterator *Package::packageIterator() const
 
 QString Package::name() const
 {
-    QString name(d->packageIter->Name());
+    QString name = latin1Name();
 
     return name;
 }
@@ -226,24 +226,25 @@ QString Package::longDescription() const
 
         QString parsedDescription;
         // Split at double newline, by "section"
-        QStringList sections = rawDescription.split("\n .");
+        QStringList sections = rawDescription.split(QLatin1String("\n ."));
 
         int i;
         for (i = 0; i < sections.count(); ++i) {
-            sections[i].replace(QRegExp("\n( |\t)+(-|\\*)"), "\n\r " % QString::fromUtf8("\xE2\x80\xA2"));
+            sections[i].replace(QRegExp(QLatin1String("\n( |\t)+(-|\\*)")),
+                                QLatin1Literal("\n\r ") % QString::fromUtf8("\xE2\x80\xA2"));
             // There should be no new lines within a section.
             sections[i].remove(QLatin1Char('\n'));
             // Hack to get the lists working again.
             sections[i].replace(QLatin1Char('\r'), QLatin1Char('\n'));
             // Merge multiple whitespace chars into one
-            sections[i].replace(QRegExp("\\ \\ +"), QChar(' '));
+            sections[i].replace(QRegExp(QLatin1String("\\ \\ +")), QChar::fromLatin1(' '));
             // Remove the initial whitespace
             sections[i].remove(0, 1);
             // Append to parsedDescription
             if (sections[i].startsWith(QLatin1String("\n ") % QString::fromUtf8("\xE2\x80\xA2 ")) || i == 0) {
                 parsedDescription += sections[i];
             }  else {
-                parsedDescription += "\n\n" % sections[i];
+                parsedDescription += QLatin1Literal("\n\n") % sections[i];
             }
         }
         return parsedDescription;
@@ -259,7 +260,7 @@ QString Package::maintainer() const
     if (!ver.end()) {
         pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromUtf8(parser.Maintainer().data());
-        maintainer.replace(QChar('<'), QLatin1String("&lt;"));
+        maintainer.replace(QLatin1Char('<'), QLatin1String("&lt;"));
     }
     return maintainer;
 }
@@ -303,11 +304,11 @@ QStringList Package::availableVersions() const
             pkgCache::PkgFileIterator File = VF.File();
 
             if (File->Archive != 0) {
-                versions.append(QString(Ver.VerStr()) % QLatin1String(" (") %
-                QString(File.Archive()) % QLatin1Char(')'));
+                versions.append(QLatin1String(Ver.VerStr()) % QLatin1Literal(" (") %
+                QLatin1String(File.Archive()) % QLatin1Char(')'));
             } else {
-                versions.append(QString(Ver.VerStr()) % QLatin1String(" (") %
-                QString(File.Site()) % QLatin1Char(')'));
+                versions.append(QLatin1String(Ver.VerStr()) % QLatin1Literal(" (") %
+                QLatin1String(File.Site()) % QLatin1Char(')'));
             }
         }
     }
@@ -349,7 +350,7 @@ QString Package::priority() const
 QStringList Package::installedFilesList() const
 {
     QStringList installedFilesList;
-    QFile infoFile("/var/lib/dpkg/info/" % name() % ".list");
+    QFile infoFile(QLatin1Literal("/var/lib/dpkg/info/") % name() % QLatin1Literal(".list"));
 
     if (infoFile.open(QFile::ReadOnly)) {
         QTextStream stream(&infoFile);
@@ -365,11 +366,11 @@ QStringList Package::installedFilesList() const
 
         for (int i = 0; i < installedFilesList.size() - 1; ++i) {
             if (installedFilesList.at(i+1).contains(installedFilesList.at(i))) {
-                installedFilesList[i] = ' ';
+                installedFilesList[i] = QString(QLatin1Char(' '));
             }
         }
 
-        installedFilesList.removeAll(QChar(' '));
+        installedFilesList.removeAll(QChar::fromLatin1(' '));
     }
 
     return installedFilesList;
@@ -381,7 +382,7 @@ QString Package::origin() const
 
     if(!Ver.end()) {
          pkgCache::VerFileIterator VF = Ver.FileList();
-         return VF.File().Origin();
+         return QLatin1String(VF.File().Origin());
     }
 
     return QString();
@@ -410,15 +411,15 @@ QUrl Package::changelogUrl() const
     const QString srcPackage = sourcePackage();
     QString sourceSection = section();
 
-    if (sourceSection.contains('/')) {
-        QStringList split = sourceSection.split('/');
+    if (sourceSection.contains(QLatin1Char('/'))) {
+        QStringList split = sourceSection.split(QLatin1Char('/'));
         sourceSection = split.at(0);
     } else {
-        sourceSection = QString("main");
+        sourceSection = QLatin1String("main");
     }
 
     if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
-        prefix = QLatin1String("lib") % srcPackage[3];
+        prefix = QLatin1Literal("lib") % srcPackage[3];
     } else {
         prefix = srcPackage[0];
     }
@@ -428,16 +429,16 @@ QUrl Package::changelogUrl() const
         versionString = availableVersion();
     }
 
-    if (versionString.contains(':')) {
-        QStringList epochVersion = versionString.split(':');
+    if (versionString.contains(QLatin1Char(':'))) {
+        QStringList epochVersion = versionString.split(QLatin1Char(':'));
         // If the version has an epoch, take the stuff after the epoch
         versionString = epochVersion[1];
     }
 
     QString urlBase = QLatin1String("http://changelogs.ubuntu.com/changelogs/pool/");
-    QUrl url = QUrl(urlBase % sourceSection % '/' % prefix % '/' %
-                    srcPackage % '/' % srcPackage % '_' % versionString % '/'
-                    % QLatin1String("changelog"));
+    QUrl url = QUrl(urlBase % sourceSection % QLatin1Char('/') % prefix % QLatin1Char('/') %
+                    srcPackage % QLatin1Char('/') % srcPackage % QLatin1Char('_') % versionString % '/'
+                    % QLatin1Literal("changelog"));
 
     return url;
 }
@@ -454,7 +455,7 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
             break;
     }
 
-    QUrl url = QUrl(urlBase % name());
+    QUrl url = QUrl(urlBase % latin1Name());
 
     return url;
 }
@@ -465,7 +466,7 @@ QString Package::supportedUntil() const
         return QString();
     }
 
-    QFile lsb_release("/etc/lsb-release");
+    QFile lsb_release(QLatin1String("/etc/lsb-release"));
     if (!lsb_release.open(QFile::ReadOnly)) {
         // Though really, your system is screwed if this happens...
         return QString();
@@ -479,15 +480,15 @@ QString Package::supportedUntil() const
     QString line;
     do {
         line = stream.readLine();
-        QStringList split = line.split('=');
-        if (split[0] == "DISTRIB_CODENAME") {
+        QStringList split = line.split(QLatin1Char('='));
+        if (split[0] == QLatin1String("DISTRIB_CODENAME")) {
             release = split[1];
         }
     } while (!line.isNull());
 
     // Canonical only provides support for Ubuntu, but we don't have to worry
     // about Debian systems as long as we assume that this function can fail.
-    QString releaseFile = d->getReleaseFileForOrigin("Ubuntu", release);
+    QString releaseFile = d->getReleaseFileForOrigin(QLatin1String("Ubuntu"), release);
 
     if(!FileExists(releaseFile.toStdString())) {
         // happens e.g. when there is no release file and is harmless
@@ -508,7 +509,7 @@ QString Package::supportedUntil() const
 
     QDateTime supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
 
-    return supportEnd.toString("MMMM yyyy");
+    return supportEnd.toString(QLatin1String("MMMM yyyy"));
 }
 
 qint64 Package::currentInstalledSize() const
@@ -636,7 +637,7 @@ bool Package::isInstalled() const
 
 bool Package::isSupported() const
 {
-    if (origin() == "Ubuntu") {
+    if (origin() == QLatin1String("Ubuntu")) {
         QString componentString = component();
         if ((componentString == QLatin1String("main") ||
              componentString == QLatin1String("restricted")) && isTrusted()) {
@@ -683,7 +684,7 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
 
         // common information
         type = QString::fromUtf8(D.DepType());
-        name = Trg.Name();
+        name = QLatin1String(Trg.Name());
 
         // satisfied
         if (((*d->depCache)[D] & pkgDepCache::DepGInstall) == pkgDepCache::DepGInstall) {
@@ -692,13 +693,13 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
         if (Trg->VersionList == 0) {
             isVirtual = true;
         } else {
-            version=D.TargetVer();
-            versionCompare=D.CompType();
+            version = QLatin1String(D.TargetVer());
+            versionCompare = QLatin1String(D.CompType());
         }
 
-        finalString = QLatin1String("<b>") % type % QLatin1String(":</b> ");
+        finalString = QLatin1Literal("<b>") % type % QLatin1Literal(":</b> ");
         if (isVirtual) {
-            finalString += QLatin1String("<i>") % name % QLatin1String("</i>");
+            finalString += QLatin1Literal("<i>") % name % QLatin1Literal("</i>");
         } else {
             finalString += name;
         }
@@ -742,7 +743,7 @@ QStringList Package::providesList() const
 
     for (pkgCache::PrvIterator Prv =
          State.CandidateVerIter(*d->depCache).ProvidesList(); !Prv.end(); ++Prv) {
-        provides.append(Prv.Name());
+        provides.append(QLatin1String(Prv.Name()));
     }
 
    return provides;
@@ -796,8 +797,8 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
 
             QString requiredVersion;
             if(Start.TargetVer() != 0) {
-                requiredVersion = '(' % QString::fromStdString(Start.CompType())
-                                  % QString::fromStdString(Start.TargetVer()) % ')';
+                requiredVersion = '(' % QLatin1String(Start.CompType())
+                                  % QLatin1String(Start.TargetVer()) % ')';
             }
 
             if (!Ver.end()) {
@@ -805,33 +806,33 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                 // upgrade. Example:
                 // "apt 0.5.4 but 0.5.3 is to be installed"
                 QVariantMap failReason;
-                failReason["Relation"] = QString::fromStdString(End.DepType());
-                failReason["RequiredVersion"] = requiredVersion;
-                failReason["CandidateVersion"] = QString::fromStdString(Ver.VerStr());
+                failReason[QLatin1String("Relation")] = QString::fromStdString(End.DepType());
+                failReason[QLatin1String("RequiredVersion")] = requiredVersion;
+                failReason[QLatin1String("CandidateVersion")] = QString::fromStdString(Ver.VerStr());
                 if (Start != End) {
-                    failReason["IsFirstOr"] = true;
+                    failReason[QLatin1String("IsFirstOr")] = true;
                 }
 
-                QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+                QString targetName = QLatin1String(Start.TargetPkg().Name());
                 wrongCandidate[targetName] = failReason;
             } else { // We have the package, but for some reason it won't be installed
                 // In this case, the required version does not exist at all
                 if ((*d->depCache)[Targ].CandidateVerIter(*d->depCache).end()) {
                     QVariantMap failReason;
-                    failReason["Relation"] = QString::fromStdString(End.DepType());
-                    failReason["RequiredVersion"] = requiredVersion;
+                    failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
+                    failReason[QLatin1String("RequiredVersion")] = requiredVersion;
                     if (Start != End) {
-                        failReason["IsFirstOr"] = true;
+                        failReason[QLatin1String("IsFirstOr")] = true;
                     }
 
-                    QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+                    QString targetName = QLatin1String(Start.TargetPkg().Name());
                     depNotInstallable[targetName] = failReason;
                 } else {
                     // Who knows why it won't be installed? Getting here means we have no good reason
                     QVariantMap failReason;
-                    failReason["Relation"] = QString::fromStdString(End.DepType());
+                    failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
                     if (Start != End) {
-                        failReason["IsFirstOr"] = true;
+                        failReason[QLatin1String("IsFirstOr")] = true;
                     }
 
                     QString targetName = QString::fromStdString(Start.TargetPkg().Name());
@@ -841,9 +842,9 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
         } else {
             // Ok, candidate has provides. We're a virtual package
             QVariantMap failReason;
-            failReason["Relation"] = QString::fromStdString(End.DepType());
+            failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
             if (Start != End) {
-                failReason["IsFirstOr"] = true;
+                failReason[QLatin1String("IsFirstOr")] = true;
             }
 
             QString targetName = QString::fromStdString(Start.TargetPkg().Name());
@@ -978,14 +979,14 @@ void Package::setPurge()
 
 bool Package::setVersion(const QString &version)
 {
-    QString defaultCandVer;
+    QLatin1String defaultCandVer("");
     pkgDepCache::StateCache &state = (*d->depCache)[*d->packageIter];
     if (state.CandVersion != NULL) {
-        defaultCandVer = state.CandVersion;
+        defaultCandVer = QLatin1String(state.CandVersion);
     }
 
     bool isDefault = (version == defaultCandVer);
-    pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
+    pkgVersionMatch Match(version.toLatin1().constData(), pkgVersionMatch::Version);
     pkgCache::VerIterator Ver = Match.Find(*d->packageIter);
 
     if (Ver.end()) {

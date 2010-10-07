@@ -133,7 +133,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
         }
 
         if (buf[0] == '\n') {
-            const QStringList list = QString::fromUtf8(line).split(':');
+            const QStringList list = QString::fromUtf8(line).split(QLatin1Char(':'));
             const QString status = list.at(0);
             const QString package = list.at(1);
             QString percent = list.at(2);
@@ -142,34 +142,34 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             // If str legitimately had a ':' in it (such as a package version)
             // we need to retrieve the next string in the list.
             if (list.count() == 5) {
-                str += QString(':' % list.at(4));
+                str += QString(QLatin1Char(':') % list.at(4));
             }
 
             if (package.isEmpty() || status.isEmpty()) {
                 continue;
             }
 
-            if (status.contains("pmerror")) {
+            if (status.contains(QLatin1String("pmerror"))) {
                 QVariantMap args;
-                args["FailedItem"] = package;
-                args["ErrorText"] = str;
+                args[QLatin1String("FailedItem")] = package;
+                args[QLatin1String("ErrorText")] = str;
                 emit commitError(QApt::CommitError, args);
-            } else if (status.contains("pmconffile")) {
+            } else if (status.contains(QLatin1String("pmconffile"))) {
                 // From what I understand, the original file starts after the ' character ('\'') and
                 // goes to a second ' character. The new conf file starts at the next ' and goes to
                 // the next '.
-                QStringList strList = str.split('\'');
+                QStringList strList = str.split(QLatin1Char('\''));
                 QString oldFile = strList.at(1);
                 QString newFile = strList.at(2);
 
                 QVariantMap args;
-                args["OldConfFile"] = oldFile;
-                args["NewConfFile"] = newFile;
+                args[QLatin1String("OldConfFile")] = oldFile;
+                args[QLatin1String("NewConfFile")] = newFile;
                 //TODO: diff support
 
                 QVariantMap result = askQuestion(QApt::ConfFilePrompt, args);
 
-                bool replaceFile = result["ReplaceFile"].toBool();
+                bool replaceFile = result[QLatin1String("ReplaceFile")].toBool();
 
                 if (replaceFile) {
                     ssize_t reply = write(writeFd, "Y\n", 2);
@@ -183,8 +183,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             }
 
             int percentage;
-            if (percent.contains('.')) {
-                QStringList percentList = percent.split('.');
+            if (percent.contains(QLatin1Char('.'))) {
+                QStringList percentList = percent.split(QLatin1Char('.'));
                 percentage = percentList.at(0).toInt();
             } else {
                 percentage = percent.toInt();

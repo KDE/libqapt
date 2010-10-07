@@ -89,8 +89,8 @@ Backend::Backend()
 {
     Q_D(Backend);
 
-    d->worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
-                                                  "/", QDBusConnection::systemBus(),
+    d->worker = new OrgKubuntuQaptworkerInterface(QLatin1String("org.kubuntu.qaptworker"),
+                                                  QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
 
     connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
@@ -103,7 +103,7 @@ Backend::Backend()
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
     d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
-    d->watcher->addWatchedService("org.kubuntu.qaptworker");
+    d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker"));
 }
 
 Backend::~Backend()
@@ -138,7 +138,7 @@ void Backend::reloadCache()
         string message;
         bool isError = _error->PopMessage(message);
         if (isError) {
-            details["ErrorText"] = QString::fromStdString(message);
+            details[QLatin1String("ErrorText")] = QString::fromStdString(message);
         }
         emitErrorOccurred(QApt::InitError, details);
         return;
@@ -194,7 +194,7 @@ void Backend::reloadCache()
 
         if(!Ver.end()) {
             pkgCache::VerFileIterator VF = Ver.FileList();
-            d->originMap[VF.File().Origin()] = VF.File().Label();
+            d->originMap[QLatin1String(VF.File().Origin())] = QLatin1String(VF.File().Label());
         }
     }
 
@@ -509,8 +509,8 @@ bool Backend::xapianIndexNeedsUpdate() const
     Q_D(const Backend);
 
    // If the cache has been modified after the xapian timestamp, we need to rebuild
-   QDateTime aptCacheTime = QFileInfo(_config->FindFile("Dir::Cache::pkgcache").c_str()).lastModified();
-   QDateTime dpkgStatusTime = QFileInfo("/var/lib/dpkg/status").lastModified();
+   QDateTime aptCacheTime = QFileInfo(QLatin1String(_config->FindFile("Dir::Cache::pkgcache").c_str())).lastModified();
+   QDateTime dpkgStatusTime = QFileInfo(QLatin1String("/var/lib/dpkg/status")).lastModified();
    if (d->xapianTimeStamp < aptCacheTime.toTime_t() ||
        d->xapianTimeStamp < dpkgStatusTime.toTime_t()) {
       return true;
@@ -523,7 +523,7 @@ bool Backend::openXapianIndex()
 {
     Q_D(Backend);
 
-    QFileInfo timeStamp("/var/lib/apt-xapian-index/update-timestamp");
+    QFileInfo timeStamp(QLatin1String("/var/lib/apt-xapian-index/update-timestamp"));
     d->xapianTimeStamp = timeStamp.lastModified().toTime_t();
 
     try {
@@ -730,7 +730,7 @@ void Backend::commitChanges()
         }
     }
 
-    d->worker->setLocale(setlocale(LC_ALL, 0));
+    d->worker->setLocale(QLatin1String(setlocale(LC_ALL, 0)));
     d->worker->commitChanges(packageList);
 }
 
@@ -743,7 +743,7 @@ void Backend::updateCache()
 {
     Q_D(Backend);
 
-    d->worker->setLocale(setlocale(LC_ALL, 0));
+    d->worker->setLocale(QLatin1String(setlocale(LC_ALL, 0)));
     d->worker->updateCache();
 }
 
@@ -756,9 +756,11 @@ bool Backend::saveSelections(const QString &path) const
         int flags = d->packages[i]->state();
 
         if (flags & Package::ToInstall) {
-            selectionDocument.append(d->packages[i]->name() % "\t\tinstall" % '\n');
+            selectionDocument.append(d->packages[i]->name() %
+            QLatin1Literal("\t\tinstall") % QLatin1Char('\n'));
         } else if (flags & Package::ToRemove) {
-            selectionDocument.append(d->packages[i]->name() % "\t\tdeinstall" % '\n');
+            selectionDocument.append(d->packages[i]->name() %
+            QLatin1Literal("\t\tdeinstall") % QLatin1Char('\n'));
         }
     }
 
@@ -798,7 +800,7 @@ bool Backend::loadSelections(const QString &path)
     QHash<QString, int> actionMap;
     do {
         line = in.readLine();
-        if (line.isEmpty() || line.at(0) == '#') {
+        if (line.isEmpty() || line.at(0) == QLatin1Char('#')) {
             continue;
         }
         line = line.simplified();
@@ -814,9 +816,9 @@ bool Backend::loadSelections(const QString &path)
         }
         packageAction = QString::fromStdString(stdAction);
 
-        if (packageAction.at(0) == 'i') {
+        if (packageAction.at(0) == QLatin1Char('i')) {
             actionMap[packageName] = Package::ToInstall;
-        } else if ((packageAction.at(0) == 'd') || (packageAction.at(0) == 'u')) {
+        } else if ((packageAction.at(0) == QLatin1Char('d')) || (packageAction.at(0) == QLatin1Char('u'))) {
             actionMap[packageName] = Package::ToRemove;
         }
     } while (!line.isNull());

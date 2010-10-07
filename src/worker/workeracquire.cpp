@@ -99,8 +99,8 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
         QVariantMap args;
-        args["FailedItem"] = QString::fromUtf8(item.Description.c_str());
-        args["WarningText"] = QString::fromUtf8(item.Owner->ErrorText.c_str());
+        args[QLatin1String("FailedItem")] = QString::fromUtf8(item.Description.c_str());
+        args[QLatin1String("WarningText")] = QString::fromUtf8(item.Owner->ErrorText.c_str());
         emit fetchWarning(QApt::FetchFailedWarning, args);
     }
 
@@ -115,12 +115,12 @@ void WorkerAcquire::Stop()
 bool WorkerAcquire::MediaChange(string Media, string Drive)
 {
     QVariantMap args;
-    args["Media"] = QString::fromUtf8(Media.c_str());
-    args["Drive"] = QString::fromUtf8(Drive.c_str());
+    args[QLatin1String("Media")] = QString::fromUtf8(Media.c_str());
+    args[QLatin1String("Drive")] = QString::fromUtf8(Drive.c_str());
 
     QVariantMap result = askQuestion(QApt::MediaChange, args);
 
-    bool mediaChanged = result["MediaChanged"].toBool();
+    bool mediaChanged = result[QLatin1String("MediaChanged")].toBool();
 
     return mediaChanged;
 }
@@ -208,8 +208,8 @@ void WorkerAcquire::setAnswer(const QVariantMap &answer)
 void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status)
 {
     if (Itm.Owner->ID == 0) {
-          QString name = Itm.ShortDesc.c_str();
-          QString URI = Itm.Description.c_str();
+          QString name = QLatin1String(Itm.ShortDesc.c_str());
+          QString URI = QLatin1String(Itm.Description.c_str());
           qint64 size = Itm.Owner->FileSize;
 
           emit packageDownloadProgress(name, percentage, URI, size, status);

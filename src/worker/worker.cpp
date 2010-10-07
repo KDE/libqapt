@@ -66,13 +66,13 @@ QAptWorker::QAptWorker(int &argc, char **argv)
 {
     new QaptworkerAdaptor(this);
 
-    if (!QDBusConnection::systemBus().registerService("org.kubuntu.qaptworker")) {
+    if (!QDBusConnection::systemBus().registerService(QLatin1String("org.kubuntu.qaptworker"))) {
         // Another worker is already here, quit
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
 
-    if (!QDBusConnection::systemBus().registerObject("/", this)) {
+    if (!QDBusConnection::systemBus().registerObject(QLatin1String("/"), this)) {
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         return;
     }
@@ -132,7 +132,7 @@ bool QAptWorker::initializeApt()
         string message;
         bool isError = _error->PopMessage(message);
         if (isError) {
-            details["ErrorText"] = QString::fromStdString(message);
+            details[QLatin1String("ErrorText")] = QString::fromStdString(message);
         }
         emit errorOccurred(QApt::InitError, details);
         return false;
@@ -165,7 +165,7 @@ void QAptWorker::initializeStatusWatcher()
 
 void QAptWorker::updateCache()
 {
-    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.updateCache", message().service())) {
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.updateCache"), message().service())) {
         emit errorOccurred(QApt::AuthError, QVariantMap());
         return;
     }
@@ -219,7 +219,7 @@ void QAptWorker::cancelDownload()
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 {
-    if (!QApt::Auth::authorize("org.kubuntu.qaptworker.commitChanges", message().service())) {
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
         emit errorOccurred(QApt::AuthError, QVariantMap());
         return;
     }
@@ -242,8 +242,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         QString packageString = mapIter.key();
         QString version;
 
-        if (packageString.contains(',')) {
-            QStringList split = packageString.split(',');
+        if (packageString.contains(QLatin1Char(','))) {
+            QStringList split = packageString.split(QLatin1Char(','));
             iter = m_cache->depCache()->FindPkg(split.at(0).toStdString());
             version = split.at(1);
         } else {
@@ -251,7 +251,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         }
         if (iter == 0) {
             QVariantMap args;
-            args["NotFoundString"] = packageString;
+            args[QLatin1String("NotFoundString")] = packageString;
             emit errorOccurred(QApt::NotFoundError, args);
             emit workerFinished(false);
             return;
@@ -351,7 +351,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     string OutputDir = _config->FindDir("Dir::Cache::Archives");
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
         QVariantMap args;
-        args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
+        args[QLatin1String("DirectoryString")] = QLatin1String(OutputDir.c_str());
         emit errorOccurred(QApt::DiskSpaceError, args);
         emit workerFinished(false);
         return;
@@ -363,7 +363,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             unsigned(Stat.f_type)            != RAMFS_MAGIC)
         {
             QVariantMap args;
-            args["DirectoryString"] = QString::fromStdString(OutputDir.c_str());
+            args[QLatin1String("DirectoryString")] = QLatin1String(OutputDir.c_str());
             emit errorOccurred(QApt::DiskSpaceError, args);
             emit workerFinished(false);
             return;
@@ -381,7 +381,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     if (!untrustedPackages.isEmpty()) {
         QVariantMap args;
-        args["UntrustedItems"] = untrustedPackages;
+        args[QLatin1String("UntrustedItems")] = untrustedPackages;
 
         if (_config->FindB("APT::Get::AllowUnauthenticated", true) == true) {
             // Ask if the user really wants to install untrusted packages, if
@@ -393,7 +393,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             emit questionOccurred(QApt::InstallUntrusted, args);
             m_questionBlock->exec();
 
-            bool m_installUntrusted = m_questionResponse["InstallUntrusted"].toBool();
+            bool m_installUntrusted = m_questionResponse[QLatin1String("InstallUntrusted")].toBool();
             if(!m_installUntrusted) {
                 m_questionResponse = QVariantMap(); //Reset for next question
                 emit workerFinished(false);
@@ -463,29 +463,29 @@ void QAptWorker::updateXapianIndex()
     emit workerEvent(QApt::XapianUpdateStarted);
 
 
-    QDBusMessage m = QDBusMessage::createMethodCall("org.debian.AptXapianIndex",
-                                                    "/",
-                                                    "org.debian.AptXapianIndex",
-                                                    "update_async");
+    QDBusMessage m = QDBusMessage::createMethodCall(QLatin1String("org.debian.AptXapianIndex"),
+                                                    QLatin1String("/"),
+                                                    QLatin1String("org.debian.AptXapianIndex"),
+                                                    QLatin1String("update_async"));
     QVariantList dbusArgs;
 
     dbusArgs << true << true; // first arg is force, second update_only
     m.setArguments(dbusArgs);
     QDBusConnection::systemBus().send(m);
 
-    QDBusConnection::systemBus().connect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
-                                         "UpdateProgress", this, SIGNAL(xapianUpdateProgress(int)));
-    QDBusConnection::systemBus().connect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
-                                         "UpdateFinished", this, SLOT(xapianUpdateFinished(bool)));
+    QDBusConnection::systemBus().connect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
+                                         QLatin1String("UdateProgress"), this, SIGNAL(xapianUpdateProgress(int)));
+    QDBusConnection::systemBus().connect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
+                                         QLatin1String("UpdateFinished"), this, SLOT(xapianUpdateFinished(bool)));
 }
 
 void QAptWorker::xapianUpdateFinished(bool result)
 {
     Q_UNUSED(result);
-    QDBusConnection::systemBus().disconnect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
-                                            "UpdateProgress", this, SIGNAL(xapianUpdateProgress(int)));
-    QDBusConnection::systemBus().disconnect("org.debian.AptXapianIndex", "/", "org.debian.AptXapianIndex",
-                                            "UpdateFinished", this, SLOT(xapianUpdateFinished(bool)));
+    QDBusConnection::systemBus().disconnect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
+                                            QLatin1String("UdateProgress"), this, SIGNAL(xapianUpdateProgress(int)));
+    QDBusConnection::systemBus().disconnect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
+                                            QLatin1String("UpdateFinished"), this, SLOT(xapianUpdateFinished(bool)));
 
     emit workerEvent(QApt::XapianUpdateFinished);
 }
