@@ -178,13 +178,41 @@ public:
 
     /**
      * Queries the backend for the total number of packages in the APT
-     * database that are installed. This is quicker than using the
+     * database that are installed.
+     *
+     * This is quicker than using the
      * packageCount(const Package::States &states) overload, and is
      * the recommended way for getting an installed packages count.
      *
      * @return The number of installed packages in the APT database
      */
     int installedCount() const;
+
+    /**
+     * Queries the backend for the total number of packages in the APT
+     * database marked for installation.
+     *
+     * This is quicker than using the
+     * packageCount(const Package::States &states) overload, and is
+     * the recommended way for checking how many packages are to be
+     * installed/upgraded.
+     *
+     * @return The number of packages marked for installation
+     */
+    int toInstallCount() const;
+
+    /**
+     * Queries the backend for the total number of packages in the APT
+     * database marked for removal or purging.
+     *
+     * This is quicker than using the
+     * packageCount(const Package::States &states) overload, and is
+     * the recommended way for checking how many packages are to be
+     * removed/purged.
+     *
+     * @return The number of packages marked for removal/purging
+     */
+    int toRemoveCount() const;
 
     /**
      * Returns the total amount of data that will be downloaded if the user

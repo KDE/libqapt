@@ -314,6 +314,20 @@ int Backend::installedCount() const
     return d->installedCount;
 }
 
+int Backend::toInstallCount() const
+{
+    Q_D(const Backend);
+
+    return d->cache->depCache()->InstCount();
+}
+
+int Backend::toRemoveCount() const
+{
+    Q_D(const Backend);
+
+    return d->cache->depCache()->DelCount();
+}
+
 qint64 Backend::downloadSize() const
 {
     Q_D(const Backend);
