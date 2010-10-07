@@ -84,7 +84,7 @@ public:
     */
     QString name() const;
 
-    // TODO QApt2: Replace name() with latin1Name (but still call it name())
+    // TODO QApt2: Get rid of QString impl. and rename latin1Name() to name()
    /**
     * Returns the name of the package. This is the better choice over the
     * regular name() since a QLatin1String is much cheaper to construct
@@ -121,12 +121,16 @@ public:
     */
     QStringList availableVersions() const;
 
+    // TODO QApt2: Get rid of QString impl. and rename latin1Section() to
+    // section()
    /**
     * Returns the categorical section where the package resides
     *
     * \return The section of the package
     */
     QString section() const;
+
+    QLatin1String latin1Section() const;
 
    /**
     * Returns the source package corresponding to the package
