@@ -61,7 +61,7 @@ public:
     // Set of group names extracted from our packages
     QSet<Group> groups;
     // Cache of origin/human-readable name pairings
-    QMap<QString, QString> originMap;
+    QHash<QString, QString> originMap;
 
     // Counts
     int installedCount;
@@ -198,8 +198,8 @@ void Backend::reloadCache()
         }
     }
 
-    if (d->originMap.contains("")) {
-        d->originMap.remove("");
+    if (d->originMap.contains(QLatin1String(""))) {
+        d->originMap.remove(QLatin1String(""));
     }
 
     // Populate groups
