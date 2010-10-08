@@ -269,7 +269,7 @@ QString Backend::originLabel(const QString &origin) const
 {
     Q_D(const Backend);
 
-    QString originLabel = d->originMap[origin];
+    QString originLabel = d->originMap.value(origin);
 
     return originLabel;
 }
