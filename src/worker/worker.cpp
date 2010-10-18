@@ -61,7 +61,6 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         , m_cache(0)
         , m_records(0)
         , m_questionBlock(0)
-        , m_questionResponse(QVariantMap())
         , m_systemLocked(false)
 {
     new QaptworkerAdaptor(this);
@@ -77,7 +76,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         return;
     }
 
-    QTimer::singleShot(10000, this, SLOT(quit()));
+    QTimer::singleShot(30000, this, SLOT(quit()));
 }
 
 QAptWorker::~QAptWorker()
@@ -393,6 +392,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             emit questionOccurred(QApt::InstallUntrusted, args);
             m_questionBlock->exec();
 
+            // m_questionBlock will block function until we get a response in m_installUntrusted
             bool m_installUntrusted = m_questionResponse[QLatin1String("InstallUntrusted")].toBool();
             if(!m_installUntrusted) {
                 m_questionResponse = QVariantMap(); //Reset for next question
