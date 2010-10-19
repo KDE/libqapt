@@ -47,7 +47,7 @@ namespace QApt {
 class BackendPrivate
 {
 public:
-    BackendPrivate() : cache(0), records(0) {}
+    BackendPrivate() : cache(0), records(0), maxStackSize(20) {}
     ~BackendPrivate()
     {
         delete cache;
@@ -72,6 +72,7 @@ public:
     pkgRecords *records;
 
     // Undo/redo stuff
+    int maxStackSize;
     QList<CacheState> undoStack;
     QList<CacheState> redoStack;
 
@@ -556,10 +557,7 @@ void Backend::saveCacheState()
     d->undoStack.prepend(state);
     d->redoStack.clear();
 
-    // TODO: Configurable
-    int maxStackSize = 20;
-
-    while (d->undoStack.size() > maxStackSize) {
+    while (d->undoStack.size() > d->maxStackSize) {
         d->undoStack.removeLast();
     }
 }
@@ -592,6 +590,13 @@ void Backend::restoreCacheState(const CacheState &state)
         }
     }
     emit packageChanged();
+}
+
+void Backend::setUndoRedoCacheSize(int newSize)
+{
+    Q_D(Backend);
+
+    d->maxStackSize = newSize;
 }
 
 bool Backend::isUndoStackEmpty() const

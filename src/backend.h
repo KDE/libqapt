@@ -419,6 +419,14 @@ Q_SIGNALS:
     void xapianUpdateProgress(int percentage);
 
 public Q_SLOTS:
+   /**
+    * Sets the maximum size of the undo and redo stacks.
+    * The default size is 20.
+    *
+    * @param newSize The new size of the undo/redo stack
+    */
+    void setUndoRedoCacheSize(int newSize);
+
     /**
      * Takes the current state of the cache and puts it on the undo stack
      */
