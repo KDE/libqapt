@@ -506,12 +506,12 @@ bool Backend::isBroken() const
 {
     Q_D(const Backend);
 
-    if (d->cache->depCache() == 0) {
+    if (!d->cache->depCache()) {
         return true;
     }
 
     // Check for broken things
-    if (d->cache->depCache()->BrokenCount() != 0) {
+    if (d->cache->depCache()->BrokenCount()) {
         return true;
     }
 
