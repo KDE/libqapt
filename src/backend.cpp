@@ -765,7 +765,7 @@ void Backend::updateCache()
     d->worker->updateCache();
 }
 
-bool Backend::saveInstalledSelectionsList(const QString &path) const
+bool Backend::saveInstalledPackagesList(const QString &path) const
 {
     Q_D(const Backend);
 

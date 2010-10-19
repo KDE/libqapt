@@ -520,7 +520,7 @@ public Q_SLOTS:
      * \return @c true if saving succeeded
      * \return @c false if the saving failed
      */
-    bool saveInstalledSelectionsList(const QString &path) const;
+    bool saveInstalledPackagesList(const QString &path) const;
 
     /**
      * Writes a list of packages that have been marked for install, removal or
