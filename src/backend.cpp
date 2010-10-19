@@ -186,8 +186,9 @@ void Backend::reloadCache()
 
         QString group = pkg->section();
 
+        // Populate groups
         if (!group.isEmpty()) {
-            groupSet << group;
+            d->groups << group;
         }
 
         pkgCache::VerIterator Ver = (*depCache)[iter].CandidateVerIter(*depCache);
@@ -200,11 +201,6 @@ void Backend::reloadCache()
 
     if (d->originMap.contains(QLatin1String(""))) {
         d->originMap.remove(QLatin1String(""));
-    }
-
-    // Populate groups
-    foreach (const QString &group, groupSet) {
-        d->groups << group;
     }
 
     d->undoStack.clear();
