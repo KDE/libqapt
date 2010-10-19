@@ -84,10 +84,10 @@ public:
     QDBusServiceWatcher *watcher;
     OrgKubuntuQaptworkerInterface *worker;
 
-    void writeFile(const QString &path);
+    bool writeSelectionFile(const QString &file, const QString &path) const;
 };
 
-void BackendPrivate::writeFile(const QString &path)
+bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
 {
     QFile file(path);
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
@@ -782,7 +782,7 @@ bool Backend::saveInstalledSelectionsList(const QString &path) const
         return false;
     }
 
-    return writeFile(path);
+    return d->writeSelectionFile(selectionDocument, path);
 }
 
 bool Backend::saveSelections(const QString &path) const
@@ -806,7 +806,7 @@ bool Backend::saveSelections(const QString &path) const
         return false;
     }
 
-    return writeFile(path);
+    return d->writeSelectionFile(selectionDocument, path);
 }
 
 bool Backend::loadSelections(const QString &path)
