@@ -328,8 +328,10 @@ qint64 Backend::downloadSize() const
 {
     Q_D(const Backend);
 
+    // Raw size, ignoring already-downloaded or partially downloaded archives
     qint64 downloadSize = d->cache->depCache()->DebSize();
 
+    // If possible, get what really needs to be downloaded
     pkgAcquire fetcher;
     pkgPackageManager *PM = _system->CreatePM(d->cache->depCache());
     if (PM->GetArchives(&fetcher, d->cache->list(), d->records)) {
