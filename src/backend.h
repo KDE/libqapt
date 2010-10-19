@@ -512,8 +512,19 @@ public Q_SLOTS:
     void answerWorkerQuestion(const QVariantMap &response);
 
     /**
+     * Exports a list of all packages currently installed on the system. This
+     * list can be read by the readSelections() function or by Synaptic.
+     *
+     * @param path The path to save the selection list to
+     *
+     * \return @c true if saving succeeded
+     * \return @c false if the saving failed
+     */
+    bool saveInstalledSelectionsList(const QString &path) const;
+
+    /**
      * Writes a list of packages that have been marked for install, removal or
-     * upgrade
+     * upgrade.
      *
      * @param path The path to save the selection list to
      *

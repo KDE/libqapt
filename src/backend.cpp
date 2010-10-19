@@ -750,13 +750,41 @@ void Backend::updateCache()
     d->worker->updateCache();
 }
 
+bool Backend::saveInstalledSelectionsList(const QString &path) const
+{
+    Q_D(const Backend);
+
+    QString selectionDocument;
+    for (unsigned i = 0; i < d->packages.size(); ++i) {
+
+        if (d->packages.at(i)->isInstalled()) {
+            selectionDocument.append(d->packages[i]->name() %
+            QLatin1Literal("\t\tinstall") % QLatin1Char('\n'));
+        }
+    }
+
+    if (selectionDocument.isEmpty()) {
+        return false;
+    }
+
+    QFile file(path);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        return false;
+    } else {
+        QTextStream out(&file);
+        out << selectionDocument;
+    }
+
+  return true;
+}
+
 bool Backend::saveSelections(const QString &path) const
 {
     Q_D(const Backend);
 
     QString selectionDocument;
     for (unsigned i = 0; i < d->packages.size(); ++i) {
-        int flags = d->packages[i]->state();
+        int flags = d->packages.at(i)->state();
 
         if (flags & Package::ToInstall) {
             selectionDocument.append(d->packages[i]->name() %
