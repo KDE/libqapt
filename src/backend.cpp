@@ -83,7 +83,22 @@ public:
     // DBus
     QDBusServiceWatcher *watcher;
     OrgKubuntuQaptworkerInterface *worker;
+
+    void writeFile(const QString &path);
 };
+
+void BackendPrivate::writeFile(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        return false;
+    } else {
+        QTextStream out(&file);
+        out << selectionDocument;
+    }
+
+    return true;
+}
 
 Backend::Backend()
         : d_ptr(new BackendPrivate)
@@ -767,15 +782,7 @@ bool Backend::saveInstalledSelectionsList(const QString &path) const
         return false;
     }
 
-    QFile file(path);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        return false;
-    } else {
-        QTextStream out(&file);
-        out << selectionDocument;
-    }
-
-  return true;
+    return writeFile(path);
 }
 
 bool Backend::saveSelections(const QString &path) const
@@ -799,15 +806,7 @@ bool Backend::saveSelections(const QString &path) const
         return false;
     }
 
-    QFile file(path);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        return false;
-    } else {
-        QTextStream out(&file);
-        out << selectionDocument;
-    }
-
-    return true;
+    return writeFile(path);
 }
 
 bool Backend::loadSelections(const QString &path)
