@@ -815,6 +815,7 @@ bool Backend::loadSelections(const QString &path)
 
     QFile file(path);
     if (!file.open(QFile::ReadOnly)) {
+        qDebug() << "Could not open the file";
         return false;
     }
 
@@ -822,29 +823,22 @@ bool Backend::loadSelections(const QString &path)
 
     QString line;
 
-    string stdName;
-    string stdAction;
     QString packageName;
     QString packageAction;
 
     QHash<QString, int> actionMap;
     do {
         line = in.readLine();
+        // Comment or harmless whitespace line
         if (line.isEmpty() || line.at(0) == QLatin1Char('#')) {
             continue;
         }
-        line = line.simplified();
+        line = line.trimmed();
 
-        const char *C = line.toStdString().data();
-        if (!ParseQuoteWord(C, stdName)) {
-            return false;
-        }
-        packageName = QString::fromStdString(stdName);
+        QStringList split = line.split(QLatin1String("\t\t"));
 
-        if (!ParseQuoteWord(C, stdAction)) {
-            return false;
-        }
-        packageAction = QString::fromStdString(stdAction);
+        packageName = split.at(0);
+        packageAction = split.at(1);
 
         if (packageAction.at(0) == QLatin1Char('i')) {
             actionMap[packageName] = Package::ToInstall;
@@ -858,8 +852,8 @@ bool Backend::loadSelections(const QString &path)
     }
 
     pkgDepCache &cache = *d->cache->depCache();
+    // Should protect whatever is already selected in the cache.
     pkgProblemResolver Fix(&cache);
-    // XXX Should protect whatever is already selected in the cache.
 
     pkgCache::PkgIterator pkgIter;
     QHash<QString, int>::const_iterator mapIter = actionMap.begin();
@@ -877,10 +871,12 @@ bool Backend::loadSelections(const QString &path)
                if(_config->FindB("Volatile::SetSelectionDoReInstall",false)) {
                    cache.SetReInstall(pkgIter, true);
                }
-               if(_config->FindB("Volatile::SetSelectionsNoFix",false)) {
-                   cache.MarkInstall(pkgIter, false);
-               } else {
-                   cache.MarkInstall(pkgIter, true);
+               if (pkgIter.CurrentVer().end()) { // Only mark if not already installed
+                  if(_config->FindB("Volatile::SetSelectionsNoFix",false)) {
+                      cache.MarkInstall(pkgIter, false);
+                  } else {
+                      cache.MarkInstall(pkgIter, true);
+                  }
                }
                break;
            case Package::ToRemove:
