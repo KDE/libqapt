@@ -815,7 +815,6 @@ bool Backend::loadSelections(const QString &path)
 
     QFile file(path);
     if (!file.open(QFile::ReadOnly)) {
-        qDebug() << "Could not open the file";
         return false;
     }
 
@@ -837,8 +836,12 @@ bool Backend::loadSelections(const QString &path)
 
         QStringList split = line.split(QLatin1String("\t\t"));
 
-        packageName = split.at(0);
-        packageAction = split.at(1);
+        if (split.count() == 2) {
+            packageName = split.at(0);
+            packageAction = split.at(1);
+        } else {
+            return false; // Malformed file
+        }
 
         if (packageAction.at(0) == QLatin1Char('i')) {
             actionMap[packageName] = Package::ToInstall;
