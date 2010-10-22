@@ -320,13 +320,19 @@ void QAptBatch::workerEvent(int code)
             show();
             break;
         case QApt::CacheUpdateFinished:
+            setWindowTitle(i18nc("@title:window", "Refresh Complete"));
             if (m_warningStack.size() > 0) {
                 showQueuedWarnings();
             }
             if (m_errorStack.size() > 0) {
                 showQueuedErrors();
             }
-            setLabelText(i18nc("@title:window", "Package information successfully refreshed"));
+
+            if (m_errorStack.size() > 0) {
+                setLabelText(i18nc("@info:status", "Refresh completed with errors"));
+            } else {
+                setLabelText(i18nc("@label", "Package information successfully refreshed"));
+            }
             disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
             progressBar()->setValue(100);
             m_detailsWidget->hide();
@@ -364,14 +370,26 @@ void QAptBatch::workerEvent(int code)
             }
             if (m_mode == "install") {
                 setWindowTitle(i18nc("@title:window", "Installation Complete"));
-                setLabelText(i18ncp("@label",
-                                    "Package successfully installed",
-                                    "Packages successfully installed", m_packages.size()));
+
+                if (m_errorStack.size() > 0) {
+                    setLabelText(i18nc("@label",
+                                       "Package installation finished with errors."));
+                } else {
+                    setLabelText(i18ncp("@label",
+                                        "Package successfully installed",
+                                        "Packages successfully installed", m_packages.size()));
+                }
             } else if (m_mode == "uninstall") {
                 setWindowTitle(i18nc("@title:window", "Removal Complete"));
-                setLabelText(i18ncp("@label",
-                                    "Package successfully uninstalled",
-                                    "Packages successfully uninstalled", m_packages.size()));
+
+                if (m_errorStack.size() > 0) {
+                    setLabelText(i18nc("@label",
+                                       "Package removal finished with errors."));
+                } else {
+                    setLabelText(i18ncp("@label",
+                                        "Package successfully uninstalled",
+                                        "Packages successfully uninstalled", m_packages.size()));
+                }
             }
             progressBar()->setValue(100);
             m_done = true;
