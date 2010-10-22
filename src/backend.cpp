@@ -893,6 +893,8 @@ bool Backend::loadSelections(const QString &path)
     Fix.InstallProtect();
     Fix.Resolve(true);
 
+    emit packageChanged();
+
     return true;
 }
 
