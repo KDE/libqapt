@@ -30,11 +30,16 @@
 namespace QApt {
 
 /**
+ * ConfigPrivate is a class containing all private members of the Config class
+ */
+class ConfigPrivate;
+
+/**
  * @brief Config wrapper for the libapt-pkg config API
  *
  * Config is a wrapper around libapt-pkg's config.h. It provides Qt-style
  * calls to get/set config. It writes to the main apt config file, usually in
- * \/etc/apt/apt.conf.
+ * /etc/apt/apt.conf.
  *
  * @author Jonathan Thomas
  */
@@ -51,9 +56,16 @@ public:
       */
     virtual ~Config();
 
-    bool readEntry(const QString &key, const bool defaultValue);
-    int readEntry(const QString &key, const int defaultValue);
-    QString readEntry(const QString &key, const QString &defaultValue);
+    bool readEntry(const QString &key, const bool defaultValue) const;
+    int readEntry(const QString &key, const int defaultValue) const;
+    QString readEntry(const QString &key, const QString &defaultValue) const;
+
+    void writeEntry(const QString &key, const bool value);
+    void writeEntry(const QString &key, const int value);
+    void writeEntry(const QString &key, const QString &value);
+
+private:
+    ConfigPrivate *const d;
 };
 
 }
