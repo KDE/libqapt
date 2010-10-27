@@ -22,5 +22,13 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
+  <action id="org.kubuntu.qaptworker.writeFileToDisk">
+    <description>Change system settings</description>
+    <message>Change system settings</message>
+    <defaults>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
 
 </policyconfig>

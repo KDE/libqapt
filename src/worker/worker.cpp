@@ -46,6 +46,7 @@
 #include <sys/fcntl.h>
 
 // Qt includes
+#include <QtCore/QFile>
 #include <QtCore/QProcess>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusMessage>
@@ -483,7 +484,7 @@ void QAptWorker::updateXapianIndex()
     QDBusConnection::systemBus().send(m);
 
     QDBusConnection::systemBus().connect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
-                                         QLatin1String("UdateProgress"), this, SIGNAL(xapianUpdateProgress(int)));
+                                         QLatin1String("UpdateProgress"), this, SIGNAL(xapianUpdateProgress(int)));
     QDBusConnection::systemBus().connect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
                                          QLatin1String("UpdateFinished"), this, SLOT(xapianUpdateFinished(bool)));
 }
@@ -492,9 +493,27 @@ void QAptWorker::xapianUpdateFinished(bool result)
 {
     Q_UNUSED(result);
     QDBusConnection::systemBus().disconnect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
-                                            QLatin1String("UdateProgress"), this, SIGNAL(xapianUpdateProgress(int)));
+                                            QLatin1String("UpdateProgress"), this, SIGNAL(xapianUpdateProgress(int)));
     QDBusConnection::systemBus().disconnect(QLatin1String("org.debian.AptXapianIndex"), QLatin1String("/"), QLatin1String("org.debian.AptXapianIndex"),
                                             QLatin1String("UpdateFinished"), this, SLOT(xapianUpdateFinished(bool)));
 
     emit workerEvent(QApt::XapianUpdateFinished);
+}
+
+bool QAptWorker::writeFileToDisk(const QString &contents, const QString &path)
+{
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writeFileToDisk"), message().service())) {
+        emit errorOccurred(QApt::AuthError, QVariantMap());
+        return false;
+    }
+
+    QFile file(path);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        file.write(contents.toStdString().c_str());
+
+        return true;
+    }
+
+    return false;
 }

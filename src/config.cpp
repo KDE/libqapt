@@ -24,16 +24,27 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QFile>
 #include <QtCore/QHash>
+#include <QtCore/QLatin1String>
+#include <QtDBus/QDBusConnection>
 #include <QDebug>
 
 // APT includes
 #include <apt-pkg/configuration.h>
 
+// Own includes
+#include "workerdbus.h" // OrgKubuntuQaptworkerInterface
+
 namespace QApt {
+
+const QString APT_CONFIG_PATH = QString("/etc/apt/apt.conf");
 
 class ConfigPrivate
 {
     public:
+        // DBus
+        OrgKubuntuQaptworkerInterface *worker;
+
+        // Data
         QByteArray buffer;
         bool newFile;
 
@@ -85,10 +96,17 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
     }
 }
 
-Config::Config()
-       : d(new ConfigPrivate())
+Config::Config(QObject *parent)
+       : QObject(parent)
+       , d_ptr(new ConfigPrivate)
 {
-    QFile file("/etc/apt/apt.conf");
+    Q_D(Config);
+
+    d->worker = new OrgKubuntuQaptworkerInterface(QLatin1String("org.kubuntu.qaptworker"),
+                                                  QLatin1String("/"), QDBusConnection::systemBus(),
+                                                  this);
+
+    QFile file(APT_CONFIG_PATH);
 
     if (file.exists()) {
         file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -102,6 +120,7 @@ Config::Config()
 
 Config::~Config()
 {
+    delete d_ptr;
 }
 
 bool Config::readEntry(const QString &key, const bool defaultValue) const
@@ -121,6 +140,8 @@ QString Config::readEntry(const QString &key, const QString &defaultValue) const
 
 void Config::writeEntry(const QString &key, const bool value)
 {
+    Q_D(Config);
+
     QByteArray boolString;
 
     if (value == true) {
@@ -137,11 +158,13 @@ void Config::writeEntry(const QString &key, const bool value)
         qDebug() << d->buffer;
     }
 
-    // writeToDisk();
+    d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
 void Config::writeEntry(const QString &key, const int value)
 {
+    Q_D(Config);
+
     QByteArray intString;
 
     intString = '\"' + QString::number(value).toAscii() + "\";";
@@ -154,11 +177,13 @@ void Config::writeEntry(const QString &key, const int value)
         qDebug() << d->buffer;
     }
 
-    // writeToDisk();
+    d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
 void Config::writeEntry(const QString &key, const QString &value)
 {
+    Q_D(Config);
+
     QByteArray valueString;
 
     valueString = '\"' + value.toAscii() + "\";";
@@ -171,7 +196,7 @@ void Config::writeEntry(const QString &key, const QString &value)
         qDebug() << d->buffer;
     }
 
-    // writeToDisk();
+    d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
 }

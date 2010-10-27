@@ -70,5 +70,11 @@
     </method>
     <method name="updateXapianIndex">
     </method>
+    <method name="writeFileToDisk">
+      <arg type="b" direction="out"/>
+      <arg name="contents" type="s" direction="in"/>
+      <arg name="path" type="s" direction="in"/>
+    </method>
+
   </interface>
 </node>

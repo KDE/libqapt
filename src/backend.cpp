@@ -145,7 +145,7 @@ bool Backend::init()
     }
 
     d->cache = new Cache(this);
-    d->config = new Config();
+    d->config = new Config(this);
     reloadCache();
     openXapianIndex();
 

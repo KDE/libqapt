@@ -21,6 +21,7 @@
 #ifndef QAPT_CONFIG_H
 #define QAPT_CONFIG_H
 
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 /**
@@ -43,13 +44,14 @@ class ConfigPrivate;
  *
  * @author Jonathan Thomas
  */
-class Config
+class Q_DECL_EXPORT Config : public QObject
 {
+    Q_OBJECT
 public:
      /**
       * Default constructor
       */
-    explicit Config();
+    explicit Config(QObject *parent);
 
      /**
       * Default destructor
@@ -65,7 +67,8 @@ public:
     void writeEntry(const QString &key, const QString &value);
 
 private:
-    ConfigPrivate *const d;
+    Q_DECLARE_PRIVATE(Config);
+    ConfigPrivate *const d_ptr;
 };
 
 }

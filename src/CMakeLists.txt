@@ -15,12 +15,12 @@ add_subdirectory(worker)
 set(qapt_MOC_HDRS
     backend.h
     cache.h
+    config.h
    )
 
 set(qapt_HDRS
     package.h
     globals.h
-    config.h
     )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
