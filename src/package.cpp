@@ -373,7 +373,10 @@ QStringList Package::installedFilesList() const
 
         installedFilesList.removeAll(QChar::fromLatin1(' '));
         // Last line is empty for some reason...
-        installedFilesList.removeLast();
+
+        if (!installedFilesList.isEmpty()) {
+            installedFilesList.removeLast();
+        }
     }
 
     return installedFilesList;
