@@ -63,8 +63,6 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
         lines.removeLast();
     }
 
-    
-
     // Try to replace key if it's there
     while (lineIndex < lines.size()) {
         QByteArray line = lines[lineIndex];
