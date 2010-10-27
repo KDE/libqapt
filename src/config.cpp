@@ -58,6 +58,13 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
 
     QList<QByteArray> lines = buffer.split('\n');
 
+    // We will re-add final newline on write
+    if (lines.last().isEmpty()) {
+        lines.removeLast();
+    }
+
+    
+
     // Try to replace key if it's there
     while (lineIndex < lines.size()) {
         QByteArray line = lines[lineIndex];
@@ -92,8 +99,9 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
         // No new keys. Recompose lines and set buffer to new buffer
         foreach (const QByteArray &line, lines) {
             tempBuffer += QByteArray(line + '\n');
-            buffer = tempBuffer;
         }
+
+        buffer = tempBuffer;
     } else {
         // New key or new file. Append to existing buffer
         tempBuffer = QByteArray(key + ' ' + value);
@@ -165,6 +173,7 @@ void Config::writeEntry(const QString &key, const bool value)
         qDebug() << d->buffer;
     }
 
+    _config->Set(key.toStdString().c_str(), value);
     d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
@@ -177,13 +186,14 @@ void Config::writeEntry(const QString &key, const int value)
     intString = '\"' + QString::number(value).toAscii() + "\";";
 
     if (d->newFile) {
-        d->buffer.append(key + ' ' + intString);
+        d->buffer.append(key.toAscii()+ ' ' + intString);
         d->newFile = false;
     } else {
         d->writeBufferEntry(key.toAscii(), intString);
         qDebug() << d->buffer;
     }
 
+    _config->Set(key.toStdString().c_str(), value);
     d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
@@ -203,6 +213,7 @@ void Config::writeEntry(const QString &key, const QString &value)
         qDebug() << d->buffer;
     }
 
+    _config->Set(key.toStdString(), value.toStdString());
     d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
