@@ -186,7 +186,7 @@ void Config::writeEntry(const QString &key, const int value)
     intString = '\"' + QString::number(value).toAscii() + "\";";
 
     if (d->newFile) {
-        d->buffer.append(key.toAscii()+ ' ' + intString);
+        d->buffer.append(key.toAscii() + ' ' + intString);
         d->newFile = false;
     } else {
         d->writeBufferEntry(key.toAscii(), intString);
