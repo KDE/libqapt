@@ -322,6 +322,8 @@ private:
 
     Package *package(pkgCache::PkgIterator &iter) const;
 
+    void throwInitError();
+
 Q_SIGNALS:
     /**
      * Emitted whenever a backend error occurs. You should listen to this

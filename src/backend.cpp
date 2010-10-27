@@ -48,10 +48,11 @@ namespace QApt {
 class BackendPrivate
 {
 public:
-    BackendPrivate() : cache(0), records(0), maxStackSize(20) {}
+    BackendPrivate() : cache(0), config(0), records(0), maxStackSize(20) {}
     ~BackendPrivate()
     {
         delete cache;
+        delete config;
         delete records;
     }
     // Caches
@@ -85,7 +86,7 @@ public:
     QDBusServiceWatcher *watcher;
     OrgKubuntuQaptworkerInterface *worker;
 
-    Config *m_config;
+    Config *config;
 
     bool writeSelectionFile(const QString &file, const QString &path) const;
 };
@@ -134,14 +135,17 @@ bool Backend::init()
 {
     Q_D(Backend);
     if (!pkgInitConfig(*_config)) {
+        throwInitError();
         return false;
     }
 
     if (!pkgInitSystem(*_config, _system)) {
+        throwInitError();
         return false;
     }
 
     d->cache = new Cache(this);
+    d->config = new Config();
     reloadCache();
     openXapianIndex();
 
@@ -153,13 +157,7 @@ void Backend::reloadCache()
     Q_D(Backend);
 
     if (!d->cache->open()) {
-        QVariantMap details;
-        string message;
-        bool isError = _error->PopMessage(message);
-        if (isError) {
-            details[QLatin1String("ErrorText")] = QString::fromStdString(message);
-        }
-        emitErrorOccurred(QApt::InitError, details);
+        throwInitError();
         return;
     }
 
@@ -224,6 +222,18 @@ void Backend::reloadCache()
 
     d->undoStack.clear();
     d->redoStack.clear();
+}
+
+void Backend::throwInitError()
+{
+    QVariantMap details;
+    string message;
+    bool isError = _error->PopMessage(message);
+    if (isError) {
+        details[QLatin1String("ErrorText")] = QString::fromStdString(message);
+    }
+
+    emitErrorOccurred(QApt::InitError, details);
 }
 
 pkgSourceList *Backend::packageSourceList() const
