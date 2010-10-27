@@ -58,6 +58,7 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
 
     QList<QByteArray> lines = buffer.split('\n');
 
+    // Try to replace key if it's there
     while (lineIndex < lines.size()) {
         QByteArray line = lines[lineIndex];
         // skip empty lines and lines beginning with '#'
@@ -85,14 +86,20 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
         lineIndex++;
     }
 
-    if (changed) {
-        QByteArray tempBuffer;
+    QByteArray tempBuffer;
 
+    if (changed) {
+        // No new keys. Recompose lines and set buffer to new buffer
         foreach (const QByteArray &line, lines) {
             tempBuffer += QByteArray(line + '\n');
+            buffer = tempBuffer;
         }
+    } else {
+        // New key or new file. Append to existing buffer
+        tempBuffer = QByteArray(key + ' ' + value);
+        tempBuffer.append('\n');
 
-        buffer = tempBuffer;
+        buffer += tempBuffer;
     }
 }
 
