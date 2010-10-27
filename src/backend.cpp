@@ -40,6 +40,7 @@
 
 // QApt includes
 #include "cache.h"
+#include "config.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
 
 namespace QApt {
@@ -83,6 +84,8 @@ public:
     // DBus
     QDBusServiceWatcher *watcher;
     OrgKubuntuQaptworkerInterface *worker;
+
+    Config *m_config;
 
     bool writeSelectionFile(const QString &file, const QString &path) const;
 };

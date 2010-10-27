@@ -3,4 +3,5 @@ install( FILES
     Globals
     Cache
     Package
+    Config
 DESTINATION include/LibQApt COMPONENT Devel)

@@ -52,6 +52,7 @@
 
 #define RAMFS_MAGIC     0x858458f6
 
+#include "debug.h"
 #include "qaptauthorization.h"
 #include "workeracquire.h"
 #include "workerinstallprogress.h"

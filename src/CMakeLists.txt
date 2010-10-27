@@ -2,6 +2,7 @@ set(qapt_SRCS
     backend.cpp
     cache.cpp
     package.cpp
+    config.cpp
     )
 
 include_directories(
@@ -19,6 +20,7 @@ set(qapt_MOC_HDRS
 set(qapt_HDRS
     package.h
     globals.h
+    config.h
     )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
@@ -46,6 +48,7 @@ install(TARGETS qapt
 install(FILES
     backend.h
     cache.h
+    config.h
     package.h
     globals.h
 
