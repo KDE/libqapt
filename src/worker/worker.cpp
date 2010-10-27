@@ -118,23 +118,19 @@ bool QAptWorker::unlockSystem()
 bool QAptWorker::initializeApt()
 {
     if (!pkgInitConfig(*_config)) {
+        throwInitError();
         return false;
     }
 
     if (!pkgInitSystem(*_config, _system)) {
+        throwInitError();
         return false;
     }
 
     delete m_cache;
     m_cache = new QApt::Cache(this);
     if (!m_cache->open()) {
-        QVariantMap details;
-        string message;
-        bool isError = _error->PopMessage(message);
-        if (isError) {
-            details[QLatin1String("ErrorText")] = QString::fromStdString(message);
-        }
-        emit errorOccurred(QApt::InitError, details);
+        throwInitError();
         return false;
     }
 
@@ -144,6 +140,18 @@ bool QAptWorker::initializeApt()
     m_records = new pkgRecords(*depCache);
 
     return true;
+}
+
+void QAptWorker::throwInitError()
+{
+    QVariantMap details;
+    string message;
+    bool isError = _error->PopMessage(message);
+    if (isError) {
+        details[QLatin1String("ErrorText")] = QString::fromStdString(message);
+    }
+
+    errorOccurred(QApt::InitError, details);
 }
 
 void QAptWorker::initializeStatusWatcher()
