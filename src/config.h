@@ -40,7 +40,9 @@ class ConfigPrivate;
  *
  * Config is a wrapper around libapt-pkg's config.h. It provides Qt-style
  * calls to get/set config. It writes to the main apt config file, usually in
- * /etc/apt/apt.conf.
+ * /etc/apt/apt.conf. It is possible to use this class without a QApt::Backend,
+ * but please note that you \b _MUST_ initialize the package system with
+ * libapt-pkg before the values returned by readEntry will be accurate.
  *
  * @author Jonathan Thomas
  */
@@ -58,12 +60,38 @@ public:
       */
     virtual ~Config();
 
+    /**
+     * Reads the value of an entry specified by @p key
+     *
+     * @param key The key to search for
+     * @param default The default value returned if the key was not found
+     *
+     * @return The value for this key, or @p default if the key was not found
+     *
+     * @see writeEntry()
+     */
     bool readEntry(const QString &key, const bool defaultValue) const;
+
+    /** Overload for readEntry(const QString&, const bool) */
     int readEntry(const QString &key, const int defaultValue) const;
+
+    /** Overload for readEntry(const QString&, const bool) */
     QString readEntry(const QString &key, const QString &defaultValue) const;
 
+    /**
+     * Writes a value to the APT configuration object, and applies it
+     *
+     * @param key the key to write to
+     * @param value the value to write
+     *
+     * @see readEntry()
+     */
     void writeEntry(const QString &key, const bool value);
+
+    /** Overload for writeEntry(const QString&, const bool) */
     void writeEntry(const QString &key, const int value);
+
+    /** Overload for writeEntry(const QString&, const bool) */
     void writeEntry(const QString &key, const QString &value);
 
 private:
