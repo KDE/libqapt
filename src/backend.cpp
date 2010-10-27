@@ -562,6 +562,13 @@ bool Backend::openXapianIndex()
     return true;
 }
 
+Config *Backend::config() const
+{
+    Q_D(const Backend);
+
+    return d->config;
+}
+
 CacheState Backend::currentCacheState() const
 {
     Q_D(const Backend);

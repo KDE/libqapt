@@ -30,6 +30,7 @@ class pkgSourceList;
 
 namespace QApt {
     class Cache;
+    class Config;
 }
 
 /**
@@ -101,6 +102,13 @@ public:
      * \return The current state of the cache as a @c CacheState
      */
     CacheState currentCacheState() const;
+
+    /**
+     * Pointer to the QApt Backend's config object.
+     *
+     * \return A pointer to the QApt Backend's config object
+     */
+    Config *config() const;
 
     /**
      * Queries the backend for a Package object for the specified name.
