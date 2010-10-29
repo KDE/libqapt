@@ -108,10 +108,12 @@ bool Backend::init()
 {
     Q_D(Backend);
     if (!pkgInitConfig(*_config)) {
+        throwInitError();
         return false;
     }
 
     if (!pkgInitSystem(*_config, _system)) {
+        throwInitError();
         return false;
     }
 
@@ -127,13 +129,7 @@ void Backend::reloadCache()
     Q_D(Backend);
 
     if (!d->cache->open()) {
-        QVariantMap details;
-        string message;
-        bool isError = _error->PopMessage(message);
-        if (isError) {
-            details["ErrorText"] = QString::fromStdString(message);
-        }
-        emitErrorOccurred(QApt::InitError, details);
+        throwInitError();
         return;
     }
 
@@ -197,6 +193,18 @@ void Backend::reloadCache()
 
     d->undoStack.clear();
     d->redoStack.clear();
+}
+
+void Backend::throwInitError()
+{
+    QVariantMap details;
+    string message;
+    bool isError = _error->PopMessage(message);
+    if (isError) {
+        details[QLatin1String("ErrorText")] = QString::fromStdString(message);
+    }
+
+    errorOccurred(QApt::InitError, details);
 }
 
 pkgSourceList *Backend::packageSourceList() const

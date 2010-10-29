@@ -71,6 +71,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     bool initializeApt();
+    void throwInitError();
     void setAnswer(const QVariantMap &answer);
 
 Q_SIGNALS:
