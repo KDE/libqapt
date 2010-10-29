@@ -123,7 +123,7 @@ bool Cache::open()
     // Open the cache file
     d->cache = new pkgCache(d->mmap);
     d->policy = new pkgPolicy(d->cache);
-    if (!ReadPinFile(*(d->policy))) {
+    if (!ReadPinFile(*(d->policy)) || !ReadPinDir(*(d->policy))) {
         return false;
     }
 
