@@ -21,8 +21,8 @@
 #include "backend.h"
 
 // Qt includes
+#include <QtCore/QByteArray>
 #include <QtCore/QStringList>
-#include <QtCore/QTextStream>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusServiceWatcher>
 
@@ -838,37 +838,42 @@ bool Backend::loadSelections(const QString &path)
         return false;
     }
 
-    QTextStream in(&file);
+    int lineIndex = 0;
+    QByteArray buffer = file.readAll();
 
-    QString line;
+    QList<QByteArray> lines = buffer.split('\n');
+    QHash<QByteArray, int> actionMap;
 
-    QString packageName;
-    QString packageAction;
-
-    QHash<QString, int> actionMap;
-    do {
-        line = in.readLine();
-        // Comment or harmless whitespace line
-        if (line.isEmpty() || line.at(0) == QLatin1Char('#')) {
+    while (lineIndex < lines.size()) {
+        QByteArray line = lines.at(lineIndex);
+        if (line.isEmpty() || line.at(0) == '#') {
+            lineIndex++;
             continue;
         }
+
         line = line.trimmed();
 
-        QStringList split = line.split(QLatin1String("\t\t"));
+        QByteArray aKey;
+        QByteArray aValue;
+        int eqpos = line.indexOf("\t\t");
 
-        if (split.count() == 2) {
-            packageName = split.at(0);
-            packageAction = split.at(1);
+        if (eqpos < 0) {
+            // Invalid
+            lineIndex++;
+            continue;
         } else {
-            return false; // Malformed file
+            aKey = line.left(eqpos);
+            aValue = line.right(line.size() - eqpos -2);
         }
 
-        if (packageAction.at(0) == QLatin1Char('i')) {
-            actionMap[packageName] = Package::ToInstall;
-        } else if ((packageAction.at(0) == QLatin1Char('d')) || (packageAction.at(0) == QLatin1Char('u'))) {
-            actionMap[packageName] = Package::ToRemove;
+        if (aValue.at(0) == 'i') {
+            actionMap[aKey] = Package::ToInstall;
+        } else if ((aValue.at(0) == 'd') || (aValue.at(0) == 'u')) {
+            actionMap[aKey] = Package::ToRemove;
         }
-    } while (!line.isNull());
+
+        ++lineIndex;
+    }
 
     if (actionMap.isEmpty()) {
        return false;
@@ -879,9 +884,9 @@ bool Backend::loadSelections(const QString &path)
     pkgProblemResolver Fix(&cache);
 
     pkgCache::PkgIterator pkgIter;
-    QHash<QString, int>::const_iterator mapIter = actionMap.begin();
+    QHash<QByteArray, int>::const_iterator mapIter = actionMap.begin();
     while (mapIter != actionMap.end()) {
-        pkgIter = d->cache->depCache()->FindPkg(mapIter.key().toStdString());
+        pkgIter = d->cache->depCache()->FindPkg(mapIter.key().constData());
         if (pkgIter.end()) {
             return false;
         }
