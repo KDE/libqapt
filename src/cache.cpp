@@ -83,8 +83,8 @@ bool Cache::open()
 
     d->trustCache->clear();
 
-    if (d->cache->GetDepCache()->DelCount() != 0 ||
-        d->cache->GetDepCache()->InstCount() != 0) {
+    pkgDepCache *depCache = d->cache->GetDepCache();
+    if (depCache->DelCount() != 0 || depCache->InstCount() != 0) {
         return false;
     }
 
