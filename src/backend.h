@@ -154,13 +154,14 @@ public:
      */
     QString originLabel(const QString &origin) const;
 
+    // TODO QApt2: const QString &originLabel
     /**
      * Returns the machine-readable name for the origin repository of the given
      * the human-readable name.
      *
      * @return The machine-readable origin label
      */
-    QString origin(const QString &originLabel) const;
+    QString origin(QString originLabel) const;
 
     // TODO QApt2: Around that time it might be wise to use qint64 for count()'s
     /**
