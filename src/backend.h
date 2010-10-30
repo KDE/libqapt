@@ -160,7 +160,7 @@ public:
      *
      * @return The machine-readable origin label
      */
-    QString origin(QString originLabel) const;
+    QString origin(const QString &originLabel) const;
 
     // TODO QApt2: Around that time it might be wise to use qint64 for count()'s
     /**

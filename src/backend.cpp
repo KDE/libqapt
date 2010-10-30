@@ -299,7 +299,7 @@ QString Backend::originLabel(const QString &origin) const
     return originLabel;
 }
 
-QString Backend::origin(QString originLabel) const
+QString Backend::origin(const QString &originLabel) const
 {
     Q_D(const Backend);
 
