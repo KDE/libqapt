@@ -134,12 +134,7 @@ Backend::~Backend()
 bool Backend::init()
 {
     Q_D(Backend);
-    if (!pkgInitConfig(*_config)) {
-        throwInitError();
-        return false;
-    }
-
-    if (!pkgInitSystem(*_config, _system)) {
+    if (!pkgInitConfig(*_config) || !pkgInitSystem(*_config, _system)) {
         throwInitError();
         return false;
     }

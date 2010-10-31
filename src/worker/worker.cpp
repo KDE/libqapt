@@ -31,7 +31,6 @@
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/configuration.h>
-#include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/init.h>
@@ -117,12 +116,7 @@ bool QAptWorker::unlockSystem()
 
 bool QAptWorker::initializeApt()
 {
-    if (!pkgInitConfig(*_config)) {
-        throwInitError();
-        return false;
-    }
-
-    if (!pkgInitSystem(*_config, _system)) {
+    if (!pkgInitConfig(*_config) || !pkgInitSystem(*_config, _system)) {
         throwInitError();
         return false;
     }
@@ -134,10 +128,8 @@ bool QAptWorker::initializeApt()
         return false;
     }
 
-    pkgDepCache *depCache = m_cache->depCache();
-
     delete m_records;
-    m_records = new pkgRecords(*depCache);
+    m_records = new pkgRecords(*m_cache->depCache());
 
     return true;
 }
