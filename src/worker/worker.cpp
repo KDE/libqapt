@@ -35,7 +35,6 @@
 #include <apt-pkg/error.h>
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/init.h>
-#include <apt-pkg/pkgcachegen.h>
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/policy.h>
@@ -251,6 +250,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         QString packageString = mapIter.key();
         QString version;
 
+        // Check if a version is specified
         if (packageString.contains(QLatin1Char(','))) {
             QStringList split = packageString.split(QLatin1Char(','));
             iter = m_cache->depCache()->FindPkg(split.at(0).toStdString());
@@ -258,6 +258,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         } else {
             iter = m_cache->depCache()->FindPkg(packageString.toStdString());
         }
+
+        // Somehow the package searched for doesn't exist.
         if (iter == 0) {
             QVariantMap args;
             args[QLatin1String("NotFoundString")] = packageString;
@@ -355,7 +357,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         emit warningOccurred(QApt::SizeMismatchWarning, QVariantMap());
     }
 
-    /* Check for enough free space */
+    // Check for enough free space
     struct statvfs Buf;
     string OutputDir = _config->FindDir("Dir::Cache::Archives");
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
