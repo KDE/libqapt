@@ -121,8 +121,9 @@ bool QAptWorker::initializeApt()
         return false;
     }
 
-    delete m_cache;
-    m_cache = new QApt::Cache(this);
+    if (!m_cache) {
+        m_cache = new QApt::Cache(this);
+    }
     if (!m_cache->open()) {
         throwInitError();
         return false;
@@ -473,7 +474,7 @@ void QAptWorker::updateXapianIndex()
                                                     QLatin1String("update_async"));
     QVariantList dbusArgs;
 
-    dbusArgs << true << true; // first arg is force, second update_only
+    dbusArgs << /*force*/ true << /*update_only*/ true;
     m.setArguments(dbusArgs);
     QDBusConnection::systemBus().send(m);
 

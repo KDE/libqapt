@@ -22,7 +22,11 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <apt-pkg/cachefile.h>
+#include <apt-pkg/depcache.h>
+#include <apt-pkg/error.h>
+#include <apt-pkg/sourcelist.h>
+#include <apt-pkg/pkgcachegen.h>
+#include <apt-pkg/policy.h>
 
 namespace QApt {
 
@@ -41,19 +45,33 @@ class CachePrivate
 {
 public:
     CachePrivate()
-        : cache(new pkgCacheFile())
+        : mmap(0)
+        , cache(0)
+        , policy(0)
+        , depCache(0)
+        , list(new pkgSourceList)
         , trustCache(new QHash<pkgCache::PkgFileIterator, pkgIndexFile*>)
     {
     }
 
     virtual ~CachePrivate()
     {
+        delete list;
         delete cache;
+        delete policy;
+        delete depCache;
+        delete mmap;
         delete trustCache;
     }
 
-    CacheBuildProgress progressMeter;
-    pkgCacheFile *cache;
+    CacheBuildProgress m_progressMeter;
+    MMap *mmap;
+
+    pkgCache *cache;
+    pkgPolicy *policy;
+
+    pkgDepCache *depCache;
+    pkgSourceList *list;
 
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache;
 };
@@ -73,20 +91,54 @@ bool Cache::open()
 {
     Q_D(Cache);
 
-    // delete any old structures
-    d->cache->Close();
+   // delete any old structures
+    if (d->cache) {
+        delete d->cache;
+        d->cache = 0;
+    }
+    if (d->policy) {
+        delete d->policy;
+        d->policy = 0;
+    }
+    if (d->depCache) {
+        delete d->depCache;
+        d->depCache = 0;
+    }
+    if (d->mmap) {
+        delete d->mmap;
+        d->mmap = 0;
+    }
 
-    // Open the cache file
-    if (!d->cache->ReadOnlyOpen(&d->progressMeter)) {
+    // Read the sources list
+    if (!d->list->ReadMainList()) {
         return false;
     }
+
+    pkgMakeStatusCache(*(d->list), d->m_progressMeter, &(d->mmap), true);
+    d->m_progressMeter.Done();
+    if (_error->PendingError()) {
+        return false;
+    }
+
+    // Open the cache file
+    d->cache = new pkgCache(d->mmap);
+    d->policy = new pkgPolicy(d->cache);
+    if (!ReadPinFile(*(d->policy)) || !ReadPinDir(*(d->policy))) {
+        return false;
+    }
+
+    if (_error->PendingError()) {
+        return false;
+    }
+
+    d->depCache = new pkgDepCache(d->cache, d->policy);
+    d->depCache->Init(&(d->m_progressMeter));
 
     d->trustCache->clear();
 
-    pkgDepCache *depCache = d->cache->GetDepCache();
-    if (depCache->DelCount() != 0 || depCache->InstCount() != 0) {
-        return false;
-    }
+    if (d->depCache->DelCount() != 0 || d->depCache->InstCount() != 0) {
+         return false;
+     }
 
     return true;
 }
@@ -95,14 +147,14 @@ pkgDepCache *Cache::depCache() const
 {
     Q_D(const Cache);
 
-    return d->cache->GetDepCache();
+    return d->depCache;
 }
 
 pkgSourceList *Cache::list() const
 {
     Q_D(const Cache);
 
-    return d->cache->GetSourceList();
+    return d->list;
 }
 
 QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *Cache::trustCache() const
