@@ -1,0 +1,21 @@
+1.0.4:
+======
+- Bugfixes:
+  * Respect preference files in the /etc/apt/preferences.d/ dir, and not just the
+    /etc/apt/preferences file itself
+  * Catch and report initialization errors in places we were missing for
+  * Report that package state has changed when loading selection files
+
+1.0.3:
+======
+- Bugfixes:
+  * Implementing proper locking, fixing the "Doesn't respect APT system locks" bug
+
+1.0.2:
+======
+- Bugfixes:
+  * QAptBatch: Set the focus to the appropriate button for each mode
+
+1.0.0:
+====
+* Initial release
