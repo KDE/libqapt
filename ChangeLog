@@ -23,6 +23,8 @@
 
 - Optimizations:
   * APT system initialization in Backend::init() is no longer blocking.
+  * General optimizations have been made throughout to significantly speed up
+    Backend::init()
   * Speed up Package::isSupported() by making a cache of package index files to
     prevent doing a binary search for the index file from the sources list each time
     isSupported() is called.
