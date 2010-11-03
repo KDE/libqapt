@@ -23,6 +23,7 @@
 
 #include <QtCore/QFlags>
 #include <QtCore/QList>
+#include <QtCore/QVariantMap>
 
 namespace QApt
 {
@@ -47,6 +48,50 @@ namespace QApt
     * Defines the GroupList type, which is a QList of Groups (QStrings)
     */
     typedef QStringList GroupList;
+
+   /**
+    * Defines the Error type, a QVariantMap with info about errors
+    * 
+    * These are the fields that each ErrorCode can have:
+    *            <"Key", ValueType> (Description of value)
+    * InitError: <"ErrorText", QString> (APT's error description)
+    * LockError: No fields
+    * DiskSpaceError: <"DirectoryString", QString>
+    * FetchError: No fields
+    * CommitError: <"FailedItem, QString> (Package that failed to commit)
+    *              <"ErrorText", QString> (APT's error description)
+    * AuthError: No fields
+    * WorkerDisappeared: No fields
+    * UntrustedError: <"UntrustedItems", QStringList> (List of untrusted packages)
+    * UserCancelError: No fields, pseudo-error
+    * DownloadDisallowedError: No fields
+    * NotFoundError: <"NotFoundString", QString> (String of the nonexistant package)
+    *                <"WarningText", QString> (APT's warning description)
+    */
+    typedef QVariantMap Error;
+
+    /**
+    * Defines the Warning type, a QVariantMap with info about warnings
+    *
+    * These are the fields that each WarningCode can have:
+    *                      <"Key", ValueType> (Description of value)
+    * SizeMismatchWarning: No fields
+    * FetchFailedWarning: <"FailedItem", QString> (Package that failed to download)
+    * 
+    */
+    typedef QVariantMap Warning;
+
+   /**
+    * Defines the Warning type, a QVariantMap with info about worker questions
+    *
+    * These are the fields that each WorkerQuestion can have:
+    *                 <"Key", ValueType> (Description of value)
+    * ConfFilePrompt: <"OldConfFile", QString> (Old conf file)
+    *                 <"NewConfFile", QString> (New conf file)
+    * MediaChange: <"Media", QString> (Name of the CD needed)
+    *              <"Drive", QString> (The drive to insert the CD into)
+    */
+    typedef QVariantMap Question;
 
    /**
     * An enumerator listing all the events that the QApt Worker can emit
@@ -75,6 +120,7 @@ namespace QApt
    /**
     * An enumerator listing all the question types that the QApt Worker can ask
     */
+    // TODO QApt2: Rename to QuestionCode
     enum WorkerQuestion {
         /// An invalid question
         InvalidQuestion  = 0,
