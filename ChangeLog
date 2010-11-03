@@ -1,0 +1,87 @@
+1.1:
+======
+- Features:
+  * Add a new QApt::Config class. It features a KConfig-like API to the APT system
+    configuration, as well as provides config writing support without dumping the
+    entire APT configuration settings to a file like APT does. It currently supports
+    reading and writing int, bool and string settings. QApt::Backend has a
+    QApt::Config instance that can be accessed by its config() method after
+    initialization.
+  * Added pretty includes in the form of <LibQApt/Include> (e.g. <LibQApt/Backend>
+  * Added a packageDownloadProgress() for per-package download progress reporting.
+    This enables client applications to give more detailed information about
+    currently-downloading packages, including parallel package downloads.
+  * Added a markPackagesForAutoRemove() method that acts like apt-get autoremove,
+    marking packages for removal that APT deems obsolete.
+  * Added a new setUndoRedoCacheSize() function to QApt::Backend. This allows
+    applications to customize the undo/redo stack size, allowing them to increase
+    it if RAM usage is less of an issue, or decrease/eliminate the cache if RAM is tight.
+  * Added Add a saveInstalledPackagesList() function to QApt::Backend that exports a
+    list of all installed packages to the given path. This list can be ready by
+    Backend::readSelections() or by the Synaptic Package Manager.
+  * LibQApt now compiles with QT_NO_CAST_TO_ASCII and QT_NO_CAST_FROM_ASCII.
+
+- Optimizations:
+  * APT system initialization in Backend::init() is no longer blocking.
+  * Speed up Package::isSupported() by making a cache of package index files to
+    prevent doing a binary search for the index file from the sources list each time
+    isSupported() is called.
+  * Speed Package::isInstalled() up by checking for installation without calling state().
+  * Added an installedCount() function that is faster than using the packageCount()
+    overload function that takes a package state flag.
+  * Add more efficient toInstallCount() and toRemoveCount() functions to Backend.
+    These both just grab int's already cached in memory by APT, meaning that we
+    don't have to iterate through every Package and get a full state reading to
+    determine whether it is being installed/removed.
+  * Add a more efficient latin1Section function. Since QLatin1String returns an
+    empty string when it encounters null char pointers, we can use latin1Section()
+    in section() to have equivalent, simpler code that still retains safety.
+  * Improve the speed of Backend::loadSelections() by parsing selection files with
+    QByteArray, as well as some other miscellaneous optimizations.
+  * Change the Backend's origin/human readable name mapping to use a QHash, giving some
+    minor optimizations to the originLabel() and origin() functions.
+
+- Bugfixes:
+  * Added a NotFound error for the QApt Batch Installer to use when it encounters
+    a non-existant package. Before it was not catching this error at all and went
+    straight to completion as if nothing was wrong.
+  * QAptBatch: Don't say we were successful if there were errors. That looks a bit
+    silly, especially when we have error dialogs to contradict ourselves.
+  * Fixed a bug where installing a package locally did not make the
+    xapianIndexNeedsUpdate() return true;
+  * Fixed a bug where the worker would never respond to DBus requests when heavy
+    load was present on the system. (BKO: #249929)
+  * Fixed a bug where calling originLabel() with an origin that did not have a
+    label would insert the origin into the origin map, wasting memory.
+  * Fixed a blank line being snuck in to the end of lists returned by the
+    Package::installedFilesList() function
+  * Compile with -fvisibility=hidden by default so that libqapt doesn't expose
+    symbols from libraries it links against, making life easier for packagers
+    everywhere.
+
+- Other
+  * Documentation for the detail QVariantMaps of ErrorCodes, WarningCodes and
+    WorkerQuestions is now provided, whereas they were completely undocumented
+    in previous releases.
+
+1.0.4:
+======
+- Bugfixes:
+  * Respect preference files in the /etc/apt/preferences.d/ dir, and not just the
+    /etc/apt/preferences file itself
+  * Catch and report initialization errors in places we were missing for
+  * Report that package state has changed when loading selection files
+
+1.0.3:
+======
+- Bugfixes:
+  * Implementing proper locking, fixing the "Doesn't respect APT system locks" bug
+
+1.0.2:
+======
+- Bugfixes:
+  * QAptBatch: Set the focus to the appropriate button for each mode
+
+1.0.0:
+====
+* Initial release
