@@ -1,14 +1,14 @@
 1.1:
 ======
 - Features:
-  * Add a new QApt::Config class. It features a KConfig-like API to the APT system
+  * Added a new QApt::Config class. It features a KConfig-like API to the APT system
     configuration, as well as provides config writing support without dumping the
     entire APT configuration settings to a file like APT does. It currently supports
     reading and writing int, bool and string settings. QApt::Backend has a
     QApt::Config instance that can be accessed by its config() method after
     initialization.
-  * Added pretty includes in the form of <LibQApt/Include> (e.g. <LibQApt/Backend>
-  * Added a packageDownloadProgress() for per-package download progress reporting.
+  * Added pretty includes in the form of <LibQApt/Include> (e.g. <LibQApt/Backend>)
+  * Added a packageDownloadProgress() signal for per-package download progress reporting.
     This enables client applications to give more detailed information about
     currently-downloading packages, including parallel package downloads.
   * Added a markPackagesForAutoRemove() method that acts like apt-get autoremove,
@@ -22,7 +22,8 @@
   * LibQApt now compiles with QT_NO_CAST_TO_ASCII and QT_NO_CAST_FROM_ASCII.
 
 - Optimizations:
-  * APT system initialization in Backend::init() is no longer blocking.
+  * APT system initialization in Backend::init() is no longer blocking, so that you
+    can paint your UI sooner to give a perception of speed.
   * General optimizations have been made throughout to significantly speed up
     Backend::init()
   * Speed up Package::isSupported() by making a cache of package index files to
@@ -35,9 +36,10 @@
     These both just grab int's already cached in memory by APT, meaning that we
     don't have to iterate through every Package and get a full state reading to
     determine whether it is being installed/removed.
-  * Add a more efficient latin1Section function. Since QLatin1String returns an
-    empty string when it encounters null char pointers, we can use latin1Section()
-    in section() to have equivalent, simpler code that still retains safety.
+  * Add a more efficient latin1Section() function. to QApt::Package Since
+    QLatin1String returns an empty string when it encounters null char pointers, we
+    can use latin1Section() in section() to have equivalent, simpler code that still
+    retains safety.
   * Improve the speed of Backend::loadSelections() by parsing selection files with
     QByteArray, as well as some other miscellaneous optimizations.
   * Change the Backend's origin/human readable name mapping to use a QHash, giving some
