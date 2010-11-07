@@ -23,8 +23,8 @@
 
 #include <PolkitQt1/Authority>
 #include <PolkitQt1/Subject>
+// Remove when sid has libpolkit-qt 0.98.1 or higher
 #include <polkit-qt-1/polkitqt1-version.h>
-#include "debug.h"
 
 namespace QApt {
 namespace Auth {
