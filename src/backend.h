@@ -103,6 +103,14 @@ public:
      */
     CacheState currentCacheState() const;
 
+   /**
+     * Returns the last event that the worker reported. When the worker is not
+     * running, this returns InvalidEvent
+     *
+     * \return The last reported @c WorkerEvent of the worker
+     */
+    WorkerEvent workerState() const;
+
     /**
      * Pointer to the QApt Backend's config object.
      *

@@ -48,7 +48,7 @@ namespace QApt {
 class BackendPrivate
 {
 public:
-    BackendPrivate() : cache(0), config(0), records(0), maxStackSize(20) {}
+    BackendPrivate() : cache(0), config(0), records(0), maxStackSize(20), state(InvalidEvent) {}
     ~BackendPrivate()
     {
         delete cache;
@@ -64,6 +64,7 @@ public:
     QSet<Group> groups;
     // Cache of origin/human-readable name pairings
     QHash<QString, QString> originMap;
+    WorkerEvent state;
 
     // Counts
     int installedCount;
@@ -580,6 +581,13 @@ CacheState Backend::currentCacheState() const
     return state;
 }
 
+WorkerEvent Backend::workerState() const
+{
+    Q_D(const Backend);
+
+    return d->state;
+}
+
 void Backend::saveCacheState()
 {
     Q_D(Backend);
@@ -950,6 +958,8 @@ void Backend::workerFinished(bool result)
 {
     Q_D(Backend);
 
+    d->state = InvalidEvent;
+
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
@@ -993,6 +1003,9 @@ void Backend::emitWarningOccurred(int warningCode, const QVariantMap &details)
 
 void Backend::emitWorkerEvent(int event)
 {
+    Q_D(Backend);
+
+    d->state = (WorkerEvent)event;
     emit workerEvent((WorkerEvent) event);
 }
 
