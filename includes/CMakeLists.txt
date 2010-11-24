@@ -4,4 +4,5 @@ install( FILES
     Cache
     Package
     Config
+    History
 DESTINATION include/LibQApt COMPONENT Devel)
