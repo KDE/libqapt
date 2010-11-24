@@ -40,6 +40,7 @@ class HistoryItemPrivate
         QDateTime startDate;
         Package::State action;
         QStringList packageList;
+        QString error;
 
         void parseData(const QString &data);
 };
@@ -52,6 +53,7 @@ void HistoryItemPrivate::parseData(const QString &data)
     bool dateFound = false;
     bool actionFound = false;
     bool packageListFound = false;
+    bool errorFound = false;
 
     QStringList actionStrings;
     actionStrings << "Install" << "Upgrade" << "Downgrade" << "Remove" << "Purge";
@@ -104,6 +106,8 @@ void HistoryItemPrivate::parseData(const QString &data)
                 package.append(QLatin1Char(')'));
                 packageList << package;
             }
+        } else if (!actionFound && (keyValue.value(0) == QLatin1String("Error"))) {
+            error = keyValue.value(1);
         }
 
         lineIndex++;
@@ -139,6 +143,13 @@ QStringList HistoryItem::packageList() const
     Q_D(const HistoryItem);
 
     return d->packageList;
+}
+
+QString HistoryItem::errorString() const
+{
+    Q_D(const HistoryItem);
+
+    return d->error;
 }
 
 

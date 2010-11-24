@@ -81,6 +81,14 @@ public:
     */
     QStringList packageList() const;
 
+   /**
+    * Returns the error reported by dpkg, if there is one. If the transaction
+    * did not encounter an error, this will return an empty QString.
+    *
+    * @return the error as a \c QString
+    */
+    QString errorString() const;
+
 private:
     Q_DECLARE_PRIVATE(HistoryItem);
     HistoryItemPrivate *const d_ptr;
