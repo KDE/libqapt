@@ -27,6 +27,8 @@
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
+ *
+ * @since 1.1
  */
 namespace QApt {
 

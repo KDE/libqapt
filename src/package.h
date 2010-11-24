@@ -88,9 +88,12 @@ public:
    /**
     * Returns the name of the package. This is the better choice over the
     * regular name() since a QLatin1String is much cheaper to construct
-    * than a QString, since we don't have to convert from ascii
+    * than a QString, since we don't have to convert from ascii. QLatin1String
+    * can also be used everywhere a QString is needed.
     *
     * \return The name of the package as a \c QLatin1String
+    *
+    * @since 1.1
     */
     QLatin1String latin1Name() const;
 
@@ -130,6 +133,17 @@ public:
     */
     QString section() const;
 
+   // TODO QApt2: Get rid of QString impl. and rename latin1Section() to section()
+   /**
+    * Returns the categorical section of the package. This is the better choice
+    * over the regular section() since a QLatin1String is much cheaper to construct
+    * than a QString, since we don't have to convert from ascii. QLatin1String can
+    * also be used everywhere a QString is needed.
+    *
+    * \return The name of the package as a \c QLatin1String
+    *
+    * @since 1.1
+    */
     QLatin1String latin1Section() const;
 
    /**

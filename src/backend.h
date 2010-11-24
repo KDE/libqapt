@@ -202,6 +202,8 @@ public:
      * the recommended way for getting an installed packages count.
      *
      * @return The number of installed packages in the APT database
+     *
+     * @since 1.1
      */
     int installedCount() const;
 
@@ -215,6 +217,8 @@ public:
      * installed/upgraded.
      *
      * @return The number of packages marked for installation
+     *
+     * @since 1.1
      */
     int toInstallCount() const;
 
@@ -228,6 +232,8 @@ public:
      * removed/purged.
      *
      * @return The number of packages marked for removal/purging
+     *
+     * @since 1.1
      */
     int toRemoveCount() const;
 
@@ -406,6 +412,8 @@ Q_SIGNALS:
      * @param URI The URI of the download location
      * @param size The size of the download in bytes
      * @param flag Fetch type (is a QApt::Global enum member)
+     *
+     * @since 1.1
      */
     void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
                                  double size, int flag);
@@ -443,6 +451,8 @@ public Q_SLOTS:
     * The default size is 20.
     *
     * @param newSize The new size of the undo/redo stack
+    *
+    * @since 1.1
     */
     void setUndoRedoCacheSize(int newSize);
 
@@ -485,6 +495,8 @@ public Q_SLOTS:
     * general these are packages that were automatically installed that now
     * no longer have any packages dependening on them. (Like after a
     * library transition libqapt0 -> libqapt1)
+    *
+    * @since 1.1
     */
     void markPackagesForAutoRemove();
 
@@ -538,6 +550,8 @@ public Q_SLOTS:
      *
      * \return @c true if saving succeeded
      * \return @c false if the saving failed
+     *
+     * @since 1.1
      */
     bool saveInstalledPackagesList(const QString &path) const;
 
