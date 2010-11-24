@@ -3,6 +3,7 @@ set(qapt_SRCS
     cache.cpp
     package.cpp
     config.cpp
+    history.cpp
     )
 
 include_directories(
@@ -16,6 +17,7 @@ set(qapt_MOC_HDRS
     backend.h
     cache.h
     config.h
+    history.h
    )
 
 set(qapt_HDRS
@@ -49,6 +51,7 @@ install(FILES
     backend.h
     cache.h
     config.h
+    history.h
     package.h
     globals.h
 
