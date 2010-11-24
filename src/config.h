@@ -27,8 +27,6 @@
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
- *
- * @since 1.1
  */
 namespace QApt {
 
@@ -47,6 +45,7 @@ class ConfigPrivate;
  * libapt-pkg before the values returned by readEntry will be accurate.
  *
  * @author Jonathan Thomas
+ * @since 1.1
  */
 class Q_DECL_EXPORT Config : public QObject
 {
