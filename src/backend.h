@@ -108,6 +108,8 @@ public:
      * running, this returns InvalidEvent
      *
      * \return The last reported @c WorkerEvent of the worker
+     *
+     * @since 1.1
      */
     WorkerEvent workerState() const;
 
