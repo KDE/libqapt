@@ -196,7 +196,6 @@ void HistoryPrivate::init()
                 gunzip.start(QLatin1String("gunzip"), QStringList() << QLatin1String("-c") << file);
                 gunzip.waitForFinished();
 
-                // FIXME: Doesn't work
                 data.append(gunzip.readAll());
             } else {
                 QFile historyFile(file);
