@@ -246,6 +246,7 @@ public:
     */
     QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
+    // TODO QApt2: Return a QDateTime so that KDE apps can localize
    /**
     * Returns the date when Canonical's support of the package ends.
     *
