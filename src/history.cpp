@@ -24,6 +24,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
+#include <QDebug>
 
 // APT includes
 #include <apt-pkg/configuration.h>
@@ -43,6 +44,7 @@ class HistoryItemPrivate
         Package::State action;
         QStringList packageList;
         QString error;
+        bool isValid;
 
         void parseData(const QString &data);
 };
@@ -73,6 +75,7 @@ void HistoryItemPrivate::parseData(const QString &data)
 
         // Invalid
         if (keyValue.size() < 2) {
+            isValid = false;
             lineIndex++;
             continue;
         }
@@ -154,6 +157,13 @@ QString HistoryItem::errorString() const
     return d->error;
 }
 
+bool HistoryItem::isValid() const
+{
+    Q_D(const HistoryItem);
+
+    return d->isValid;
+}
+
 
 
 class HistoryPrivate
@@ -210,7 +220,10 @@ void HistoryPrivate::init()
     data = data.trimmed();
     QStringList stanzas = data.split(QLatin1String("\n\n"));
     foreach(const QString &stanza, stanzas) {
-        historyItemList << new HistoryItem(stanza);
+        HistoryItem *historyItem = new HistoryItem(stanza);
+        if (historyItem->isValid()) {
+            historyItemList << historyItem;
+        }
     }
 }
 

@@ -89,6 +89,12 @@ public:
     */
     QString errorString() const;
 
+   /**
+    * Returns whether or not the HistoryItem is valid. (It could be an improperly
+    * parsed portion of the log
+    */
+    bool isValid() const;
+
 private:
     Q_DECLARE_PRIVATE(HistoryItem);
     HistoryItemPrivate *const d_ptr;
