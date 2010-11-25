@@ -60,7 +60,9 @@ void HistoryItemPrivate::parseData(const QString &data)
     bool errorFound = false;
 
     QStringList actionStrings;
-    actionStrings << "Install" << "Upgrade" << "Downgrade" << "Remove" << "Purge";
+    actionStrings << QLatin1String("Install") << QLatin1String("Upgrade")
+                  << QLatin1String("Downgrade") << QLatin1String("Remove")
+                  << QLatin1String("Purge");
 
     while (lineIndex < lines.size()) {
         QString line = lines.at(lineIndex);
