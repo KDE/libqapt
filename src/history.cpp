@@ -107,7 +107,7 @@ void HistoryItemPrivate::parseData(const QString &data)
             // Remove arch info
             packages.remove(QRegExp(":\\w+"));
 
-            foreach (QString package, packages.split("),")) {
+            foreach (QString package, packages.split("), ")) {
                 package.append(QLatin1Char(')'));
                 packageList << package;
             }
