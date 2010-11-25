@@ -24,7 +24,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
-#include <QDebug>
+
+// APT includes
+#include <apt-pkg/configuration.h>
 
 namespace QApt {
 
@@ -207,9 +209,9 @@ void HistoryPrivate::init()
     }
 }
 
-History::History(QObject *parent, const QString &historyDirectory)
+History::History(QObject *parent)
        : QObject(parent)
-       , d_ptr(new HistoryPrivate(historyDirectory))
+       , d_ptr(new HistoryPrivate(QLatin1String(_config->FindFile("Dir::Log::History").c_str())))
 {
 }
 

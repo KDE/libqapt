@@ -116,7 +116,7 @@ public:
      /**
       * Default constructor
       */
-    explicit History(QObject *parent, const QString &historyDirectory);
+    explicit History(QObject *parent);
 
      /**
       * Default destructor
