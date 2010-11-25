@@ -164,6 +164,11 @@ class HistoryPrivate
             init();
         };
 
+        ~HistoryPrivate()
+        {
+            qDeleteAll(historyItemList);
+        };
+
         // Data
         QString historyFilePath;
         HistoryItemList historyItemList;
