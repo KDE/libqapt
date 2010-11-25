@@ -34,7 +34,7 @@ namespace QApt {
 class HistoryItemPrivate
 {
     public:
-        HistoryItemPrivate(const QString &data)
+        HistoryItemPrivate(const QString &data) : isValid(true)
         {
             parseData(data);
         };
