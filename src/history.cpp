@@ -208,6 +208,7 @@ void HistoryPrivate::init()
         }
     }
 
+    data = data.trimmed();
     QStringList stanzas = data.split(QLatin1String("\n\n"));
     foreach(const QString &stanza, stanzas) {
         historyItemList << new HistoryItem(stanza);
