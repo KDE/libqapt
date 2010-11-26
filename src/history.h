@@ -68,18 +68,39 @@ public:
     QDateTime startDate() const;
 
    /**
-    * Returns the action performed during the transaction
-    *
-    * @return the action performed during the transaction as a \c Package::State
-    */
-    Package::State action() const;
-
-   /**
-    * Returns the list of packages affected by the transaction
+    * Returns the list of packages installed during the transaction
     *
     * @return the package list as a \c QStringList
     */
-    QStringList packages() const;
+    QStringList installedPackages() const;
+
+   /**
+    * Returns the list of packages upgraded during the transaction
+    *
+    * @return the package list as a \c QStringList
+    */
+    QStringList upgradedPackages() const;
+
+   /**
+    * Returns the list of packages downgraded during the transaction
+    *
+    * @return the package list as a \c QStringList
+    */
+    QStringList downgradedPackages() const;
+
+   /**
+    * Returns the list of packages removed during the transaction
+    *
+    * @return the package list as a \c QStringList
+    */
+    QStringList removedPackages() const;
+
+   /**
+    * Returns the list of packages purged during the transaction
+    *
+    * @return the package list as a \c QStringList
+    */
+    QStringList purgedPackages() const;
 
    /**
     * Returns the error reported by dpkg, if there is one. If the transaction

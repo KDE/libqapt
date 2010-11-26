@@ -24,7 +24,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
-#include <QDebug>
 
 // APT includes
 #include <apt-pkg/configuration.h>
@@ -41,8 +40,11 @@ class HistoryItemPrivate
 
         // Data
         QDateTime startDate;
-        Package::State action;
-        QStringList packages;
+        QStringList installedPackages;
+        QStringList upgradedPackages;
+        QStringList downgradedPackages;
+        QStringList removedPackages;
+        QStringList purgedPackages;
         QString error;
         bool isValid;
 
@@ -63,6 +65,7 @@ void HistoryItemPrivate::parseData(const QString &data)
                   << QLatin1String("Downgrade") << QLatin1String("Remove")
                   << QLatin1String("Purge");
 
+
     while (lineIndex < lines.size()) {
         QString line = lines.at(lineIndex);
         // skip empty lines and lines beginning with '#'
@@ -73,6 +76,7 @@ void HistoryItemPrivate::parseData(const QString &data)
 
         QStringList keyValue = line.split(QLatin1String(": "));
         int actionIndex = actionStrings.indexOf(keyValue.value(0));
+        Package::State action;
 
         // Invalid
         if (keyValue.size() < 2) {
@@ -112,7 +116,25 @@ void HistoryItemPrivate::parseData(const QString &data)
                 if (!package.endsWith(QLatin1Char(')'))) {
                     package.append(QLatin1Char(')'));
                 }
-                packages << package;
+
+                switch (action) {
+                case Package::ToInstall:
+                    installedPackages << package;
+                    break;
+                case Package::ToUpgrade:
+                    upgradedPackages << package;
+                    break;
+                case Package::ToDowngrade:
+                    downgradedPackages << package;
+                    break;
+                case Package::ToRemove:
+                    removedPackages << package;
+                case Package::ToPurge:
+                    purgedPackages << package;
+                    break;
+                default:
+                    break;
+                }
             }
         } else if (!errorFound && (keyValue.value(0) == QLatin1String("Error"))) {
             error = keyValue.value(1);
@@ -139,18 +161,39 @@ QDateTime HistoryItem::startDate() const
     return d->startDate;
 }
 
-Package::State HistoryItem::action() const
+QStringList HistoryItem::installedPackages() const
 {
     Q_D(const HistoryItem);
 
-    return d->action;
+    return d->installedPackages;
 }
 
-QStringList HistoryItem::packages() const
+QStringList HistoryItem::upgradedPackages() const
 {
     Q_D(const HistoryItem);
 
-    return d->packages;
+    return d->upgradedPackages;
+}
+
+QStringList HistoryItem::downgradedPackages() const
+{
+    Q_D(const HistoryItem);
+
+    return d->downgradedPackages;
+}
+
+QStringList HistoryItem::removedPackages() const
+{
+    Q_D(const HistoryItem);
+
+    return d->removedPackages;
+}
+
+QStringList HistoryItem::purgedPackages() const
+{
+    Q_D(const HistoryItem);
+
+    return d->purgedPackages;
 }
 
 QString HistoryItem::errorString() const
