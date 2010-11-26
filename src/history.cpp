@@ -55,7 +55,6 @@ void HistoryItemPrivate::parseData(const QString &data)
 
     int lineIndex = 0;
     bool dateFound = false;
-    bool actionFound = false;
     bool packagesFound = false;
     bool errorFound = false;
 
@@ -84,7 +83,7 @@ void HistoryItemPrivate::parseData(const QString &data)
 
         if (!dateFound && (keyValue.value(0) == QLatin1String("Start-Date"))) {
             startDate = QDateTime::fromString(keyValue.value(1), QLatin1String("yyyy-MM-dd  hh:mm:ss"));
-        } else if (!actionFound && (actionIndex > -1)) {
+        } else if (actionIndex > -1) {
             switch(actionIndex) {
             case 0:
                 action = Package::ToInstall;
@@ -115,7 +114,7 @@ void HistoryItemPrivate::parseData(const QString &data)
                 }
                 packages << package;
             }
-        } else if (!actionFound && (keyValue.value(0) == QLatin1String("Error"))) {
+        } else if (!errorFound && (keyValue.value(0) == QLatin1String("Error"))) {
             error = keyValue.value(1);
         }
 
