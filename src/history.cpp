@@ -110,7 +110,9 @@ void HistoryItemPrivate::parseData(const QString &data)
             packages.remove(QRegExp(":\\w+"));
 
             foreach (QString package, packages.split("), ")) {
-                package.append(QLatin1Char(')'));
+                if (!package.endsWith(QLatin1Char(')'))) {
+                    package.append(QLatin1Char(')'));
+                }
                 packageList << package;
             }
         } else if (!actionFound && (keyValue.value(0) == QLatin1String("Error"))) {
