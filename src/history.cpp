@@ -234,9 +234,6 @@ class HistoryPrivate
 
 void HistoryPrivate::init()
 {
-    qDeleteAll(historyItemList);
-    historyItemList.clear();
-
     QString data;
 
     QFileInfo historyFile(historyFilePath);
@@ -294,6 +291,9 @@ HistoryItemList History::historyItems() const
 void History::reload()
 {
     Q_D(History);
+
+    qDeleteAll(historyItemList);
+    historyItemList.clear();
 
     d->init();
 }
