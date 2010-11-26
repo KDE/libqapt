@@ -79,7 +79,7 @@ public:
     *
     * @return the package list as a \c QStringList
     */
-    QStringList packageList() const;
+    QStringList packages() const;
 
    /**
     * Returns the error reported by dpkg, if there is one. If the transaction

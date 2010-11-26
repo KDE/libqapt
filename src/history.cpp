@@ -42,7 +42,7 @@ class HistoryItemPrivate
         // Data
         QDateTime startDate;
         Package::State action;
-        QStringList packageList;
+        QStringList packages;
         QString error;
         bool isValid;
 
@@ -56,7 +56,7 @@ void HistoryItemPrivate::parseData(const QString &data)
     int lineIndex = 0;
     bool dateFound = false;
     bool actionFound = false;
-    bool packageListFound = false;
+    bool packagesFound = false;
     bool errorFound = false;
 
     QStringList actionStrings;
@@ -105,15 +105,15 @@ void HistoryItemPrivate::parseData(const QString &data)
                 break;
             }
 
-            QString packages = keyValue.value(1);
+            QString actionPackages = keyValue.value(1);
             // Remove arch info
-            packages.remove(QRegExp(":\\w+"));
+            actionPackages.remove(QRegExp(":\\w+"));
 
-            foreach (QString package, packages.split("), ")) {
+            foreach (QString package, actionPackages.split("), ")) {
                 if (!package.endsWith(QLatin1Char(')'))) {
                     package.append(QLatin1Char(')'));
                 }
-                packageList << package;
+                packages << package;
             }
         } else if (!actionFound && (keyValue.value(0) == QLatin1String("Error"))) {
             error = keyValue.value(1);
@@ -147,11 +147,11 @@ Package::State HistoryItem::action() const
     return d->action;
 }
 
-QStringList HistoryItem::packageList() const
+QStringList HistoryItem::packages() const
 {
     Q_D(const HistoryItem);
 
-    return d->packageList;
+    return d->packages;
 }
 
 QString HistoryItem::errorString() const
