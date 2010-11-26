@@ -129,6 +129,7 @@ void HistoryItemPrivate::parseData(const QString &data)
                     break;
                 case Package::ToRemove:
                     removedPackages << package;
+                    break;
                 case Package::ToPurge:
                     purgedPackages << package;
                     break;
@@ -292,8 +293,8 @@ void History::reload()
 {
     Q_D(History);
 
-    qDeleteAll(historyItemList);
-    historyItemList.clear();
+    qDeleteAll(d->historyItemList);
+    d->historyItemList.clear();
 
     d->init();
 }
