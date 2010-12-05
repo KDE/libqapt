@@ -22,7 +22,7 @@
     it if RAM usage is less of an issue, or decrease/eliminate the cache if RAM is tight.
   * Added Add a saveInstalledPackagesList() function to QApt::Backend that exports a
     list of all installed packages to the given path. This list can be ready by
-    Backend::readSelections() or by the Synaptic Package Manager.
+    Backend::readSelections() and is fully compatible with the Synaptic Package Manager.
   * LibQApt now compiles with QT_NO_CAST_TO_ASCII and QT_NO_CAST_FROM_ASCII.
 
 - Optimizations:
