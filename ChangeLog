@@ -7,6 +7,10 @@
     reading and writing int, bool and string settings. QApt::Backend has a
     QApt::Config instance that can be accessed by its config() method after
     initialization.
+  * Added a new QApt::Hisotry class. It provides an interface to the APT history
+    log(s). It provides a list of all entries in the logs, with each entry providing
+    a start date, a list of packages acted upon as well as any errors that may have
+    occurred during the transaction.
   * Added pretty includes in the form of <LibQApt/Include> (e.g. <LibQApt/Backend>)
   * Added a packageDownloadProgress() signal for per-package download progress reporting.
     This enables client applications to give more detailed information about
@@ -23,7 +27,7 @@
 
 - Optimizations:
   * APT system initialization in Backend::init() is no longer blocking, so that you
-    can paint your UI sooner to give a perception of speed.
+    can paint your UI sooner to give a perception of increased speed.
   * General optimizations have been made throughout to significantly speed up
     Backend::init()
   * Speed up Package::isSupported() by making a cache of package index files to
