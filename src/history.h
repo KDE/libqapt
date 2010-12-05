@@ -160,7 +160,7 @@ public Q_SLOTS:
    /**
     * Re-initializes the history log data. This should be connected to a
     * directory watch (such as KDirWatch) to catch changes to the history
-    * file on-the-fly
+    * file on-the-fly, if desired
     */
     void reload();
 };
