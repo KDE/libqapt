@@ -755,9 +755,73 @@ QStringList Package::providesList() const
    return provides;
 }
 
+QStringList Package::recommendsList() const
+{
+    QStringList recommends;
+
+    pkgCache::VerIterator Ver;
+    pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
+    Ver = State.CandidateVerIter(*d->depCache);
+
+    for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
+        if (it->Type == pkgCache::Dep::Recommends) {
+            recommends << QString::fromStdString(it.TargetPkg().Name());
+        }
+    }
+
+    return recommends;
+}
+
+QStringList Package::suggestsList() const
+{
+    QStringList suggests;
+
+    pkgCache::VerIterator Ver;
+    pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
+    Ver = State.CandidateVerIter(*d->depCache);
+
+    for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
+        if (it->Type == pkgCache::Dep::Suggests) {
+            suggests << QString::fromStdString(it.TargetPkg().Name());
+        }
+    }
+
+    return suggests;
+}
+
+QStringList Package::enhancesList() const
+{
+    QStringList enhances;
+
+    pkgCache::VerIterator Ver;
+    pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
+    Ver = State.CandidateVerIter(*d->depCache);
+
+    for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
+        if (it->Type == pkgCache::Dep::Enhances) {
+            enhances << QString::fromStdString(it.TargetPkg().Name());
+        }
+    }
+
+    return enhances;
+}
+
+QStringList Package::enhancedByList() const
+{
+    QStringList enhancedByList;
+
+    foreach (QApt::Package *package, d->backend->availablePackages()) {
+        if (package->enhancesList().contains(latin1Name())) {
+            enhancedByList << package->latin1Name();
+        }
+    }
+
+    return enhancedByList;
+}
+
+
 QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
 {
-    pkgCache::DepIterator depI;
     pkgCache::VerIterator Ver;
     bool First = true;
 

@@ -313,9 +313,9 @@ public:
     bool isSupported() const;
 
    /**
-    * Returns a list of the names of all the dependencies of this package.
+    * Returns a display-ready list of the names of all the dependencies of this package.
     *
-    * \return A list of packages that this package depends on
+    * \return A \c QStringList of packages that this package depends on
     */
     QStringList dependencyList(bool useCandidateVersion) const;
 
@@ -323,7 +323,7 @@ public:
     * Returns a list of the names of all the packages that depend on this
     * package. (Reverse dependencies)
     *
-    * \return A list of packages that depend on this package
+    * \return A \c QStringList of packages that depend on this package
     */
     QStringList requiredByList() const;
 
@@ -331,9 +331,37 @@ public:
     * Returns a list of the names of all the virtual packages that this package
     * provides.
     *
-    * \return A list of packages that this package provides
+    * \return A \c QStringList of packages that this package provides
     */
     QStringList providesList() const;
+
+   /**
+    * Returns a list of the names of all the packages that this package recommends.
+    *
+    * \return A \c QStringList of packages that this package recommends
+    */
+    QStringList recommendsList() const;
+
+   /**
+    * Returns a list of the names of all the packages that this package suggests.
+    *
+    * \return A \c QStringList of packages that this package suggests
+    */
+    QStringList suggestsList() const;
+
+   /**
+    * Returns a list of the names of all the packages that this package enhances.
+    *
+    * \return A \c QStringList of packages that this package enhances
+    */
+    QStringList enhancesList() const;
+
+   /**
+    * Returns a list of the names of all the packages that enhance this package.
+    *
+    * \return A \c QStringList of packages that enhance this package
+    */
+    QStringList enhancedByList() const;
 
    /**
     * If a package is in a broke state, this function returns why the package
