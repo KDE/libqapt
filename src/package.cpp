@@ -764,7 +764,8 @@ QStringList Package::recommendsList() const
     Ver = State.CandidateVerIter(*d->depCache);
 
     for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
-        if (it->Type == pkgCache::Dep::Recommends) {
+        pkgDepCache::StateCache &rState = (*d->depCache)[it.TargetPkg()];
+        if (it->Type == pkgCache::Dep::Recommends && (rState.CandidateVer != 0 )) {
             recommends << QString::fromStdString(it.TargetPkg().Name());
         }
     }
@@ -781,7 +782,8 @@ QStringList Package::suggestsList() const
     Ver = State.CandidateVerIter(*d->depCache);
 
     for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
-        if (it->Type == pkgCache::Dep::Suggests) {
+        pkgDepCache::StateCache &sState = (*d->depCache)[it.TargetPkg()];
+        if (it->Type == pkgCache::Dep::Suggests && (sState.CandidateVer != 0 )) {
             suggests << QString::fromStdString(it.TargetPkg().Name());
         }
     }
@@ -798,7 +800,8 @@ QStringList Package::enhancesList() const
     Ver = State.CandidateVerIter(*d->depCache);
 
     for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
-        if (it->Type == pkgCache::Dep::Enhances) {
+        pkgDepCache::StateCache &eState = (*d->depCache)[it.TargetPkg()];
+        if (it->Type == pkgCache::Dep::Enhances && (eState.CandidateVer != 0 )) {
             enhances << QString::fromStdString(it.TargetPkg().Name());
         }
     }
