@@ -46,7 +46,7 @@ class BackendPrivate;
  *
  * Backend encapsulates all the needed logic to perform most apt operations.
  * It implements the initializing of the database and all requests to/for the
- * database. Please note that you \b _MUST_ call init() before doing any
+ * database. Please note that you @e MUST call init() before doing any
  * further operations to the backend, or else risk encountering undefined
  * behavior.
  *
@@ -286,12 +286,16 @@ public:
      * accurate. Irrelevant results may slip in, and some relevant results
      * may be cut.
      *
+     * You @e must call the openXapianIndex() function before search will work
+     *
      * In the future, a "slow" search that searches by exact matches for
      * certain parameters will be implemented.
      *
      * @param searchString The string to narrow the search by.
      *
      * \return A @c PackageList of all packages matching the search string.
+     *
+     * @see openXapianIndex()
      */
     PackageList search(const QString &searchString) const;
 
@@ -304,6 +308,8 @@ public:
 
     /**
      * Returns whether the search index needs updating
+     *
+     * @see updateXapianIndex()
      */
     bool xapianIndexNeedsUpdate() const;
 
@@ -354,8 +360,8 @@ Q_SIGNALS:
      * Emitted whenever a backend error occurs. You should listen to this
      * signal and present the error/clean up when your app receives it.
      *
-     * @param error QApt::ErrorCode enum member indicating error type
-     * @param details A QVariant map containing info about the error, if
+     * @param error @c ErrorCode enum member indicating error type
+     * @param details  A @c QVariantMap containing containing info about the error, if
      *                available
      */
     void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
@@ -364,8 +370,8 @@ Q_SIGNALS:
      * Emitted whenever a backend warning occurs. You should listen to this
      * signal and present the warning when your app receives it.
      *
-     * @param error QApt::WarningCode enum member indicating error type
-     * @param details A QVariant map containing info about the warning, if
+     * @param error @c WarningCode enum member indicating error type
+     * @param details  A @c QVariantMap containing info about the warning, if
      *                available
      */
     void warningOccurred(QApt::WarningCode warning, const QVariantMap &details);
@@ -377,8 +383,10 @@ Q_SIGNALS:
      * You should send the response back to the worker as a QVariantMap
      * using the Backend's answerWorkerQuestion() function.
      *
-     * @param question A QApt::WorkerQuestion enum member indicating question type
-     * @param details A QVariant map containing info about the question, if available
+     * @param question A @c QApt::WorkerQuestion enum member indicating question type
+     * @param details A @c QVariantMap containing info about the question, if available
+     *
+     * @see answerWorkerQuestion()
      */
     void questionOccurred(QApt::WorkerQuestion question, const QVariantMap &details);
 
@@ -391,7 +399,7 @@ Q_SIGNALS:
     /**
      * Emitted whenever a backend event occurs.
      *
-     * @param event A QApt::WorkerEvent enum member indicating event type
+     * @param event A @c WorkerEvent enum member indicating event type
      */
     void workerEvent(QApt::WorkerEvent event);
 
@@ -518,6 +526,15 @@ public Q_SLOTS:
 
     /**
      * Commits all pending package state changes that have been made.
+     *
+     * This function is asynchronous. Events from the worker that
+     * occur while committing changes can be tracked with the workerEvent()
+     * signal.
+     *
+     * Commit progress can be tracked with the commitProgress() signal
+     *
+     * @see workerEvent()
+     * @see commitProgress()
      */
     void commitChanges();
 
@@ -529,18 +546,38 @@ public Q_SLOTS:
 
     /**
      * Checks for and downloads new package source lists.
+     *
+     * This function is asynchronous. Worker events that occur while
+     * donwloading cache files can be tracked with the workerEvent() signal.
+     *
+     * Overall download progress can be tracked by the downloadProgress()
+     * signal, and per-package download progress can be tracked by the
+     * packageDownloadProgress() signal.
+     *
+     * @see workerEvent()
+     * @see downloadProgress()
+     * @see packageDownloadProgress()
      */
     void updateCache();
 
     /**
-     * Cancels download operations initialized by the updateCache() or
-     * commitChanges() functions.
+     * Cancels download operations in the worker initialized by the
+     * updateCache() or commitChanges() functions. This function
+     * will only have an effect if a download operation is in progress.
+     * The actual committing of changes cannot be canceled once in progress.
+     *
+     * This function is asynchronous. The backend will report a
+     * \c UserCancelError using the errorOccurred() signal
+     *
+     * @see errorOccurred()
      */
     void cancelDownload();
 
     /**
      * This function should be used to return the answer the user has given
-     * to a worker question.
+     * to a worker question delivered by the questionOccurred() signal
+     *
+     * @see questionOccurred()
      */
     void answerWorkerQuestion(const QVariantMap &response);
 
@@ -554,6 +591,9 @@ public Q_SLOTS:
      * \return @c false if the saving failed
      *
      * @since 1.1
+     *
+     * @see loadSelections()
+     * @see saveSelections()
      */
     bool saveInstalledPackagesList(const QString &path) const;
 
@@ -565,6 +605,9 @@ public Q_SLOTS:
      *
      * \return @c true if saving succeeded
      * \return @c false if the saving failed
+     *
+     * @see saveInstalledPackagesList()
+     * @see loadSelections()
      */
     bool saveSelections(const QString &path) const;
 
@@ -576,9 +619,24 @@ public Q_SLOTS:
      *
      * \return @c true if reading/marking succeeded
      * \return @c false if the reading/marking failed
+     *
+     * @see saveSelections()
+     * @see saveInstalledPackagesList()
      */
     bool loadSelections(const QString &path);
 
+   /**
+    * Tells the QApt Worker to initiate a rebuild of the Xapian package search
+    * index.
+    *
+    * This function is asynchronous. The worker will report start and finish
+    * events using the workerEvent() signal. Progress is reported by the
+    * xapianUpdateProgress() signal.
+    *
+    * @see workerEvent()
+    * @see xapianUpdateProgress()
+    * @see xapianIndexNeedsUpdate()
+    */
     void updateXapianIndex();
 
 private Q_SLOTS:
