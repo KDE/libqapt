@@ -763,8 +763,18 @@ QStringList Package::recommendsList() const
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     Ver = State.CandidateVerIter(*d->depCache);
 
+    if (Ver.end()) {
+        return recommends;
+    }
+
     for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
-        pkgDepCache::StateCache &rState = (*d->depCache)[it.TargetPkg()];
+        pkgCache::PkgIterator pkg = it.TargetPkg();
+
+        // Skip purely virtual packages
+        if (!pkg->VersionList) {
+            continue;
+        }
+        pkgDepCache::StateCache &rState = (*d->depCache)[pkg];
         if (it->Type == pkgCache::Dep::Recommends && (rState.CandidateVer != 0 )) {
             recommends << QString::fromStdString(it.TargetPkg().Name());
         }
@@ -781,8 +791,18 @@ QStringList Package::suggestsList() const
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     Ver = State.CandidateVerIter(*d->depCache);
 
+    if (Ver.end()) {
+        return suggests;
+    }
+
     for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
-        pkgDepCache::StateCache &sState = (*d->depCache)[it.TargetPkg()];
+        pkgCache::PkgIterator pkg = it.TargetPkg();
+
+        // Skip purely virtual packages
+        if (!pkg->VersionList) {
+            continue;
+        }
+        pkgDepCache::StateCache &sState = (*d->depCache)[pkg];
         if (it->Type == pkgCache::Dep::Suggests && (sState.CandidateVer != 0 )) {
             suggests << QString::fromStdString(it.TargetPkg().Name());
         }
@@ -799,8 +819,18 @@ QStringList Package::enhancesList() const
     pkgDepCache::StateCache & State = (*d->depCache)[*d->packageIter];
     Ver = State.CandidateVerIter(*d->depCache);
 
+    if (Ver.end()) {
+        return enhances;
+    }
+
     for(pkgCache::DepIterator it = Ver.DependsList(); !it.end(); ++it) {
-        pkgDepCache::StateCache &eState = (*d->depCache)[it.TargetPkg()];
+        pkgCache::PkgIterator pkg = it.TargetPkg();
+
+        // Skip purely virtual packages
+        if (!pkg->VersionList) {
+            continue;
+        }
+        pkgDepCache::StateCache &eState = (*d->depCache)[pkg];
         if (it->Type == pkgCache::Dep::Enhances && (eState.CandidateVer != 0 )) {
             enhances << QString::fromStdString(it.TargetPkg().Name());
         }
