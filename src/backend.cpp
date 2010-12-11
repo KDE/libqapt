@@ -258,7 +258,7 @@ Package *Backend::package(pkgCache::PkgIterator &iter) const
 
 Package *Backend::package(const QString &name) const
 {
-    return package(name.toLatin1());
+    return package(QLatin1String(name.toStdString().c_str()));
 }
 
 Package *Backend::package(const QLatin1String &name) const
