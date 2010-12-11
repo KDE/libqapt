@@ -258,9 +258,14 @@ Package *Backend::package(pkgCache::PkgIterator &iter) const
 
 Package *Backend::package(const QString &name) const
 {
+    return package(name.toLatin1());
+}
+
+Package *Backend::package(const QLatin1String &name) const
+{
     Q_D(const Backend);
 
-    pkgCache::PkgIterator pkg = d->cache->depCache()->FindPkg(name.toStdString());
+    pkgCache::PkgIterator pkg = d->cache->depCache()->FindPkg(name.latin1());
     if (!pkg.end()) {
         return package(pkg);
     }

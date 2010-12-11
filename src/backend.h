@@ -134,6 +134,9 @@ public:
      */
     Package *package(const QString &name) const;
 
+    /** Overload for package(const QString &name) **/
+    Package *package(const QLatin1String &name) const;
+
     /**
      * Queries the backend for a Package object that installs the specified
      * file.
