@@ -482,7 +482,7 @@ PackageList Backend::search(const QString &searchString) const
       int top_percent = 0;
       for (Xapian::MSetIterator i = matches.begin(); i != matches.end(); ++i)
       {
-         Package* pkg = package(QString::fromStdString(i.get_document().get_data()));
+         Package* pkg = package(QLatin1String(i.get_document().get_data().c_str()));
          // Filter out results that apt doesn't know
          if (!pkg)
             continue;
