@@ -96,10 +96,9 @@ bool QAptWorker::lockSystem()
         return true;
     }
 
-    bool systemLocked = _system->Lock();
-    m_systemLocked = systemLocked;
+    m_systemLocked = _system->Lock();
 
-    return systemLocked;
+    return m_systemLocked;
 }
 
 bool QAptWorker::unlockSystem()
@@ -194,13 +193,13 @@ void QAptWorker::updateCache()
     fetcher.Setup(m_acquireStatus);
     // Populate it with the source selection and get all Indexes
     // (GetAll=true)
-    if (m_cache->list()->GetIndexes(&fetcher,true) == false) {
+    if (!m_cache->list()->GetIndexes(&fetcher,true)) {
         emit workerFinished(false);
         return;
     }
 
     // do the work
-    if (_config->FindB("APT::Get::Download",true) == true) {
+    if (_config->FindB("APT::Get::Download",true)) {
         bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
         emit workerFinished(result);
     } else {
