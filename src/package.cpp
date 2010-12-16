@@ -271,7 +271,7 @@ QString Package::homepage() const
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
         pkgRecords::Parser &parser = d->records->Lookup(ver.FileList());
-        homepage = QString::fromStdString(parser.Homepage());
+        homepage = QString::fromUtf8(parser.Homepage().data());
     }
     return homepage;
 }
