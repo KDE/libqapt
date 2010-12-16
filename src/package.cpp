@@ -73,9 +73,9 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label
                 const char *verOrigin = found.Origin();
                 const char *verArchive = found.Archive();
                 if (verLabel && verOrigin && verArchive) {
-                    if(QString::fromStdString(verLabel) == label &&
-                      QString::fromStdString(verOrigin) == label &&
-                      QString::fromStdString(verArchive) == release) {
+                    if(QLatin1String(verLabel) == label &&
+                      QLatin1String(verOrigin) == label &&
+                      QLatin1String(verArchive) == release) {
                           return found;
                     }
                 }
@@ -110,7 +110,7 @@ QString PackagePrivate::getReleaseFileForOrigin(const QLatin1String &label, cons
                 stduri += (*I)->GetDist();
                 stduri += "_Release";
 
-                QString uri = QString::fromStdString(stduri);
+                QString uri = QLatin1String(stduri.c_str());
                 return uri;
             }
         }
@@ -185,7 +185,7 @@ QString Package::sourcePackage() const
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
         pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
-        sourcePackage = QString::fromStdString(rec.SourcePkg());
+        sourcePackage = QLatin1String(rec.SourcePkg().c_str());
     }
 
     // If empty, use name. (Name would equal source package in that case)
@@ -258,7 +258,7 @@ QString Package::maintainer() const
     QString maintainer;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
-        pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
+        pkgRecords::Parser &parser = d->records->Lookup(ver.FileList());
         maintainer = QString::fromUtf8(parser.Maintainer().data());
         maintainer.replace(QLatin1Char('<'), QLatin1String("&lt;"));
     }
@@ -270,7 +270,7 @@ QString Package::homepage() const
     QString homepage;
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (!ver.end()) {
-        pkgRecords::Parser & parser = d->records->Lookup(ver.FileList());
+        pkgRecords::Parser &parser = d->records->Lookup(ver.FileList());
         homepage = QString::fromStdString(parser.Homepage());
     }
     return homepage;
@@ -283,10 +283,10 @@ QString Package::version() const
         if (!State.CandidateVer) {
             return QString();
         } else {
-            return QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
+            return QLatin1String(State.CandidateVerIter(*d->depCache).VerStr());
         }
     } else {
-        return QString::fromStdString(d->packageIter->CurrentVer().VerStr());
+        return QLatin1String(d->packageIter->CurrentVer().VerStr());
     }
 }
 
@@ -321,7 +321,7 @@ QString Package::installedVersion() const
     if (!(*d->packageIter)->CurrentVer) {
         return QString();
     }
-    QString installedVersion = QString::fromStdString(d->packageIter->CurrentVer().VerStr());
+    QString installedVersion = QLatin1String(d->packageIter->CurrentVer().VerStr());
     return installedVersion;
 }
 
@@ -332,7 +332,7 @@ QString Package::availableVersion() const
         return QString();
     }
 
-    QString availableVersion = QString::fromStdString(State.CandidateVerIter(*d->depCache).VerStr());
+    QString availableVersion = QLatin1String(State.CandidateVerIter(*d->depCache).VerStr());
     return availableVersion;
 }
 
@@ -340,7 +340,7 @@ QString Package::priority() const
 {
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
     if (ver != 0) {
-        QString priority = QString::fromStdString(ver.PriorityType());
+        QString priority = QLatin1String(ver.PriorityType());
         return priority;
     } else {
         return QString();
@@ -408,7 +408,7 @@ QString Package::component() const
         return QString();
     }
 
-    return QString::fromStdString(File.Component());
+    return QLatin1String(File.Component());
 }
 
 QUrl Package::changelogUrl() const
@@ -901,9 +901,9 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                 // upgrade. Example:
                 // "apt 0.5.4 but 0.5.3 is to be installed"
                 QVariantMap failReason;
-                failReason[QLatin1String("Relation")] = QString::fromStdString(End.DepType());
+                failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
                 failReason[QLatin1String("RequiredVersion")] = requiredVersion;
-                failReason[QLatin1String("CandidateVersion")] = QString::fromStdString(Ver.VerStr());
+                failReason[QLatin1String("CandidateVersion")] = QLatin1String(Ver.VerStr());
                 if (Start != End) {
                     failReason[QLatin1String("IsFirstOr")] = true;
                 }
@@ -930,7 +930,7 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                         failReason[QLatin1String("IsFirstOr")] = true;
                     }
 
-                    QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+                    QString targetName = QLatin1String(Start.TargetPkg().Name());
                     depNotInstallable[targetName] = failReason;
                 }
             }
@@ -942,7 +942,7 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                 failReason[QLatin1String("IsFirstOr")] = true;
             }
 
-            QString targetName = QString::fromStdString(Start.TargetPkg().Name());
+            QString targetName = QLatin1String(Start.TargetPkg().Name());
             virtualPackage[targetName] = failReason;
         }
     }
