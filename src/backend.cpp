@@ -516,6 +516,11 @@ GroupList Backend::availableGroups() const
     return groupList;
 }
 
+bool Backend::areChangesMarked() const
+{
+    return (toInstallCount() + toRemoveCount());
+}
+
 bool Backend::isBroken() const
 {
     Q_D(const Backend);

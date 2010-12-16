@@ -324,6 +324,12 @@ public:
     */
     bool openXapianIndex();
 
+   /**
+     * Returns whether there are packages with marked changes waiting to be
+     * committed
+     */
+    bool areChangesMarked() const;
+
     /**
      * Returns whether the cache has broken packages or has a null dependency
      * cache
