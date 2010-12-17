@@ -715,7 +715,7 @@ void Backend::markPackagesForAutoRemove()
 
     for (pkgCache::PkgIterator pkgIter = cache.PkgBegin(); !pkgIter.end(); ++pkgIter) {
         if (cache[pkgIter].Garbage) {
-            if(pkgIter.CurrentVer() != 0 &&
+            if(pkgIter.CurrentVer() &&
                pkgIter->CurrentState != pkgCache::State::ConfigFiles) {
                 cache.MarkDelete(pkgIter, false);
             }
@@ -909,15 +909,8 @@ bool Backend::loadSelections(const QString &path)
 
         switch (mapIter.value()) {
            case Package::ToInstall:
-               if(_config->FindB("Volatile::SetSelectionDoReInstall",false)) {
-                   cache.SetReInstall(pkgIter, true);
-               }
                if (pkgIter.CurrentVer().end()) { // Only mark if not already installed
-                  if(_config->FindB("Volatile::SetSelectionsNoFix",false)) {
-                      cache.MarkInstall(pkgIter, false);
-                  } else {
-                      cache.MarkInstall(pkgIter, true);
-                  }
+                  cache.MarkInstall(pkgIter, true);
                }
                break;
            case Package::ToRemove:
