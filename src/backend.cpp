@@ -185,7 +185,7 @@ void Backend::reloadCache()
 
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); !iter.end(); ++iter) {
-        if (iter->VersionList == 0) {
+        if (!iter->VersionList) {
             continue; // Exclude virtual packages.
         }
 

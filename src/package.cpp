@@ -50,6 +50,7 @@ namespace QApt {
 class PackagePrivate
 {
     public:
+        ~PackagePrivate() { delete packageIter; };
         QApt::Backend *backend;
         pkgDepCache *depCache;
         pkgRecords *records;
@@ -123,10 +124,8 @@ Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
                  pkgRecords *records, pkgCache::PkgIterator &packageIter)
         : d(new PackagePrivate())
 {
-    // Passing the pkgIter by pointer from Backend results in a crash
-    // the first time you try to call a method needing it :(
-    // Probably because the pointer is created inside an iterator and
-    // is very temporary.
+    // We have to make our own pkgIterator, since the one passed here will
+    // keep on iterating while all the packages are being built
     d->packageIter = new pkgCache::PkgIterator(packageIter);
     d->backend = backend;
     d->records= records;
