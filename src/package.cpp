@@ -57,11 +57,11 @@ class PackagePrivate
         pkgCache::PkgIterator *packageIter;
         int state;
 
-        pkgCache::PkgFileIterator searchPkgFileIter(const QString &label, const QString &release) const;
+        pkgCache::PkgFileIterator searchPkgFileIter(const QLatin1String &label, const QString &release) const;
         QString getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const;
 };
 
-pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label, const QString &release) const
+pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QLatin1String &label, const QString &release) const
 {
     pkgCache::VerIterator verIter = packageIter->VersionList();
     pkgCache::VerFileIterator verFileIter;
@@ -74,10 +74,9 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QString &label
                 const char *verOrigin = found.Origin();
                 const char *verArchive = found.Archive();
                 if (verLabel && verOrigin && verArchive) {
-                    if(QLatin1String(verLabel) == label &&
-                      QLatin1String(verOrigin) == label &&
-                      QLatin1String(verArchive) == release) {
-                          return found;
+                    if(verLabel == label && verOrigin == label &&
+                       QLatin1String(verArchive) == release) {
+                        return found;
                     }
                 }
             }
