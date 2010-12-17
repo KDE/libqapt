@@ -674,7 +674,6 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
         QString type;
         bool isOr = false;
         bool isVirtual = false;
-        bool isSatisfied = false;
         QString name;
         QString version;
         QString versionCompare;
@@ -691,10 +690,6 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
         type = QString::fromUtf8(D.DepType());
         name = QLatin1String(Trg.Name());
 
-        // satisfied
-        if (((*d->depCache)[D] & pkgDepCache::DepGInstall) == pkgDepCache::DepGInstall) {
-            isSatisfied = true;
-        }
         if (!Trg->VersionList) {
             isVirtual = true;
         } else {
@@ -849,7 +844,6 @@ QStringList Package::enhancedByList() const
 QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
 {
     pkgCache::VerIterator Ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
-    bool First = true;
 
     QHash<QString, QVariantMap> notInstallable;
     QHash<QString, QVariantMap> wrongCandidate;
