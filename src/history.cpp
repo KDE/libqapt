@@ -57,7 +57,6 @@ void HistoryItemPrivate::parseData(const QString &data)
 
     int lineIndex = 0;
     bool dateFound = false;
-    bool packagesFound = false;
     bool errorFound = false;
 
     QStringList actionStrings;
