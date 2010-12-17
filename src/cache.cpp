@@ -91,23 +91,18 @@ bool Cache::open()
 {
     Q_D(Cache);
 
-   // delete any old structures
-    if (d->cache) {
-        delete d->cache;
-        d->cache = 0;
-    }
-    if (d->policy) {
-        delete d->policy;
-        d->policy = 0;
-    }
-    if (d->depCache) {
-        delete d->depCache;
-        d->depCache = 0;
-    }
-    if (d->mmap) {
-        delete d->mmap;
-        d->mmap = 0;
-    }
+    // delete any old structures
+    delete d->cache;
+    d->cache = 0;
+
+    delete d->policy;
+    d->policy = 0;
+
+    delete d->depCache;
+    d->depCache = 0;
+
+    delete d->mmap;
+    d->mmap = 0;
 
     // Read the sources list
     if (!d->list->ReadMainList()) {
