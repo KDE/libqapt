@@ -65,7 +65,7 @@ namespace QApt
     * UntrustedError: <"UntrustedItems", QStringList> (List of untrusted packages)
     * UserCancelError: No fields, pseudo-error
     * DownloadDisallowedError: No fields
-    * NotFoundError: <"NotFoundString", QString> (String of the nonexistant package)
+    * NotFoundError: <"NotFoundString", QString> (String of the nonexistent package)
     *                <"WarningText", QString> (APT's warning description)
     */
     typedef QVariantMap Error;
