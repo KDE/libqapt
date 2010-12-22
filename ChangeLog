@@ -23,6 +23,14 @@
   * Added Add a saveInstalledPackagesList() function to QApt::Backend that exports a
     list of all installed packages to the given path. This list can be ready by
     Backend::readSelections() and is fully compatible with the Synaptic Package Manager.
+  * Add some new functions: recommendsList(), suggestsList(), enhancesList() and enhancedByList()
+    to return QStringLists of the names of packages that have the aforementioned relational statuses
+    with the Package.
+  * Added an areChangesMarked() function to provide an easier/more efficient way to check if there are
+    pending changes without checking the emptiness of the QApt::PackageList that
+    Backend::MarkedPackages() constructs and returns.
+  * API documentation updates, including making note of which functions are asynchronous
+    and have signals to report events/data.
   * LibQApt now compiles with QT_NO_CAST_TO_ASCII and QT_NO_CAST_FROM_ASCII.
 
 - Optimizations:
@@ -48,6 +56,17 @@
     QByteArray, as well as some other miscellaneous optimizations.
   * Change the Backend's origin/human readable name mapping to use a QHash, giving some
     minor optimizations to the originLabel() and origin() functions.
+  * Add a Backend::package() overload that takes a QLatin1String. If you can use this overload,
+    it is more efficient since you don't have to go QString -> ascii -> latin1 -> const char.
+  * Make the regular Backend::package() implementation use the QL1S overload. This is slightly
+    more efficient since we can convert directly from QString -> latin1 without converting to
+    ascii in between (since APT package names will always be latin1)
+  * Use the new Backend::package(QL1S) overload inside Backend::search(). the QL1S overload is
+    faster in the first place, plus since Xapian gives us an std::string it is also faster to go
+    to QL1S than to QString.
+  * Since package names are always latin1-compliant, prevent the unnecessary conversion of const char *
+    -> std::string -> QString::fromAscii -> QString::fromLatin1 by using QLatin1String to wrap around
+    the const char *, making the conversion process look more like const char * -> QL1S -> QString::fromLatin1.
 
 - Bugfixes:
   * Added a NotFound error for the QApt Batch Installer to use when it encounters
@@ -63,6 +82,9 @@
     label would insert the origin into the origin map, wasting memory.
   * Fixed a blank line being snuck in to the end of lists returned by the
     Package::installedFilesList() function
+  * Fix a potential problem with homepage URLs with UTF8 characters not displaying correctly.
+  * Fix a small memory leak in PackagePrivate. We had a pointer that we allocate to in the
+    Package constructor which we weren't deleting in the PackagePrivate destructor
   * Compile with -fvisibility=hidden by default so that libqapt doesn't expose
     symbols from libraries it links against, making life easier for packagers
     everywhere.
