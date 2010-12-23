@@ -256,6 +256,8 @@ public:
     */
     QString supportedUntil() const;
 
+    QString controlField(const QLatin1String &name) const;
+
    /**
     * Returns the amount of hard drive space that the currently-installed
     * version of this package takes up.

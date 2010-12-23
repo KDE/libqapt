@@ -508,12 +508,38 @@ QString Package::supportedUntil() const
         return QString();
     }
 
-    //FIXME: Figure out how to get the value from the package record
-    const int supportTime = 18; // months
+    QString supportTimeString = controlField(QLatin1String("Supported"));
+    supportTimeString.chop(1); // Remove the letter signifying months
+    const int supportTime = supportTimeString.toInt(); // months
 
     QDateTime supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
 
     return supportEnd.toString(QLatin1String("MMMM yyyy"));
+}
+
+QString Package::controlField(const QLatin1String &name) const
+{
+    QString field;
+    pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
+    if (ver.end()) {
+        return field;
+    }
+
+    pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
+    const char *start, *stop;
+    rec.GetRec(start, stop);
+    QString record(start);
+
+    QStringList lines = record.split(QLatin1Char('\n'));
+
+    foreach (const QString &line, lines) {
+        if (line.startsWith(name)) {
+            field = line.split(QLatin1String(": ")).at(1);
+            break;
+        }
+    }
+
+    return field;
 }
 
 qint64 Package::currentInstalledSize() const
