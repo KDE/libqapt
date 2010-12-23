@@ -485,8 +485,8 @@ QString Package::supportedUntil() const
     do {
         line = stream.readLine();
         QStringList split = line.split(QLatin1Char('='));
-        if (split[0] == QLatin1String("DISTRIB_CODENAME")) {
-            release = split[1];
+        if (split.at(0) == QLatin1String("DISTRIB_CODENAME")) {
+            release = split.at(1);
         }
     } while (!line.isNull());
 
