@@ -226,6 +226,7 @@ void Backend::throwInitError()
     string message;
     bool isError = _error->PopMessage(message);
     if (isError) {
+        details[QLatin1String("FromWorker")] = false;
         details[QLatin1String("ErrorText")] = QString::fromStdString(message);
     }
 

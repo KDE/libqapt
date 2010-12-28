@@ -124,6 +124,7 @@ bool QAptWorker::initializeApt()
         m_cache = new QApt::Cache(this);
     }
     if (!m_cache->open()) {
+        aptDebug() << "Cache didn't open";
         throwInitError();
         return false;
     }
@@ -140,6 +141,7 @@ void QAptWorker::throwInitError()
     string message;
     bool isError = _error->PopMessage(message);
     if (isError) {
+        details[QLatin1String("FromWorker")] = true;
         details[QLatin1String("ErrorText")] = QString::fromStdString(message);
     }
 
