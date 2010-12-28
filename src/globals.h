@@ -55,6 +55,8 @@ namespace QApt
     * These are the fields that each ErrorCode can have:
     *            <"Key", ValueType> (Description of value)
     * InitError: <"ErrorText", QString> (APT's error description)
+    *            <"FromWorker, bool> (Whether or not an init error comes from the worker.
+    *                                 You want to quit your app if it doesn't)
     * LockError: No fields
     * DiskSpaceError: <"DirectoryString", QString>
     * FetchError: No fields
