@@ -111,7 +111,7 @@ void HistoryItemPrivate::parseData(const QString &data)
             // Remove arch info
             actionPackages.remove(QRegExp(":\\w+"));
 
-            foreach (QString package, actionPackages.split("), ")) {
+            Q_FOREACH (QString package, actionPackages.split("), ")) {
                 if (!package.endsWith(QLatin1Char(')'))) {
                     package.append(QLatin1Char(')'));
                 }
@@ -241,7 +241,7 @@ void HistoryPrivate::init()
     QDir logDirectory(directoryPath);
     QStringList logFiles = logDirectory.entryList(QDir::Files, QDir::Name);
 
-    foreach (QString file, logFiles) {
+    Q_FOREACH (QString file, logFiles) {
         file.prepend(directoryPath + QLatin1Char('/'));
         if (file.contains(QLatin1String("history"))) {
             if (file.endsWith(QLatin1String(".gz"))) {
@@ -262,7 +262,7 @@ void HistoryPrivate::init()
 
     data = data.trimmed();
     QStringList stanzas = data.split(QLatin1String("\n\n"));
-    foreach(const QString &stanza, stanzas) {
+    Q_FOREACH(const QString &stanza, stanzas) {
         HistoryItem *historyItem = new HistoryItem(stanza);
         if (historyItem->isValid()) {
             historyItemList << historyItem;

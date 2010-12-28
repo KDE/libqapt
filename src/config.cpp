@@ -95,7 +95,7 @@ void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &va
 
     if (changed) {
         // No new keys. Recompose lines and set buffer to new buffer
-        foreach (const QByteArray &line, lines) {
+        Q_FOREACH (const QByteArray &line, lines) {
             tempBuffer += QByteArray(line + '\n');
         }
 

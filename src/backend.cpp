@@ -276,7 +276,7 @@ Package *Backend::packageForFile(const QString &file) const
 {
     Q_D(const Backend);
 
-    foreach (Package *package, d->packages) {
+    Q_FOREACH (Package *package, d->packages) {
         if (package->installedFilesList().contains(file)) {
             return package;
         }
@@ -324,7 +324,7 @@ int Backend::packageCount(const Package::States &states) const
 
     int packageCount = 0;
 
-    foreach(const Package *package, d->packages) {
+    Q_FOREACH(const Package *package, d->packages) {
         if ((package->state() & states)) {
             packageCount++;
         }
@@ -394,7 +394,7 @@ PackageList Backend::upgradeablePackages() const
 
     PackageList upgradeablePackages;
 
-    foreach (Package *package, d->packages) {
+    Q_FOREACH (Package *package, d->packages) {
         if (package->state() & Package::Upgradeable) {
             upgradeablePackages << package;
         }
@@ -409,7 +409,7 @@ PackageList Backend::markedPackages() const
 
     PackageList markedPackages;
 
-    foreach(Package *package, d->packages) {
+    Q_FOREACH(Package *package, d->packages) {
         if (package->state() & (Package::ToInstall | Package::ToReInstall |
                                 Package::ToUpgrade | Package::ToDowngrade |
                                 Package::ToRemove | Package::ToPurge)) {
@@ -744,7 +744,7 @@ void Backend::commitChanges()
 
     QVariantMap packageList;
 
-    foreach (const Package *package, d->packages) {
+    Q_FOREACH (const Package *package, d->packages) {
         int flags = package->state();
         // Cannot have any of these flags simultaneously
         int status = flags & (Package::ToKeep |

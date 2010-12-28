@@ -532,7 +532,7 @@ QString Package::controlField(const QLatin1String &name) const
 
     QStringList lines = record.split(QLatin1Char('\n'));
 
-    foreach (const QString &line, lines) {
+    Q_FOREACH (const QString &line, lines) {
         if (line.startsWith(name)) {
             field = line.split(QLatin1String(": ")).at(1);
             break;
@@ -857,7 +857,7 @@ QStringList Package::enhancedByList() const
 {
     QStringList enhancedByList;
 
-    foreach (QApt::Package *package, d->backend->availablePackages()) {
+    Q_FOREACH (QApt::Package *package, d->backend->availablePackages()) {
         if (package->enhancesList().contains(latin1Name())) {
             enhancedByList << package->latin1Name();
         }
