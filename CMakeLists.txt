@@ -3,7 +3,7 @@ project(libqapt)
 cmake_minimum_required(VERSION 2.6.0)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-set(qapt_VERSION 1.0.90)
+set(qapt_VERSION 1.0.95)
 
 set(qapt_lib_SOVERSION 1)
 set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.0.90)
