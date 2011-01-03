@@ -250,6 +250,7 @@ Cache *Backend::cache() const
 Package *Backend::package(pkgCache::PkgIterator &iter) const
 {
     Q_D(const Backend);
+
     int index = d->packagesIndex.at(iter->ID);
     if (index != -1) {
         return d->packages.at(index);
