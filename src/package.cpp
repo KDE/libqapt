@@ -144,37 +144,27 @@ pkgCache::PkgIterator *Package::packageIterator() const
 
 QString Package::name() const
 {
-    QString name = latin1Name();
-
-    return name;
+    return latin1Name();
 }
 
 QLatin1String Package::latin1Name() const
 {
-    QLatin1String name(d->packageIter->Name());
-
-    return name;
+    return QLatin1String(d->packageIter->Name());
 }
 
 int Package::id() const
 {
-    int id = (*d->packageIter)->ID;
-
-    return id;
+    return (*d->packageIter)->ID;
 }
 
 QString Package::section() const
 {
-    QString section = latin1Section();
-
-    return section;
+    return latin1Section();
 }
 
 QLatin1String Package::latin1Section() const
 {
-    QLatin1String section(d->packageIter->Section());
-
-    return section;
+    return QLatin1String(d->packageIter->Section());
 }
 
 QString Package::sourcePackage() const
@@ -293,8 +283,7 @@ QStringList Package::availableVersions() const
     QStringList versions;
 
     // Get available Versions.
-    for (pkgCache::VerIterator Ver = d->packageIter->VersionList();
-         Ver.end() == false; ++Ver) {
+    for (pkgCache::VerIterator Ver = d->packageIter->VersionList(); !Ver.end(); ++Ver) {
 
         // We always take the first available version.
         pkgCache::VerFileIterator VF = Ver.FileList();
@@ -319,8 +308,8 @@ QString Package::installedVersion() const
     if (!(*d->packageIter)->CurrentVer) {
         return QString();
     }
-    QString installedVersion = QLatin1String(d->packageIter->CurrentVer().VerStr());
-    return installedVersion;
+
+    return QLatin1String(d->packageIter->CurrentVer().VerStr());
 }
 
 QString Package::availableVersion() const
@@ -330,16 +319,14 @@ QString Package::availableVersion() const
         return QString();
     }
 
-    QString availableVersion = QLatin1String(State.CandidateVerIter(*d->depCache).VerStr());
-    return availableVersion;
+    return QLatin1String(State.CandidateVerIter(*d->depCache).VerStr());
 }
 
 QString Package::priority() const
 {
     pkgCache::VerIterator ver = (*d->depCache)[*d->packageIter].CandidateVerIter(*d->depCache);
-    if (ver != 0) {
-        QString priority = QLatin1String(ver.PriorityType());
-        return priority;
+    if (!ver) {
+        return QLatin1String(ver.PriorityType());
     } else {
         return QString();
     }
@@ -402,7 +389,7 @@ QString Package::component() const
     pkgCache::VerFileIterator VF = Ver.FileList();
     pkgCache::PkgFileIterator File = VF.File();
 
-    if(File.Component() == NULL) {
+    if(!File.Component()) {
         return QString();
     }
 
@@ -459,9 +446,7 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
             break;
     }
 
-    QUrl url = QUrl(urlBase % latin1Name());
-
-    return url;
+    return QUrl(urlBase % latin1Name());
 }
 
 QString Package::supportedUntil() const
