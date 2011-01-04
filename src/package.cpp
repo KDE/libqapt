@@ -542,6 +542,11 @@ QString Package::controlField(const QLatin1String &name) const
     return field;
 }
 
+QString Package::controlField(const QString &name) const
+{
+    return controlField(QLatin1String(name.toStdString().c_str()));
+}
+
 qint64 Package::currentInstalledSize() const
 {
     pkgCache::VerIterator ver = d->packageIter->CurrentVer();

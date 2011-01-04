@@ -256,7 +256,24 @@ public:
     */
     QString supportedUntil() const;
 
+   /**
+    * Returns the specified field of the package's debian/control file
+    *
+    * This function can be used to return data from custom control fields
+    * which do not have an official function inside APT to retrieve them.
+    * 
+    * For example, the supportedUntil() function uses this function to
+    * retrieve the value of the "Supported" field, which is Ubuntu-specific
+    * and does not have an APT function with which to obtain it.
+    *
+    * Another usecase is the GStreamer metadata fields for GStreamer packages,
+    * which are used to give information on what mimetypes/GStreamer version
+    * the package supports.
+    */
     QString controlField(const QLatin1String &name) const;
+
+    /** Overload for QString controlField(const QLatin1String &name) const; **/
+    QString controlField(const QString &name) const;
 
    /**
     * Returns the amount of hard drive space that the currently-installed
