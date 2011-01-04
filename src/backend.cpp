@@ -315,9 +315,7 @@ int Backend::packageCount() const
 {
     Q_D(const Backend);
 
-    int packageCount = d->packages.size();
-
-    return packageCount;
+    return d->packages.size();
 }
 
 int Backend::packageCount(const Package::States &states) const
