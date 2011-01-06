@@ -90,17 +90,8 @@ bool Cache::open()
         return false;
     }
 
-    if (_error->PendingError()) {
-        return false;
-    }
-
     d->depCache = *d->cache;
-
     d->trustCache->clear();
-
-    if (d->depCache->DelCount() != 0 || d->depCache->InstCount() != 0) {
-         return false;
-     }
 
     return true;
 }
