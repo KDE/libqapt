@@ -512,16 +512,18 @@ QString Package::controlField(const QLatin1String &name) const
     pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
     const char *start, *stop;
     rec.GetRec(start, stop);
+
+    pkgTagSection sec;
     QString record(start);
 
-    QStringList lines = record.split(QLatin1Char('\n'));
-
-    Q_FOREACH (const QString &line, lines) {
-        if (line.startsWith(name)) {
-            field = line.split(QLatin1String(": ")).at(1);
-            break;
-        }
+    if(!sec.Scan(start, stop-start+1)) {
+        return field;
     }
+
+    field = QString::fromStdString(sec.FindS(name.latin1()));
+
+    // Can replace the above with this if my APT patch gets accepted
+    // field = QString::fromStdString(rec.RecordField(name.latin1()));
 
     return field;
 }
