@@ -514,7 +514,6 @@ QString Package::controlField(const QLatin1String &name) const
     rec.GetRec(start, stop);
 
     pkgTagSection sec;
-    QString record(start);
 
     if(!sec.Scan(start, stop-start+1)) {
         return field;
