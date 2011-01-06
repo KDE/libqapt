@@ -180,8 +180,6 @@ void Backend::reloadCache()
     // Populate internal package cache
     int count = 0;
     QSet<Group> groupSet;
-    QStringList originList;
-    QStringList originLabelList;
 
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); !iter.end(); ++iter) {
