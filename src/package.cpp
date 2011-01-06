@@ -388,10 +388,6 @@ QString Package::component() const
     const pkgCache::VerIterator &Ver = State.CandidateVerIter(*d->depCache);
     const pkgCache::PkgFileIterator &File = Ver.FileList().File();
 
-    if(!File.Component()) {
-        return QString();
-    }
-
     return QLatin1String(File.Component());
 }
 
