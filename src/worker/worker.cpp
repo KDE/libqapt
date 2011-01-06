@@ -221,11 +221,6 @@ void QAptWorker::cancelDownload()
 
 void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
-        emit errorOccurred(QApt::AuthError, QVariantMap());
-        return;
-    }
-
     if (!initializeApt()) {
         emit workerFinished(false);
         return;
@@ -413,6 +408,11 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             emit workerFinished(false);
             return;
         }
+    }
+
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
+        emit errorOccurred(QApt::AuthError, QVariantMap());
+        return;
     }
 
     emit workerEvent(QApt::PackageDownloadStarted);
