@@ -325,11 +325,11 @@ QString Package::availableVersion() const
 QString Package::priority() const
 {
     const pkgCache::VerIterator &ver = (*d->depCache).GetCandidateVer(*d->packageIter);
-    if (!ver) {
-        return QLatin1String(ver.PriorityType());
-    } else {
-        return QString();
+    if (!ver.end()) {
+        QLatin1String(ver.PriorityType());
     }
+
+    return QString();
 }
 
 QStringList Package::installedFilesList() const
