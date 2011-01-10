@@ -412,6 +412,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
         emit errorOccurred(QApt::AuthError, QVariantMap());
+        emit workerFinished(false);
         return;
     }
 
