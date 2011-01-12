@@ -489,10 +489,17 @@ QString Package::supportedUntil() const
     }
 
     QString supportTimeString = controlField(QLatin1String("Supported"));
-    supportTimeString.chop(1); // Remove the letter signifying months
-    const int supportTime = supportTimeString.toInt(); // months
+    QChar unit = supportTimeString.at(supportTimeString.length() - 1);
+    supportTimeString.chop(1); // Remove the letter signifying months/years
+    const int supportTime = supportTimeString.toInt();
 
-    QDateTime supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
+    QDateTime supportEnd;
+
+    if (unit == 'm') {
+        supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
+    } else if (unit == 'y') {
+        supportEnd = QDateTime::fromTime_t(releaseDate).addYears(supportTime);
+    }
 
     return supportEnd.toString(QLatin1String("MMMM yyyy"));
 }
