@@ -269,6 +269,8 @@ public:
     * Another usecase is the GStreamer metadata fields for GStreamer packages,
     * which are used to give information on what mimetypes/GStreamer version
     * the package supports.
+    *
+    * @since 1.1
     */
     QString controlField(const QLatin1String &name) const;
 
