@@ -17,12 +17,13 @@
 //  Boston, MA 02111-1307, USA.
 //
 
-#ifndef GST_MATCHER_H
-#define GST_MATCHER_H
+#ifndef GSTMATCHER_H
+#define GSTMATCHER_H
+
+#include <QtCore/QVector>
 
 #include <glib.h>
 
-#include <vector>
 #include <string>
 
 using namespace std;
@@ -49,7 +50,7 @@ public:
     bool hasMatches() const;
 
 private:
-    vector<Match> m_matches;
+    QVector<Match> m_matches;
 };
 
 #endif

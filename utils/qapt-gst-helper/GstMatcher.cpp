@@ -99,7 +99,7 @@ GstMatcher::GstMatcher(gchar **values)
             values.opt     = opt;
             values.caps    = caps;
 
-            m_matches.push_back(values);
+            m_matches.append(values);
         } else {
             g_debug("Did not match: %s", value);
         }
@@ -111,14 +111,14 @@ GstMatcher::~GstMatcher()
 {
     gst_deinit();
 
-    for (vector<Match>::iterator i = m_matches.begin(); i != m_matches.end(); ++i) {
+    for (QVector<Match>::iterator i = m_matches.begin(); i != m_matches.end(); ++i) {
         gst_caps_unref(static_cast<GstCaps*>(i->caps));
     }
 }
 
 bool GstMatcher::matches(QApt::Package *package)
 {
-    for (vector<Match>::iterator i = m_matches.begin(); i != m_matches.end(); ++i) {
+    for (QVector<Match>::iterator i = m_matches.begin(); i != m_matches.end(); ++i) {
             // Tries to find "Gstreamer-version: xxx"
             if (package->controlField("Gstreamer-Version") == QString::fromStdString(i->version)) {
                 QString typeData = package->controlField(QString::fromStdString(i->type));
@@ -147,6 +147,6 @@ bool GstMatcher::matches(QApt::Package *package)
 
 bool GstMatcher::hasMatches() const
 {
-    return !m_matches.empty();
+    return !m_matches.isEmpty();
 }
 
