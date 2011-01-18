@@ -35,7 +35,6 @@
 
 #include "../../src/backend.h"
 
-#include "../qapt-batch/detailswidget.h"
 #include "PluginFinder.h"
 #include "PluginInfo.h"
 
@@ -61,6 +60,10 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
             this, SLOT(warningOccurred(QApt::WarningCode, QVariantMap)));
     connect(m_backend, SIGNAL(questionOccurred(QApt::WorkerQuestion, QVariantMap)),
             this, SLOT(questionOccurred(QApt::WorkerQuestion, QVariantMap)));
+    connect(m_backend, SIGNAL(downloadProgress(int, int, int)),
+            this, SLOT(updateDownloadProgress(int, int, int)));
+    connect(m_backend, SIGNAL(commitProgress(const QString&, int)),
+            this, SLOT(updateCommitProgress(const QString&, int)));
 
     foreach (const QString &plugin, gstDetails) {
         PluginInfo *pluginInfo = new PluginInfo(plugin);
@@ -68,8 +71,6 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
             m_searchList << pluginInfo;
         }
     }
-
-    qDebug() << m_searchList.size();
 
     if (m_winId) {
         KWindowSystem::setMainWindow(this, m_winId);
@@ -393,7 +394,7 @@ void PluginHelper::workerEvent(QApt::WorkerEvent code)
             connect(this, SIGNAL(cancelClicked()), m_backend, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Downloading"));
             setLabelText(i18nc("@info:status", "Downloading codecs"));
-            setButtons(KDialog::Cancel);
+            setButtons(KDialog::Cancel | KDialog::Details);
             setButtonFocus(KDialog::Cancel);
             break;
         case QApt::PackageDownloadFinished:
@@ -402,7 +403,6 @@ void PluginHelper::workerEvent(QApt::WorkerEvent code)
             break;
         case QApt::CommitChangesStarted:
             setWindowTitle(i18nc("@title:window", "Installing Codecs"));
-            //m_detailsWidget->hide();
             setButtons(KDialog::Cancel);
             setAllowCancel(false); //Committing changes is uninterruptable (safely, that is)
             break;
@@ -513,6 +513,27 @@ void PluginHelper::install()
     progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
     setAutoClose(false);
     show();
+}
+
+void PluginHelper::updateDownloadProgress(int percentage, int speed, int ETA)
+{
+    Q_UNUSED(speed);
+    Q_UNUSED(ETA);
+
+    if (percentage == 100) {
+        --percentage;
+    }
+
+    progressBar()->setValue(percentage);
+}
+
+void PluginHelper::updateCommitProgress(const QString& message, int percentage)
+{
+    if (percentage == 100) {
+        --percentage;
+    }
+    progressBar()->setValue(percentage);
+    setLabelText(message);
 }
 
 #include "PluginHelper.moc"

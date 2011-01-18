@@ -33,7 +33,6 @@ namespace QApt {
     class Backend;
 }
 
-class DetailsWidget;
 class PluginFinder;
 class PluginInfo;
 
@@ -65,7 +64,6 @@ private:
 
     QThread *m_finderThread;
     PluginFinder *m_finder;
-    DetailsWidget *m_detailsWidget;
 
 private Q_SLOTS:
     void canSearch();
@@ -81,6 +79,9 @@ private Q_SLOTS:
     void notFound();
     void incrementProgress();
     void install();
+
+    void updateDownloadProgress(int percentage, int speed, int ETA);
+    void updateCommitProgress(const QString& message, int percentage);
 
     virtual void reject();
 };
