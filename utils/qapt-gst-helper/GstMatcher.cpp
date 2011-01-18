@@ -75,10 +75,6 @@ GstMatcher::GstMatcher(gchar **values)
             } else if (type.compare("element") == 0) {
                 type = "Gstreamer-Elements";
             }
-//             cout << version << endl;
-//             cout << type << endl;
-//             cout << data << endl;
-//             cout << opt << endl;
 
             gchar *capsString;
             if (opt.empty()) {
@@ -128,7 +124,6 @@ bool GstMatcher::matches(QApt::Package *package)
                     GstCaps *caps;
                     caps = gst_caps_from_string(typeData.toStdString().c_str());
                     if (!caps) {
-                        qDebug() << "no caps";
                         continue;
                     }
 
