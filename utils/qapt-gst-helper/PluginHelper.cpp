@@ -394,8 +394,6 @@ void PluginHelper::workerEvent(QApt::WorkerEvent code)
             connect(this, SIGNAL(cancelClicked()), m_backend, SLOT(cancelDownload()));
             setWindowTitle(i18nc("@title:window", "Downloading"));
             setLabelText(i18nc("@info:status", "Downloading codecs"));
-            setButtons(KDialog::Cancel | KDialog::Details);
-            setButtonFocus(KDialog::Cancel);
             break;
         case QApt::PackageDownloadFinished:
             setAllowCancel(false);
