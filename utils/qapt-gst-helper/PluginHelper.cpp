@@ -69,6 +69,8 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
         }
     }
 
+    qDebug() << m_searchList.size();
+
     if (m_winId) {
         KWindowSystem::setMainWindow(this, m_winId);
     }
@@ -76,6 +78,14 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
 
 void PluginHelper::run()
 {
+    if (!m_searchList.size()) {
+        KMessageBox::error(this, i18nc("@info Error message", "No valid plugin "
+                                       "info was provided, so no plugins could "
+                                       "be found."),
+                           i18nc("@title:window", "Couldn't Find Plugins"));
+        exit(ERR_RANDOM_ERR);
+    }
+
     canSearch();
 
     setLabelText(i18nc("@info:progress", "Looking for plugins"));
@@ -85,8 +95,7 @@ void PluginHelper::run()
 
     if (!m_backend->init()) {
         // TODO: Report some sort of init error
-        qApp->exit(ERR_RANDOM_ERR);
-        return;
+        exit(ERR_RANDOM_ERR);
     }
 
     m_finder = new PluginFinder(0, m_backend);
