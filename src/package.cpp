@@ -495,9 +495,9 @@ QString Package::supportedUntil() const
 
     QDateTime supportEnd;
 
-    if (unit == 'm') {
+    if (unit == QLatin1Char('m')) {
         supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
-    } else if (unit == 'y') {
+    } else if (unit == QLatin1Char('y')) {
         supportEnd = QDateTime::fromTime_t(releaseDate).addYears(supportTime);
     }
 
