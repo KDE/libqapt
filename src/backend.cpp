@@ -48,12 +48,12 @@ namespace QApt {
 class BackendPrivate
 {
 public:
-    BackendPrivate() : cache(0), config(0), records(0), maxStackSize(20), state(InvalidEvent) {}
+    BackendPrivate() : state(InvalidEvent), cache(0), records(0), maxStackSize(20), config(0) {}
     ~BackendPrivate()
     {
         delete cache;
-        delete config;
         delete records;
+        delete config;
     }
     // Caches
     // The canonical list of all unique, non-virutal package objects
@@ -582,7 +582,7 @@ CacheState Backend::currentCacheState() const
     #if QT_VERSION >= 0x040700
     state.reserve(pkgSize);
     #endif
-    for (unsigned i = 0; i < pkgSize; ++i) {
+    for (int i = 0; i < pkgSize; ++i) {
         state.append(d->packages[i]->state());
     }
 
@@ -615,7 +615,7 @@ void Backend::restoreCacheState(const CacheState &state)
     pkgDepCache *deps = d->cache->depCache();
     pkgDepCache::ActionGroup group(*deps);
 
-    for (unsigned i = 0; i < d->packages.size(); ++i) {
+    for (int i = 0; i < d->packages.size(); ++i) {
         Package *pkg = d->packages[i];
         int flags = pkg->state();
         int oldflags = state[i];
@@ -785,6 +785,8 @@ void Backend::commitChanges()
 
 void Backend::packageChanged(Package *package)
 {
+    Q_UNUSED(package);
+
     emit packageChanged();
 }
 
@@ -801,7 +803,7 @@ bool Backend::saveInstalledPackagesList(const QString &path) const
     Q_D(const Backend);
 
     QString selectionDocument;
-    for (unsigned i = 0; i < d->packages.size(); ++i) {
+    for (int i = 0; i < d->packages.size(); ++i) {
 
         if (d->packages.at(i)->isInstalled()) {
             selectionDocument.append(d->packages[i]->name() %
@@ -821,7 +823,7 @@ bool Backend::saveSelections(const QString &path) const
     Q_D(const Backend);
 
     QString selectionDocument;
-    for (unsigned i = 0; i < d->packages.size(); ++i) {
+    for (int i = 0; i < d->packages.size(); ++i) {
         int flags = d->packages.at(i)->state();
 
         if (flags & Package::ToInstall) {
@@ -959,6 +961,8 @@ void Backend::workerFinished(bool result)
 {
     Q_D(Backend);
 
+    Q_UNUSED(result);
+
     d->state = InvalidEvent;
 
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
@@ -1017,6 +1021,8 @@ void Backend::emitWorkerQuestionOccurred(int question, const QVariantMap &detail
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
+    Q_UNUSED(name);
+
     if (oldOwner.isEmpty()) {
         return; // Don't care, just appearing
     }
