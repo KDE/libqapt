@@ -38,6 +38,8 @@ find_package(Automoc4 REQUIRED)
 find_package(PolkitQt-1 REQUIRED)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
+find_package(GLIB2)
+find_package(GStreamer)
 
 # Find the required Libaries
 include_directories(
@@ -182,6 +184,11 @@ if (KDE4_FOUND)
     #PO_SUBDIR
     #DOC_SUBDIR
 endif (KDE4_FOUND)
+
+macro_log_feature(GSTREAMER_FOUND "GStreamer" "GStreamer multimedia framework"
+                  "http://gstreamer.freedesktop.org" FALSE "" "Used to build an optional GStreamer plugin installer")
+
+macro_display_feature_log()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig

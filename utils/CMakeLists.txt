@@ -7,9 +7,6 @@ if (NOT KDE4_FOUND)
 endif (NOT KDE4_FOUND)
 include(FindPkgConfig REQUIRED)
 
-find_package(GLIB2)
-find_package(GStreamer)
-
 add_subdirectory(qapt-batch)
 
 if (GLIB2_FOUND)
