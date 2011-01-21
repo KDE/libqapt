@@ -1106,4 +1106,9 @@ bool Package::setVersion(const QString &version)
     return true;
 }
 
+void Package::setPinned(bool pin)
+{
+    pin ? d->state |= IsPinned : d->state &= ~IsPinned;
+}
+
 }

@@ -448,7 +448,15 @@ public:
     */
     bool setVersion(const QString & version);
 
-    // "//" == TODO
+   /**
+    * Set the package as pinned internally for display purposes.
+    *
+    * To actually pin a package use @c Backend::setPackagePinned
+    *
+    * @see Backend::setPackagePinned()
+    */
+    void setPinned(bool pin);
+
    /**
     * An enumerator for various states that a @c Package may hold. A package
     * may hold several states at once.
@@ -503,7 +511,9 @@ public:
         /// The package's install policy is broken
         InstallPolicyBroken = 1 << 23,
         /// The package is not installed
-        NotInstalled        = 1 << 24
+        NotInstalled        = 1 << 24,
+        /// The package has been pinned
+        IsPinned            = 1 << 25
     };
     Q_DECLARE_FLAGS(States, State);
 

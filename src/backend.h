@@ -635,6 +635,19 @@ public Q_SLOTS:
     bool loadSelections(const QString &path);
 
    /**
+    * Locks the package at either the current version if installed, or
+    * prevents automatic installation if not installed.
+    *
+    * The backend must be reloaded before the pinning will take effect
+    *
+    * @param package The package to control pinning for
+    * @param pin Whether to pin or unpin the package
+    *
+    * @return @c true on success, @c false on failure
+    */
+    bool setPackagePinned(QApt::Package *package, bool pin);
+
+   /**
     * Tells the QApt Worker to initiate a rebuild of the Xapian package search
     * index.
     *

@@ -23,6 +23,7 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QStringList>
+#include <QtCore/QTemporaryFile>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusServiceWatcher>
 
@@ -30,10 +31,12 @@
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
+#include <apt-pkg/fileutl.h>
 #include <apt-pkg/init.h>
 #include <apt-pkg/policy.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/strutl.h>
+#include <apt-pkg/tagfile.h>
 
 // Xapian includes
 #include <xapian.h>
@@ -100,6 +103,7 @@ public:
     Config *config;
 
     bool writeSelectionFile(const QString &file, const QString &path) const;
+    bool setPackagePinned(Package *package, bool pin);
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -222,6 +226,46 @@ void Backend::reloadCache()
 
     d->undoStack.clear();
     d->redoStack.clear();
+
+    // Determine which packages are pinned for display purposes
+    QString dir = QString::fromStdString(_config->FindDir("Dir::Etc"))
+                  % QLatin1String("preferences.d/");
+    QDir logDirectory(dir);
+    QStringList pinFiles = logDirectory.entryList(QDir::Files, QDir::Name);
+    pinFiles << QString::fromStdString(_config->FindDir("Dir::Etc")) %
+                QLatin1String("preferences");
+
+    Q_FOREACH (const QString &pinName, pinFiles) {
+        QString pinPath;
+
+        // Handle absolute paths
+        if (!pinName.startsWith(QLatin1Char('/'))) {
+            pinPath = dir % pinName;
+        } else {
+            pinPath = pinName;
+        }
+        QFile pinFile(pinPath);
+
+        if (!pinFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            continue;
+        }
+        FileFd Fd(pinFile.handle(), FileFd::ReadOnly);
+
+        pkgTagFile tagFile(&Fd);
+        if (_error->PendingError()) {
+            continue;
+        }
+
+        pkgTagSection tags;
+        while (tagFile.Step(tags)) {
+            QLatin1String name(tags.FindS("Package").c_str());
+            Package *pkg = package(name);
+            if (pkg) {
+                pkg->setPinned(true);
+                qDebug() << "Package is pinned";
+            }
+        }
+    }
 }
 
 void Backend::throwInitError()
@@ -933,6 +977,105 @@ bool Backend::loadSelections(const QString &path)
     Fix.Resolve(true);
 
     emit packageChanged();
+
+    return true;
+}
+
+bool Backend::setPackagePinned(Package *package, bool pin)
+{
+    Q_D(Backend);
+
+    QString dir = QString::fromStdString(_config->FindDir("Dir::Etc"))
+                  % QLatin1String("preferences.d/");
+    QString path = dir % package->latin1Name();
+    QString pinDocument;
+
+    if (pin) {
+        if (package->state() & Package::IsPinned) {
+            return true;
+        }
+
+        pinDocument = QLatin1Literal("Package: ") % package->latin1Name()
+                      % QLatin1Char('\n');
+
+        if (package->installedVersion().isEmpty()) {
+            pinDocument += QLatin1String("Pin: version  0.0\n");
+        } else {
+            pinDocument += QLatin1Literal("Pin: version ") % package->installedVersion()
+                           % QLatin1Char('\n');
+        }
+
+        // Make configurable?
+        pinDocument += QLatin1String("Pin-Priority: 1001\n\n");
+    } else {
+        QDir logDirectory(dir);
+        QStringList pinFiles = logDirectory.entryList(QDir::Files, QDir::Name);
+        pinFiles << QString::fromStdString(_config->FindDir("Dir::Etc")) %
+                    QLatin1String("preferences");
+
+        // Search all pin files, delete package stanza from file
+        Q_FOREACH (const QString &pinName, pinFiles) {
+            QString pinPath;
+            if (!pinName.startsWith(QLatin1Char('/'))) {
+                pinPath = dir % pinName;
+            } else {
+                pinPath = pinName;
+            }
+            QFile pinFile(pinPath);
+
+            // Open to get a file name
+            QTemporaryFile tempFile;
+            if (!tempFile.open()) {
+                return false;
+            }
+            tempFile.close();
+
+            QString tempFileName = tempFile.fileName();
+            FILE *out = fopen(tempFileName.toStdString().c_str(),"w");
+            if (!out) {
+                return false;
+            }
+
+            if (!pinFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                continue;
+            }
+            FileFd Fd(pinFile.handle(), FileFd::ReadOnly);
+
+            pkgTagFile tagFile(&Fd);
+            if (_error->PendingError()) {
+                return false;
+            }
+
+            pkgTagSection tags;
+            while (tagFile.Step(tags)) {
+                QString name = QLatin1String(tags.FindS("Package").c_str());
+
+                if (name.isEmpty()) {
+                    return false;
+                }
+
+                // Include all but the matching name in the new pinfile
+                if (name != package->latin1Name()) {
+                    TFRewriteData tfrd;
+                    tfrd.Tag = 0;
+                    tfrd.Rewrite = 0;
+                    tfrd.NewTag = 0;
+                    TFRewrite(out, tags, TFRewritePackageOrder, &tfrd);
+                    fprintf(out, "\n");
+                }
+            }
+
+            if (!tempFile.open()) {
+                return false;
+            }
+
+            pinDocument = tempFile.readAll();
+        }
+    }
+
+    if (!d->worker->writeFileToDisk(pinDocument, path)) {
+        return false;
+    }
 
     return true;
 }
