@@ -1,5 +1,3 @@
--Add @since to apidox of functions added in 1.1
--Add package pinning file writing support to QApt Worker
 -Make the direct output of the dpkg process available, so that advanced package managers can have a console GUI for power users
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/
