@@ -262,7 +262,6 @@ void Backend::reloadCache()
             Package *pkg = package(name);
             if (pkg) {
                 pkg->setPinned(true);
-                qDebug() << "Package is pinned";
             }
         }
     }
