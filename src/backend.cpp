@@ -48,7 +48,15 @@ namespace QApt {
 class BackendPrivate
 {
 public:
-    BackendPrivate() : state(InvalidEvent), cache(0), records(0), maxStackSize(20), config(0) {}
+    BackendPrivate()
+        : state(InvalidEvent)
+        , cache(0)
+        , records(0)
+        , maxStackSize(20)
+        , requestedWorker(false)
+        , config(0)
+    {
+    }
     ~BackendPrivate()
     {
         delete cache;
@@ -87,6 +95,8 @@ public:
     QDBusServiceWatcher *watcher;
     OrgKubuntuQaptworkerInterface *worker;
 
+    bool requestedWorker;
+
     Config *config;
 
     bool writeSelectionFile(const QString &file, const QString &path) const;
@@ -114,17 +124,13 @@ Backend::Backend()
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
 
-    connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
-            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
-    connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
-    connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
-    connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
-    connect(d->worker, SIGNAL(xapianUpdateProgress(int)), this, SIGNAL(xapianUpdateProgress(int)));
-
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
     d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
     d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker"));
+
+    connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
+            this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 }
 
 Backend::~Backend()
@@ -779,6 +785,7 @@ void Backend::commitChanges()
         }
     }
 
+    d->requestedWorker = true;
     d->worker->setLocale(QLatin1String(setlocale(LC_ALL, 0)));
     d->worker->commitChanges(packageList);
 }
@@ -794,6 +801,7 @@ void Backend::updateCache()
 {
     Q_D(Backend);
 
+    d->requestedWorker = true;
     d->worker->setLocale(QLatin1String(setlocale(LC_ALL, 0)));
     d->worker->updateCache();
 }
@@ -933,15 +941,13 @@ void Backend::updateXapianIndex()
 {
     Q_D(Backend);
 
+    d->requestedWorker = true;
     d->worker->updateXapianIndex();
 }
 
 void Backend::workerStarted()
 {
     Q_D(Backend);
-
-    connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-            this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
     connect(d->worker, SIGNAL(downloadProgress(int, int, int)),
             this, SIGNAL(downloadProgress(int, int, int)));
@@ -965,8 +971,8 @@ void Backend::workerFinished(bool result)
 
     d->state = InvalidEvent;
 
-    disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-               this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+    connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
+            this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
     disconnect(d->worker, SIGNAL(downloadProgress(int, int, int)),
                this, SIGNAL(downloadProgress(int, int, int)));
@@ -980,6 +986,8 @@ void Backend::workerFinished(bool result)
                this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
     disconnect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
                this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
+
+    d->requestedWorker = false;
 }
 
 void Backend::cancelDownload()
@@ -1021,13 +1029,23 @@ void Backend::emitWorkerQuestionOccurred(int question, const QVariantMap &detail
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
+    Q_D(Backend);
+
     Q_UNUSED(name);
 
     if (oldOwner.isEmpty()) {
-        return; // Don't care, just appearing
+        if (d->requestedWorker) {
+            connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
+                    this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+            connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
+            connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
+            connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
+            connect(d->worker, SIGNAL(xapianUpdateProgress(int)), this, SIGNAL(xapianUpdateProgress(int)));
+        }
+        return; // Don't care if newOwner is empty, just appearing
     }
 
-    if (newOwner.isEmpty()) {
+    if (newOwner.isEmpty() && d->requestedWorker) {
         // Ok, something got screwed. Report and flee
         emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
         workerFinished(false);
