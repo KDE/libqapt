@@ -465,6 +465,10 @@ QString Package::supportedUntil() const
     do {
         line = stream.readLine();
         QStringList split = line.split(QLatin1Char('='));
+        if (split.size() != 2) {
+            continue;
+        }
+
         if (split.at(0) == QLatin1String("DISTRIB_CODENAME")) {
             release = split.at(1);
         }
@@ -489,6 +493,10 @@ QString Package::supportedUntil() const
     }
 
     QString supportTimeString = controlField(QLatin1String("Supported"));
+    if (supportTimeString.isEmpty()) {
+        return QString();
+    }
+
     QChar unit = supportTimeString.at(supportTimeString.length() - 1);
     supportTimeString.chop(1); // Remove the letter signifying months/years
     const int supportTime = supportTimeString.toInt();
