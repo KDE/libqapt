@@ -1116,6 +1116,14 @@ void Backend::workerFinished(bool result)
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString, QString, QString)));
 
+    disconnect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
+               this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+    disconnect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
+    disconnect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
+    disconnect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
+    disconnect(d->worker, SIGNAL(xapianUpdateProgress(int)), this, SIGNAL(xapianUpdateProgress(int)));
+    // The above are disconnected here since we have no idea if the signals are meant for
+    // us without checking d->requestedWorker
     disconnect(d->worker, SIGNAL(downloadProgress(int, int, int)),
                this, SIGNAL(downloadProgress(int, int, int)));
     disconnect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
@@ -1187,7 +1195,8 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
         return; // Don't care if newOwner is empty, just appearing
     }
 
-    if (newOwner.isEmpty() && d->requestedWorker) {
+    // If it is quitting and we are doing something with the worker, something's up
+    if (newOwner.isEmpty() && (d->state != InvalidEvent)) {
         // Ok, something got screwed. Report and flee
         emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
         workerFinished(false);
