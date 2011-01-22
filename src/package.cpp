@@ -465,6 +465,10 @@ QString Package::supportedUntil() const
     do {
         line = stream.readLine();
         QStringList split = line.split(QLatin1Char('='));
+        if (split.size() != 2) {
+            continue;
+        }
+
         if (split.at(0) == QLatin1String("DISTRIB_CODENAME")) {
             release = split.at(1);
         }
