@@ -106,10 +106,11 @@ void PluginHelper::run()
             this, SLOT(notFound()));
 
     m_finderThread = new QThread(this);
-    m_finder->moveToThread(m_finderThread);
-    m_finderThread->start();
+    connect(m_finderThread, SIGNAL(started()), m_finder, SLOT(startSearch()));
 
-    m_finder->find(m_searchList);
+    m_finder->moveToThread(m_finderThread);
+    m_finder->setSearchList(m_searchList);
+    m_finderThread->start();
 }
 
 PluginHelper::~PluginHelper()
