@@ -22,7 +22,7 @@
 #define PLUGINFINDER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QStringList>
+#include <QtCore/QList>
 
 namespace QApt {
     class Backend;
@@ -41,11 +41,15 @@ public:
 private:
     QApt::Backend *m_backend;
     bool m_stop;
+    QList<PluginInfo *> m_searchList;
 
 public Q_SLOTS:
-    void find(const PluginInfo *info);
-    void find(const QList<PluginInfo *> &infos);
+    void startSearch();
+    void setSearchList(const QList<PluginInfo *> &list);
     void stop();
+
+private Q_SLOTS:
+    void find(const PluginInfo *pluginInfo);
 
 Q_SIGNALS:
     void foundCodec(QApt::Package *package);

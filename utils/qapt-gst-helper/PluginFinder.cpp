@@ -66,9 +66,14 @@ void PluginFinder::find(const PluginInfo *pluginInfo)
     emit notFound();
 }
 
-void PluginFinder::find(const QList<PluginInfo *> &infos)
+void PluginFinder::setSearchList(const QList<PluginInfo *> &list)
 {
-    foreach(PluginInfo *info, infos) {
+    m_searchList = list;
+}
+
+void PluginFinder::startSearch()
+{
+    foreach(PluginInfo *info, m_searchList) {
         find(info);
     }
 
