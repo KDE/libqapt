@@ -492,9 +492,12 @@ QString Package::supportedUntil() const
         return QString();
     }
 
-    QString supportTimeString = controlField(QLatin1String("Supported"));
-    if (supportTimeString.isEmpty()) {
-        return QString();
+    // Default to 18m in case the package has no "supported" field
+    QString supportTimeString = QLatin1String("18m");
+    QString supportTimeField = controlField(QLatin1String("Supported"));
+
+    if (!supportTimeString.isEmpty()) {
+        supportTimeString = supportTimeField;
     }
 
     QChar unit = supportTimeString.at(supportTimeString.length() - 1);
