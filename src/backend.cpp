@@ -779,7 +779,7 @@ void Backend::commitChanges()
         }
     }
 
-    d->worker->setLocale(QLatin1String(setlocale(LC_ALL, 0)));
+    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
     d->worker->commitChanges(packageList);
 }
 
@@ -792,7 +792,7 @@ void Backend::updateCache()
 {
     Q_D(Backend);
 
-    d->worker->setLocale(QLatin1String(setlocale(LC_ALL, 0)));
+    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
     d->worker->updateCache();
 }
 
