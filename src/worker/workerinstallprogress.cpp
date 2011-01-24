@@ -27,11 +27,12 @@
 
 #include <apt-pkg/error.h>
 
+#include <errno.h>
 #include <sys/statvfs.h>
 #include <sys/statfs.h>
 #include <sys/wait.h>
 #include <sys/fcntl.h>
-#include <errno.h>
+#include <pty.h>
 
 #include <iostream>
 #include <stdlib.h>
@@ -67,29 +68,19 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     }
 
     int readFromChildFD[2];
-    int writeToChildFD[2];
 
     //Initialize both pipes
-    if (pipe(readFromChildFD) < 0 || pipe(writeToChildFD) < 0) {
+    if (pipe(readFromChildFD) < 0) {
         return res;
     }
 
-    m_child_id = fork();
+    int pty_master;
+    m_child_id = forkpty(&pty_master, 0, 0, 0);
     if (m_child_id == -1) {
         return res;
     } else if (m_child_id == 0) {
-        close(0);
-
-        if (dup(writeToChildFD[0]) != 0) {
-            close(readFromChildFD[1]);
-            close(writeToChildFD[0]);
-            _exit(1);
-        }
-        close(writeToChildFD[0]);
-
-        // close pipes we don't need
+        // close pipe we don't need
         close(readFromChildFD[0]);
-        close(writeToChildFD[1]);
 
         res = pm->DoInstallPostFork(readFromChildFD[1]);
 
@@ -107,13 +98,12 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     // Check if the child died
     int ret;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
-        updateInterface(readFromChildFD[0], writeToChildFD[1]);
+        updateInterface(readFromChildFD[0], pty_master);
     }
 
     close(readFromChildFD[0]);
     close(readFromChildFD[1]);
-    close(writeToChildFD[0]);
-    close(writeToChildFD[1]);
+    close(pty_master);
 
     return res;
 }
