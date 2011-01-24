@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2004 Canonical                                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -84,19 +85,18 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
             close(writeToChildFD[0]);
             _exit(1);
         }
+        close(writeToChildFD[0]);
 
-        // close Forked stdout and the read end of the pipe
-        close(1);
+        // close pipes we don't need
+        close(readFromChildFD[0]);
+        close(writeToChildFD[1]);
 
         res = pm->DoInstallPostFork(readFromChildFD[1]);
 
         // dump errors into cerr (pass it to the parent process)
         _error->DumpErrors();
 
-        close(readFromChildFD[0]);
-        close(writeToChildFD[1]);
         close(readFromChildFD[1]);
-        close(writeToChildFD[0]);
 
         _exit(res);
     }
