@@ -216,8 +216,7 @@ QString Package::longDescription() const
         // Split at double newline, by "section"
         QStringList sections = rawDescription.split(QLatin1String("\n ."));
 
-        int i;
-        for (i = 0; i < sections.count(); ++i) {
+        for (int i = 0; i < sections.count(); ++i) {
             sections[i].replace(QRegExp(QLatin1String("\n( |\t)+(-|\\*)")),
                                 QLatin1Literal("\n\r ") % QString::fromUtf8("\xE2\x80\xA2"));
             // There should be no new lines within a section.
