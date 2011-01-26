@@ -104,13 +104,12 @@ QString PackagePrivate::getReleaseFileForOrigin(const QLatin1String &label, cons
         for(I=list->begin(); I != list->end(); ++I) {
             vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
             if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
-                string stduri = _config->FindDir("Dir::State::lists");
-                stduri += URItoFileName((*I)->GetURI());
-                stduri += "dists_";
-                stduri += (*I)->GetDist();
-                stduri += "_Release";
+                QString uri = QString::fromStdString(_config->FindDir("Dir::State::lists"))
+                % QString::fromStdString(URItoFileName((*I)->GetURI()))
+                % QLatin1Literal("dists_")
+                % QString::fromStdString((*I)->GetDist())
+                % QLatin1Literal("_Release");
 
-                QString uri = QLatin1String(stduri.c_str());
                 return uri;
             }
         }
