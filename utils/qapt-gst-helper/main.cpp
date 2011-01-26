@@ -25,6 +25,8 @@
 #include <KCmdLineArgs>
 #include <KLocale>
 
+#include <QGst/Init>
+
 static const char description[] =
     I18N_NOOP2("@info", "A GStreamer codec installer using QApt");
 
@@ -44,6 +46,7 @@ int main(int argc, char **argv)
     KCmdLineArgs::addCmdLineOptions(options);
 
     KApplication app;
+    QGst::init(&argc, &argv);
 
     // do not restore!
     if (app.isSessionRestored()) {

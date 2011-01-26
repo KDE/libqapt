@@ -60,7 +60,6 @@ void PluginInfo::parseDetails(const QString &gstDetails)
 
     gchar **split = NULL;
     gchar **ss = NULL;
-    GstStructure *s;
     gchar *caps = NULL;
 
     split = g_strsplit (gstDetails.toStdString().c_str(), "|", -1);
@@ -74,30 +73,27 @@ void PluginInfo::parseDetails(const QString &gstDetails)
     }
 
     /* split */
-    gst_init(NULL, NULL);
     ss = g_strsplit (split[4], "-", 2);
     m_typeName = g_strdup (ss[0]);
     caps = g_strdup (ss[1]);
 
-    s = gst_structure_from_string (caps, NULL);
-    if (s == NULL) {
-        g_message ("Failed to parse caps: %s", caps);
+    m_structure = QGst::Structure::fromString(caps);
+    if (!m_structure.isValid()) {
+        qDebug() << "Failed to parse caps: " << caps;
         goto out;
     }
 
     /* remove fields that are almost always just MIN-MAX of some sort
      * in order to make the caps look less messy */
-    gst_structure_remove_field (s, "pixel-aspect-ratio");
-    gst_structure_remove_field (s, "framerate");
-    gst_structure_remove_field (s, "channels");
-    gst_structure_remove_field (s, "width");
-    gst_structure_remove_field (s, "height");
-    gst_structure_remove_field (s, "rate");
-    gst_structure_remove_field (s, "depth");
-    gst_structure_remove_field (s, "clock-rate");
-    gst_structure_remove_field (s, "bitrate");
-
-    m_structure = s;
+    m_structure.removeField("pixel-aspect-ratio");
+    m_structure.removeField("framerate");
+    m_structure.removeField("channels");
+    m_structure.removeField("width");
+    m_structure.removeField("height");
+    m_structure.removeField("rate");
+    m_structure.removeField("depth");
+    m_structure.removeField("clock-rate");
+    m_structure.removeField("bitrate");
 
 out:
     g_free (caps);
@@ -143,8 +139,8 @@ QString PluginInfo::typeName() const
 QString PluginInfo::searchString() const
 {
     QString searchString = QLatin1Literal("gstreamer") % m_version % '(';
-    if (m_structure) {
-        searchString.append(m_typeName % '-' % gst_structure_get_name(m_structure) % ')');
+    if (m_structure.isValid()) {
+        searchString.append(m_typeName % '-' % m_structure.name() % ')');
     } else {
         searchString.append(m_capsInfo % ')');
     }

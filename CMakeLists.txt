@@ -39,7 +39,7 @@ find_package(PolkitQt-1 REQUIRED)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
 find_package(GLIB2)
-find_package(GStreamer)
+find_package(QtGStreamer)
 
 # Find the required Libaries
 include_directories(
@@ -185,7 +185,7 @@ if (KDE4_FOUND)
     #DOC_SUBDIR
 endif (KDE4_FOUND)
 
-macro_log_feature(GSTREAMER_FOUND "GStreamer" "GStreamer multimedia framework"
+macro_log_feature(QTGSTREAMER_FOUND "QtGStreamer" "Qt wrapper around the GStreamer multimedia framework"
                   "http://gstreamer.freedesktop.org" FALSE "" "Used to build an optional GStreamer plugin installer")
 
 macro_display_feature_log()

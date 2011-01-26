@@ -23,7 +23,7 @@
 
 #include <QtCore/QString>
 
-#include <gst/gst.h>
+#include <QGst/Structure>
 
 class PluginInfo
 {
@@ -54,7 +54,7 @@ private:
     QString m_name;
     QString m_typeName;
     QString m_capsInfo;
-    GstStructure *m_structure;
+    QGst::Structure m_structure;
     int m_pluginType;
     QString m_data;
 

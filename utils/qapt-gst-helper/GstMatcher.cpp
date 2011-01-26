@@ -18,8 +18,9 @@
 
 #include "GstMatcher.h"
 
+#include <QStringBuilder>
+
 #include <regex.h>
-#include <gst/gst.h>
 #include <iostream>
 #include <QDebug>
 
@@ -27,8 +28,6 @@
 
 GstMatcher::GstMatcher(gchar **values)
 {
-    gst_init(NULL, NULL);
-
     // The search term from PackageKit daemon:
     // gstreamer0.10(urisource-foobar)
     // gstreamer0.10(decoder-audio/x-wma)(wmaversion=3)
@@ -76,16 +75,16 @@ GstMatcher::GstMatcher(gchar **values)
                 type = "Gstreamer-Elements";
             }
 
-            gchar *capsString;
+            QString capsString;
             if (opt.empty()) {
-                capsString = g_strdup_printf("%s", data.c_str());
+                capsString = QLatin1String(data.c_str());
             } else {
-                capsString = g_strdup_printf("%s, %s", data.c_str(), opt.c_str());
+                capsString = QLatin1String(data.c_str()) % QLatin1Literal(", ")
+                             % QLatin1String(opt.c_str());
             }
-            GstCaps *caps = gst_caps_from_string(capsString);
-            g_free(capsString);
 
-            if (!caps) {
+            QGst::CapsPtr caps = QGst::Caps::fromString(capsString);
+            if (caps->isEmpty()) {
                 continue;
             }
 
@@ -105,11 +104,6 @@ GstMatcher::GstMatcher(gchar **values)
 
 GstMatcher::~GstMatcher()
 {
-    gst_deinit();
-
-    for (QVector<Match>::iterator i = m_matches.begin(); i != m_matches.end(); ++i) {
-        gst_caps_unref(static_cast<GstCaps*>(i->caps));
-    }
 }
 
 bool GstMatcher::matches(QApt::Package *package)
@@ -121,19 +115,13 @@ bool GstMatcher::matches(QApt::Package *package)
                 // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
                 if (!typeData.isEmpty()) {
 
-                    GstCaps *caps;
-                    caps = gst_caps_from_string(typeData.toStdString().c_str());
-                    if (!caps) {
+                    QGst::CapsPtr caps = QGst::Caps::fromString(typeData);
+                    if (caps->isEmpty()) {
                         continue;
                     }
 
                     // if the record is capable of intersect them we found the package
-                    bool provides = gst_caps_can_intersect(static_cast<GstCaps*>(i->caps), caps);
-                    gst_caps_unref(caps);
-
-                    if (provides) {
-                        return true;
-                    }
+                    return (i->caps)->canIntersect(caps);;
                 }
             }
         }

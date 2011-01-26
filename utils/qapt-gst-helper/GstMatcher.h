@@ -22,6 +22,8 @@
 
 #include <QtCore/QVector>
 
+#include <QGst/Caps>
+
 #include <glib.h>
 
 #include <string>
@@ -37,7 +39,7 @@ typedef struct {
     string   type;
     string   data;
     string   opt;
-    void    *caps;
+    QGst::CapsPtr    caps;
 } Match;
 
 class GstMatcher

@@ -7,7 +7,7 @@ set(qapt-gst-helper_SRCS
 
 include_directories(${KDE4_INCLUDES}
                     ${QT_INCLUDES}
-                    ${GSTREAMER_INCLUDE_DIR}
+                    ${QTGSTREAMER_INCLUDE_DIR}
                     ${GLIB2_INCLUDE_DIR}
                     /usr/include/libxml2/)
 
@@ -16,7 +16,7 @@ kde4_add_executable(qapt-gst-helper ${qapt-gst-helper_SRCS})
 target_link_libraries(qapt-gst-helper
                       ${KDE4_KDEUI_LIBS}
                       ${GLIB2_LIBRARIES}
-                      ${GSTREAMER_LIBRARIES}
+                      ${QTGSTREAMER_LIBRARY}
                       qapt)
 
 install(TARGETS qapt-gst-helper DESTINATION ${LIBEXEC_INSTALL_DIR})
