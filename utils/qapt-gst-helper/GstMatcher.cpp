@@ -1,32 +1,35 @@
-//
-//  Copyright (C) 2010 Daniel Nicoletti <dantti85-pk@yahoo.com.br>
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; see the file COPYING.  If not, write to
-//  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-//  Boston, MA 02111-1307, USA.
+/***************************************************************************
+ *   Copyright © 2010 Daniel Nicoletti <dantti85-pk@yahoo.com.br>          *
+ *   Copyright © 2011 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or         *
+ *   modify it under the terms of the GNU General Public License as        *
+ *   published by the Free Software Foundation; either version 2 of        *
+ *   the License or (at your option) version 3 or any later version        *
+ *   accepted by the membership of KDE e.V. (or its successor approved     *
+ *   by the membership of KDE e.V.), which shall act as a proxy            *
+ *   defined in Section 14 of version 3 of the license.                    *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
+ ***************************************************************************/
 
 #include "GstMatcher.h"
 
 #include <QStringBuilder>
 
+#include <KDebug>
+
 #include <regex.h>
-#include <iostream>
-#include <QDebug>
 
 #include <../../src/package.h>
 
-GstMatcher::GstMatcher(gchar **values)
+GstMatcher::GstMatcher(const QStringList &values)
 {
     // The search term from PackageKit daemon:
     // gstreamer0.10(urisource-foobar)
@@ -40,27 +43,26 @@ GstMatcher::GstMatcher(gchar **values)
         return;
     }
 
-    gchar *value;
-    for (uint i = 0; i < g_strv_length(values); i++) {
-        value = values[i];
+    for (int i = 0; i < values.size(); i++) {
+        string value = values.at(i).toStdString();
         regmatch_t matches[5];
-        if (regexec(&pkre, value, 5, matches, 0) == 0) {
+        if (regexec(&pkre, value.c_str(), 5, matches, 0) == 0) {
             Match values;
             string version, type, data, opt;
 
             // Appends the version
-            version = string(value, matches[1].rm_so, matches[1].rm_eo - matches[1].rm_so);
+            version = string(value.c_str(), matches[1].rm_so, matches[1].rm_eo - matches[1].rm_so);
 
             // type (encode|decoder...)
-            type = string(value, matches[2].rm_so, matches[2].rm_eo - matches[2].rm_so);
+            type = string(value.c_str(), matches[2].rm_so, matches[2].rm_eo - matches[2].rm_so);
 
             // data "audio/x-wma"
-            data = string(value, matches[3].rm_so, matches[3].rm_eo - matches[3].rm_so);
+            data = string(value.c_str(), matches[3].rm_so, matches[3].rm_eo - matches[3].rm_so);
 
             // opt "wmaversion=3"
             if (matches[4].rm_so != -1) {
                 // remove the '(' ')' that the regex matched
-                opt = string(value, matches[4].rm_so + 1, matches[4].rm_eo - matches[4].rm_so - 2);
+                opt = string(value.c_str(), matches[4].rm_so + 1, matches[4].rm_eo - matches[4].rm_so - 2);
             }
 
             if (type.compare("encoder") == 0) {
@@ -96,7 +98,7 @@ GstMatcher::GstMatcher(gchar **values)
 
             m_matches.append(values);
         } else {
-            g_debug("Did not match: %s", value);
+            kDebug() << "Did not match: ";
         }
     }
     regfree(&pkre);
@@ -121,7 +123,7 @@ bool GstMatcher::matches(QApt::Package *package)
                     }
 
                     // if the record is capable of intersect them we found the package
-                    return (i->caps)->canIntersect(caps);;
+                    return (i->caps)->canIntersect(caps);
                 }
             }
         }

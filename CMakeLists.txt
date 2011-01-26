@@ -38,7 +38,6 @@ find_package(Automoc4 REQUIRED)
 find_package(PolkitQt-1 REQUIRED)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
-find_package(GLIB2)
 find_package(QtGStreamer)
 
 # Find the required Libaries

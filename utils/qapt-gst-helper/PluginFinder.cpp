@@ -44,10 +44,9 @@ void PluginFinder::find(const PluginInfo *pluginInfo)
         return;
     }
 
-    gchar *details[2];
-    QByteArray missingCodec = pluginInfo->searchString().toLocal8Bit();
-    details[0] = missingCodec.data();
-    details[1] = NULL;
+    QStringList details;
+    details << pluginInfo->searchString();
+    details << QString();
 
     GstMatcher matcher(details);
 

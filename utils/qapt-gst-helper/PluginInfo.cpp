@@ -140,6 +140,7 @@ QString PluginInfo::searchString() const
         searchString.append(m_capsInfo % ')');
     }
 
+    kDebug() << searchString;
     return searchString;
 }
 
