@@ -22,9 +22,8 @@
 
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
-#include <QDebug>
 
-#include <glib-object.h>
+#include <KDebug>
 
 PluginInfo::PluginInfo(const QString &gstDetails)
           : m_pluginType(InvalidType)
@@ -52,35 +51,36 @@ void PluginInfo::parseDetails(const QString &gstDetails)
     m_name = parts.at(3);
     m_capsInfo = parts.at(4);
 
-    if (m_capsInfo.contains("encoder")) {
+    QStringList ss;
+
+    if (m_capsInfo.startsWith("uri")) {
+        // Split URI
+        ss = parts.at(4).split(QLatin1Char(' '));
+
+        if (!ss.isEmpty()) {
+            m_typeName =  parts.at(0);
+        } else {
+            m_isValid = false;
+        }
+        return;
+    }
+
+    // Everything up to the first '-' is the typeName
+    m_typeName = parts.at(4).section('-', 0, 0);
+    QString caps = parts.at(4);
+    caps.remove(m_typeName % '-');
+
+    if (m_typeName == "encoder") {
         m_pluginType = Encoder;
-    } else if (m_capsInfo.contains("decoder")) {
+    } else if (m_typeName == "decoder") {
         m_pluginType = Decoder;
     }
 
-    gchar **split = NULL;
-    gchar **ss = NULL;
-    gchar *caps = NULL;
-
-    split = g_strsplit (gstDetails.toStdString().c_str(), "|", -1);
-
-    if (m_capsInfo.startsWith("uri")) {
-        /* split uri */
-        ss = g_strsplit (split[4], " ", 2);
-
-        m_typeName = g_strdup(ss[0]);
-        goto out;
-    }
-
-    /* split */
-    ss = g_strsplit (split[4], "-", 2);
-    m_typeName = g_strdup (ss[0]);
-    caps = g_strdup (ss[1]);
-
-    m_structure = QGst::Structure::fromString(caps);
+    m_structure = QGst::Structure::fromString(caps.toStdString().c_str());
     if (!m_structure.isValid()) {
-        qDebug() << "Failed to parse caps: " << caps;
-        goto out;
+        kDebug() << "Failed to parse caps: " << caps;
+        m_isValid = false;
+        return;
     }
 
     /* remove fields that are almost always just MIN-MAX of some sort
@@ -94,11 +94,6 @@ void PluginInfo::parseDetails(const QString &gstDetails)
     m_structure.removeField("depth");
     m_structure.removeField("clock-rate");
     m_structure.removeField("bitrate");
-
-out:
-    g_free (caps);
-    g_strfreev (ss);
-    g_strfreev (split);
 }
 
 QString PluginInfo::version() const
