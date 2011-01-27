@@ -44,6 +44,7 @@
 
 #include "backend.h"
 #include "cache.h"
+#include "config.h"
 
 namespace QApt {
 
@@ -467,22 +468,17 @@ QString Package::component() const
 
 QUrl Package::changelogUrl() const
 {
-    QString prefix;
-    const QString srcPackage = sourcePackage();
-    QString sourceSection = section();
+    QUrl url;
 
-    if (sourceSection.contains(QLatin1Char('/'))) {
-        QStringList split = sourceSection.split(QLatin1Char('/'));
-        sourceSection = split.at(0);
-    } else {
-        sourceSection = QLatin1String("main");
+    const pkgCache::VerIterator &ver = (*d->depCache).GetCandidateVer(*d->packageIter);
+    if (ver.end()) {
+        return url;
     }
 
-    if (srcPackage.size() > 3 && srcPackage.startsWith(QLatin1String("lib"))) {
-        prefix = QLatin1Literal("lib") % srcPackage[3];
-    } else {
-        prefix = srcPackage[0];
-    }
+    pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
+
+    QString path = QLatin1String(rec.FileName().c_str());
+    path = path.left(path.lastIndexOf(QLatin1Char('/')) + 1);
 
     QString versionString;
     if (!availableVersion().isEmpty()) {
@@ -495,10 +491,15 @@ QUrl Package::changelogUrl() const
         versionString = epochVersion[1];
     }
 
-    QString urlBase = QLatin1String("http://changelogs.ubuntu.com/changelogs/pool/");
-    QUrl url = QUrl(urlBase % sourceSection % QLatin1Char('/') % prefix % QLatin1Char('/') %
-                    srcPackage % QLatin1Char('/') % srcPackage % QLatin1Char('_') % versionString % '/'
-                    % QLatin1Literal("changelog"));
+    path += sourcePackage() % QLatin1Char('_') % versionString % QLatin1Char('/');
+
+    Config *config = d->backend->config();
+    QString server = config->readEntry(QLatin1String("Apt::Changelogs::Server"),
+                                       QLatin1String("http://changelogs.ubuntu.com/changelogs"));
+
+    url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog"));
+
+    qDebug() << QString(server % path % QLatin1Literal("changelog"));
 
     return url;
 }
