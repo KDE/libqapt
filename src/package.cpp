@@ -981,6 +981,7 @@ bool Package::isTrusted() const
 
     pkgSourceList *Sources = d->backend->packageSourceList();
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache = d->backend->cache()->trustCache();
+
     for (pkgCache::VerFileIterator i = Ver.FileList(); !i.end(); ++i)
     {
         pkgIndexFile *Index;
