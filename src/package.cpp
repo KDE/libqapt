@@ -425,8 +425,6 @@ QUrl Package::changelogUrl() const
 
     url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog"));
 
-    qDebug() << QString(server % path % QLatin1Literal("changelog"));
-
     return url;
 }
 
