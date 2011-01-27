@@ -50,15 +50,27 @@ namespace QApt {
 class PackagePrivate
 {
     public:
-        ~PackagePrivate() { delete packageIter; };
+        PackagePrivate()
+            : state(0)
+            , staticStateCalculated(false)
+        {
+        }
+        ~PackagePrivate()
+        {
+            delete packageIter;
+        };
         QApt::Backend *backend;
         pkgDepCache *depCache;
         pkgRecords *records;
         pkgCache::PkgIterator *packageIter;
         int state;
+        bool staticStateCalculated;
 
         pkgCache::PkgFileIterator searchPkgFileIter(const QLatin1String &label, const QString &release) const;
         QString getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const;
+
+        // Calculate state flags that cannot change
+        void initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache);
 };
 
 pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QLatin1String &label, const QString &release) const
@@ -116,6 +128,70 @@ QString PackagePrivate::getReleaseFileForOrigin(const QLatin1String &label, cons
     }
 
     return QString();
+}
+
+void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache)
+{
+    int packageState = 0;
+
+    if (!ver.end()) {
+        packageState |= QApt::Package::Installed;
+
+        if (stateCache.CandidateVer && stateCache.Upgradable()) {
+            packageState |= QApt::Package::Upgradeable;
+            if (stateCache.Keep()) {
+                packageState |= QApt::Package::Held;
+            }
+        }
+
+        if (stateCache.Downgrade()) {
+            packageState |= QApt::Package::ToDowngrade;
+        }
+    } else {
+        packageState |= QApt::Package::NotInstalled;
+    }
+    if (stateCache.NowBroken()) {
+        packageState |= QApt::Package::NowBroken;
+    }
+
+    if (stateCache.InstBroken()) {
+        packageState |= QApt::Package::InstallBroken;
+    }
+
+    if ((*packageIter)->Flags & (pkgCache::Flag::Important |
+                                 pkgCache::Flag::Essential)) {
+        packageState |= QApt::Package::IsImportant;
+    }
+
+    if ((*packageIter)->CurrentState == pkgCache::State::ConfigFiles) {
+        packageState |= QApt::Package::ResidualConfig;
+    }
+
+    if (!stateCache.CandidateVer) {
+        packageState |= QApt::Package::NotDownloadable;
+    } else if (!stateCache.CandidateVerIter(*depCache).Downloadable()) {
+        packageState |= QApt::Package::NotDownloadable;
+    }
+
+    if (stateCache.Flags & pkgCache::Flag::Auto) {
+        packageState |= QApt::Package::IsAuto;
+    }
+
+    if (stateCache.Garbage) {
+        packageState |= QApt::Package::IsGarbage;
+    }
+
+    if (stateCache.NowPolicyBroken()) {
+        packageState |= QApt::Package::NowPolicyBroken;
+    }
+
+    if (stateCache.InstPolicyBroken()) {
+        packageState |= QApt::Package::InstallPolicyBroken;
+    }
+
+    state |= packageState;
+
+    staticStateCalculated = true;
 }
 
 Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
@@ -578,8 +654,12 @@ int Package::state() const
 {
     int packageState = 0;
 
-    pkgDepCache::StateCache &stateCache = (*d->depCache)[*d->packageIter];
     const pkgCache::VerIterator &ver = d->packageIter->CurrentVer();
+    pkgDepCache::StateCache &stateCache = (*d->depCache)[*d->packageIter];
+
+    if (!d->staticStateCalculated) {
+        d->initStaticState(ver, stateCache);
+    }
 
     if (stateCache.Install()) {
         packageState |= ToInstall;
@@ -600,61 +680,6 @@ int Package::state() const
         }
     } else if (stateCache.Keep()) {
         packageState |= ToKeep;
-    }
-
-    if (!ver.end()) {
-        packageState |= Installed;
-
-        if (stateCache.CandidateVer != NULL && stateCache.Upgradable()) {
-            packageState |= Upgradeable;
-            if (stateCache.Keep()) {
-                packageState |= Held;
-            }
-      }
-
-        if (stateCache.Downgrade()) {
-            packageState |= ToDowngrade;
-        }
-    } else {
-        packageState |= NotInstalled;
-    }
-    if (stateCache.NowBroken()) {
-        packageState |= NowBroken;
-    }
-
-    if (stateCache.InstBroken()) {
-        packageState |= InstallBroken;
-    }
-
-    if ((*d->packageIter)->Flags & (pkgCache::Flag::Important |
-                              pkgCache::Flag::Essential)) {
-        packageState |= IsImportant;
-    }
-
-    if ((*d->packageIter)->CurrentState == pkgCache::State::ConfigFiles) {
-        packageState |= ResidualConfig;
-    }
-
-    if (!stateCache.CandidateVer) {
-        packageState |= NotDownloadable;
-    } else if (!stateCache.CandidateVerIter(*d->depCache).Downloadable()) {
-        packageState |= NotDownloadable;
-    }
-
-    if (stateCache.Flags & pkgCache::Flag::Auto) {
-        packageState |= IsAuto;
-    }
-
-    if (stateCache.Garbage) {
-        packageState |= IsGarbage;
-    }
-
-    if (stateCache.NowPolicyBroken()) {
-        packageState |= NowPolicyBroken;
-    }
-
-    if (stateCache.InstPolicyBroken()) {
-        packageState |= InstallPolicyBroken;
     }
 
    return packageState | d->state;
