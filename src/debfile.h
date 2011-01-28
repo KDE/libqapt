@@ -31,7 +31,7 @@ namespace QApt {
 class DebFilePrivate;
 
 /**
- * The DebFile class is an interface to obtain data from Debian package
+ * The DebFile class is an interface to obtain data from a Debian package
  * archive.
  *
  * @author Jonathan Thomas

@@ -108,7 +108,7 @@ QLatin1String DebFile::architecture() const
 
 QString DebFile::maintainer() const
 {
-    return QLatin1String(d->controlData.FindS("Maintainer").c_str());
+    return QString::fromStdString(d->controlData.FindS("Maintainer"));
 }
 
 QLatin1String DebFile::section() const
@@ -123,7 +123,7 @@ QLatin1String DebFile::priority() const
 
 QString DebFile::homepage() const
 {
-    return QLatin1String(d->controlData.FindS("Homepage").c_str());
+    return QString::fromStdString(d->controlData.FindS("Homepage"));
 }
 
 QString DebFile::longDescription() const
@@ -140,7 +140,7 @@ QString DebFile::shortDescription() const
 
 QString DebFile::controlField(const QLatin1String &field) const
 {
-    return QLatin1String(d->controlData.FindS(field.latin1()).c_str());
+    return QString::fromStdString(d->controlData.FindS(field.latin1()));
 }
 
 QString DebFile::controlField(const QString &field) const
