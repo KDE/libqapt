@@ -5,4 +5,5 @@ install( FILES
     Package
     Config
     History
+    DebFile
 DESTINATION include/LibQApt COMPONENT Devel)

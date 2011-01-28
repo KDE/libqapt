@@ -34,6 +34,8 @@
 #include <KStatusBar>
 #include <KVBox>
 
+#include <libqapt/debfile.h>
+
 #include <DebconfGui.h>
 
 #include "cacheupdatewidget.h"
