@@ -92,9 +92,9 @@ public:
 
     qint64 installedSize() const;
 
-    bool extractArchive(const QString &directory = QString());
+    bool extractArchive(const QString &directory = QString()) const;
 
-    bool extractFileFromArchive(const QString &fileName);
+    bool extractFileFromArchive(const QString &fileName) const;
 
 private:
     DebFilePrivate *const d;

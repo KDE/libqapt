@@ -158,7 +158,7 @@ qint64 DebFile::installedSize() const
     return sizeString.toLongLong();
 }
 
-bool DebFile::extractArchive(const QString &basePath)
+bool DebFile::extractArchive(const QString &basePath) const
 {
     // The deb extractor extracts to the working path.
     QString oldCurrent = QDir::currentPath();
@@ -181,7 +181,7 @@ bool DebFile::extractArchive(const QString &basePath)
     return res;
 }
 
-bool DebFile::extractFileFromArchive(const QString &fileName)
+bool DebFile::extractFileFromArchive(const QString &fileName) const
 {
     QProcess process;
 
