@@ -40,6 +40,7 @@ class DebFilePrivate
 
         ~DebFilePrivate()
         {
+            delete extractor;
         }
 
         bool isValid;
@@ -63,8 +64,6 @@ void DebFilePrivate::init()
     }
 
     controlData = extractor->Section;
-
-    qDebug() << QLatin1String(controlData.FindS("Architecture").c_str());
 }
 
 DebFile::DebFile(const QString &filePath)
