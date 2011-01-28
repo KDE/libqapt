@@ -20,6 +20,9 @@
 
 #include "debfile.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QProcess>
+
 #include <apt-pkg/debfile.h>
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/tagfile.h>
@@ -153,6 +156,36 @@ qint64 DebFile::installedSize() const
     QString sizeString = QLatin1String(d->controlData.FindS("Installed-Size").c_str());
 
     return sizeString.toLongLong();
+}
+
+bool DebFile::extractArchive(const QString &basePath)
+{
+    // The deb extractor extracts to the working path.
+    QString oldCurrent = QDir::currentPath();
+
+    if (!basePath.isEmpty()) {
+        QDir::setCurrent(basePath);
+    }
+
+    FileFd in(d->filePath.toStdString(), FileFd::ReadOnly);
+    debDebFile deb(in);
+
+    pkgDirStream stream;
+    bool res = deb.ExtractArchive(stream);
+
+    // Restore working path once we are done
+    if (!basePath.isEmpty()) {
+        QDir::setCurrent(oldCurrent);
+    }
+
+    return res;
+}
+
+bool DebFile::extractFileFromArchive(const QString &fileName)
+{
+    QProcess process;
+
+    return true;
 }
 
 }
