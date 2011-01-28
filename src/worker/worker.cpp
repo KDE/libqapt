@@ -45,7 +45,6 @@
 
 // Qt includes
 #include <QtCore/QFile>
-#include <QtCore/QProcess>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusMessage>
 
