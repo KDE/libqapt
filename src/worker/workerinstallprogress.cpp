@@ -76,6 +76,7 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
 
     int pty_master;
     m_child_id = forkpty(&pty_master, 0, 0, 0);
+
     if (m_child_id == -1) {
         return res;
     } else if (m_child_id == 0) {
