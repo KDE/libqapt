@@ -114,39 +114,15 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
     char buf[2];
     static char line[1024] = "";
 
-    char consoleBuf[2];
-    static char consoleLine[1024] = "";
-
     while (1) {
         int len = read(fd, buf, 1);
-        int consoleLen = read(writeFd, consoleBuf, 1);
-
-        // Console output; needs to happen every tick
-        if (consoleLen > 0) {
-            switch (consoleBuf[0]) {
-            default:
-                consoleBuf[1] = 0;
-                strcat(consoleLine, consoleBuf);
-                break;
-            case '\r':
-            case '\n':
-                QString consoleOutput = QString::fromUtf8(consoleLine);
-                consoleLine[0] = 0;
-
-                // Append the \r or \n
-                consoleOutput.append(consoleBuf[0]);
-
-                emit commitMessage(consoleOutput);
-                break;
-            }
-        }
 
         // Status message didn't change
         if (len < 1) {
             break;
         }
 
-        if (buf[0] == '\n') {
+        if (buf[0] == '\b') {
             const QStringList list = QString::fromUtf8(line).split(QLatin1Char(':'));
             const QString status = list.at(0);
             const QString package = list.at(1);

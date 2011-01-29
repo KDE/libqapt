@@ -457,9 +457,6 @@ Q_SIGNALS:
      */
     void commitProgress(const QString &status, int percentage);
 
-    //FIXME: apidox
-    void commitMessage(const QString &message);
-
    /**
     * Emits the progress of the Apt Xapian Indexer
     *

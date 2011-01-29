@@ -1103,8 +1103,6 @@ void Backend::workerStarted()
             this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
     connect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
             this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
-    connect(d->worker, SIGNAL(commitMessage(const QString &)),
-            this, SIGNAL(commitMessage(const QString &)));
 }
 
 void Backend::workerFinished(bool result)
@@ -1130,8 +1128,6 @@ void Backend::workerFinished(bool result)
                this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
     disconnect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
                this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
-    disconnect(d->worker, SIGNAL(commitMessage(const QString &)),
-               this, SIGNAL(commitMessage(const QString &)));
 }
 
 void Backend::cancelDownload()

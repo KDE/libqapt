@@ -59,7 +59,6 @@ signals:
     void workerQuestion(int questionCode, const QVariantMap &args);
     void commitProgress(QString status, int percentage);
     void commitError(int code, const QVariantMap &details);
-    void commitMessage(const QString &line);
 };
 
 #endif

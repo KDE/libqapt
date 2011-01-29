@@ -68,9 +68,6 @@
       <arg name="response" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
-    <signal name="commitMessage">
-      <arg name="message" type="s" direction="out"/>
-    </signal>
     <method name="updateXapianIndex">
     </method>
     <method name="writeFileToDisk">
