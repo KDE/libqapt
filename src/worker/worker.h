@@ -92,6 +92,7 @@ Q_SIGNALS:
     void questionOccurred(int questionCode, const QVariantMap& details);
     void answerReady(const QVariantMap& response);
     void xapianUpdateProgress(int percentage);
+    void commitMessage(const QString &message);
 };
 
 #endif

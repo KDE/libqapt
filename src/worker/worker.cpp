@@ -435,6 +435,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             this, SIGNAL(commitProgress(const QString&, int)));
     connect(installProgress, SIGNAL(workerQuestion(int, const QVariantMap&)),
             this, SIGNAL(questionOccurred(int, const QVariantMap&)));
+    connect(installProgress, SIGNAL(commitMessage(const QString &)),
+            this, SIGNAL(commitMessage(const QString &)));
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 

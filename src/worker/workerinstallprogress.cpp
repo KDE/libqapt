@@ -96,7 +96,7 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     // make it nonblocking
     fcntl(readFromChildFD[0], F_SETFL, O_NONBLOCK);
 
-    // Check if the child died
+    // Update the interface until the child dies
     int ret;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
         updateInterface(readFromChildFD[0], pty_master);
@@ -114,11 +114,34 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
     char buf[2];
     static char line[1024] = "";
 
-    while (1) {
-        // This algorithm should be improved (it's the same as the rpm one ;)
-        int len = read(fd, buf, 1);
+    char consoleBuf[2];
+    static char consoleLine[1024] = "";
 
-        // nothing was read
+    while (1) {
+        int len = read(fd, buf, 1);
+        int consoleLen = read(writeFd, consoleBuf, 1);
+
+        // Console output; needs to happen every tick
+        if (consoleLen > 0) {
+            switch (consoleBuf[0]) {
+            default:
+                consoleBuf[1] = 0;
+                strcat(consoleLine, consoleBuf);
+                break;
+            case '\r':
+            case '\n':
+                QString consoleOutput = QString::fromUtf8(consoleLine);
+                consoleLine[0] = 0;
+
+                // Append the \r or \n
+                consoleOutput.append(consoleBuf[0]);
+
+                emit commitMessage(consoleOutput);
+                break;
+            }
+        }
+
+        // Status message didn't change
         if (len < 1) {
             break;
         }
