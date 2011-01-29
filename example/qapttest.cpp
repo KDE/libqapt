@@ -20,6 +20,7 @@
 
 #include "qapttest.h"
 
+#include <QtCore/QDir>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
@@ -130,6 +131,12 @@ QAptTest::QAptTest()
 //     QApt::PackageList packageList = m_group->packages();
 //     foreach (QApt::Package *package, packageList) {
 //             kDebug() << package->name();
+//     }
+
+//     QApt::DebFile deb("/var/cache/apt/archives/upower_0.9.8-1build1_i386.deb");
+// 
+//     if (deb.isValid()) {
+//         kDebug() << deb.extractFileFromArchive("./usr/bin/upower", QDir::tempPath());
 //     }
 }
 

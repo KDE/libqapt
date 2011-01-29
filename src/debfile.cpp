@@ -22,6 +22,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
+#include <QtCore/QStringBuilder>
 #include <QtCore/QTemporaryFile>
 
 #include <apt-pkg/debfile.h>
@@ -211,11 +212,33 @@ bool DebFile::extractArchive(const QString &basePath) const
     return res;
 }
 
-bool DebFile::extractFileFromArchive(const QString &fileName) const
+bool DebFile::extractFileFromArchive(const QString &fileName, const QString &destination) const
 {
-    QProcess process;
+    QTemporaryFile tempFile;
+    if (!tempFile.open()) {
+        return false;
+    }
 
-    return true;
+    QString tempFileName = tempFile.fileName();
+
+    // dpkg --fsys-tarfile filename
+    QString program = QLatin1String("dpkg --fsys-tarfile ") + d->filePath;
+
+    QProcess dpkg;
+    dpkg.setStandardOutputFile(tempFileName);
+    dpkg.start(program);
+    dpkg.waitForFinished();
+
+    QString program2 = QLatin1Literal("tar -xf") % tempFileName %
+                       QLatin1Literal(" -C ") % destination % ' ' % fileName;
+
+    QProcess tar;
+    tar.start(program2);
+    tar.waitForFinished();
+
+    qDebug() << tar.readAllStandardError();
+
+    return !tar.exitCode();
 }
 
 }

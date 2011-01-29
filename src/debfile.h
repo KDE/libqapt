@@ -96,7 +96,7 @@ public:
 
     bool extractArchive(const QString &directory = QString()) const;
 
-    bool extractFileFromArchive(const QString &fileName) const;
+    bool extractFileFromArchive(const QString &fileName, const QString &destination) const;
 
 private:
     DebFilePrivate *const d;
