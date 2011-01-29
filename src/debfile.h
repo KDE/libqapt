@@ -21,7 +21,7 @@
 #ifndef QAPT_DEBFILE_H
 #define QAPT_DEBFILE_H
 
-#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 namespace QApt {
 
@@ -89,6 +89,8 @@ public:
 
     /** Overload for QString controlField(const QLatin1String &name) const; **/
     QString controlField(const QString &name) const;
+
+    QStringList fileList() const;
 
     qint64 installedSize() const;
 

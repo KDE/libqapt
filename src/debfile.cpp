@@ -22,6 +22,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
+#include <QtCore/QTemporaryFile>
 
 #include <apt-pkg/debfile.h>
 #include <apt-pkg/fileutl.h>
@@ -149,6 +150,35 @@ QString DebFile::controlField(const QLatin1String &field) const
 QString DebFile::controlField(const QString &field) const
 {
     return controlField(QLatin1String(field.toStdString().c_str()));
+}
+
+QStringList DebFile::fileList() const
+{
+    QTemporaryFile tempFile;
+    if (!tempFile.open()) {
+        return QStringList();
+    }
+
+    QString tempFileName = tempFile.fileName();
+    QProcess dpkg;
+    QProcess tar;
+
+    // dpkg --fsys-tarfile filename
+    QString program = QLatin1String("dpkg --fsys-tarfile ") + d->filePath;
+
+    dpkg.setStandardOutputFile(tempFileName);
+    dpkg.start(program);
+    dpkg.waitForFinished();
+
+    QString program2 = QLatin1String("tar -tf ") + tempFileName;
+    tar.start(program2);
+    tar.waitForFinished();
+
+    QString output = tar.readAllStandardOutput();
+
+    QString files = tar.readAll();
+
+    return files.split('\n');
 }
 
 qint64 DebFile::installedSize() const
