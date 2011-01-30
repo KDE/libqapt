@@ -662,6 +662,20 @@ public Q_SLOTS:
     */
     void updateXapianIndex();
 
+   /**
+    * Add the given .deb package archive to the APT package cache. The .deb
+    * file's corresponding package must already be known to APT. The candidate
+    * version of the package must also match the version that the .deb
+    * provides, and the MD5 sum of the package and the .deb archive must match.
+    *
+    * The main use for this function is to add .deb archives from e.g. a USB
+    * stick so that computers without internet connections can install/upgrade
+    * packages.
+    *
+    * @param archive The .deb archive to be added to the package cache
+    *
+    * @return @c true on success, @c false on failure
+    */
     bool addArchiveToCache(const DebFile &archive);
 
 private Q_SLOTS:
