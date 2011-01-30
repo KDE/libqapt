@@ -98,6 +98,7 @@ QStringList DebThumbnailer::iconsFromDebFile(const QApt::DebFile &debFile)
         }
     }
 
+    // XPM as a fallback. It's really not pretty when scaled up
     if (iconsList.isEmpty()) {
         foreach (const QString &fileName, fileList) {
             if (fileName.startsWith(QLatin1String("./usr/share/pixmaps"))) {
