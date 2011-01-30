@@ -75,6 +75,10 @@
       <arg name="contents" type="s" direction="in"/>
       <arg name="path" type="s" direction="in"/>
     </method>
+    <method name="copyArchiveToCache">
+      <arg type="b" direction="out"/>
+      <arg name="archive" type="s" direction="in"/>
+    </method>
 
   </interface>
 </node>

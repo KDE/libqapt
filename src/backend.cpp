@@ -44,6 +44,7 @@
 // QApt includes
 #include "cache.h"
 #include "config.h"
+#include "debfile.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
 
 namespace QApt {
@@ -1082,6 +1083,43 @@ void Backend::updateXapianIndex()
     Q_D(Backend);
 
     d->worker->updateXapianIndex();
+}
+
+bool Backend::addArchiveToCache(const DebFile &archive)
+{
+    Q_D(Backend);
+
+    // Sanity checks
+    Package *pkg = package(archive.packageName());
+    if (!pkg) {
+        // The package is not in the cache, so we can't do anything
+        // with this .deb
+        return false;
+    }
+
+    QString arch = archive.architecture();
+
+    if (arch != QLatin1String("all") &&
+        arch != d->config->readEntry(QLatin1String("APT::Architecture"), QString())) {
+        // Incompatible architecture
+        return false;
+    }
+
+    QLatin1String debVersion = archive.version();
+    QString candVersion = pkg->availableVersion();
+
+    if (debVersion != candVersion) {
+        // Incompatible version
+        return false;
+    }
+
+    if (archive.md5Sum() != pkg->md5Sum()) {
+        // Not the same as the candidate
+        return false;
+    }
+
+    // Add the package, but we'll need auth so the worker'll do it
+    return d->worker->copyArchiveToCache(archive.filePath());
 }
 
 void Backend::workerStarted()

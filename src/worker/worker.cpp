@@ -513,3 +513,18 @@ bool QAptWorker::writeFileToDisk(const QString &contents, const QString &path)
 
     return false;
 }
+
+bool QAptWorker::copyArchiveToCache(const QString &archivePath)
+{
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writeFileToDisk"), message().service())) {
+        emit errorOccurred(QApt::AuthError, QVariantMap());
+        return false;
+    }
+
+    initializeApt();
+    QString cachePath = QString::fromStdString(_config->FindDir("Dir::Cache::Archives"));
+    // Filename
+    cachePath += archivePath.right(archivePath.size() - archivePath.lastIndexOf('/'));
+
+    return QFile::copy(archivePath, cachePath);
+}

@@ -31,6 +31,7 @@ class pkgSourceList;
 namespace QApt {
     class Cache;
     class Config;
+    class DebFile;
 }
 
 /**
@@ -660,6 +661,8 @@ public Q_SLOTS:
     * @see xapianIndexNeedsUpdate()
     */
     void updateXapianIndex();
+
+    bool addArchiveToCache(const DebFile &archive);
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);

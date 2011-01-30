@@ -69,6 +69,7 @@ public Q_SLOTS:
     void answerWorkerQuestion(const QVariantMap &response);
     void updateXapianIndex();
     bool writeFileToDisk(const QString &contents, const QString &path);
+    bool copyArchiveToCache(const QString &archivePath);
 
 private Q_SLOTS:
     bool initializeApt();
