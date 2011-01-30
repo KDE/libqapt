@@ -663,10 +663,12 @@ public Q_SLOTS:
     void updateXapianIndex();
 
    /**
-    * Add the given .deb package archive to the APT package cache. The .deb
-    * file's corresponding package must already be known to APT. The candidate
-    * version of the package must also match the version that the .deb
-    * provides, and the MD5 sum of the package and the .deb archive must match.
+    * Add the given .deb package archive to the APT package cache.
+    *
+    * To succeed, the .deb file's corresponding package must already be known
+    * to APT. The version of the package that the .deb file provides must match
+    * the candidate version from APT, and additionally the md5 sums of the .deb
+    * file and the candidate version of the package in APT must match.
     *
     * The main use for this function is to add .deb archives from e.g. a USB
     * stick so that computers without internet connections can install/upgrade
