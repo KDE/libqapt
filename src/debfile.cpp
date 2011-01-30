@@ -194,6 +194,13 @@ QStringList DebFile::fileList() const
     filesList.removeFirst(); // First entry is the "./" entry
     filesList.removeAll(QLatin1String("")); // Remove empty entries
 
+    // Remove non-file directory listings
+    for (int i = 0; i < filesList.size() - 1; ++i) {
+        if (filesList.at(i+1).contains(filesList.at(i))) {
+            filesList[i] = QString(QLatin1Char(' '));
+        }
+    }
+
     return filesList;
 }
 
