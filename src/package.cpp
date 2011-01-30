@@ -466,6 +466,23 @@ QString Package::component() const
     return QLatin1String(File.Component());
 }
 
+QByteArray Package::md5Sum() const
+{
+    QByteArray md5Sum;
+
+    const pkgCache::VerIterator &ver = (*d->depCache).GetCandidateVer(*d->packageIter);
+
+    if(ver.end()) {
+        return md5Sum;
+    }
+
+    pkgRecords::Parser &rec = d->records->Lookup(ver.FileList());
+    md5Sum = rec.MD5Hash().c_str();
+
+    return md5Sum;
+
+}
+
 QUrl Package::changelogUrl() const
 {
     QUrl url;

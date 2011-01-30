@@ -230,6 +230,8 @@ public:
     */
     QString component() const;
 
+    QByteArray md5Sum() const;
+
    /**
     * Returns the url to the location of a package's changelog.
     *
