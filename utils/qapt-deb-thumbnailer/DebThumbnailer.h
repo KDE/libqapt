@@ -21,7 +21,6 @@
 #ifndef DEBTHUMBNAILER_H
 #define DEBTHUMBNAILER_H
 
-#include <QtCore/QObject>
 #include <QtCore/QStringList>
 
 #include <kio/thumbcreator.h>
@@ -30,9 +29,8 @@ namespace QApt {
     class DebFile;
 }
 
-class DebThumbnailer : public QObject, public ThumbCreator
+class DebThumbnailer : public ThumbCreator
 {
-    Q_OBJECT
 public:
     DebThumbnailer();
     virtual ~DebThumbnailer();
