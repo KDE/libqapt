@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+Name=Debian Package Files
+X-KDE-ServiceTypes=ThumbCreator
+MimeType=application/x-deb
+X-KDE-Library=debthumbnailer
+CacheThumbnail=true
+IgnoreMaximumSize=true
