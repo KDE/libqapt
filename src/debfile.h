@@ -56,48 +56,138 @@ public:
    /**
     * Returns the file path of the archive
     *
-    * \return The file path of the archive
+    * @return The file path of the archive
     */
     QString filePath() const;
 
    /**
-    * Returns the name of the package in the archive
+    * Returns the name of the package in this archive
     *
-    * \return The name of the package in the archive
+    * @return The name of the package in this archive
     */
     QString packageName() const;
 
+   /**
+    * Returns the source package corresponding to the package in this archive
+    *
+    * @return The source package
+    */
     QLatin1String sourcePackage() const;
 
+   /**
+    * Returns the version of the package that this archive provides
+    *
+    * @return The version of the package this DebFile contains
+    */
     QLatin1String version() const;
 
+   /**
+    * Returns the CPU architecture that this archive can be installed on
+    *
+    * For santiy checks, the "APT::Architecture" APT configuration entry
+    * can be used to compare to the output of this function. DebFiles with an
+    * architecture of "all" can be installed on any architecture
+    *
+    * @return The archictecure the DebFile is meant for
+    */
     QLatin1String architecture() const;
 
+   /**
+    * Returns of the maintainer of the package in this archive
+    *
+    * @return The name and email of the maintainer
+    */
     QString maintainer() const;
 
+   /**
+    * Returns the categorical section where the archive's package resides
+    *
+    * @return The section of the archive's package
+    */
     QLatin1String section() const;
 
+   /**
+    * Returns the update priority of the archive's package
+    *
+    * @return The update priority
+    */
     QLatin1String priority() const;
 
+   /**
+    * Returns the homepage of the archive's package
+    *
+    * @return The homepage
+    */
     QString homepage() const;
 
+   /**
+    * Returns the one-line description of the archive's package
+    *
+    * @return The short description
+    */
     QString shortDescription() const;
 
+   /**
+    * Returns the full description of the archive's package
+    *
+    * @return The long description
+    */
     QString longDescription() const;
 
+   /**
+    * Returns the specified field of the package's debian/control file
+    *
+    * This function can be used to return data from custom control fields
+    * which do not have an official function inside APT to retrieve them.
+    *
+    * @return The value of the specified control field
+    */
     QString controlField(const QLatin1String &name) const;
 
     /** Overload for QString controlField(const QLatin1String &name) const; **/
     QString controlField(const QString &name) const;
 
+   /**
+    * Returns the md5sum of the archive
+    *
+    * @return This archive's md5sum
+    */
     QByteArray md5Sum() const;
 
+   /**
+    * Returns a list of files that this archive contains
+    *
+    * @return The file list as a @c QStringList
+    */
     QStringList fileList() const;
 
+   /**
+    * Returns the installed size of the package that this archive contains
+    *
+    * @return The package's installed size as a 64-bit integer
+    */
     qint64 installedSize() const;
 
+   /**
+    * Extracts the data files of the archive to the given directory.
+    *
+    * If no target directory is given, the current working directory will be
+    * used.
+    *
+    * @param directory The directory to extract to
+    *
+    * @return @c true on success, @c false on failure
+    */
     bool extractArchive(const QString &directory = QString()) const;
 
+   /**
+    * Extracts the given file from the package archive to the given destination
+    *
+    * @param fileName The file to extract from the archive
+    * @param destination The destination to place the extracted file
+    *
+    * @return @c true on success, @c false on failure
+    */
     bool extractFileFromArchive(const QString &fileName, const QString &destination) const;
 
 private:

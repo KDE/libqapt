@@ -230,6 +230,11 @@ public:
     */
     QString component() const;
 
+   /**
+    * Returns the md5sum of the candidate version of the package
+    *
+    * @return The md5sum of the package
+    */
     QByteArray md5Sum() const;
 
    /**
