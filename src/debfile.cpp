@@ -44,10 +44,12 @@ class DebFilePrivate
 
         ~DebFilePrivate()
         {
+            delete extractor;
         }
 
         bool isValid;
         QString filePath;
+        debDebFile::MemControlExtract *extractor;
         pkgTagSection controlData;
 
         void init();
@@ -59,13 +61,13 @@ void DebFilePrivate::init()
     debDebFile deb(in);
 
     // Extract control data
-    debDebFile::MemControlExtract extractor("control");
-    if(!extractor.Read(deb)) {
+    extractor = new debDebFile::MemControlExtract("control");
+    if(!extractor->Read(deb)) {
       isValid = false;
       return;
     }
 
-    controlData = extractor.Section;
+    controlData = extractor->Section;
 }
 
 DebFile::DebFile(const QString &filePath)
@@ -75,6 +77,7 @@ DebFile::DebFile(const QString &filePath)
 
 DebFile::~DebFile()
 {
+    delete d;
     delete d;
 }
 
