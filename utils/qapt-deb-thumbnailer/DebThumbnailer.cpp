@@ -59,20 +59,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
         return false;
     }
 
-    QString iconPath;
-
-    // If we can, find a matching size
-    foreach (const QString &icon, iconsList) {
-        if (icon.contains(QString::number(height))) {
-            iconPath = icon;
-            break;
-        }
-    }
-
-    // Otherwise just take the last icon we found
-    if (iconPath.isEmpty()) {
-        iconPath = iconsList.last();
-    }
+    QString iconPath = iconsList.last();
 
     QDir tempDir = QDir::temp();
     tempDir.mkdir(QLatin1String("kde-deb-thumbnailer"));
