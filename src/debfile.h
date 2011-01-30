@@ -90,6 +90,8 @@ public:
     /** Overload for QString controlField(const QLatin1String &name) const; **/
     QString controlField(const QString &name) const;
 
+    QByteArray md5Sum() const;
+
     QStringList fileList() const;
 
     qint64 installedSize() const;

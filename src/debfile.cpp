@@ -153,6 +153,19 @@ QString DebFile::controlField(const QString &field) const
     return controlField(QLatin1String(field.toStdString().c_str()));
 }
 
+QByteArray DebFile::md5Sum() const
+{
+    FileFd in(d->filePath.toStdString(), FileFd::ReadOnly);
+    debDebFile deb(in);
+    MD5Summation debMD5;
+
+    in.Seek(0);
+
+    debMD5.AddFD(in.Fd(), in.Size());
+
+    return QByteArray(debMD5.Result().Value().c_str());
+}
+
 QStringList DebFile::fileList() const
 {
     QTemporaryFile tempFile;
@@ -175,11 +188,13 @@ QStringList DebFile::fileList() const
     tar.start(program2);
     tar.waitForFinished();
 
-    QString output = tar.readAllStandardOutput();
+    QString files = tar.readAllStandardOutput();
 
-    QString files = tar.readAll();
+    QStringList filesList = files.split('\n');
+    filesList.removeFirst(); // First entry is the "./" entry
+    filesList.removeAll(QLatin1String("")); // Remove empty entries
 
-    return files.split('\n');
+    return filesList;
 }
 
 qint64 DebFile::installedSize() const
