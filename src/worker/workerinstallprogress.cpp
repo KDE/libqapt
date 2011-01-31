@@ -122,7 +122,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             break;
         }
 
-        if (buf[0] == '\b') {
+        if (buf[0] == '\n') {
             const QStringList list = QString::fromUtf8(line).split(QLatin1Char(':'));
             const QString status = list.at(0);
             const QString package = list.at(1);
