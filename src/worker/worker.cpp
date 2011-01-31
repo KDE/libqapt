@@ -451,6 +451,81 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     installProgress = 0;
 }
 
+void QAptWorker::downloadArchives(const QStringList &packageStrings, const QString &dest)
+{
+    if (!initializeApt()) {
+        emit workerFinished(false);
+        return;
+    }
+
+    emit workerStarted();
+
+    initializeStatusWatcher();
+    pkgAcquire fetcher;
+    fetcher.Setup(m_acquireStatus);
+    // Populate it with the source selection and get all Indexes
+    // (GetAll=true)
+    if (!m_cache->list()->GetIndexes(&fetcher,true)) {
+        emit workerFinished(false);
+        return;
+    }
+
+    pkgIndexFile *index;
+
+    foreach (const QString &packageString, packageStrings) {
+        pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(packageString.toStdString());
+
+        if (!iter) {
+            // Package not found
+            continue;
+        }
+
+        pkgCache::VerIterator ver = (*m_cache->depCache()).GetCandidateVer(iter);
+
+        if (!ver || !ver.Downloadable() || !ver.Arch()) {
+            // Virtual package or not downloadable or broken
+            continue;
+        }
+
+        // Obtain package info
+        pkgCache::VerFileIterator vf = ver.FileList();
+        pkgRecords::Parser &rec = m_records->Lookup(ver.FileList());
+
+        // Try to cross match against the source list
+        if (!m_cache->list()->FindIndex(vf.File(), index)) {
+            continue;
+        }
+
+        string fileName = rec.FileName();
+        string MD5sum = rec.MD5Hash();
+
+        if (fileName.empty()) {
+            //TODO: Error
+            return;
+        }
+
+        new pkgAcqFile(&fetcher,
+                       index->ArchiveURI(fileName),
+                       MD5sum,
+                       ver->Size,
+                       index->ArchiveInfo(ver),
+                       ver.ParentPkg().Name(),
+                       dest.toStdString(), "");
+    }
+
+    emit workerEvent(QApt::PackageDownloadStarted);
+
+    if (fetcher.Run() != pkgAcquire::Continue) {
+        // Our fetcher will report errors for itself, but we have to send the
+        // finished signal
+        emit workerFinished(false);
+        return;
+    }
+
+    emit workerEvent(QApt::PackageDownloadFinished);
+    emit workerFinished(true);
+}
+
 void QAptWorker::answerWorkerQuestion(const QVariantMap &response)
 {
     emit answerReady(response);

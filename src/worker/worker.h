@@ -66,6 +66,7 @@ public Q_SLOTS:
     void updateCache();
     void cancelDownload();
     void commitChanges(QVariantMap instructionsList);
+    void downloadArchives(const QStringList &packages, const QString &destDir);
     void answerWorkerQuestion(const QVariantMap &response);
     void updateXapianIndex();
     bool writeFileToDisk(const QString &contents, const QString &path);

@@ -833,6 +833,14 @@ void Backend::commitChanges()
     d->worker->commitChanges(packageList);
 }
 
+void Backend::downloadArchives(const QStringList &packages, const QString &destination)
+{
+    Q_D(Backend);
+
+    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    d->worker->downloadArchives(packages, destination);
+}
+
 void Backend::packageChanged(Package *package)
 {
     Q_UNUSED(package);

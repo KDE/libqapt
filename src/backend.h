@@ -548,6 +548,8 @@ public Q_SLOTS:
      */
     void commitChanges();
 
+    void downloadArchives(const QStringList &packages, const QString &destination);
+
     /**
      * A slot that Packages use to tell the backend they've changed.
      * (Used internally by QApt::Package. You likely will never use this)

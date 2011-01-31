@@ -460,6 +460,7 @@ public:
     *
     * To actually pin a package use @c Backend::setPackagePinned
     *
+    * @since 1.2
     * @see Backend::setPackagePinned()
     */
     void setPinned(bool pin);

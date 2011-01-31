@@ -64,6 +64,11 @@
       <arg name="instructionsList" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
+    <method name="downloadArchives">
+      <arg name="packages" type="a{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QStringList"/>
+      <arg name="destination" type="s" direction="in"/>
+    </method>
     <method name="answerWorkerQuestion">
       <arg name="response" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
