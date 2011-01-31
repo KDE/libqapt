@@ -526,5 +526,10 @@ bool QAptWorker::copyArchiveToCache(const QString &archivePath)
     // Filename
     cachePath += archivePath.right(archivePath.size() - archivePath.lastIndexOf('/'));
 
+    if (QFile::exists(cachePath)) {
+        // Already copied
+        return true;
+    }
+
     return QFile::copy(archivePath, cachePath);
 }
