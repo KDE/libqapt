@@ -463,12 +463,6 @@ void QAptWorker::downloadArchives(const QStringList &packageStrings, const QStri
     initializeStatusWatcher();
     pkgAcquire fetcher;
     fetcher.Setup(m_acquireStatus);
-    // Populate it with the source selection and get all Indexes
-    // (GetAll=true)
-    if (!m_cache->list()->GetIndexes(&fetcher,true)) {
-        emit workerFinished(false);
-        return;
-    }
 
     pkgIndexFile *index;
 
