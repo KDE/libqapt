@@ -833,9 +833,36 @@ void Backend::commitChanges()
     d->worker->commitChanges(packageList);
 }
 
-void Backend::downloadArchives(const QStringList &packages, const QString &destination)
+void Backend::downloadArchives(const QString &listFile, const QString &destination)
 {
     Q_D(Backend);
+
+    QFile file(listFile);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        // TODO: error
+        return;
+    }
+
+    QByteArray buffer = file.readAll();
+
+    QList<QByteArray> lines = buffer.split('\n');
+
+    if (lines.isEmpty() || lines.first() != QByteArray("[Download List]")) {
+        return;
+    }
+
+    lines.removeAt(0);
+
+    QStringList packages;
+    foreach (const QByteArray &line, lines) {
+        packages << line;
+    }
+
+    QString dirName = listFile.left(listFile.lastIndexOf('/'));
+
+    QDir dir(dirName);
+    dir.mkdir(QLatin1String("packages"));
 
     d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
     d->worker->downloadArchives(packages, destination);
@@ -985,6 +1012,23 @@ bool Backend::loadSelections(const QString &path)
     emit packageChanged();
 
     return true;
+}
+
+bool Backend::saveDownloadList(const QString &path) const
+{
+    Q_D(const Backend);
+
+    QString downloadDocument;
+    downloadDocument.append(QLatin1String("[Download List]") % QLatin1Char('\n'));
+    for (int i = 0; i < d->packages.size(); ++i) {
+        int flags = d->packages.at(i)->state();
+
+        if (flags & Package::ToInstall) {
+            downloadDocument.append(d->packages[i]->name() % QLatin1Char('\n'));
+        }
+    }
+
+    return d->writeSelectionFile(downloadDocument, path);
 }
 
 bool Backend::setPackagePinned(Package *package, bool pin)

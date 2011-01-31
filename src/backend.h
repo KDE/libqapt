@@ -548,7 +548,15 @@ public Q_SLOTS:
      */
     void commitChanges();
 
-    void downloadArchives(const QStringList &packages, const QString &destination);
+   /**
+    * Downloads the packages listed in the provided list file to the provided
+    * destination directory. The worker sends normal download event signals
+    * as usual, and this can be handled exactly like any other package download
+    *
+    * @param listFile The path to the package list file
+    * @param destination The path of the directory to download the packages to
+    */
+    void downloadArchives(const QString &listFile, const QString &destination);
 
     /**
      * A slot that Packages use to tell the backend they've changed.
@@ -636,6 +644,17 @@ public Q_SLOTS:
      * @see saveInstalledPackagesList()
      */
     bool loadSelections(const QString &path);
+
+   /**
+    * Writes a list of packages that have been marked for installation. This
+    * list can then be loaded with the loadDownloadList() function to start
+    * downloading the packages.
+    *
+    * @param path The path to save the download list to
+    *
+    * @return @c true if savign succeeded, @c false if the saving failed
+    */
+    bool saveDownloadList(const QString &path) const;
 
    /**
     * Locks the package at either the current version if installed, or
