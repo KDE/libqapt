@@ -132,10 +132,6 @@ QAptTest::QAptTest()
 //     foreach (QApt::Package *package, packageList) {
 //             kDebug() << package->name();
 //     }
-
-    QStringList packages;
-    packages << "amor" << "kdesudo" << "lskat";
-    m_backend->downloadArchives(packages, "/tmp/lol/");
 }
 
 QAptTest::~QAptTest()
