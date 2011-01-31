@@ -78,7 +78,6 @@ DebFile::DebFile(const QString &filePath)
 DebFile::~DebFile()
 {
     delete d;
-    delete d;
 }
 
 bool DebFile::isValid() const
@@ -91,9 +90,9 @@ QString DebFile::filePath() const
     return d->filePath;
 }
 
-QString DebFile::packageName() const
+QLatin1String DebFile::packageName() const
 {
-    return QString::fromStdString(d->controlData.FindS("Package"));
+    return QLatin1String(d->controlData.FindS("Package").c_str());
 }
 
 QLatin1String DebFile::sourcePackage() const

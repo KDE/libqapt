@@ -65,7 +65,7 @@ public:
     *
     * @return The name of the package in this archive
     */
-    QString packageName() const;
+    QLatin1String packageName() const;
 
    /**
     * Returns the source package corresponding to the package in this archive
