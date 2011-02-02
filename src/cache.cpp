@@ -56,7 +56,6 @@ public:
 
     CacheBuildProgress progressMeter;
     pkgCacheFile *cache;
-    pkgDepCache *depCache;
 
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache;
 };
@@ -79,7 +78,6 @@ bool Cache::open()
     // delete any old structures
     delete d->cache;
     d->cache = 0;
-    d->depCache = 0;
 
     bool shouldLock = (geteuid == 0);
 
@@ -90,7 +88,6 @@ bool Cache::open()
         return false;
     }
 
-    d->depCache = *d->cache;
     d->trustCache->clear();
 
     return true;
@@ -100,7 +97,7 @@ pkgDepCache *Cache::depCache() const
 {
     Q_D(const Cache);
 
-    return d->depCache;
+    return *d->cache;
 }
 
 pkgSourceList *Cache::list() const
