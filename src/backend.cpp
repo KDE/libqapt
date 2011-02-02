@@ -200,7 +200,8 @@ void Backend::reloadCache()
 
         Package *pkg = new Package(this, depCache, d->records, iter);
         d->packagesIndex[iter->ID] = count;
-        d->packages.insert(count++, pkg);
+        d->packages.append(pkg);
+        ++count;
 
         if (iter->CurrentVer) {
             d->installedCount++;
