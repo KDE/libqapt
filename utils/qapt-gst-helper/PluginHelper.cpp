@@ -135,10 +135,10 @@ void PluginHelper::canSearch()
                             niceNames.join("</li><li>"));
 
     // Dunno if it's possible to have both an encoder and a decoder in the same list
-    int type = m_searchList.first()->pluginType();
+    int type = m_searchList.at(0)->pluginType();
     // Or if a list can have multiple requesting apps
     QString appName;
-    QString requestedBy = m_searchList.first()->requestedBy();
+    QString requestedBy = m_searchList.at(0)->requestedBy();
     if (requestedBy.isEmpty()) {
         appName = i18nc("A program for which we have no name", "A program");
     } else {
