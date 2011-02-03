@@ -9,6 +9,7 @@ include(FindPkgConfig REQUIRED)
 
 add_subdirectory(qapt-batch)
 add_subdirectory(qapt-deb-thumbnailer)
+add_subdirectory(plasma-runner-installer)
 
 if (QTGSTREAMER_FOUND)
     add_definitions(-fexceptions)
