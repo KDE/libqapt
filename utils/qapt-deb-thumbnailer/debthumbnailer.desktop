@@ -1,6 +1,12 @@
 [Desktop Entry]
 Type=Service
 Name=Debian Package Files
+Name[hu]=Debian csomagfájlok
+Name[pt]=Ficheiros de Pacotes da Debian
+Name[pt_BR]=Arquivos de pacotes do Debian
+Name[sv]=Debian-paketfiler
+Name[uk]=Файли пакунків Debian
+Name[x-test]=xxDebian Package Filesxx
 X-KDE-ServiceTypes=ThumbCreator
 MimeType=application/x-deb
 X-KDE-Library=debthumbnailer
