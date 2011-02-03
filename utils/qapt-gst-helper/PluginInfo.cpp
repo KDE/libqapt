@@ -53,7 +53,7 @@ void PluginInfo::parseDetails(const QString &gstDetails)
 
     QStringList ss;
 
-    if (m_capsInfo.startsWith("uri")) {
+    if (m_capsInfo.startsWith(QLatin1String("uri"))) {
         // Split URI
         ss = parts.at(4).split(QLatin1Char(' '));
 

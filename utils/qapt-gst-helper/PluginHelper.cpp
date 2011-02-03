@@ -508,7 +508,7 @@ void PluginHelper::install()
 {
     m_backend->commitChanges();
 
-    setLabelText(i18nc("@label", "Waiting"));
+    setLabelText(i18nc("@label Progress bar label when waiting to start", "Waiting"));
     progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
     setAutoClose(false);
     show();

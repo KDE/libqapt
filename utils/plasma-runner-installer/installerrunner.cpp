@@ -77,7 +77,7 @@ void InstallerRunner::match(Plasma::RunnerContext &context)
         QString output = QString(process.readAllStandardError());
         QStringList resultLines = output.split('\n');
         foreach(const QString &line, resultLines) {
-            if (line.startsWith("sudo")) {
+            if (line.startsWith(QLatin1String("sudo"))) {
                 QString package = line.split(' ').last();
                 Plasma::QueryMatch match(this);
                 match.setType(Plasma::QueryMatch::ExactMatch);
