@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Installer
+Comment=Suggests the installation of not-installed applications
+X-KDE-ServiceTypes=Plasma/Runner
+Type=Service
+Icon=applications-other
+X-KDE-Library=krunner_installer
+X-Plasma-RunnerPhase=first
+X-KDE-PluginInfo-Author=Jonathan Thomas
+X-KDE-PluginInfo-Email=echidnaman@kubuntu.org
+X-KDE-PluginInfo-Name=installer
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-License=LGPL
+X-KDE-PluginInfo-EnabledByDefault=true
