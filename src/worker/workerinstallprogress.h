@@ -39,10 +39,6 @@ public:
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);
 
 private:
-    int m_stdout;
-    int m_stderr;
-    int m_childin;
-
     pid_t m_child_id;
     QAptWorker *m_worker;
     QEventLoop *m_questionBlock;

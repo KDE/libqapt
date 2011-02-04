@@ -23,7 +23,6 @@
 
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
-#include <QtCore/QFile>
 
 #include <apt-pkg/error.h>
 
@@ -128,7 +127,6 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             const QString package = list.at(1);
             QString percent = list.at(2);
             QString str = list.at(3);
-
             // If str legitimately had a ':' in it (such as a package version)
             // we need to retrieve the next string in the list.
             if (list.count() == 5) {
