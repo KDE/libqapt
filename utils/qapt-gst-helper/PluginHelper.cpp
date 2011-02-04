@@ -29,7 +29,6 @@
 #include <KIcon>
 #include <KLocale>
 #include <KMessageBox>
-#include <KProgressDialog>
 #include <KWindowSystem>
 #include <QDebug>
 
