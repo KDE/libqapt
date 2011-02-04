@@ -50,6 +50,7 @@
 
 #define RAMFS_MAGIC     0x858458f6
 
+#include "../debfile.h"
 #include "debug.h"
 #include "qaptauthorization.h"
 #include "workeracquire.h"
@@ -518,6 +519,69 @@ void QAptWorker::downloadArchives(const QStringList &packageStrings, const QStri
 
     emit workerEvent(QApt::PackageDownloadFinished);
     emit workerFinished(true);
+}
+
+void QAptWorker::installDebFile(const QString &fileName)
+{
+    if (!initializeApt()) {
+        emit workerFinished(false);
+        return;
+    }
+
+    emit workerStarted();
+
+    QApt::DebFile deb(fileName);
+
+    QString arch = deb.architecture();
+
+    if (arch != QLatin1String("all") &&
+        arch != QString::fromStdString(_config->Find("APT::Architecture", ""))) {
+        // TODO report what arch was provided vs needed
+        emit errorOccurred(QApt::WrongArchError, QVariantMap());
+        emit workerFinished(false);
+        return;
+    }
+
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
+        emit errorOccurred(QApt::AuthError, QVariantMap());
+        emit workerFinished(false);
+        return;
+    }
+
+    m_dpkgProcess = new QProcess(this);
+    QString program = QLatin1Literal("dpkg") %
+                      QLatin1Literal(" -i ") % fileName;
+    m_dpkgProcess->start(program);
+    connect(m_dpkgProcess, SIGNAL(started()), this, SLOT(dpkgStarted()));
+    connect(m_dpkgProcess, SIGNAL(readyRead()), this, SLOT(updateDpkgProgress()));
+    connect(m_dpkgProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SLOT(dpkgFinished(int, QProcess::ExitStatus)));
+
+}
+
+void QAptWorker::dpkgStarted()
+{
+    emit workerEvent(QApt::DebInstallStarted);
+}
+
+void QAptWorker::updateDpkgProgress()
+{
+    QString str = m_dpkgProcess->readLine();
+
+    emit debInstallMessage(str);
+}
+
+void QAptWorker::dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitCode);
+
+    if (!exitStatus) {
+        emit workerEvent(QApt::DebInstallFinished);
+    }
+
+    emit workerFinished(!exitStatus);
+    delete m_dpkgProcess;
+    m_dpkgProcess = 0;
 }
 
 void QAptWorker::answerWorkerQuestion(const QVariantMap &response)

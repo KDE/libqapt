@@ -29,6 +29,9 @@
       <arg name="status" type="s" direction="out"/>
       <arg name="percentage" type="i" direction="out"/>
     </signal>
+    <signal name="debInstallMessage">
+      <arg name="status" type="s" direction="out"/>
+    </signal>
     <signal name="errorOccurred">
       <arg name="code" type="i" direction="out"/>
       <arg name="details" type="a{sv}" direction="out"/>
@@ -68,6 +71,9 @@
       <arg name="packages" type="a{sv}" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QStringList"/>
       <arg name="destination" type="s" direction="in"/>
+    </method>
+    <method name="installDebFile">
+      <arg name="debFile" type="s" direction="in"/>
     </method>
     <method name="answerWorkerQuestion">
       <arg name="response" type="a{sv}" direction="in"/>

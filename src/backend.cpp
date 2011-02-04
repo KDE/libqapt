@@ -869,6 +869,14 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
     d->worker->downloadArchives(packages, destination);
 }
 
+void Backend::installDebFile(const DebFile &debFile)
+{
+    Q_D(Backend);
+
+    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    d->worker->installDebFile(debFile.filePath());
+}
+
 void Backend::packageChanged(Package *package)
 {
     Q_UNUSED(package);
@@ -1190,6 +1198,8 @@ void Backend::workerStarted()
             this, SIGNAL(downloadMessage(int, const QString&)));
     connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
             this, SIGNAL(commitProgress(const QString&, int)));
+    connect(d->worker, SIGNAL(debInstallMessage(const QString&)),
+            this, SIGNAL(debInstallMessage(const QString&)));
     connect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
             this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
     connect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),

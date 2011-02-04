@@ -459,6 +459,18 @@ Q_SIGNALS:
     void commitProgress(const QString &status, int percentage);
 
    /**
+    * Emitted during the install of a .deb file, giving the output
+    * of the dpkg process installing the .deb
+    *
+    * @param message A line of output from dpkg
+    *
+    * @since 1.2
+    *
+    * @see installDebFile(const DebFile &debFile)
+    */
+    void debInstallMessage(const QString &message);
+
+   /**
     * Emits the progress of the Apt Xapian Indexer
     *
     * @param progress The progress percentage of the indexer
@@ -557,6 +569,8 @@ public Q_SLOTS:
     * @param destination The path of the directory to download the packages to
     */
     void downloadArchives(const QString &listFile, const QString &destination);
+
+    void installDebFile(const DebFile &file);
 
     /**
      * A slot that Packages use to tell the backend they've changed.

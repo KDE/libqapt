@@ -116,7 +116,11 @@ namespace QApt
         /// The worker has begun to update the xapian index
         XapianUpdateStarted     = 7,
         /// The worker has finished updating the xapian index
-        XapianUpdateFinished    = 8
+        XapianUpdateFinished    = 8,
+        /// The worker has started installing a .deb with dpkg
+        DebInstallStarted       = 9,
+        /// The worker has finished installing a .deb with dpkg
+        DebInstallFinished      = 10
     };
 
    /**
@@ -161,7 +165,9 @@ namespace QApt
         /// Emitted when the APT configuration prevents downloads
         DownloadDisallowedError = 10,
         /// Emitted when the selected package does not exist
-        NotFoundError           = 11
+        NotFoundError           = 11,
+        /// Emitted when a .deb package cannot be installed due to an arch mismatch
+        WrongArchError          = 12
     };
 
    /**

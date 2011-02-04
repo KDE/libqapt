@@ -22,6 +22,7 @@
 #define QAPTWORKER_H
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QProcess>
 #include <QtDBus/QDBusContext>
 
 class pkgPolicy;
@@ -58,6 +59,7 @@ private:
     WorkerAcquire *m_acquireStatus;
     QEventLoop *m_questionBlock;
     QProcess *m_xapianProc;
+    QProcess *m_dpkgProcess;
 
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
@@ -67,6 +69,7 @@ public Q_SLOTS:
     void cancelDownload();
     void commitChanges(QVariantMap instructionsList);
     void downloadArchives(const QStringList &packages, const QString &destDir);
+    void installDebFile(const QString &fileName);
     void answerWorkerQuestion(const QVariantMap &response);
     void updateXapianIndex();
     bool writeFileToDisk(const QString &contents, const QString &path);
@@ -76,6 +79,9 @@ private Q_SLOTS:
     bool initializeApt();
     void throwInitError();
     void initializeStatusWatcher();
+    void dpkgStarted();
+    void updateDpkgProgress();
+    void dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void setAnswer(const QVariantMap &answer);
     void xapianUpdateFinished(bool result);
 
@@ -89,6 +95,7 @@ Q_SIGNALS:
                                  double size, int flag);
     QT_DEPRECATED void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
+    void debInstallMessage(const QString &message);
     void errorOccurred(int code, const QVariantMap &details);
     void warningOccurred(int code, const QVariantMap &details);
     void questionOccurred(int questionCode, const QVariantMap& details);
