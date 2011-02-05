@@ -45,6 +45,11 @@ private:
     QLabel *m_nameLabel;
     QLabel *m_statusLabel;
     KTextBrowser *m_descriptionWidget;
+    QLabel *m_versionLabel;
+    QLabel *m_sizeLabel;
+    QLabel *m_maintainerLabel;
+    QLabel *m_sectionLabel;
+    QLabel *m_homepageLabel;
     KTextBrowser *m_fileWidget;
 
 public Q_SLOTS:

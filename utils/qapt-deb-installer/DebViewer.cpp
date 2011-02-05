@@ -26,6 +26,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QVBoxLayout>
 
+#include <KGlobal>
 #include <KIcon>
 #include <KLocale>
 #include <KTabWidget>
@@ -85,6 +86,47 @@ DebViewer::DebViewer(QWidget *parent)
     m_descriptionWidget = new KTextBrowser(descriptionTab);
 
     QWidget *detailsTab = new QWidget(detailsWidget);
+    QGridLayout *detailsGrid = new QGridLayout(detailsTab);
+    detailsTab->setLayout(detailsGrid);
+
+    // detailsGrid, row 1
+    QLabel *versionPrefixLabel = new QLabel(detailsTab);
+    versionPrefixLabel->setText(i18nc("@label Label preceding the package version",
+                                      "Version:"));
+    m_versionLabel = new QLabel(detailsTab);
+    detailsGrid->addWidget(versionPrefixLabel, 0, 0, Qt::AlignRight);
+    detailsGrid->addWidget(m_versionLabel, 0, 1, Qt::AlignLeft);
+    // detailsGrid, row 2
+    QLabel *sizePrefixLabel = new QLabel(detailsTab);
+    sizePrefixLabel->setText(i18nc("@label Label preceding the package size",
+                                   "Installed Size:"));
+    m_sizeLabel = new QLabel(detailsTab);
+    detailsGrid->addWidget(sizePrefixLabel, 1, 0, Qt::AlignRight);
+    detailsGrid->addWidget(m_sizeLabel, 1, 1, Qt::AlignLeft);
+    // detailsGrid, row 3
+    QLabel *maintainerPrefixLabel = new QLabel(detailsTab);
+    maintainerPrefixLabel->setText(i18nc("@label Label preceding the package maintainer",
+                                         "Maintainer:"));
+    m_maintainerLabel = new QLabel(detailsTab);
+    detailsGrid->addWidget(maintainerPrefixLabel, 2, 0, Qt::AlignRight);
+    detailsGrid->addWidget(m_maintainerLabel, 2, 1, Qt::AlignLeft);
+    // detailsGrid, row 4
+    QLabel *sectionPrefixLabel = new QLabel(detailsTab);
+    sectionPrefixLabel->setText(i18nc("@label Label preceding the package category",
+                                      "Category:"));
+    m_sectionLabel = new QLabel(detailsTab);
+    detailsGrid->addWidget(sectionPrefixLabel, 3, 0, Qt::AlignRight);
+    detailsGrid->addWidget(m_sectionLabel, 3, 1, Qt::AlignLeft);
+    // detailsGrid, row 4
+    QLabel *homepagePrefixLabel = new QLabel(detailsTab);
+    homepagePrefixLabel->setText(i18nc("@label Label preceding the package homepage",
+                                       "Homepage:"));
+    m_homepageLabel = new QLabel(detailsTab);
+    detailsGrid->addWidget(homepagePrefixLabel, 4, 0, Qt::AlignRight);
+    detailsGrid->addWidget(m_homepageLabel, 4, 1, Qt::AlignLeft);
+
+    detailsGrid->setColumnStretch(1, 1);
+    detailsGrid->setRowStretch(5, 1);
 
     KVBox *fileTab = new KVBox(detailsWidget);
     m_fileWidget = new KTextBrowser(fileTab);
@@ -144,6 +186,12 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     longDesc.replace('\n', QLatin1String("<br>"));
 
     m_descriptionWidget->append(shortDesc + longDesc);
+
+    m_versionLabel->setText(debFile->version());
+    m_sizeLabel->setText(KGlobal::locale()->formatByteSize(debFile->installedSize()));
+    m_maintainerLabel->setText(debFile->maintainer());
+    m_sectionLabel->setText(debFile->section());
+    m_homepageLabel->setText(debFile->homepage());
 
     QStringList fileList = debFile->fileList();
     qSort(fileList);
