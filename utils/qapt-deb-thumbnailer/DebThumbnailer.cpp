@@ -54,6 +54,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
     }
 
     QStringList iconsList = debFile.iconList();
+    qSort(iconsList);
 
     if (iconsList.isEmpty()) {
         return false;
