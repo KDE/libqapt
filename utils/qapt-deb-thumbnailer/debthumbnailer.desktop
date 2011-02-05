@@ -1,7 +1,10 @@
 [Desktop Entry]
 Type=Service
 Name=Debian Package Files
+Name[cs]=Soubory balíčku pro Debian
+Name[da]=Debian-pakkefiler
 Name[hu]=Debian csomagfájlok
+Name[nl]=Debian-pakketbestanden
 Name[pt]=Ficheiros de Pacotes da Debian
 Name[pt_BR]=Arquivos de pacotes do Debian
 Name[sv]=Debian-paketfiler
