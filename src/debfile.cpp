@@ -38,6 +38,8 @@ class DebFilePrivate
     public:
         DebFilePrivate(const QString &path)
             : filePath(path)
+            , extractor(0)
+            , isValid(true)
         {
             init();
         }
