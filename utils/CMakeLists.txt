@@ -8,6 +8,7 @@ endif (NOT KDE4_FOUND)
 include(FindPkgConfig REQUIRED)
 
 add_subdirectory(qapt-batch)
+add_subdirectory(qapt-deb-installer)
 add_subdirectory(qapt-deb-thumbnailer)
 add_subdirectory(plasma-runner-installer)
 

@@ -81,7 +81,9 @@ DebViewer::DebViewer(QWidget *parent)
     // Details tab widget
     KTabWidget *detailsWidget = new KTabWidget(this);
 
-    QWidget *descriptionTab = new QWidget(detailsWidget);
+    KVBox *descriptionTab = new KVBox(detailsWidget);
+    m_descriptionWidget = new KTextBrowser(descriptionTab);
+
     QWidget *detailsTab = new QWidget(detailsWidget);
 
     KVBox *fileTab = new KVBox(detailsWidget);
@@ -132,9 +134,16 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     m_iconLabel->setPixmap(icon.pixmap(48,48));
 
     m_nameLabel->setText(debFile->packageName());
-    m_statusLabel->setText("A very packity package");
+    m_statusLabel->setText("A very packity package"); // FIXME: placeholder
 
     // Details tab widgets
+    QString shortDesc = debFile->shortDescription();
+    shortDesc.prepend(QLatin1String("<b>"));
+    shortDesc.append(QLatin1String("</b><br><br>"));
+    QString longDesc = debFile->longDescription();
+    longDesc.replace('\n', QLatin1String("<br>"));
+
+    m_descriptionWidget->append(shortDesc + longDesc);
 
     QStringList fileList = debFile->fileList();
     qSort(fileList);
@@ -145,8 +154,6 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
             filesString.append(file + '\n');
         }
     }
-
-    kDebug() << filesString;
 
     m_fileWidget->setPlainText(filesString);
 }

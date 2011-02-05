@@ -44,6 +44,7 @@ private:
     QLabel *m_iconLabel;
     QLabel *m_nameLabel;
     QLabel *m_statusLabel;
+    KTextBrowser *m_descriptionWidget;
     KTextBrowser *m_fileWidget;
 
 public Q_SLOTS:
