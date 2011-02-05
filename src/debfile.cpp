@@ -203,6 +203,28 @@ QStringList DebFile::fileList() const
     return filesList;
 }
 
+QStringList DebFile::iconList() const
+{
+    QStringList fileNames = fileList();
+    QStringList iconsList;
+    foreach (const QString &fileName, fileNames) {
+        if (fileName.startsWith(QLatin1String("./usr/share/icons"))) {
+            iconsList << fileName;
+        }
+    }
+
+    // XPM as a fallback. It's really not pretty when scaled up
+    if (iconsList.isEmpty()) {
+        foreach (const QString &fileName, fileNames) {
+            if (fileName.startsWith(QLatin1String("./usr/share/pixmaps"))) {
+                iconsList << fileName;
+            }
+        }
+    }
+
+    return iconsList;
+}
+
 qint64 DebFile::installedSize() const
 {
     QString sizeString = QLatin1String(d->controlData.FindS("Installed-Size").c_str());

@@ -26,7 +26,7 @@
 
 #include <KIcon>
 
-#include <LibQApt/DebFile>
+#include "../../src/debfile.h"
 
 extern "C"
 {
@@ -53,7 +53,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
         return false;
     }
 
-    QStringList iconsList = iconsFromDebFile(debFile);
+    QStringList iconsList = debFile.iconList();
 
     if (iconsList.isEmpty()) {
         return false;
@@ -86,26 +86,4 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
 ThumbCreator::Flags DebThumbnailer::flags() const
 {
     return (Flags)(None);
-}
-
-QStringList DebThumbnailer::iconsFromDebFile(const QApt::DebFile &debFile)
-{
-    QStringList fileList = debFile.fileList();
-    QStringList iconsList;
-    foreach (const QString &fileName, fileList) {
-        if (fileName.startsWith(QLatin1String("./usr/share/icons"))) {
-            iconsList << fileName;
-        }
-    }
-
-    // XPM as a fallback. It's really not pretty when scaled up
-    if (iconsList.isEmpty()) {
-        foreach (const QString &fileName, fileList) {
-            if (fileName.startsWith(QLatin1String("./usr/share/pixmaps"))) {
-                iconsList << fileName;
-            }
-        }
-    }
-
-    return iconsList;
 }

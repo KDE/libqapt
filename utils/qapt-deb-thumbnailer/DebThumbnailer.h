@@ -37,9 +37,6 @@ public:
 
     virtual bool create(const QString &path, int w, int h, QImage &img);
     virtual Flags flags() const;
-
-private:
-    QStringList iconsFromDebFile(const QApt::DebFile &deb);
 };
 
 #endif

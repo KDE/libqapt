@@ -162,6 +162,13 @@ public:
     QStringList fileList() const;
 
    /**
+    * Returns a list of potential app icons in this archive
+    *
+    * @return A @c QStringList of icon paths
+    */
+    QStringList iconList() const;
+
+   /**
     * Returns the installed size of the package that this archive contains
     *
     * @return The package's installed size as a 64-bit integer
