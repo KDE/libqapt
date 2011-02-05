@@ -281,8 +281,6 @@ bool DebFile::extractFileFromArchive(const QString &fileName, const QString &des
     tar.start(program2);
     tar.waitForFinished();
 
-    qDebug() << tar.readAllStandardError();
-
     return !tar.exitCode();
 }
 
