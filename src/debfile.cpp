@@ -226,6 +226,8 @@ QStringList DebFile::fileList() const
         if (filesList.at(i+1).contains(filesList.at(i))) {
             filesList[i] = QString(QLatin1Char(' '));
         }
+
+        filesList.removeAll(QChar::fromLatin1(' '));
     }
 
     return filesList;
