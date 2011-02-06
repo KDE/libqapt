@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=QApt Package Installer
+GenericName=Package Installer
+Comment=Install and view software packages
+Exec=qapt-deb-installer
+Icon=applications-other
+Terminal=false
+Type=Application
+Categories=Application;System;
+MimeType=application/x-deb;application/x-debian-package;
+OnlyShowIn=KDE;
+NotShowIn=GNOME;
+NoDisplay=true
+InitialPreference=13
