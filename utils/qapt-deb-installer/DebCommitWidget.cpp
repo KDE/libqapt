@@ -45,6 +45,11 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     m_terminal->setFontFamily(QLatin1String("Monospace"));
     m_terminal->setWordWrapMode(QTextOption::NoWrap);
     m_terminal->setUndoRedoEnabled(false);
+    QPalette p = m_terminal->palette();
+    p.setColor(QPalette::Base, Qt::black);
+    p.setColor(QPalette::Text, QColor(178, 178, 178));
+    m_terminal->setPalette(p);
+    m_terminal->setFrameShape(QFrame::NoFrame);
 
     m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock", this);
     m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
