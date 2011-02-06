@@ -44,6 +44,9 @@ private:
     QLabel *m_iconLabel;
     QLabel *m_nameLabel;
     QLabel *m_statusLabel;
+    QWidget *m_versionInfoWidget;
+    QLabel *m_versionTitleLabel;
+    QLabel *m_versionInfoLabel;
     KTextBrowser *m_descriptionWidget;
     QLabel *m_versionLabel;
     QLabel *m_sizeLabel;
@@ -54,6 +57,10 @@ private:
 
 public Q_SLOTS:
     void setDebFile(QApt::DebFile *debFile);
+    void setStatusText(const QString &text);
+    void hideVersionInfo();
+    void setVersionTitle(const QString &title);
+    void setVersionInfo(const QString &info);
 };
 
 #endif

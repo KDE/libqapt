@@ -25,8 +25,8 @@
 
 #include <KDialog>
 
-#include <LibQApt/DebFile>
-#include <LibQApt/Globals>
+#include "../../src/debfile.h"
+#include "../../src/globals.h"
 
 class QStackedWidget;
 
@@ -56,6 +56,15 @@ private:
     KPushButton *m_applyButton;
     KPushButton *m_cancelButton;
 
+    //Misc
+    QString m_statusString;
+    bool m_canInstall;
+    QString m_versionTitle;
+    QString m_versionInfo;
+
+    // Functions
+    int compareVersions(const char *ver1, const char *ver2);
+
 private Q_SLOTS:
     void initGUI();
 
@@ -64,6 +73,8 @@ private Q_SLOTS:
 
     void installDebFile();
     void initCommitWidget();
+    void checkDeb();
+    void compareDebWithCache();
 };
 
 #endif

@@ -78,6 +78,29 @@ DebViewer::DebViewer(QWidget *parent)
     headerLayout->addWidget(m_iconLabel);
     headerLayout->addWidget(nameStatusBox);
     headerLayout->addWidget(headerSpacer);
+    //
+
+
+    // Version info box
+    m_versionInfoWidget = new QWidget(this);
+    QHBoxLayout *versionInfoLayout = new QHBoxLayout(m_versionInfoWidget);
+    m_versionInfoWidget->setLayout(versionInfoLayout);
+
+    QLabel *infoIcon = new QLabel(m_versionInfoWidget);
+    infoIcon->setPixmap(KIcon("dialog-information").pixmap(32, 32));
+
+    KVBox *verInfoBox = new KVBox(m_versionInfoWidget);
+    m_versionTitleLabel = new QLabel(verInfoBox);
+    m_versionInfoLabel = new QLabel(verInfoBox);
+
+    QWidget *versionSpacer = new QWidget(m_versionInfoWidget);
+    versionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    versionInfoLayout->addWidget(infoIcon);
+    versionInfoLayout->addWidget(verInfoBox);
+    versionInfoLayout->addWidget(versionSpacer);
+    //
+
 
     // Details tab widget
     KTabWidget *detailsWidget = new KTabWidget(this);
@@ -131,11 +154,13 @@ DebViewer::DebViewer(QWidget *parent)
     KVBox *fileTab = new KVBox(detailsWidget);
     m_fileWidget = new KTextBrowser(fileTab);
 
+
     detailsWidget->addTab(descriptionTab, i18nc("@title:tab", "Description"));
     detailsWidget->addTab(detailsTab, i18nc("@title:tab", "Details"));
     detailsWidget->addTab(fileTab, i18nc("@title:tab", "Included Files"));
 
     mainLayout->addWidget(headerWidget);
+    mainLayout->addWidget(m_versionInfoWidget);
     mainLayout->addWidget(detailsWidget);
 }
 
@@ -176,7 +201,6 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     m_iconLabel->setPixmap(icon.pixmap(48,48));
 
     m_nameLabel->setText(debFile->packageName());
-    m_statusLabel->setText("A very packity package"); // FIXME: placeholder
 
     // Details tab widgets
     QString shortDesc = debFile->shortDescription();
@@ -204,6 +228,26 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     }
 
     m_fileWidget->setPlainText(filesString);
+}
+
+void DebViewer::setStatusText(const QString &text)
+{
+    m_statusLabel->setText(text);
+}
+
+void DebViewer::hideVersionInfo()
+{
+    m_versionInfoWidget->hide();
+}
+
+void DebViewer::setVersionTitle(const QString &title)
+{
+    m_versionTitleLabel->setText(title);
+}
+
+void DebViewer::setVersionInfo(const QString &info)
+{
+    m_versionInfoLabel->setText(info);
 }
 
 #include "DebViewer.moc"

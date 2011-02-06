@@ -28,8 +28,13 @@
 #include <KLocale>
 #include <KPushButton>
 #include <KMessageBox>
+#include <KDebug>
 
-#include <LibQApt/Backend>
+#include <apt-pkg/pkgsystem.h>
+#include <apt-pkg/version.h>
+
+#include "../../src/backend.h"
+#include "../../src/config.h"
 
 #include "DebCommitWidget.h"
 #include "DebViewer.h"
@@ -39,6 +44,7 @@ DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     , m_backend(new QApt::Backend)
     , m_debFile(debFile)
     , m_commitWidget(0)
+    , m_canInstall(false)
 {
     m_backend->init();
     connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode, QVariantMap)),
@@ -58,7 +64,6 @@ void DebInstaller::initGUI()
     setButtonText(KDialog::Apply, i18nc("@label", "Install Package"));
     m_applyButton = button(KDialog::Apply);
     m_cancelButton = button(KDialog::Cancel);
-    //m_applyButton->setEnabled(false);
 
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(installDebFile()));
 
@@ -77,7 +82,20 @@ void DebInstaller::initGUI()
         return;
     }
 
+    setWindowTitle(i18nc("@title:window",
+                         "Package Installer - %1", m_debFile.packageName()));
     m_debViewer->setDebFile(&m_debFile);
+    checkDeb();
+
+    m_applyButton->setEnabled(m_canInstall);
+    m_debViewer->setStatusText(m_statusString);
+
+    if (!m_versionInfo.isEmpty()){
+        m_debViewer->setVersionTitle(m_versionTitle);
+        m_debViewer->setVersionInfo(m_versionInfo);
+    } else {
+        m_debViewer->hideVersionInfo();
+    }
 }
 
 void DebInstaller::workerEvent(QApt::WorkerEvent event)
@@ -153,6 +171,63 @@ void DebInstaller::initCommitWidget()
 
     connect(m_backend, SIGNAL(debInstallMessage(const QString &)),
             m_commitWidget, SLOT(updateTerminal(const QString &)));
+}
+
+void DebInstaller::checkDeb()
+{
+    QString arch = m_backend->config()->readEntry(QLatin1String("APT::Architecture"),
+                                                  QLatin1String(""));
+    QString debArch = m_debFile.architecture();
+
+    if (arch != QLatin1String("all") && arch != debArch) {
+        // Wrong arch
+        m_statusString = i18nc("@info", "Error: Wrong architecture '%1'", debArch);
+        m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
+        m_statusString.append(QLatin1String("</font>"));
+        m_canInstall = false;
+        return;
+    }
+
+    compareDebWithCache();
+
+    m_statusString = i18nc("@info", "All dependencies are satisfied.");
+    m_canInstall = true;
+}
+
+void DebInstaller::compareDebWithCache()
+{
+    QApt::Package *pkg = m_backend->package(m_debFile.packageName());
+
+    if (!pkg) {
+        return;
+    }
+
+    QString version = m_debFile.version();
+
+    int res = compareVersions(m_debFile.version().latin1(),
+                              pkg->availableVersion().toStdString().c_str());
+
+    if (res == 0 && !pkg->isInstalled()) {
+        m_versionTitle = i18nc("@info", "The same version is available in a software channel.");
+        m_versionInfo = i18nc("@info", "It is recommended to install the software from the channel instead");
+    } else if (res > 0) {
+        m_versionTitle = i18nc("@info", "An older version is available in a software channel.");
+        m_versionInfo = i18nc("@info", "It is recommended to install the version from the "
+                                       "software channel, since it usually has more support.");
+    } else if (res < 0) {
+        m_versionTitle = i18nc("@info", "A never version is available in a software channel.");
+        m_versionInfo = i18nc("@info", "It is strongly advised to install the version from the "
+                                       "software channel, since it usually has more support.");
+    }
+}
+
+int DebInstaller::compareVersions(const char *A, const char *B)
+{
+    int LenA = strlen(A);
+    int LenB = strlen(B);
+
+    return _system->VS->DoCmpVersion(A, A+LenA,
+                                     B, B+LenB);
 }
 
 #include "DebInstaller.moc"
