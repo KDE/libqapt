@@ -179,7 +179,7 @@ void DebInstaller::checkDeb()
                                                   QLatin1String(""));
     QString debArch = m_debFile.architecture();
 
-    if (arch != QLatin1String("all") && arch != debArch) {
+    if (debArch != QLatin1String("all") && arch != debArch) {
         // Wrong arch
         m_statusString = i18nc("@info", "Error: Wrong architecture '%1'", debArch);
         m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
