@@ -53,7 +53,7 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
 
     m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock", this);
     m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
-    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hideDebconf()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
     m_debconfGui->hide();
     layout->addWidget(m_debconfGui);
 
