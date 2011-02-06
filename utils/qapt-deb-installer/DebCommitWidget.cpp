@@ -25,6 +25,8 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 
+#include <DebconfGui.h>
+
 // KDE includes
 #include <KLocale>
 
@@ -44,6 +46,12 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     m_terminal->setWordWrapMode(QTextOption::NoWrap);
     m_terminal->setUndoRedoEnabled(false);
 
+    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock", this);
+    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hideDebconf()));
+    m_debconfGui->hide();
+    layout->addWidget(m_debconfGui);
+
     layout->addWidget(m_headerLabel);
     layout->addWidget(m_terminal);
 }
@@ -62,3 +70,14 @@ void DebCommitWidget::setHeaderText(const QString &text)
     m_headerLabel->setText(text);
 }
 
+void DebCommitWidget::showDebconf()
+{
+    m_terminal->hide();
+    m_debconfGui->show();
+}
+
+void DebCommitWidget::hideDebconf()
+{
+    m_debconfGui->hide();
+    m_terminal->show();
+}

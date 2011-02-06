@@ -26,6 +26,11 @@
 class QLabel;
 class QTextEdit;
 
+namespace DebconfKde
+{
+    class DebconfGui;
+}
+
 class DebCommitWidget : public QWidget
 {
     Q_OBJECT
@@ -36,10 +41,15 @@ public:
 private:
     QLabel *m_headerLabel;
     QTextEdit *m_terminal;
+    DebconfKde::DebconfGui *m_debconfGui;
 
 public Q_SLOTS:
     void updateTerminal(const QString &message);
     void setHeaderText(const QString &text);
+
+private Q_SLOTS:
+    void showDebconf();
+    void hideDebconf();
 };
 
 #endif

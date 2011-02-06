@@ -552,6 +552,8 @@ void QAptWorker::installDebFile(const QString &fileName)
     QString program = QLatin1Literal("dpkg") %
                       QLatin1Literal(" -i ") % fileName;
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
+    setenv("DEBIAN_FRONTEND", "passthrough", 1);
+    setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
     m_dpkgProcess->start(program);
     connect(m_dpkgProcess, SIGNAL(started()), this, SLOT(dpkgStarted()));
     connect(m_dpkgProcess, SIGNAL(readyRead()), this, SLOT(updateDpkgProgress()));
@@ -575,8 +577,6 @@ void QAptWorker::updateDpkgProgress()
 void QAptWorker::dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
-
-    aptDebug() << m_dpkgProcess->readAllStandardError();
 
     if (!exitStatus) {
         emit workerEvent(QApt::DebInstallFinished);
