@@ -21,6 +21,7 @@
 #include "DebInstaller.h"
 
 #include <QtCore/QStringBuilder>
+#include <QtGui/QStackedWidget>
 
 #include <KApplication>
 #include <KIcon>
@@ -30,30 +31,20 @@
 
 #include <LibQApt/Backend>
 
+#include "DebCommitWidget.h"
 #include "DebViewer.h"
 
 DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     : KDialog(parent)
     , m_backend(new QApt::Backend)
     , m_debFile(debFile)
+    , m_commitWidget(0)
 {
     m_backend->init();
     connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode, QVariantMap)),
             this, SLOT(errorOccurred(QApt::ErrorCode, QVariantMap)));
 
     initGUI();
-
-    if (!m_debFile.isValid()) {
-        QString text = i18nc("@label",
-                             "Could not open <filename>%1</filename>. It does not appear to be a "
-                             "valid Debian package file.", m_debFile.filePath());
-        KMessageBox::error(this, text, QString());
-        KApplication::exit();
-    }
-
-    DebViewer *debViewer = new DebViewer(this);
-    setMainWidget(debViewer);
-    debViewer->setDebFile(&m_debFile);
 }
 
 DebInstaller::~DebInstaller()
@@ -66,17 +57,45 @@ void DebInstaller::initGUI()
     setButtons(KDialog::Cancel | KDialog::Apply);
     setButtonText(KDialog::Apply, i18nc("@label", "Install Package"));
     m_applyButton = button(KDialog::Apply);
+    m_cancelButton = button(KDialog::Cancel);
     //m_applyButton->setEnabled(false);
 
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(installDebFile()));
+
+    m_stack = new QStackedWidget(this);
+    setMainWidget(m_stack);
+
+    m_debViewer = new DebViewer(m_stack);
+    m_stack->addWidget(m_debViewer);
+
+    if (!m_debFile.isValid()) {
+        QString text = i18nc("@label",
+                             "Could not open <filename>%1</filename>. It does not appear to be a "
+                             "valid Debian package file.", m_debFile.filePath());
+        KMessageBox::error(this, text, QString());
+        KApplication::instance()->quit();
+        return;
+    }
+
+    m_debViewer->setDebFile(&m_debFile);
 }
 
 void DebInstaller::workerEvent(QApt::WorkerEvent event)
 {
     switch (event) {
     case QApt::DebInstallStarted:
+        if (m_commitWidget) {
+            m_stack->setCurrentWidget(m_commitWidget);
+        }
         break;
     case QApt::DebInstallFinished:
+        if (m_commitWidget) {
+            m_commitWidget->updateTerminal(i18nc("@label Message that the install is done",
+                                                "Done"));
+            m_commitWidget->setHeaderText(i18nc("@info The widget's header label",
+                                                "<title>Done</title>"));
+        }
+        setButtons(KDialog::Close);
         break;
     case QApt::InvalidEvent:
     default:
@@ -98,13 +117,17 @@ void DebInstaller::errorOccurred(QApt::ErrorCode error, const QVariantMap &args)
             title = i18nc("@title:window", "Initialization error");
             QString details = args["ErrorText"].toString();
             KMessageBox::detailedError(this, text, details, title);
-            //FIXME: Quit
+            KApplication::instance()->quit();
             break;
         }
         case QApt::WrongArchError:
             text = i18nc("@label",
                          "This package is incompatible with your computer.");
             KMessageBox::error(this, text, QString());
+            break;
+        case QApt::AuthError:
+            m_applyButton->setEnabled(true);
+            m_cancelButton->setEnabled(true);
             break;
         case QApt::UnknownError:
         default:
@@ -118,6 +141,18 @@ void DebInstaller::installDebFile()
             this, SLOT(workerEvent(QApt::WorkerEvent)));
 
     m_backend->installDebFile(m_debFile);
+    m_applyButton->setEnabled(false);
+    m_cancelButton->setEnabled(false);
+    initCommitWidget();
+}
+
+void DebInstaller::initCommitWidget()
+{
+    m_commitWidget = new DebCommitWidget(this);
+    m_stack->addWidget(m_commitWidget);
+
+    connect(m_backend, SIGNAL(debInstallMessage(const QString &)),
+            m_commitWidget, SLOT(updateTerminal(const QString &)));
 }
 
 #include "DebInstaller.moc"

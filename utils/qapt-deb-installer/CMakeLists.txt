@@ -1,5 +1,6 @@
 set(qapt-deb-installer_SRCS
     main.cpp
+    DebCommitWidget.cpp
     DebInstaller.cpp
     DebViewer.cpp)
 

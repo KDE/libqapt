@@ -18,52 +18,47 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef DEBINSTALLER_H
-#define DEBINSTALLER_H
+#include "DebCommitWidget.h"
 
-#include <QtCore/QStringList>
+// Qt includes
+#include <QtGui/QLabel>
+#include <QtGui/QTextEdit>
+#include <QtGui/QVBoxLayout>
 
-#include <KDialog>
+// KDE includes
+#include <KLocale>
 
-#include <LibQApt/DebFile>
-#include <LibQApt/Globals>
+DebCommitWidget::DebCommitWidget(QWidget *parent)
+    : QWidget(parent)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    setLayout(layout);
 
-class QStackedWidget;
+    m_headerLabel = new QLabel(this);
+    m_headerLabel->setText(i18nc("@info The widget's header label",
+                                 "<title>Installing</title>"));
 
-namespace QApt {
-    class Backend;
+    m_terminal = new QTextEdit(this);
+    m_terminal->setReadOnly(true);
+    m_terminal->setFontFamily(QLatin1String("Monospace"));
+    m_terminal->setWordWrapMode(QTextOption::NoWrap);
+    m_terminal->setUndoRedoEnabled(false);
+
+    layout->addWidget(m_headerLabel);
+    layout->addWidget(m_terminal);
 }
 
-class DebCommitWidget;
-class DebViewer;
-
-class DebInstaller : public KDialog
+DebCommitWidget::~DebCommitWidget()
 {
-    Q_OBJECT
-public:
-    explicit DebInstaller(QWidget *parent, const QString &debFile);
-    ~DebInstaller();
+}
 
-private:
-    // Backend stuff
-    QApt::Backend *m_backend;
-    QApt::DebFile m_debFile;
+void DebCommitWidget::updateTerminal(const QString &message)
+{
+    m_terminal->insertPlainText(message);
+}
 
-    // GUI
-    QStackedWidget *m_stack;
-    DebViewer *m_debViewer;
-    DebCommitWidget *m_commitWidget;
-    KPushButton *m_applyButton;
-    KPushButton *m_cancelButton;
+void DebCommitWidget::setHeaderText(const QString &text)
+{
+    m_headerLabel->setText(text);
+}
 
-private Q_SLOTS:
-    void initGUI();
-
-    void workerEvent(QApt::WorkerEvent event);
-    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
-
-    void installDebFile();
-    void initCommitWidget();
-};
-
-#endif

@@ -18,52 +18,28 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef DEBINSTALLER_H
-#define DEBINSTALLER_H
+#ifndef DEBCOMMITWIDGET_H
+#define DEBCOMMITWIDGET_H
 
-#include <QtCore/QStringList>
+#include <QtGui/QWidget>
 
-#include <KDialog>
+class QLabel;
+class QTextEdit;
 
-#include <LibQApt/DebFile>
-#include <LibQApt/Globals>
-
-class QStackedWidget;
-
-namespace QApt {
-    class Backend;
-}
-
-class DebCommitWidget;
-class DebViewer;
-
-class DebInstaller : public KDialog
+class DebCommitWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DebInstaller(QWidget *parent, const QString &debFile);
-    ~DebInstaller();
+    explicit DebCommitWidget(QWidget *parent = 0);
+    ~DebCommitWidget();
 
 private:
-    // Backend stuff
-    QApt::Backend *m_backend;
-    QApt::DebFile m_debFile;
+    QLabel *m_headerLabel;
+    QTextEdit *m_terminal;
 
-    // GUI
-    QStackedWidget *m_stack;
-    DebViewer *m_debViewer;
-    DebCommitWidget *m_commitWidget;
-    KPushButton *m_applyButton;
-    KPushButton *m_cancelButton;
-
-private Q_SLOTS:
-    void initGUI();
-
-    void workerEvent(QApt::WorkerEvent event);
-    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
-
-    void installDebFile();
-    void initCommitWidget();
+public Q_SLOTS:
+    void updateTerminal(const QString &message);
+    void setHeaderText(const QString &text);
 };
 
 #endif
