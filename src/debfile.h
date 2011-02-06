@@ -65,21 +65,21 @@ public:
     *
     * @return The name of the package in this archive
     */
-    QLatin1String packageName() const;
+    QString packageName() const;
 
    /**
     * Returns the source package corresponding to the package in this archive
     *
     * @return The source package
     */
-    QLatin1String sourcePackage() const;
+    QString sourcePackage() const;
 
    /**
     * Returns the version of the package that this archive provides
     *
     * @return The version of the package this DebFile contains
     */
-    QLatin1String version() const;
+    QString version() const;
 
    /**
     * Returns the CPU architecture that this archive can be installed on
@@ -90,7 +90,7 @@ public:
     *
     * @return The archictecure the DebFile is meant for
     */
-    QLatin1String architecture() const;
+    QString architecture() const;
 
    /**
     * Returns of the maintainer of the package in this archive
@@ -104,14 +104,14 @@ public:
     *
     * @return The section of the archive's package
     */
-    QLatin1String section() const;
+    QString section() const;
 
    /**
     * Returns the update priority of the archive's package
     *
     * @return The update priority
     */
-    QLatin1String priority() const;
+    QString priority() const;
 
    /**
     * Returns the homepage of the archive's package

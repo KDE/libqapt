@@ -1166,7 +1166,7 @@ bool Backend::addArchiveToCache(const DebFile &archive)
         return false;
     }
 
-    QLatin1String debVersion = archive.version();
+    QString debVersion = archive.version();
     QString candVersion = pkg->availableVersion();
 
     if (debVersion != candVersion) {

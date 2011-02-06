@@ -92,24 +92,24 @@ QString DebFile::filePath() const
     return d->filePath;
 }
 
-QLatin1String DebFile::packageName() const
+QString DebFile::packageName() const
 {
-    return QLatin1String(d->controlData.FindS("Package").c_str());
+    return QString::fromStdString(d->controlData.FindS("Package"));
 }
 
-QLatin1String DebFile::sourcePackage() const
+QString DebFile::sourcePackage() const
 {
-    return QLatin1String(d->controlData.FindS("Source").c_str());
+    return QString::fromStdString(d->controlData.FindS("Source"));
 }
 
-QLatin1String DebFile::version() const
+QString DebFile::version() const
 {
-    return QLatin1String(d->controlData.FindS("Version").c_str());
+    return QString::fromStdString(d->controlData.FindS("Version"));
 }
 
-QLatin1String DebFile::architecture() const
+QString DebFile::architecture() const
 {
-    return QLatin1String(d->controlData.FindS("Architecture").c_str());
+    return QString::fromStdString(d->controlData.FindS("Architecture"));
 }
 
 QString DebFile::maintainer() const
@@ -117,14 +117,14 @@ QString DebFile::maintainer() const
     return QString::fromStdString(d->controlData.FindS("Maintainer"));
 }
 
-QLatin1String DebFile::section() const
+QString DebFile::section() const
 {
-    return QLatin1String(d->controlData.FindS("Section").c_str());
+    return QString::fromStdString(d->controlData.FindS("Section"));
 }
 
-QLatin1String DebFile::priority() const
+QString DebFile::priority() const
 {
-    return QLatin1String(d->controlData.FindS("Priority").c_str());
+    return QString::fromStdString(d->controlData.FindS("Priority"));
 }
 
 QString DebFile::homepage() const

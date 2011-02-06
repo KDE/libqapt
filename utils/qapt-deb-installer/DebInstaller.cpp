@@ -204,7 +204,7 @@ void DebInstaller::compareDebWithCache()
 
     QString version = m_debFile.version();
 
-    int res = compareVersions(m_debFile.version().latin1(),
+    int res = compareVersions(m_debFile.version().toStdString().c_str(),
                               pkg->availableVersion().toStdString().c_str());
 
     if (res == 0 && !pkg->isInstalled()) {
