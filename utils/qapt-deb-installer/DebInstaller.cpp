@@ -215,7 +215,7 @@ void DebInstaller::compareDebWithCache()
         m_versionInfo = i18nc("@info", "It is recommended to install the version from the "
                                        "software channel, since it usually has more support.");
     } else if (res < 0) {
-        m_versionTitle = i18nc("@info", "A never version is available in a software channel.");
+        m_versionTitle = i18nc("@info", "A newer version is available in a software channel.");
         m_versionInfo = i18nc("@info", "It is strongly advised to install the version from the "
                                        "software channel, since it usually has more support.");
     }
