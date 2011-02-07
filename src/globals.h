@@ -34,7 +34,7 @@ namespace QApt
     typedef QList<Package*> PackageList;
 
    /**
-    * Defines the GroupList type, which is really just a QString
+    * Defines the Group type, which is really just a QString
     */
     typedef QString Group;
 
