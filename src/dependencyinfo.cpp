@@ -20,6 +20,8 @@
 
 #include "dependencyinfo.h"
 
+#include <apt-pkg/deblistparser.h>
+
 // Own includes
 #include "package.h"
 
@@ -42,6 +44,55 @@ DependencyInfo::DependencyInfo(const QString &package, const QString &version,
 
 DependencyInfo::~DependencyInfo()
 {
+}
+
+QList<DependencyItem> DependencyInfo::parseDepends(const QString &field, DependencyType type)
+{
+    string package;
+    string version;
+    unsigned int op;
+
+    string fieldStr = field.toStdString();
+
+    const char *start = fieldStr.c_str();
+    const char *stop = start + strlen(start);
+
+    QList<DependencyItem> depends;
+
+    bool hadOr = false;
+    while (start != stop) {
+        DependencyItem depItem;
+
+        start = debListParser::ParseDepends(start, stop, package, version, op,
+                                            false);
+
+        if (!start) {
+            // Parsing error
+            return depends;
+        }
+
+        if (hadOr) {
+            depItem = depends.last();
+            depends.removeLast();
+        }
+
+        if (op & pkgCache::Dep::Or) {
+            hadOr = true;
+            // Remove or bit from the op so we can assign to a RelationType
+            op = (op & ~pkgCache::Dep::Or);
+        } else {
+            hadOr = false;
+        }
+
+        DependencyInfo info(QString::fromStdString(package),
+                            QString::fromStdString(version),
+                            (RelationType)op, type);
+        depItem.append(info);
+
+        depends.append(depItem);
+    }
+
+    return depends;
 }
 
 QString DependencyInfo::packageName() const

@@ -36,12 +36,27 @@ namespace QApt {
  * to use this function, unless you are installing packages via .deb files
  * directly with dpkg circumventing APT, and wish to check that all
  * dependencies are satisfied before blindly installing the package with dpkg.
+ *
+ * @since 1.2
+ *
+ * @author Jonathan Thomas
  */
 class Q_DECL_EXPORT DependencyInfo
 {
 public:
+   /**
+    * Default constructor.
+    *
+    * All unspecified fields are either empty or 0
+    */
     DependencyInfo();
+
+   /**
+    * Default destructor.
+    */
     ~DependencyInfo();
+
+    static QList<QList<DependencyInfo > > parseDepends(const QString &field, DependencyType type);
 
    /**
     * The name of the package that the dependency describes.

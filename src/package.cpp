@@ -31,7 +31,6 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
-#include <apt-pkg/deblistparser.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/indexfile.h>
 #include <apt-pkg/init.h>
@@ -70,7 +69,6 @@ class PackagePrivate
 
         pkgCache::PkgFileIterator searchPkgFileIter(const QLatin1String &label, const QString &release) const;
         QString getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const;
-        QList<DependencyItem> parseDepends(const QString &field, DependencyType type) const;
 
         // Calculate state flags that cannot change
         void initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache);
@@ -131,55 +129,6 @@ QString PackagePrivate::getReleaseFileForOrigin(const QLatin1String &label, cons
     }
 
     return QString();
-}
-
-QList<DependencyItem> PackagePrivate::parseDepends(const QString &field, DependencyType type) const
-{
-    string package;
-    string version;
-    unsigned int op;
-
-    string fieldStr = field.toStdString();
-
-    const char *start = fieldStr.c_str();
-    const char *stop = start + strlen(start);
-
-    QList<DependencyItem> depends;
-
-    bool hadOr = false;
-    while (start != stop) {
-        DependencyItem depItem;
-
-        start = debListParser::ParseDepends(start, stop, package, version, op,
-                                            false);
-
-        if (!start) {
-            // Parsing error
-            return depends;
-        }
-
-        if (hadOr) {
-            depItem = depends.last();
-            depends.removeLast();
-        }
-
-        if (op & pkgCache::Dep::Or) {
-            hadOr = true;
-            // Remove or bit from the op so we can assign to a RelationType
-            op = (op & ~pkgCache::Dep::Or);
-        } else {
-            hadOr = false;
-        }
-
-        DependencyInfo info(QString::fromStdString(package),
-                            QString::fromStdString(version),
-                            (RelationType)op, type);
-        depItem.append(info);
-
-        depends.append(depItem);
-    }
-
-    return depends;
 }
 
 void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache)
@@ -772,47 +721,47 @@ bool Package::isSupported() const
 
 QList<DependencyItem> Package::depends() const
 {
-    return d->parseDepends(controlField("Depends"), Depends);
+    return DependencyInfo::parseDepends(controlField("Depends"), Depends);
 }
 
 QList<DependencyItem> Package::preDepends() const
 {
-    return d->parseDepends(controlField("Pre-Depends"), PreDepends);
+    return DependencyInfo::parseDepends(controlField("Pre-Depends"), PreDepends);
 }
 
 QList<DependencyItem> Package::suggests() const
 {
-    return d->parseDepends(controlField("Suggests"), Suggests);
+    return DependencyInfo::parseDepends(controlField("Suggests"), Suggests);
 }
 
 QList<DependencyItem> Package::recommends() const
 {
-    return d->parseDepends(controlField("Recommends"), Recommends);
+    return DependencyInfo::parseDepends(controlField("Recommends"), Recommends);
 }
 
 QList<DependencyItem> Package::conflicts() const
 {
-    return d->parseDepends(controlField("Conflicts"), Conflicts);
+    return DependencyInfo::parseDepends(controlField("Conflicts"), Conflicts);
 }
 
 QList<DependencyItem> Package::replaces() const
 {
-    return d->parseDepends(controlField("Replaces"), Replaces);
+    return DependencyInfo::parseDepends(controlField("Replaces"), Replaces);
 }
 
 QList<DependencyItem> Package::obsoletes() const
 {
-    return d->parseDepends(controlField("Obsoletes"), Obsoletes);
+    return DependencyInfo::parseDepends(controlField("Obsoletes"), Obsoletes);
 }
 
 QList<DependencyItem> Package::breaks() const
 {
-    return d->parseDepends(controlField("Breaks"), Breaks);
+    return DependencyInfo::parseDepends(controlField("Breaks"), Breaks);
 }
 
 QList<DependencyItem> Package::enhances() const
 {
-    return d->parseDepends(controlField("Enhance"), Enhances);
+    return DependencyInfo::parseDepends(controlField("Enhance"), Enhances);
 }
 
 QStringList Package::dependencyList(bool useCandidateVersion) const
