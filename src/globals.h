@@ -234,6 +234,46 @@ namespace QApt
         /// The full screenshot
         Screenshot  = 2
     };
+
+    enum DependencyType {
+        /// Junk type
+        InvalidType = 0,
+        /// Required to run a package
+        Depends = 1,
+        /// Required to install a package
+        PreDepends = 2,
+        /// Suggested to enhance functionality
+        Suggests = 3,
+        /// Should be present in normal installations, but is not vital
+        Recommends = 4,
+        /// Conflicts another package
+        Conflicts = 5,
+        /// Replaces files from another package
+        Replaces = 6,
+        /// Makes another package obsolete
+        Obsoletes = 7,
+        /// Breaks another package
+        Breaks = 8,
+        /// Provides features that enhance another package
+        Enhances = 9
+    };
+
+    enum RelationType {
+        /// A non-versioned dependency on a package
+        NoOperand = 0x0,
+        /// Depends on any version less than or equal to (<=) the specified version
+        LessOrEqual = 0x1,
+        /// Depends on any version greater than or equal to (>=) the specified version
+        GreaterOrEqual = 0x2,
+        /// Depends on any version less than (<) the specified version
+        LessThan = 0x3,
+        /// Depends on any version greater than (>) the specified version
+        GreaterThan = 0x4,
+        /// Depends on a version equal to (=) the specified version
+        Equals = 0x5,
+        /// Depends on any version not equal to (!=) the specified version
+        NotEqual = 0x6
+    };
 }
 
 #endif

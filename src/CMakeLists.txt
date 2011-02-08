@@ -5,6 +5,7 @@ set(qapt_SRCS
     config.cpp
     history.cpp
     debfile.cpp
+    dependencyinfo.cpp
     )
 
 include_directories(
@@ -24,6 +25,7 @@ set(qapt_MOC_HDRS
 set(qapt_HDRS
     package.h
     debfile.h
+    dependencyinfo.h
     globals.h
     )
 
@@ -54,6 +56,7 @@ install(FILES
     cache.h
     config.h
     debfile.h
+    dependencyinfo.h
     history.h
     package.h
     globals.h
