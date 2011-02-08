@@ -78,7 +78,7 @@ QList<DependencyItem> DependencyInfo::parseDepends(const QString &field, Depende
 
         if (op & pkgCache::Dep::Or) {
             hadOr = true;
-            // Remove or bit from the op so we can assign to a RelationType
+            // Remove the Or bit from the op so we can assign to a RelationType
             op = (op & ~pkgCache::Dep::Or);
         } else {
             hadOr = false;
