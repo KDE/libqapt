@@ -29,6 +29,7 @@
 
 #include <apt-pkg/pkgcache.h>
 
+#include "dependencyinfo.h"
 #include "globals.h"
 
 class pkgRecords;
@@ -339,6 +340,24 @@ public:
     * Returns whether the package is supported by Canonical
     */
     bool isSupported() const;
+
+    QList<DependencyItem> depends() const;
+
+    QList<DependencyItem> preDepends() const;
+
+    QList<DependencyItem> suggests() const;
+
+    QList<DependencyItem> recommends() const;
+
+    QList<DependencyItem> conflicts() const;
+
+    QList<DependencyItem> replaces() const;
+
+    QList<DependencyItem> obsoletes() const;
+
+    QList<DependencyItem> breaks() const;
+
+    QList<DependencyItem> enhances() const;
 
    /**
     * Returns a display-ready list of the names of all the dependencies of this package.
