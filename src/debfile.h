@@ -23,6 +23,8 @@
 
 #include <QtCore/QStringList>
 
+#include "dependencyinfo.h"
+
 namespace QApt {
 
 /**
@@ -174,6 +176,24 @@ public:
     * @return The package's installed size as a 64-bit integer
     */
     qint64 installedSize() const;
+
+    QList<DependencyItem> depends() const;
+
+    QList<DependencyItem> preDepends() const;
+
+    QList<DependencyItem> suggests() const;
+
+    QList<DependencyItem> recommends() const;
+
+    QList<DependencyItem> conflicts() const;
+
+    QList<DependencyItem> replaces() const;
+
+    QList<DependencyItem> obsoletes() const;
+
+    QList<DependencyItem> breaks() const;
+
+    QList<DependencyItem> enhances() const;
 
    /**
     * Extracts the data files of the archive to the given directory.

@@ -255,6 +255,51 @@ QStringList DebFile::iconList() const
     return iconsList;
 }
 
+QList<DependencyItem> DebFile::depends() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Depends")), Depends);
+}
+
+QList<DependencyItem> DebFile::preDepends() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Pre-Depends")), PreDepends);
+}
+
+QList<DependencyItem> DebFile::suggests() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Suggests")), Suggests);
+}
+
+QList<DependencyItem> DebFile::recommends() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Recommends")), Recommends);
+}
+
+QList<DependencyItem> DebFile::conflicts() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Conflicts")), Conflicts);
+}
+
+QList<DependencyItem> DebFile::replaces() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Replaces")), Replaces);
+}
+
+QList<DependencyItem> DebFile::obsoletes() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Obsoletes")), Obsoletes);
+}
+
+QList<DependencyItem> DebFile::breaks() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Breaks")), Breaks);
+}
+
+QList<DependencyItem> DebFile::enhances() const
+{
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Enhance")), Enhances);
+}
+
 qint64 DebFile::installedSize() const
 {
     QString sizeString = QLatin1String(d->controlData.FindS("Installed-Size").c_str());
