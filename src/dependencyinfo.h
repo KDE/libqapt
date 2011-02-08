@@ -101,9 +101,6 @@ private:
     QString m_packageVersion;
     RelationType m_relationType;
     DependencyType m_dependencyType;
-
-    friend class PackagePrivate;
-    friend class DebFilePrivate;
 };
 
 /**
