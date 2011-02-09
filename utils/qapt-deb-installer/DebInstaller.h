@@ -63,7 +63,10 @@ private:
     QString m_versionInfo;
 
     // Functions
+    bool checkDeb();
+    void compareDebWithCache();
     int compareVersions(const char *ver1, const char *ver2);
+    QApt::PackageList checkConflicts();
 
 private Q_SLOTS:
     void initGUI();
@@ -73,8 +76,6 @@ private Q_SLOTS:
 
     void installDebFile();
     void initCommitWidget();
-    void checkDeb();
-    void compareDebWithCache();
 };
 
 #endif

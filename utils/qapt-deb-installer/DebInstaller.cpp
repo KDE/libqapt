@@ -30,11 +30,13 @@
 #include <KMessageBox>
 #include <KDebug>
 
+#include <apt-pkg/debversion.h>
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/version.h>
 
 #include "../../src/backend.h"
 #include "../../src/config.h"
+#include "../../src/dependencyinfo.h"
 
 #include "DebCommitWidget.h"
 #include "DebViewer.h"
@@ -44,7 +46,6 @@ DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     , m_backend(new QApt::Backend)
     , m_debFile(debFile)
     , m_commitWidget(0)
-    , m_canInstall(false)
 {
     m_backend->init();
     connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode, QVariantMap)),
@@ -85,9 +86,9 @@ void DebInstaller::initGUI()
     setWindowTitle(i18nc("@title:window",
                          "Package Installer - %1", m_debFile.packageName()));
     m_debViewer->setDebFile(&m_debFile);
-    checkDeb();
+    bool canInstall = checkDeb();
 
-    m_applyButton->setEnabled(m_canInstall);
+    m_applyButton->setEnabled(canInstall);
     m_debViewer->setStatusText(m_statusString);
 
     if (!m_versionInfo.isEmpty()){
@@ -173,7 +174,7 @@ void DebInstaller::initCommitWidget()
             m_commitWidget, SLOT(updateTerminal(const QString &)));
 }
 
-void DebInstaller::checkDeb()
+bool DebInstaller::checkDeb()
 {
     QString arch = m_backend->config()->readEntry(QLatin1String("APT::Architecture"),
                                                   QLatin1String(""));
@@ -184,14 +185,20 @@ void DebInstaller::checkDeb()
         m_statusString = i18nc("@info", "Error: Wrong architecture '%1'", debArch);
         m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
         m_statusString.append(QLatin1String("</font>"));
-        m_canInstall = false;
-        return;
+        return false;
     }
 
     compareDebWithCache();
 
+    QApt::PackageList conflicts = checkConflicts();
+
+    if (!conflicts.isEmpty()) {
+        // create status message
+        return false;
+    }
+
     m_statusString = i18nc("@info", "All dependencies are satisfied.");
-    m_canInstall = true;
+    return true;
 }
 
 void DebInstaller::compareDebWithCache()
@@ -228,6 +235,49 @@ int DebInstaller::compareVersions(const char *A, const char *B)
 
     return _system->VS->DoCmpVersion(A, A+LenA,
                                      B, B+LenB);
+}
+
+QApt::PackageList DebInstaller::checkConflicts()
+{
+    QApt::PackageList conflictingPackages;
+    QList<QApt::DependencyItem> conflicts = m_debFile.conflicts();
+
+    QApt::Package *pkg = 0;
+    bool ok = true;
+    foreach(const QApt::DependencyItem &item, conflicts) {
+        foreach (const QApt::DependencyInfo &info, item) {
+            pkg = m_backend->package(info.packageName());
+
+            if (!pkg) {
+                // FIXME: Virtual package, must check provides
+                continue;
+            }
+
+            string pkgVer;
+            string depVer;
+
+            if (pkg->isInstalled()) {
+                pkgVer = pkg->installedVersion().toStdString();
+            } else if (pkg->state() & QApt::Package::ToInstall) {
+                pkgVer = pkg->availableVersion().toStdString();
+            }
+
+            ok = _system->VS->CheckDep(pkgVer.c_str(),
+                                       info.relationType(),
+                                       depVer.c_str());
+
+            if (ok) {
+                // Group satisfied
+                break;
+            }
+        }
+
+        if (!ok && pkg) {
+            conflictingPackages.append(pkg);
+        }
+    }
+
+    return conflictingPackages;
 }
 
 #include "DebInstaller.moc"
