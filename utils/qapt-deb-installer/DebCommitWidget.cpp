@@ -22,6 +22,7 @@
 
 // Qt includes
 #include <QtGui/QLabel>
+#include <QtGui/QProgressBar>
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 
@@ -55,14 +56,33 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
     m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
     m_debconfGui->hide();
-    layout->addWidget(m_debconfGui);
+
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->hide();
 
     layout->addWidget(m_headerLabel);
     layout->addWidget(m_terminal);
+    layout->addWidget(m_debconfGui);
+    layout->addWidget(m_progressBar);
 }
 
 DebCommitWidget::~DebCommitWidget()
 {
+}
+
+void DebCommitWidget::updateDownloadProgress(int progress, int speed, int ETA)
+{
+    Q_UNUSED(speed);
+    Q_UNUSED(ETA);
+
+    m_progressBar->setValue(progress);
+}
+
+void DebCommitWidget::updateCommitProgress(const QString &message, int progress)
+{
+    Q_UNUSED(message);
+
+    m_progressBar->setValue(progress);
 }
 
 void DebCommitWidget::updateTerminal(const QString &message)
@@ -84,5 +104,17 @@ void DebCommitWidget::showDebconf()
 void DebCommitWidget::hideDebconf()
 {
     m_debconfGui->hide();
+    m_terminal->show();
+}
+
+void DebCommitWidget::showProgress()
+{
+    m_terminal->hide();
+    m_progressBar->show();
+}
+
+void DebCommitWidget::hideProgress()
+{
+    m_progressBar->hide();
     m_terminal->show();
 }

@@ -24,6 +24,7 @@
 #include <QtGui/QWidget>
 
 class QLabel;
+class QProgressBar;
 class QTextEdit;
 
 namespace DebconfKde
@@ -42,10 +43,15 @@ private:
     QLabel *m_headerLabel;
     QTextEdit *m_terminal;
     DebconfKde::DebconfGui *m_debconfGui;
+    QProgressBar *m_progressBar;
 
 public Q_SLOTS:
+    void updateDownloadProgress(int progress, int speed, int ETA);
+    void updateCommitProgress(const QString &message, int progress);
     void updateTerminal(const QString &message);
     void setHeaderText(const QString &text);
+    void showProgress();
+    void hideProgress();
 
 private Q_SLOTS:
     void showDebconf();

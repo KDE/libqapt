@@ -67,6 +67,8 @@ private:
     void compareDebWithCache();
     int compareVersions(const char *ver1, const char *ver2);
     QApt::PackageList checkConflicts();
+    QApt::Package *checkBreaksSystem();
+    bool satisfyDepends();
 
 private Q_SLOTS:
     void initGUI();

@@ -102,8 +102,45 @@ void DebInstaller::initGUI()
 void DebInstaller::workerEvent(QApt::WorkerEvent event)
 {
     switch (event) {
+    case QApt::PackageDownloadStarted:
+        if (m_commitWidget) {
+            m_stack->setCurrentWidget(m_commitWidget);
+            m_commitWidget->showProgress();
+            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are downloading",
+                                                "<title>Downloading Dependencies</title>"));
+
+            connect(m_backend, SIGNAL(downloadProgress(int, int, int)),
+                m_commitWidget, SLOT(updateDownloadProgress(int, int, int)));
+        }
+        break;
+    case QApt::PackageDownloadFinished:
+        if (m_commitWidget) {
+            disconnect(m_backend, SIGNAL(downloadProgress(int, int, int)),
+                       m_commitWidget, SLOT(updateDownloadProgress(int, int, int)));
+        }
+        break;
+    case QApt::CommitChangesStarted:
+        if (m_commitWidget) {
+            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are installing",
+                                                "<title>Installing Dependencies</title>"));
+
+            connect(m_backend, SIGNAL(commitProgress(const QString&, int)),
+                    m_commitWidget, SLOT(updateCommitProgress(const QString&, int)));
+        }
+        break;
+    case QApt::CommitChangesFinished:
+        if (m_commitWidget) {
+            m_commitWidget->hideProgress();
+
+            disconnect(m_backend, SIGNAL(commitProgress(const QString&, int)),
+                       m_commitWidget, SLOT(updateCommitProgress(const QString&, int)));
+
+            m_backend->installDebFile(m_debFile);
+        }
+        break;
     case QApt::DebInstallStarted:
         if (m_commitWidget) {
+            m_commitWidget->hideProgress();
             m_stack->setCurrentWidget(m_commitWidget);
         }
         break;
@@ -111,7 +148,7 @@ void DebInstaller::workerEvent(QApt::WorkerEvent event)
         if (m_commitWidget) {
             m_commitWidget->updateTerminal(i18nc("@label Message that the install is done",
                                                 "Done"));
-            m_commitWidget->setHeaderText(i18nc("@info The widget's header label",
+            m_commitWidget->setHeaderText(i18nc("@info Header label used when the install is done",
                                                 "<title>Done</title>"));
         }
         setButtons(KDialog::Close);
@@ -159,10 +196,15 @@ void DebInstaller::installDebFile()
     connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)),
             this, SLOT(workerEvent(QApt::WorkerEvent)));
 
-    m_backend->installDebFile(m_debFile);
     m_applyButton->setEnabled(false);
     m_cancelButton->setEnabled(false);
+
     initCommitWidget();
+    if (m_backend->markedPackages().size()) {
+        m_backend->commitChanges();
+    } else {
+        m_backend->installDebFile(m_debFile);
+    }
 }
 
 void DebInstaller::initCommitWidget()
@@ -172,6 +214,7 @@ void DebInstaller::initCommitWidget()
 
     connect(m_backend, SIGNAL(debInstallMessage(const QString &)),
             m_commitWidget, SLOT(updateTerminal(const QString &)));
+    kDebug() << "Set up commit widget";
 }
 
 bool DebInstaller::checkDeb()
@@ -191,13 +234,34 @@ bool DebInstaller::checkDeb()
     compareDebWithCache();
 
     QApt::PackageList conflicts = checkConflicts();
-
     if (!conflicts.isEmpty()) {
         // create status message
         return false;
     }
 
-    m_statusString = i18nc("@info", "All dependencies are satisfied.");
+    QApt::Package *willBreak = checkBreaksSystem();
+    if (willBreak) {
+        kDebug() << "will break";
+        // create status message
+        return false;
+    }
+
+    if (!satisfyDepends()) {
+        kDebug() << "cannot satisfy depends";
+        // create status message
+        return false;
+    }
+
+    int toInstall = m_backend->markedPackages().size();
+    if (toInstall) {
+        m_statusString = i18ncp("@label A note saying that additional packages are needed",
+                                "Requires the installation of %1 additional package.",
+                                "Requires the installation of %1 additional packages",
+                                toInstall);
+    } else {
+        m_statusString = i18nc("@info", "All dependencies are satisfied.");
+    }
+
     return true;
 }
 
@@ -278,6 +342,87 @@ QApt::PackageList DebInstaller::checkConflicts()
     }
 
     return conflictingPackages;
+}
+
+QApt::Package *DebInstaller::checkBreaksSystem()
+{
+    QApt::PackageList systemPackages = m_backend->availablePackages();
+    string debVer = m_debFile.version().toStdString();
+
+    foreach (QApt::Package *pkg, systemPackages) {
+        if (!pkg->isInstalled()) {
+            continue;
+        }
+
+        // Check for broken depends
+        foreach(const QApt::DependencyItem &item, pkg->depends()) {
+            foreach (const QApt::DependencyInfo &dep, item) {
+                if (dep.packageName() != m_debFile.packageName()) {
+                    continue;
+                }
+
+                string depVer = dep.packageVersion().toStdString();
+
+                if (!_system->VS->CheckDep(debVer.c_str(), dep.relationType(),
+                                           depVer.c_str())) {
+                    return pkg;
+                }
+            }
+        }
+
+        // Check for existing conflicts against the .deb
+        // FIXME: Check provided virtual packages too
+        foreach(const QApt::DependencyItem &item, pkg->conflicts()) {
+            foreach (const QApt::DependencyInfo &conflict, item) {
+                if (conflict.packageName() != m_debFile.packageName()) {
+                    continue;
+                }
+
+                string conflictVer = conflict.packageVersion().toStdString();
+
+                if (_system->VS->CheckDep(debVer.c_str(),
+                                          conflict.relationType(),
+                                          conflictVer.c_str())) {
+                    return pkg;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+bool DebInstaller::satisfyDepends()
+{
+    foreach(const QApt::DependencyItem &item, m_debFile.depends()) {
+        bool oneSatisfied = false;
+        foreach (const QApt::DependencyInfo &dep, item) {
+            QApt::Package *pkg = m_backend->package(dep.packageName());
+            if (!pkg) {
+                // FIXME: virtual package handling
+                continue;
+            }
+
+            // FIXME: Use CheckDep
+            if (pkg->isInstalled()) {
+                oneSatisfied = true;
+                break;
+            } else {
+                pkg->setInstall();
+
+                if (!pkg->wouldBreak()) {
+                    oneSatisfied = true;
+                    break;
+                }
+            }
+        }
+
+        if (!oneSatisfied) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 #include "DebInstaller.moc"
