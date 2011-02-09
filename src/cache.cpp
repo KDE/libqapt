@@ -24,8 +24,6 @@
 
 #include <apt-pkg/cachefile.h>
 
-#include <unistd.h>
-
 namespace QApt {
 
 class CacheBuildProgress : public OpProgress
