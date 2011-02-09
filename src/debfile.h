@@ -87,8 +87,9 @@ public:
     * Returns the CPU architecture that this archive can be installed on
     *
     * For santiy checks, the "APT::Architecture" APT configuration entry
-    * can be used to compare to the output of this function. DebFiles with an
-    * architecture of "all" can be installed on any architecture
+    * can be compared with the output of this function to confirm that the
+    * DebFile is compatible with the host computer. DebFiles with an
+    * architecture of "all" can be installed on any architecture.
     *
     * @return The archictecure the DebFile is meant for
     */
