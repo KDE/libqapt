@@ -403,17 +403,34 @@ bool DebInstaller::satisfyDepends()
                 continue;
             }
 
-            // FIXME: Use CheckDep
-            if (pkg->isInstalled()) {
-                oneSatisfied = true;
-                break;
-            } else {
-                pkg->setInstall();
+            string debVersion = dep.packageVersion().toStdString();
 
-                if (!pkg->wouldBreak()) {
+            // If we're installed, see if we already satisfy the dependency
+            if (pkg->isInstalled()) {
+                string pkgVersion = pkg->installedVersion().toStdString();
+
+                if (_system->VS->CheckDep(pkgVersion.c_str(),
+                                          dep.relationType(),
+                                          debVersion.c_str())) {
                     oneSatisfied = true;
                     break;
                 }
+            }
+
+            // else check if cand ver will satisfy, then mark
+            string candVersion = pkg->availableVersion().toStdString();
+
+            if (!_system->VS->CheckDep(candVersion.c_str(),
+                                       dep.relationType(),
+                                       debVersion.c_str())) {
+                continue;
+            }
+
+            pkg->setInstall();
+
+            if (!pkg->wouldBreak()) {
+                oneSatisfied = true;
+                break;
             }
         }
 
