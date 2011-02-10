@@ -235,20 +235,24 @@ bool DebInstaller::checkDeb()
 
     QApt::PackageList conflicts = checkConflicts();
     if (!conflicts.isEmpty()) {
-        // create status message
         return false;
     }
 
     QApt::Package *willBreak = checkBreaksSystem();
     if (willBreak) {
-        kDebug() << "will break";
-        // create status message
+        m_statusString = i18nc("@info Error string when installing would break an existing package",
+                               "Error: Breaks the existing package \"%1\"",
+                               willBreak->latin1Name());
+        m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
+        m_statusString.append(QLatin1String("</font>"));
         return false;
     }
 
     if (!satisfyDepends()) {
-        kDebug() << "cannot satisfy depends";
         // create status message
+        m_statusString = i18nc("@info", "Error: Cannot satisfy dependencies");
+        m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
+        m_statusString.append(QLatin1String("</font>"));
         return false;
     }
 
