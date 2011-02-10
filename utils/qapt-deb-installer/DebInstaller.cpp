@@ -214,7 +214,6 @@ void DebInstaller::initCommitWidget()
 
     connect(m_backend, SIGNAL(debInstallMessage(const QString &)),
             m_commitWidget, SLOT(updateTerminal(const QString &)));
-    kDebug() << "Set up commit widget";
 }
 
 bool DebInstaller::checkDeb()
