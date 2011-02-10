@@ -1225,6 +1225,8 @@ void Backend::workerFinished(bool result)
                this, SIGNAL(downloadMessage(int, const QString&)));
     disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),
                this, SIGNAL(commitProgress(const QString&, int)));
+    disconnect(d->worker, SIGNAL(debInstallMessage(const QString&)),
+               this, SIGNAL(debInstallMessage(const QString&)));
     disconnect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
                this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
     disconnect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
