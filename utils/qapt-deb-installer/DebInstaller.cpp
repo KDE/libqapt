@@ -320,14 +320,8 @@ QApt::PackageList DebInstaller::checkConflicts()
                 continue;
             }
 
-            string pkgVer;
-            string depVer;
-
-            if (pkg->isInstalled()) {
-                pkgVer = pkg->installedVersion().toStdString();
-            } else if (pkg->state() & QApt::Package::ToInstall) {
-                pkgVer = pkg->availableVersion().toStdString();
-            }
+            string pkgVer = pkg->version().toStdString();
+            string depVer = info.packageVersion().toStdString();
 
             ok = _system->VS->CheckDep(pkgVer.c_str(),
                                        info.relationType(),
