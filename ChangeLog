@@ -1,3 +1,27 @@
+1.1.0:
+======
+- Bugfixes:
+  * Don't crash in Package::supportedUntil() when packages in Ubuntu's main
+    archive do not have a "Supported" field.
+  * Prevent a potential crash in Package::supportedUntil() when a corrupt
+    /etc/lsb-release file is present.
+  * Set LC_MESSAGES as the worker's locale rather than LC_ALL. If extra locale
+    categories are set, LC_ALL will return a rather unuseful composite of all of them.
+    Thanks to Colin Watson for the patch.
+  * Don't close stdout inside the QApt Worker. Packages' post-installation scripts
+    that use stdout will silently fail when it is closed with newer versions of APT.
+  * Use a pty instead of a pipe for write access to enable apt to produce useful
+    entries in /var/log/apt/term.log.
+    Adapted from a patch by Colin Watson.
+  * Don't hardcode the changelog server used in Package::changelogUrl() to
+    changelogs.ubuntu.com. Debian would have to patch the source file for
+    changelogs to work, plus it is configurable at the APT level in the first place.
+- Optimizations:
+  * Don't try to build the entire changelog URL ourselves in Package::changelogUrl(),
+    as the package's control records has much of the URL we need in the form of
+    its filename.
+  
+
 1.1:
 ======
 - Features:
@@ -7,7 +31,7 @@
     reading and writing int, bool and string settings. QApt::Backend has a
     QApt::Config instance that can be accessed by its config() method after
     initialization.
-  * Added a new QApt::Hisotry class. It provides an interface to the APT history
+  * Added a new QApt::History class. It provides an interface to the APT history
     log(s). It provides a list of all entries in the logs, with each entry providing
     a start date, a list of packages acted upon as well as any errors that may have
     occurred during the transaction.
