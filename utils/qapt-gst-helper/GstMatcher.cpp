@@ -43,6 +43,8 @@ GstMatcher::GstMatcher(const QStringList &values)
         return;
     }
 
+    kDebug() << values;
+
     for (int i = 0; i < values.size(); i++) {
         string value = values.at(i).toStdString();
         regmatch_t matches[5];
@@ -63,6 +65,7 @@ GstMatcher::GstMatcher(const QStringList &values)
             if (matches[4].rm_so != -1) {
                 // remove the '(' ')' that the regex matched
                 opt = string(value.c_str(), matches[4].rm_so + 1, matches[4].rm_eo - matches[4].rm_so - 2);
+                kDebug() << QString::fromStdString(opt);
             }
 
             if (type.compare("encoder") == 0) {

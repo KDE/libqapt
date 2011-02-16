@@ -41,6 +41,7 @@ public:
     QString requestedBy() const;
     QString name() const;
     QString capsInfo() const;
+    QString capsVariantInfo() const;
     int pluginType() const;
     QString data() const;
     QString searchString() const;
@@ -54,6 +55,7 @@ private:
     QString m_name;
     QString m_typeName;
     QString m_capsInfo;
+    QString m_capsVariantInfo;
     QGst::Structure m_structure;
     int m_pluginType;
     QString m_data;

@@ -67,8 +67,6 @@ void PluginInfo::parseDetails(const QString &gstDetails)
 
     // Everything up to the first '-' is the typeName
     m_typeName = parts.at(4).section('-', 0, 0);
-    QString caps = parts.at(4);
-    caps.remove(m_typeName % '-');
 
     if (m_typeName == "encoder") {
         m_pluginType = Encoder;
@@ -76,9 +74,9 @@ void PluginInfo::parseDetails(const QString &gstDetails)
         m_pluginType = Decoder;
     }
 
-    m_structure = QGst::Structure::fromString(caps.toStdString().c_str());
+    m_structure = QGst::Structure::fromString(m_capsInfo.toStdString().c_str());
     if (!m_structure.isValid()) {
-        kDebug() << "Failed to parse caps: " << caps;
+        kDebug() << "Failed to parse caps: " << m_capsInfo;
         m_isValid = false;
         return;
     }
@@ -116,6 +114,11 @@ QString PluginInfo::capsInfo() const
     return m_capsInfo;
 }
 
+QString PluginInfo::capsVariantInfo() const
+{
+    return m_capsVariantInfo;
+}
+
 int PluginInfo::pluginType() const
 {
     return m_pluginType;
@@ -135,7 +138,16 @@ QString PluginInfo::searchString() const
 {
     QString searchString = QLatin1Literal("gstreamer") % m_version % '(';
     if (m_structure.isValid()) {
-        searchString.append(m_typeName % '-' % m_structure.name() % ')');
+        kDebug() << m_structure.toString();
+        searchString.append(m_structure.name() % ')');
+
+        QString fields = m_structure.toString();
+        fields.remove(m_structure.name() % QLatin1Literal(", "));
+        fields.remove(';');
+
+        if (!fields.isEmpty()) {
+            searchString.append('(' % fields % ')');
+        }
     } else {
         searchString.append(m_capsInfo % ')');
     }
