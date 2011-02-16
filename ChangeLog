@@ -1,4 +1,4 @@
-1.1.0:
+1.1.1:
 ======
 - Bugfixes:
   * Don't crash in Package::supportedUntil() when packages in Ubuntu's main
