@@ -725,6 +725,21 @@ int Package::state() const
    return packageState | d->state;
 }
 
+int Package::compareVersion(const QString &v1, const QString &v2)
+{
+    // Make deep copies of toStdString(), since otherwise they would
+    // go out of scope when we call c_str()
+    string s1 = v1.toStdString();
+    string s2 = v2.toStdString();
+
+    const char *a = s1.c_str();
+    const char *b = s2.c_str();
+    int lenA = strlen(a);
+    int lenB = strlen(b);
+
+    return _system->VS->DoCmpVersion(a, a+lenA, b, b+lenB);
+}
+
 bool Package::isInstalled() const
 {
     return !d->packageIter->CurrentVer().end();

@@ -346,6 +346,14 @@ public:
     int state() const;
 
    /**
+    * Compares v1 with v2 and returns an integer less than, equal to, or
+    * greater than zero if s1 is less than, equal to, or greater than s2.
+    *
+    * @since 1.2
+    */
+    static int compareVersion(const QString &v1, const QString &v2);
+
+   /**
     * Returns whether the Package is installed
     */
     bool isInstalled() const;
