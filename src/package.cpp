@@ -31,6 +31,7 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
+#include <apt-pkg/debversion.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/indexfile.h>
 #include <apt-pkg/init.h>
@@ -351,6 +352,29 @@ QString Package::version() const
     } else {
         return QLatin1String(d->packageIter->CurrentVer().VerStr());
     }
+}
+
+QString Package::upstreamVersion() const
+{
+    const char *ver;
+
+    if (!(*d->packageIter)->CurrentVer) {
+        pkgDepCache::StateCache &State = (*d->depCache)[*d->packageIter];
+        if (!State.CandidateVer) {
+            return QString();
+        } else {
+            ver = State.CandidateVerIter(*d->depCache).VerStr();
+        }
+    } else {
+        ver = d->packageIter->CurrentVer().VerStr();
+    }
+
+    return QString::fromStdString(_system->VS->UpstreamVersion(ver));
+}
+
+QString Package::upstreamVersion(const QString &version)
+{
+    return QString::fromStdString(_system->VS->UpstreamVersion(version.toStdString().c_str()));
 }
 
 QStringList Package::availableVersions() const

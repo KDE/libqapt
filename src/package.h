@@ -118,6 +118,20 @@ public:
     QString version() const;
 
    /**
+    * Returns the upstream version of the package. This is the Debian version
+    * with the epoch and Debian revision information (if any) removed.
+    *
+    * (E.g. 0.2-0ubuntu1 becomes 0.2)
+    *
+    * @return The upstream version of the package
+    *
+    * @since 1.2
+    */
+    QString upstreamVersion() const;
+
+    static QString upstreamVersion(const QString &version);
+
+   /**
     * Returns a list of all available versions of the package in the form of
     * "version, release" (E.g. "0.2-0ubuntu1, maverick")
     *
