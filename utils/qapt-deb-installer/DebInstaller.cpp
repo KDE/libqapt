@@ -278,8 +278,7 @@ void DebInstaller::compareDebWithCache()
 
     QString version = m_debFile.version();
 
-    int res = compareVersions(m_debFile.version().toStdString().c_str(),
-                              pkg->availableVersion().toStdString().c_str());
+    int res = QApt::Package::compareVersion(m_debFile.version(), pkg->availableVersion());
 
     if (res == 0 && !pkg->isInstalled()) {
         m_versionTitle = i18nc("@info", "The same version is available in a software channel.");
@@ -293,15 +292,6 @@ void DebInstaller::compareDebWithCache()
         m_versionInfo = i18nc("@info", "It is strongly advised to install the version from the "
                                        "software channel, since it usually has more support.");
     }
-}
-
-int DebInstaller::compareVersions(const char *A, const char *B)
-{
-    int LenA = strlen(A);
-    int LenB = strlen(B);
-
-    return _system->VS->DoCmpVersion(A, A+LenA,
-                                     B, B+LenB);
 }
 
 QApt::PackageList DebInstaller::checkConflicts()
