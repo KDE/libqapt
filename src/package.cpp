@@ -610,7 +610,7 @@ QString Package::supportedUntil() const
     QString supportTimeString = QLatin1String("18m");
     QString supportTimeField = controlField(QLatin1String("Supported"));
 
-    if (!supportTimeString.isEmpty()) {
+    if (!supportTimeField.isEmpty()) {
         supportTimeString = supportTimeField;
     }
 
