@@ -447,6 +447,8 @@ public:
     * \return A @c QHash of reasons why the package is broken, corresponding to a
     * QApt::BrokenReason
     */
+    // TODO QApt2: Get rid of this insane thing and use a proper OO scheme,
+    // perhaps something like DependencyInfo
     QHash<int, QHash<QString, QVariantMap> > brokenReason() const;
 
    /**
