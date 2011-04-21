@@ -56,7 +56,8 @@ class Q_DECL_EXPORT Package
 
 public:
    /**
-    * Default constructor
+    * Constructor. You will most likely never use this, and it will probably
+    * become private in QApt2.
     *
     * @param parent The backend that this package is being made a child of
     * @param depcache The underlying dependency cache for fetching some info
