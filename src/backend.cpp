@@ -327,6 +327,10 @@ Package *Backend::packageForFile(const QString &file) const
 {
     Q_D(const Backend);
 
+    if (file.isEmpty()) {
+        return 0;
+    }
+
     Q_FOREACH (Package *package, d->packages) {
         if (package->installedFilesList().contains(file)) {
             return package;
