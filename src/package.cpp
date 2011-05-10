@@ -68,14 +68,14 @@ class PackagePrivate
         int state;
         bool staticStateCalculated;
 
-        pkgCache::PkgFileIterator searchPkgFileIter(const QLatin1String &label, const QString &release) const;
-        QString getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const;
+        pkgCache::PkgFileIterator searchPkgFileIter(QLatin1String label, const QString &release) const;
+        QString getReleaseFileForOrigin(QLatin1String label, const QString &release) const;
 
         // Calculate state flags that cannot change
         void initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache);
 };
 
-pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QLatin1String &label, const QString &release) const
+pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(QLatin1String label, const QString &release) const
 {
     pkgCache::VerIterator verIter = packageIter->VersionList();
     pkgCache::VerFileIterator verFileIter;
@@ -101,7 +101,7 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(const QLatin1String 
    return found;
 }
 
-QString PackagePrivate::getReleaseFileForOrigin(const QLatin1String &label, const QString &release) const
+QString PackagePrivate::getReleaseFileForOrigin(QLatin1String label, const QString &release) const
 {
     pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
 
