@@ -363,6 +363,12 @@ qint64 Backend::downloadSize() const
     // Raw size, ignoring already-downloaded or partially downloaded archives
     qint64 downloadSize = d->cache->depCache()->DebSize();
 
+    // If downloadSize() is called during a cache refresh, there is a chance it
+    // will do so at a bad time and produce an error. Discard any errors that
+    // happen during this function, since they will always be innocuous and at
+    // worst will result in the less accurate DebSize() number being returned
+    _error->PushToStack();
+
     // If possible, get what really needs to be downloaded
     pkgAcquire fetcher;
     pkgPackageManager *PM = _system->CreatePM(d->cache->depCache());
@@ -370,6 +376,9 @@ qint64 Backend::downloadSize() const
         downloadSize = fetcher.FetchNeeded();
     }
     delete PM;
+
+    _error->Discard();
+    _error->RevertToStack();
 
     return downloadSize;
 }
