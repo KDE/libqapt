@@ -81,7 +81,7 @@ bool Cache::open()
 
     d->cache = new pkgCacheFile();
 
-    // Read the sources list
+    // Build the cache
     if (!d->cache->Open(&d->progressMeter, shouldLock)) {
         return false;
     }
