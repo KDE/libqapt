@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=QApt Package Installer
+Name[bs]=QApt instaler paketa
 Name[cs]=Instalátor balíčků QApt
 Name[da]=QApt pakkeinstallationsprogram
 Name[de]=QApt-Pakeinstallationsprogramm
@@ -18,6 +19,7 @@ Name[uk]=Програма для встановлення пакунків QApt
 Name[x-test]=xxQApt Package Installerxx
 Name[zh_TW]=QApt 套件安裝程式
 GenericName=Package Installer
+GenericName[bs]=Instaler paketa
 GenericName[cs]=Instalátor balíčků
 GenericName[da]=Pakkeinstallationsprogram
 GenericName[de]=Pakeinstallationsprogramm
@@ -37,6 +39,7 @@ GenericName[uk]=Встановлення пакунків
 GenericName[x-test]=xxPackage Installerxx
 GenericName[zh_TW]=套件安裝程式
 Comment=Install and view software packages
+Comment[bs]=Instalacija i pregled softverskih paketa
 Comment[cs]=Instalovat a prohlížet balíčky softwaru
 Comment[da]=Installér og vis softwarepakker
 Comment[de]=Software-Pakete installieren und betrachten
