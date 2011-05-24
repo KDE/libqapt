@@ -87,5 +87,5 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
 
 ThumbCreator::Flags DebThumbnailer::flags() const
 {
-    return (Flags)(None);
+    return None;
 }
