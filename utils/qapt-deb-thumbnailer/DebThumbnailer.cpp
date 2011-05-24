@@ -21,6 +21,7 @@
 #include "DebThumbnailer.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QStringBuilder>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 
@@ -65,14 +66,14 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
     QDir tempDir = QDir::temp();
     tempDir.mkdir(QLatin1String("kde-deb-thumbnailer"));
 
-    QString destPath = QDir::tempPath() + QLatin1String("/kde-deb-thumbnailer/");
+    QString destPath = QDir::tempPath() % QLatin1Literal("/kde-deb-thumbnailer/");
 
     if (!debFile.extractFileFromArchive(iconPath, destPath)) {
         return false;
     }
 
     QPixmap mimeIcon = KIcon("application-x-deb").pixmap(width, height);
-    QPixmap appOverlay = QPixmap(destPath + iconPath).scaledToWidth(width/2);
+    QPixmap appOverlay = QPixmap(destPath % iconPath).scaledToWidth(width/2);
 
     QPainter painter(&mimeIcon);
     for (int y = 0; y < appOverlay.height(); y += appOverlay.height()) {
