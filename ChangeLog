@@ -1,3 +1,13 @@
+1.1.3:
+======
+- Bugfixes:
+  * Don't waste time searching if the given file is empty, and return a null pointer.
+    Fixes Backend::packageForFile() returning unpredictable results when passed an empty
+    file string.
+  * Innocuous errors can occur at certain times during the execution of downloadSize()
+    can cause initialization errors, so discard all errors incurred in this function.
+    (BKO: #265741)
+
 1.1.2:
 ======
 No code changes. This update was for translation updates only.
@@ -24,7 +34,6 @@ No code changes. This update was for translation updates only.
   * Don't try to build the entire changelog URL ourselves in Package::changelogUrl(),
     as the package's control records has much of the URL we need in the form of
     its filename.
-  
 
 1.1:
 ======
