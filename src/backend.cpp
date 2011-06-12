@@ -642,12 +642,11 @@ CacheState Backend::currentCacheState() const
     Q_D(const Backend);
 
     CacheState state;
-    int pkgSize = d->packages.size();
     #if QT_VERSION >= 0x040700
     state.reserve(pkgSize);
     #endif
-    for (int i = 0; i < pkgSize; ++i) {
-        state.append(d->packages[i]->state());
+    for (Package *pkg: d->packages) {
+        state.append(pkg->state());
     }
 
     return state;
