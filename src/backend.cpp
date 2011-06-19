@@ -101,6 +101,8 @@ public:
     Config *config;
 
     bool writeSelectionFile(const QString &file, const QString &path) const;
+    void setWorkerLocale();
+    void setWorkerProxy();
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -114,6 +116,17 @@ bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const 
     }
 
     return true;
+}
+
+void BackendPrivate::setWorkerLocale()
+{
+    worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+}
+
+void BackendPrivate::setWorkerProxy()
+{
+    qDebug() << "Mah proxeh: " << QLatin1String(getenv("http_proxy"));
+    worker->setProxy(QLatin1String(getenv("http_proxy")));
 }
 
 Backend::Backend()
@@ -837,7 +850,8 @@ void Backend::commitChanges()
         }
     }
 
-    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    d->setWorkerLocale();
+    d->setWorkerProxy();
     d->worker->commitChanges(packageList);
 }
 
@@ -872,7 +886,8 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
     QDir dir(dirName);
     dir.mkdir(QLatin1String("packages"));
 
-    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    d->setWorkerLocale();
+    d->setWorkerProxy();
     d->worker->downloadArchives(packages, destination);
 }
 
@@ -880,7 +895,8 @@ void Backend::installDebFile(const DebFile &debFile)
 {
     Q_D(Backend);
 
-    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    d->setWorkerLocale();
+    d->setWorkerProxy();
     d->worker->installDebFile(debFile.filePath());
 }
 
@@ -895,7 +911,8 @@ void Backend::updateCache()
 {
     Q_D(Backend);
 
-    d->worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    d->setWorkerLocale();
+    d->setWorkerProxy();
     d->worker->updateCache();
 }
 

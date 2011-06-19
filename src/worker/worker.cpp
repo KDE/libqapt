@@ -90,6 +90,11 @@ void QAptWorker::setLocale(const QString &locale) const
     std::setlocale(LC_ALL, locale.toAscii());
 }
 
+void QAptWorker::setProxy(const QString &proxy) const
+{
+    setenv("http_proxy", proxy.toAscii(), 1);
+}
+
 bool QAptWorker::lockSystem()
 {
     if (m_systemLocked) {

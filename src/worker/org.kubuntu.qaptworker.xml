@@ -53,6 +53,9 @@
     <method name="setLocale">
       <arg name="locale" type="s" direction="in"/>
     </method>
+    <method name="setProxy">
+      <arg name="proxy" type="s" direction="in"/>
+    </method>
     <method name="lockSystem">
       <arg type="b" direction="out"/>
     </method>
