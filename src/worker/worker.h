@@ -61,6 +61,7 @@ private:
 
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
+    void setProxy(const QString &proxy) const;
     bool lockSystem();
     bool unlockSystem();
     void updateCache();
