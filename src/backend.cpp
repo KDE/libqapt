@@ -114,7 +114,6 @@ void BackendPrivate::setWorkerLocale()
 
 void BackendPrivate::setWorkerProxy()
 {
-    qDebug() << "Mah proxeh: " << QLatin1String(getenv("http_proxy"));
     worker->setProxy(QLatin1String(getenv("http_proxy")));
 }
 
