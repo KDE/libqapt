@@ -59,7 +59,7 @@ class DebFilePrivate
 
 void DebFilePrivate::init()
 {
-    FileFd in(filePath.toStdString(), FileFd::ReadOnly);
+    FileFd in(filePath.toUtf8().data(), FileFd::ReadOnly);
     debDebFile deb(in);
 
     // Extract control data
