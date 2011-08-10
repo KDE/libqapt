@@ -166,10 +166,9 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         speed = CurrentCPS;
     }
 
-    int ETA = 0;
-    if (CurrentCPS) {
-        ETA = (int)((TotalBytes - CurrentBytes) / CurrentCPS);
-    }
+   unsigned long long ETA = 0;
+   if(CurrentCPS > 0)
+        ETA = (TotalBytes - CurrentBytes) / CurrentCPS;
 
     // if the ETA is greater than two weeks, show unknown time
     if (ETA > 14*24*60*60) {
