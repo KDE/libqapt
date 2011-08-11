@@ -1,3 +1,83 @@
+1.2.0:
+======
+- Features:
+  * Added the ability to pin and unpin packages via writing files to
+    /etc/apt/preferences.d/
+  * Added the QApt::DebFile class, an information retreval interface for .deb
+    package archives.
+  * Added Backend::saveDownloadList() to create a download list usable by the
+    downloadArchives() function.
+  * Added a downloadArchives() function to download a list of archives to an
+    arbitrary directory. The worker will emit package download signals as usual.
+    This can be useful, for example, for downloading packages to a USB stick.
+  * Added Backend::addArchiveToCache(), whichs adds .deb files for the candidate
+    versions of existing packages to the apt .deb cache. This function can be used
+    to add .debs from e.g. a USB stick so that computers without internet
+    connections can update packages.
+  * Added an installDebFile method to QApt::Backend and the QApt Worker. This
+    method starts the installation of the given .deb file, complete with a
+    DebInstallStarted event signal on start, DebInstallFinished when finished,
+    and a debInstallMessage() signal in between for dpkg output.
+    A new error, WrongArchError, has been added to QApt::ErrorCode for when a
+    .deb file cannot be installed due to incompatible CPU architectures for binary
+    packages. (No multiarch support yet)
+  * Added a new DependencyInfo class to help describe a package's relational
+    dependencies. Useful for when working without APT's dependency solving
+    while using .deb files
+  * Added functions to QApt::Package for returning lists of DependenyInfo objects
+    for various relational dependencies.
+  * Added an upstreamVersion() function to the Package class to return the upstream
+    version of a package. Also include a static version in case we have a package
+    version without a Package object and want the upstream version without having
+    a Package object instantiated.
+  * Added a static method "compareVersion()" to the Package class to compare the
+    versions of two packages, returning the standard less than 0, 0 or greater than
+    zero when appropriate.
+
+- Optimizations:
+  * Speed up concatenation of the release file URI in
+    PackagePrivate::getReleaseFileForOrigin() (Helps speed up the
+    Package::isSupported() function)
+  * Speed up Package::state() by 66% by caching state info that cannot change
+    between cache reloads.
+  * Don't pass const references to QLatin1Strings to PackagePrivate::searchPkgFileIter()
+    and getReleaseFileForOrigin(). QL1S already has a pointer to a c-string, so we are
+    pointlessly dereferencing a refernce to a pointer, making things a tad bit slower.
+    These are private functions, so API/ABI is untouched.
+
+- Bugfixes:
+  * Fixed a copy/paste error in the documentation for the QApt::Group typedef
+  * Fixed a constructor being incorrectly called a default constructor in the api docs.
+  * Send the value of the http_proxy env var to the worker, since it normally runs in
+    a shell-less environment with no env vars defined. Fixes proxies defined in the
+    http_proxy environment variable not working. (BKO: 275276)
+  * Fixed a divide-by-zero crash in the QApt Worker when built against APT 0.8.16 or
+    higher. (BKO: 279690)
+
+- New Utilities:
+  * Introducing the Installer Plasma Runner plugin, providing package installation
+    suggestions using the command-not-found utility and QApt Batch.
+  * Introducing the QApt Deb Installer, a utility for installing .deb packages.
+  * Introducing the QApt Deb Thumbnailer, a thumbnailing plugin for KDE that
+    produces thumbnail previews for Dolphin and friends.
+  * Introducing the QApt GStreamer Helper, a utility that can be used by Phonon's
+    GStreamer backend for automatically suggesting and installing GStreamer codecs
+    for media playback.
+
+1.1.3:
+======
+- Bugfixes:
+  * Don't waste time searching if the given file is empty, and return a null pointer.
+    Fixes Backend::packageForFile() returning unpredictable results when passed an
+    empty file string.
+  * Innocuous errors can occur at certain times during the execution of
+    downloadSize() can cause initialization errors, so discard all errors incurred
+    in this function. (BKO: #265741)
+
+1.1.2:
+======
+- This was a translations-only update
+
 1.1.1:
 ======
 - Bugfixes:
