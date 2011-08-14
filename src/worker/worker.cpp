@@ -271,7 +271,17 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
                 m_cache->depCache()->MarkKeep(iter, false);
                 m_cache->depCache()->SetReInstall(iter, false);
                 break;
-            case QApt::Package::ToUpgrade:
+            case QApt::Package::ToUpgrade: {
+                bool fromUser = !(State.Flags & pkgCache::Flag::Auto);
+                m_cache->depCache()->MarkInstall(iter, true, 0, fromUser);
+                if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
+                    pkgProblemResolver Fix(m_cache->depCache());
+                    Fix.Clear(iter);
+                    Fix.Protect(iter);
+                    Fix.Resolve(true);
+                }
+                break;
+            }
             case QApt::Package::ToInstall:
                 m_cache->depCache()->MarkInstall(iter, true);
                 if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
