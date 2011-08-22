@@ -1153,7 +1153,10 @@ void Package::setAuto(bool flag)
 void Package::setKeep()
 {
     d->depCache->MarkKeep(*d->packageIter, false);
-    pkgFixBroken(*d->depCache);
+    if (d->depCache->BrokenCount() > 0) {
+        pkgProblemResolver Fix(d->depCache);
+        Fix.ResolveByKeep();
+    }
     d->backend->packageChanged(this);
 }
 
