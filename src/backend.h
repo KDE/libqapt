@@ -550,6 +550,8 @@ public Q_SLOTS:
 
     void markPackages(const QApt::PackageList &packages, QApt::Package::State action);
 
+    void setCompressEvents(bool enabled);
+
     /**
      * Commits all pending package state changes that have been made.
      *

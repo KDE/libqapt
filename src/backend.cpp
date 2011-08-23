@@ -101,11 +101,13 @@ public:
 
     Config *config;
 
+    // Event compression
     bool compressEvents;
+    pkgDepCache::ActionGroup *actionGroup;
+
     bool writeSelectionFile(const QString &file, const QString &path) const;
     void setWorkerLocale();
     void setWorkerProxy();
-    void setCompressEvents(bool enabled);
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -129,11 +131,6 @@ void BackendPrivate::setWorkerLocale()
 void BackendPrivate::setWorkerProxy()
 {
     worker->setProxy(QLatin1String(getenv("http_proxy")));
-}
-
-void BackendPrivate::setCompressEvents(bool enabled)
-{
-    compressEvents = enabled;
 }
 
 Backend::Backend()
@@ -830,8 +827,7 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
     }
 
     pkgDepCache *deps = d->cache->depCache();
-    pkgDepCache::ActionGroup group(*deps);
-    d->setCompressEvents(true);
+    setCompressEvents(true);
 
     foreach (Package *package, packages) {
         pkgCache::PkgIterator *iter = package->packageIterator();
@@ -880,8 +876,21 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
         }
     }
 
-    d->setCompressEvents(false);
+    setCompressEvents(false);
     emit packageChanged();
+}
+
+void Backend::setCompressEvents(bool enabled)
+{
+    Q_D(Backend);
+
+    if (enabled) {
+        d->actionGroup = new pkgDepCache::ActionGroup(*d->cache->depCache());
+    } else {
+        delete d->actionGroup;
+        d->actionGroup = 0;
+        d->compressEvents = enabled;
+    }
 }
 
 void Backend::commitChanges()
