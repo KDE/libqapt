@@ -886,10 +886,11 @@ void Backend::setCompressEvents(bool enabled)
 
     if (enabled) {
         d->actionGroup = new pkgDepCache::ActionGroup(*d->cache->depCache());
+        d->compressEvents = true;
     } else {
         delete d->actionGroup;
         d->actionGroup = 0;
-        d->compressEvents = enabled;
+        d->compressEvents = false;
     }
 }
 
