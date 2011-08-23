@@ -58,6 +58,7 @@ public:
         , records(0)
         , maxStackSize(20)
         , config(0)
+        , compressEvents(false)
     {
     }
     ~BackendPrivate()
@@ -100,9 +101,11 @@ public:
 
     Config *config;
 
+    bool compressEvents;
     bool writeSelectionFile(const QString &file, const QString &path) const;
     void setWorkerLocale();
     void setWorkerProxy();
+    void setCompressEvents(bool enabled);
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -126,6 +129,11 @@ void BackendPrivate::setWorkerLocale()
 void BackendPrivate::setWorkerProxy()
 {
     worker->setProxy(QLatin1String(getenv("http_proxy")));
+}
+
+void BackendPrivate::setCompressEvents(bool enabled)
+{
+    compressEvents = enabled;
 }
 
 Backend::Backend()
@@ -729,6 +737,13 @@ bool Backend::isRedoStackEmpty() const
     return d->redoStack.isEmpty();
 }
 
+bool Backend::areEventsCompressed() const
+{
+    Q_D(const Backend);
+
+    return d->compressEvents;
+}
+
 void Backend::undo()
 {
     Q_D(Backend);
@@ -804,6 +819,69 @@ void Backend::markPackageForRemoval(const QString &name)
 {
     Package *pkg = package(name);
     pkg->setRemove();
+}
+
+void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::State action)
+{
+    Q_D(Backend);
+
+    if (packages.isEmpty()) {
+        return;
+    }
+
+    pkgDepCache *deps = d->cache->depCache();
+    pkgDepCache::ActionGroup group(*deps);
+    d->setCompressEvents(true);
+
+    foreach (Package *package, packages) {
+        pkgCache::PkgIterator *iter = package->packageIterator();
+        switch (action) {
+        case Package::ToInstall: {
+            int state = package->state();
+            // Mark for install if not already installed, or if upgradeable
+            if (!(state & Package::Installed) || (state & Package::Upgradeable)) {
+                package->setInstall();
+            }
+            break;
+        }
+        case Package::ToRemove:
+            if (package->isInstalled()) {
+                package->setRemove();
+            }
+            break;
+        case Package::ToUpgrade: {
+            bool fromUser = !(package->state() & Package::IsAuto);
+            deps->MarkInstall(*iter, true, 0, fromUser);
+            break;
+        }
+        case Package::ToReInstall: {
+            int state = package->state();
+
+            if(state & Package::Installed
+               && !(state & Package::NotDownloadable)
+               && !(state & Package::Upgradeable)) {
+                package->setReInstall();
+            }
+            break;
+        }
+        case Package::ToKeep:
+            package->setKeep();
+            break;
+        case Package::ToPurge: {
+            int state = package->state();
+
+            if ((state & Package::Installed) || (state & Package::ResidualConfig)) {
+                package->setPurge();
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    d->setCompressEvents(false);
+    emit packageChanged();
 }
 
 void Backend::commitChanges()

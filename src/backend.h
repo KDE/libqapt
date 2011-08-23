@@ -89,6 +89,8 @@ public:
      */
     bool isRedoStackEmpty() const;
 
+    bool areEventsCompressed() const;
+
     /**
      * Repopulates the internal package cache, package list, and group list.
      * Mostly used internally, like after an update or a package installation
@@ -545,6 +547,8 @@ public Q_SLOTS:
      * @param name The name of the package to be removed
      */
     void markPackageForRemoval(const QString &name);
+
+    void markPackages(const QApt::PackageList &packages, QApt::Package::State action);
 
     /**
      * Commits all pending package state changes that have been made.

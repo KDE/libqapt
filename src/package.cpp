@@ -1157,7 +1157,10 @@ void Package::setKeep()
         pkgProblemResolver Fix(d->depCache);
         Fix.ResolveByKeep();
     }
-    d->backend->packageChanged(this);
+
+    if (!d->backend->areEventsCompressed()) {
+        d->backend->packageChanged(this);
+    }
 }
 
 void Package::setInstall()
@@ -1173,13 +1176,18 @@ void Package::setInstall()
         Fix.Resolve(true);
     }
 
-    d->backend->packageChanged(this);
+    if (!d->backend->areEventsCompressed()) {
+        d->backend->packageChanged(this);
+    }
 }
 
 void Package::setReInstall()
 {
     d->depCache->SetReInstall(*d->packageIter, true);
-    d->backend->packageChanged(this);
+
+    if (!d->backend->areEventsCompressed()) {
+        d->backend->packageChanged(this);
+    }
 }
 
 
@@ -1197,7 +1205,9 @@ void Package::setRemove()
     d->depCache->SetReInstall(*d->packageIter, false);
     d->depCache->MarkDelete(*d->packageIter, false);
 
-    d->backend->packageChanged(this);
+    if (!d->backend->areEventsCompressed()) {
+        d->backend->packageChanged(this);
+    }
 }
 
 void Package::setPurge()
@@ -1214,7 +1224,9 @@ void Package::setPurge()
     d->depCache->SetReInstall(*d->packageIter, false);
     d->depCache->MarkDelete(*d->packageIter, true);
 
-    d->backend->packageChanged(this);
+    if (!d->backend->areEventsCompressed()) {
+        d->backend->packageChanged(this);
+    }
 }
 
 bool Package::setVersion(const QString &version)
