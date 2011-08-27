@@ -76,7 +76,10 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         return;
     }
 
-    QTimer::singleShot(30000, this, SLOT(quit()));
+    m_timeout = new QTimer(this);
+    connect(m_timeout, SIGNAL(timeout()), this, SLOT(quit()));
+    m_timeout->setSingleShot(true);
+    m_timeout->start(30000);
 }
 
 QAptWorker::~QAptWorker()
@@ -542,6 +545,7 @@ void QAptWorker::installDebFile(const QString &fileName)
         emit workerFinished(false);
         return;
     }
+    m_timeout->stop();
 
     emit workerStarted();
 
@@ -596,6 +600,8 @@ void QAptWorker::dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus)
     if (!exitStatus) {
         emit workerEvent(QApt::DebInstallFinished);
     }
+
+    m_timeout->start();
 
     emit workerFinished(!exitStatus);
     delete m_dpkgProcess;
