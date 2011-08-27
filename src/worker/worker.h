@@ -55,7 +55,6 @@ private:
     pkgPolicy *m_policy;
     pkgRecords *m_records;
     bool m_systemLocked;
-    pid_t m_child_id;
 
     QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
