@@ -30,6 +30,7 @@ class pkgRecords;
 
 class QEventLoop;
 class QProcess;
+class QTimer;
 
 namespace QApt {
     class Cache;
@@ -54,12 +55,14 @@ private:
     pkgPolicy *m_policy;
     pkgRecords *m_records;
     bool m_systemLocked;
+    pid_t m_child_id;
 
     QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
     QEventLoop *m_questionBlock;
     QProcess *m_xapianProc;
     QProcess *m_dpkgProcess;
+    QTimer *m_timeout;
 
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
