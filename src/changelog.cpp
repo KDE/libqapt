@@ -23,8 +23,12 @@
 // Qt includes
 #include <QtCore/QRegExp>
 #include <QtCore/QSharedData>
+#include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
 #include <QDebug>
+
+// QApt includes
+#include "package.h"
 
 namespace QApt {
 
@@ -48,14 +52,15 @@ public:
     void parseData(const QString &sourcePackage);
 };
 
-void ChangelogEntryPrivate::parseData(const QString & sourcePackage)
+void ChangelogEntryPrivate::parseData(const QString &sourcePackage)
 {
-    QRegExp rxInfo(QString("^%1 \\((.*)\\)(.*)$").arg(sourcePackage));
-    int pos = rxInfo.indexIn(data);
+    QStringList lines = data.split('\n');
+    QRegExp rxInfo(QString("^%1 \\((.*)\\)(.*)$").arg(QRegExp::escape(sourcePackage)));
+    int pos = rxInfo.indexIn(lines.first());
 
     QStringList list = rxInfo.capturedTexts();
-    Q_FOREACH(const QString &match, list) {
-        qDebug() << match;
+    if (list.count() > 1) {
+        version = list.at(1);
     }
 }
 
@@ -114,6 +119,39 @@ Changelog::~Changelog()
 QString Changelog::text() const
 {
     return d->data;
+}
+
+ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
+{
+    ChangelogEntryList newEntries;
+
+    QStringList entryTexts;
+
+    foreach (const QString &line, d->data.split('\n')) {
+        if (line.startsWith(d->sourcePackage)) {
+            entryTexts.append(line % '\n');
+            continue;
+        }
+
+        int curIndex = entryTexts.count() -1;
+        QString curEntry = entryTexts.at(curIndex);
+
+        curEntry.append(line % '\n');
+        entryTexts[curIndex] = curEntry;
+    }
+
+    foreach (const QString &stanza, entryTexts) {
+        ChangelogEntry entry(stanza, d->sourcePackage);
+
+        int res = Package::compareVersion(entry.version(), version);
+
+        // Add entries newer than the given version
+        if (res > 0) {
+            newEntries << entry;
+        }
+    }
+
+    return newEntries;
 }
 
 }

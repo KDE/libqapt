@@ -74,6 +74,7 @@ public:
     ~Changelog();
 
     QString text() const;
+    ChangelogEntryList newEntriesSince(const QString &version) const;
 
 private:
     QT_END_NAMESPACE
