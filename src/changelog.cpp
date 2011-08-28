@@ -162,10 +162,10 @@ QString Changelog::text() const
     return d->data;
 }
 
-ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
+ChangelogEntryList Changelog::entries() const
 {
-    ChangelogEntryList newEntries;
 
+    ChangelogEntryList entries;
     QStringList entryTexts;
 
     foreach (const QString &line, d->data.split('\n')) {
@@ -183,6 +183,16 @@ ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
 
     foreach (const QString &stanza, entryTexts) {
         ChangelogEntry entry(stanza, d->sourcePackage);
+
+        entries << entry;
+    }
+}
+
+ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
+{
+    ChangelogEntryList newEntries;
+
+    foreach (const ChangelogEntry &entry, entries()) {
 
         int res = Package::compareVersion(entry.version(), version);
 

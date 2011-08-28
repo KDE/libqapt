@@ -77,6 +77,7 @@ public:
     ~Changelog();
 
     QString text() const;
+    ChangelogEntryList entries() const;
     ChangelogEntryList newEntriesSince(const QString &version) const;
 
 private:
