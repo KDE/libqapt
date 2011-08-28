@@ -21,6 +21,7 @@
 #ifndef QAPT_CHANGELOG_H
 #define QAPT_CHANGELOG_H
 
+#include <QtCore/QDateTime>
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QSharedDataPointer>
@@ -46,6 +47,8 @@ public:
 
     QString entryText() const;
     QString version() const;
+    QDateTime issueDateTime() const;
+    QString description() const;
 
 private:
     QT_END_NAMESPACE

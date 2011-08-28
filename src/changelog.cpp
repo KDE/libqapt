@@ -30,6 +30,9 @@
 // QApt includes
 #include "package.h"
 
+// apt-pkg includes
+#include <apt-pkg/strutl.h>
+
 namespace QApt {
 
 class ChangelogEntryPrivate : public QSharedData
@@ -48,6 +51,8 @@ public:
     // Data
     QString data;
     QString version;
+    QDateTime issueDate;
+    QString description;
 
     void parseData(const QString &sourcePackage);
 };
@@ -56,11 +61,37 @@ void ChangelogEntryPrivate::parseData(const QString &sourcePackage)
 {
     QStringList lines = data.split('\n');
     QRegExp rxInfo(QString("^%1 \\((.*)\\)(.*)$").arg(QRegExp::escape(sourcePackage)));
-    int pos = rxInfo.indexIn(lines.first());
+
+    QString versionLine = lines.first();
+    lines.removeFirst();
+    int pos = rxInfo.indexIn(versionLine);
 
     QStringList list = rxInfo.capturedTexts();
     if (list.count() > 1) {
         version = list.at(1);
+    }
+
+    foreach (const QString &line, lines) {
+        // Populate description
+        if (line.startsWith(QLatin1String("  "))) {
+            description.append(line % '\n');
+            continue;
+        }
+
+        // NBC Dateline, to catch a QDateTime
+        // Spacing matters here
+        QRegExp rxDate("^ -- (.+) (<.+>)  (.+)$"); // Chris Hansen
+        int pos = rxDate.indexIn(line);
+        list = rxDate.capturedTexts();
+
+        if (list.count() > 1) {
+            // Why don't you have a seat over there...
+            time_t issueTime = -1;
+            if (RFC1123StrToTime(list.at(3).toUtf8().data(), issueTime)) {
+                issueDate = QDateTime::fromTime_t(issueTime);
+                break;
+            }
+        }
     }
 }
 
@@ -86,6 +117,16 @@ QString ChangelogEntry::entryText() const
 QString ChangelogEntry::version() const
 {
     return d->version;
+}
+
+QDateTime ChangelogEntry::issueDateTime() const
+{
+    return d->issueDate;
+}
+
+QString ChangelogEntry::description() const
+{
+    return d->description;
 }
 
 
