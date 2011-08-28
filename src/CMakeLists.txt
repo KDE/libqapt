@@ -6,6 +6,7 @@ set(qapt_SRCS
     history.cpp
     debfile.cpp
     dependencyinfo.cpp
+    changelog.cpp
     )
 
 include_directories(
@@ -26,6 +27,7 @@ set(qapt_HDRS
     package.h
     debfile.h
     dependencyinfo.h
+    changelog.h
     globals.h
     )
 
@@ -54,6 +56,7 @@ install(TARGETS qapt
 install(FILES
     backend.h
     cache.h
+    changelog.h
     config.h
     debfile.h
     dependencyinfo.h

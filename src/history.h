@@ -35,7 +35,7 @@
 namespace QApt {
 
 /**
- * HistoryItemPrivate is a class containing all private members of the History class
+ * HistoryItemPrivate is a class containing all private members of the HistoryItem class
  */
 class HistoryItemPrivate;
 
