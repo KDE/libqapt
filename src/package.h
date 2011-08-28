@@ -70,6 +70,7 @@ public:
    /**
     * Default destructor
     */
+    // TODO QApt2: Nope
     virtual ~Package();
 
    /**

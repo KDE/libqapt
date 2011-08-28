@@ -148,6 +148,7 @@ public:
      /**
       * Default destructor
       */
+     // TODO QApt2: lolno
     virtual ~History();
 
     HistoryItemList historyItems() const;

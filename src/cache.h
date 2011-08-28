@@ -56,6 +56,7 @@ public:
      /**
       * Default destructor
       */
+     // TODO: QApt2: Nah
     virtual ~Cache();
 
     /**

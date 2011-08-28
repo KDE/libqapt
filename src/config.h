@@ -59,6 +59,7 @@ public:
      /**
       * Default destructor
       */
+    // TODO QApt2: no virtual destructor
     virtual ~Config();
 
     /**

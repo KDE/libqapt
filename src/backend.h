@@ -65,6 +65,7 @@ public:
      /**
       * Default destructor
       */
+    // TODO QApt2: Heck no
     virtual ~Backend();
 
     /**
