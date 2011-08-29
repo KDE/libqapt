@@ -44,6 +44,7 @@ public:
     explicit ChangelogEntry(const QString &entryData, const QString &sourcePackage);
     ChangelogEntry(const ChangelogEntry &other);
     ~ChangelogEntry();
+    ChangelogEntry &operator=(const ChangelogEntry &rhs);
 
     QString entryText() const;
     QString version() const;
@@ -75,6 +76,7 @@ public:
     explicit Changelog(const QString &data, const QString &sourcePackage);
     Changelog(const Changelog &other);
     ~Changelog();
+    Changelog &operator=(const Changelog &rhs);
 
     QString text() const;
     ChangelogEntryList entries() const;

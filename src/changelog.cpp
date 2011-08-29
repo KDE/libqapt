@@ -39,13 +39,18 @@ class ChangelogEntryPrivate : public QSharedData
 {
 public:
     ChangelogEntryPrivate(const QString &entryData, const QString &sourcePkg)
-        : data(entryData)
+        : QSharedData()
+        , data(entryData)
     {
         parseData(sourcePkg);
     }
 
     ChangelogEntryPrivate(const ChangelogEntryPrivate &other)
-        : QSharedData(other), data(other.data) {}
+        : QSharedData(other)
+        , data(other.data)
+        {
+        }
+
     ~ChangelogEntryPrivate() {}
 
     // Data
@@ -101,12 +106,23 @@ ChangelogEntry::ChangelogEntry(const QString &entryData, const QString &sourcePk
 }
 
 ChangelogEntry::ChangelogEntry(const ChangelogEntry &other)
-        : d(other.d)
 {
+    qDebug() << other.d;
+    d = other.d;
 }
 
 ChangelogEntry::~ChangelogEntry()
 {
+}
+
+ChangelogEntry &ChangelogEntry::operator=(const ChangelogEntry& rhs)
+{
+    // Protect against self-assignment
+    if (this == &rhs) {
+        return *this;
+    }
+    d = rhs.d;
+    return *this;
 }
 
 QString ChangelogEntry::entryText() const
@@ -134,9 +150,17 @@ class ChangelogPrivate : public QSharedData
 {
 public:
     ChangelogPrivate(const QString &cData, const QString &sData)
-        : data(cData), sourcePackage(sData) {}
+        : QSharedData()
+        , data(cData)
+        , sourcePackage(sData)
+        {
+        }
     ChangelogPrivate(const ChangelogPrivate &other)
-        : data(other.data), sourcePackage(other.sourcePackage) {}
+        : QSharedData(other)
+        , data(other.data),
+        sourcePackage(other.sourcePackage)
+        {
+        }
     ~ChangelogPrivate() {}
 
     QString data;
@@ -155,6 +179,16 @@ Changelog::Changelog(const Changelog &other)
 
 Changelog::~Changelog()
 {
+}
+
+Changelog &Changelog::operator=(const Changelog& rhs)
+{
+    // Protect against self-assignment
+    if (this == &rhs) {
+        return *this;
+    }
+    d = rhs.d;
+    return *this;
 }
 
 QString Changelog::text() const
