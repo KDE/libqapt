@@ -29,6 +29,7 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
+#include <apt-pkg/aptconfiguration.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/fileutl.h>
@@ -99,6 +100,8 @@ public:
     OrgKubuntuQaptworkerInterface *worker;
 
     Config *config;
+    bool isMultiArch;
+    QString nativeArch;
 
     bool writeSelectionFile(const QString &file, const QString &path) const;
     void setWorkerLocale();
@@ -165,6 +168,8 @@ bool Backend::init()
 
     d->cache = new Cache(this);
     d->config = new Config(this);
+    d->nativeArch = config()->readEntry(QLatin1String("APT::Architecture"),
+                                        QLatin1String(""));
     reloadCache();
     openXapianIndex();
 
@@ -200,6 +205,10 @@ void Backend::reloadCache()
     int count = 0;
     QSet<Group> groupSet;
 
+    d->isMultiArch = APT::Configuration::getArchitectures(false).size() > 1;
+    bool pkgMultiArch;
+    QString arch;
+
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); !iter.end(); ++iter) {
         if (!iter->VersionList) {
@@ -207,6 +216,18 @@ void Backend::reloadCache()
         }
 
         Package *pkg = new Package(this, depCache, d->records, iter);
+
+        if (d->isMultiArch) {
+            // Do not add non-multiarch packages
+            pkgMultiArch = pkg->isMultiArchEnabled();
+            arch = pkg->architecture();
+
+            if (!pkgMultiArch && (arch != d->nativeArch) && (arch != QLatin1String("all"))) {
+                delete pkg;
+                continue;
+            }
+        }
+
         d->packagesIndex[iter->ID] = count;
         d->packages.append(pkg);
         ++count;
@@ -584,6 +605,13 @@ GroupList Backend::availableGroups() const
     GroupList groupList = d->groups.toList();
 
     return groupList;
+}
+
+bool Backend::isMultiArchEnabled() const
+{
+    Q_D(const Backend);
+
+    return d->isMultiArch;
 }
 
 bool Backend::areChangesMarked() const
