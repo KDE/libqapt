@@ -79,6 +79,12 @@ public:
      */
     bool init();
 
+   /**
+    * Returns whether or not APT is configured for installing packages for
+    * additional foriegn CPU architectures.
+    */
+    bool isMultiArchEnabled() const;
+
     /**
      * Returns whether the undo stack is empty
      */

@@ -55,6 +55,7 @@ class PackagePrivate
         PackagePrivate()
             : state(0)
             , staticStateCalculated(false)
+            , multiArchCalculated(false)
         {
         }
         ~PackagePrivate()
@@ -67,6 +68,8 @@ class PackagePrivate
         pkgCache::PkgIterator *packageIter;
         int state;
         bool staticStateCalculated;
+        bool isMultiArch;
+        bool multiArchCalculated;
 
         pkgCache::PkgFileIterator searchPkgFileIter(QLatin1String label, const QString &release) const;
         QString getReleaseFileForOrigin(QLatin1String label, const QString &release) const;
@@ -375,6 +378,11 @@ QString Package::upstreamVersion() const
 QString Package::upstreamVersion(const QString &version)
 {
     return QString::fromStdString(_system->VS->UpstreamVersion(version.toStdString().c_str()));
+}
+
+QString Package::architecture() const
+{
+    return d->packageIter->Arch();
 }
 
 QStringList Package::availableVersions() const
@@ -756,6 +764,18 @@ bool Package::isSupported() const
     }
 
     return false;
+}
+
+bool Package::isMultiArchEnabled() const
+{
+    if (!d->multiArchCalculated) {
+        QString multiArchStr = controlField(QLatin1String("Multi-Arch"));
+        d->isMultiArch = !multiArchStr.isEmpty();
+
+        d->multiArchCalculated = true;
+    }
+
+    return d->isMultiArch;
 }
 
 QList<DependencyItem> Package::depends() const

@@ -131,7 +131,21 @@ public:
     */
     QString upstreamVersion() const;
 
+   /**
+    * Returns the upstream portion of @c version
+    *
+    * @param version The version to get the upstream portion from
+    *
+    * @return The upstream version from the given version string
+    */
     static QString upstreamVersion(const QString &version);
+
+   /**
+    * Returns the CPU architecture that the package supports
+    *
+    * @return The package's architecture
+    */
+    QString architecture() const;
 
    /**
     * Returns a list of all available versions of the package in the form of
@@ -364,6 +378,11 @@ public:
     * Returns whether the package is supported by Canonical
     */
     bool isSupported() const;
+
+   /**
+    * Returns whether or not a package is MultiArch-enabled
+    */
+    bool isMultiArchEnabled() const;
 
     QList<DependencyItem> depends() const;
 
