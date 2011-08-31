@@ -107,7 +107,6 @@ ChangelogEntry::ChangelogEntry(const QString &entryData, const QString &sourcePk
 
 ChangelogEntry::ChangelogEntry(const ChangelogEntry &other)
 {
-    qDebug() << other.d;
     d = other.d;
 }
 
@@ -220,6 +219,8 @@ ChangelogEntryList Changelog::entries() const
 
         entries << entry;
     }
+
+    return entries;
 }
 
 ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
