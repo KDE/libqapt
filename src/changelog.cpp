@@ -208,6 +208,9 @@ ChangelogEntryList Changelog::entries() const
         }
 
         int curIndex = entryTexts.count() -1;
+        if (curIndex < 0) {
+            continue;
+        }
         QString curEntry = entryTexts.at(curIndex);
 
         curEntry.append(line % '\n');
