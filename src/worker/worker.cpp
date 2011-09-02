@@ -623,6 +623,7 @@ void QAptWorker::setAnswer(const QVariantMap &answer)
 
 void QAptWorker::updateXapianIndex()
 {
+    m_timeout->stop();
     emit workerEvent(QApt::XapianUpdateStarted);
 
 
@@ -651,6 +652,7 @@ void QAptWorker::xapianUpdateFinished(bool result)
                                             QLatin1String("UpdateFinished"), this, SLOT(xapianUpdateFinished(bool)));
 
     emit workerEvent(QApt::XapianUpdateFinished);
+    m_timeout->start();
 }
 
 bool QAptWorker::writeFileToDisk(const QString &contents, const QString &path)
