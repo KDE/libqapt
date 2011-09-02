@@ -25,7 +25,6 @@
 #include <QtCore/QSharedData>
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
-#include <QDebug>
 
 // QApt includes
 #include "package.h"
@@ -58,6 +57,7 @@ public:
     QString version;
     QDateTime issueDate;
     QString description;
+    QStringList CVEUrls;
 
     void parseData(const QString &sourcePackage);
 };
@@ -97,6 +97,9 @@ void ChangelogEntryPrivate::parseData(const QString &sourcePackage)
                 break;
             }
         }
+
+
+        QRegExp rxCVE("CVE-\\d{4}-\\d{4}");
     }
 }
 
