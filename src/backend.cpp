@@ -94,6 +94,7 @@ public:
     // Xapian
     time_t xapianTimeStamp;
     Xapian::Database xapianDatabase;
+    bool xapianIndexExists;
 
     // DBus
     QDBusServiceWatcher *watcher;
@@ -642,12 +643,14 @@ bool Backend::xapianIndexNeedsUpdate() const
    // If the cache has been modified after the xapian timestamp, we need to rebuild
    QDateTime aptCacheTime = QFileInfo(QLatin1String(_config->FindFile("Dir::Cache::pkgcache").c_str())).lastModified();
    QDateTime dpkgStatusTime = QFileInfo(QLatin1String("/var/lib/dpkg/status")).lastModified();
+
+   bool outdated = false;
    if (d->xapianTimeStamp < aptCacheTime.toTime_t() ||
        d->xapianTimeStamp < dpkgStatusTime.toTime_t()) {
-      return true;
+       outdated = true;
    }
 
-   return false;
+   return (outdated || (!d->xapianIndexExists));
 }
 
 bool Backend::openXapianIndex()
@@ -660,8 +663,11 @@ bool Backend::openXapianIndex()
     try {
         d->xapianDatabase.add_database(Xapian::Database("/var/lib/apt-xapian-index/index"));
     } catch (Xapian::DatabaseOpeningError) {
+        d->xapianIndexExists = false;
         return false;
     };
+
+    d->xapianIndexExists = true;
 
     return true;
 }
