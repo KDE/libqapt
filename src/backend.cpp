@@ -936,6 +936,7 @@ void Backend::commitChanges()
 
     Q_FOREACH (const Package *package, d->packages) {
         int flags = package->state();
+        std::string fullName = package->packageIterator()->FullName();
         // Cannot have any of these flags simultaneously
         int status = flags & (Package::ToKeep |
                               Package::NewInstall |
@@ -946,26 +947,26 @@ void Backend::commitChanges()
         switch (status) {
            case Package::ToKeep:
                if (flags & Package::Held) {
-                   packageList.insert(package->name(), Package::Held);
+                   packageList.insert(fullName.c_str(), Package::Held);
                }
                break;
            case Package::NewInstall:
-               packageList.insert(package->name(), Package::ToInstall);
+               packageList.insert(fullName.c_str(), Package::ToInstall);
                break;
            case Package::ToReInstall:
-               packageList.insert(package->name(), Package::ToReInstall);
+               packageList.insert(fullName.c_str(), Package::ToReInstall);
                break;
            case Package::ToUpgrade:
-               packageList.insert(package->name(), Package::ToUpgrade);
+               packageList.insert(fullName.c_str(), Package::ToUpgrade);
                break;
            case Package::ToDowngrade:
-               packageList.insert(package->name() % ',' % package->availableVersion(), Package::ToDowngrade);
+               packageList.insert(QString(fullName.c_str()) % ',' % package->availableVersion(), Package::ToDowngrade);
                break;
            case Package::ToRemove:
                if(flags & Package::ToPurge) {
-                   packageList.insert(package->name(), Package::ToPurge);
+                   packageList.insert(fullName.c_str(), Package::ToPurge);
                } else {
-                   packageList.insert(package->name(), Package::ToRemove);
+                   packageList.insert(fullName.c_str(), Package::ToRemove);
                }
                break;
         }
