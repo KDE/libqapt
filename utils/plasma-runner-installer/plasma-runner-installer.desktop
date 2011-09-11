@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Installer
 Name[bs]=Instaler
+Name[ca]=Instal·lador
 Name[cs]=Instalátor
 Name[da]=Installationsprogram
 Name[de]=Installationsprogramm
@@ -27,6 +28,7 @@ Name[x-test]=xxInstallerxx
 Name[zh_TW]=安裝程式
 Comment=Suggests the installation of not-installed applications
 Comment[bs]=Predlaže instalaciju neinstaliranih paketa
+Comment[ca]=Suggereix la instal·lació d'aplicacions no instal·lades
 Comment[cs]=Navrhuje instalaci nenainstalovaných aplikací
 Comment[da]=Foreslår installation af ikke-installerede programmer
 Comment[de]=Schlägt die Installation von Anwendungen vor, die nicht installiert sind
