@@ -116,10 +116,10 @@ bool GstMatcher::matches(QApt::Package *package)
     for (QVector<Match>::const_iterator i = m_matches.constBegin(); i != m_matches.constEnd(); ++i) {
             // Tries to find "Gstreamer-version: xxx"
             if (package->controlField(QLatin1String("Gstreamer-Version")) == QString::fromStdString(i->version)) {
-                // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
                 QString typeData = package->controlField(QLatin1String(i->type.c_str()));
-                if (!typeData.isEmpty()) {
 
+                if (!typeData.isEmpty()) {
+                    // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
                     QGst::CapsPtr caps = QGst::Caps::fromString(typeData);
                     if (caps->isEmpty()) {
                         continue;
