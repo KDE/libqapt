@@ -89,7 +89,7 @@ GstMatcher::GstMatcher(const QStringList &values)
             }
 
             QGst::CapsPtr caps = QGst::Caps::fromString(capsString);
-            if (caps->isEmpty()) {
+            if (!caps || caps->isEmpty()) {
                 continue;
             }
 
