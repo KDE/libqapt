@@ -380,9 +380,19 @@ public:
     bool isSupported() const;
 
    /**
-    * Returns whether or not a package is MultiArch-enabled
+    * Returns whether or not a package is MultiArch-enabled.
+    *
+    * This function was made under the false assumption that non-native
+    * binary packages were considered MultiArch by APT. This is not true,
+    * so this function was renamed to isForeignArch() and expanded to include
+    * non-native binary packages.
     */
-    bool isMultiArchEnabled() const;
+    QT_DEPRECATED bool isMultiArchEnabled() const;
+
+   /**
+    * Returns whether or not the package is for the native CPU architecture
+    */
+    bool isForeignArch() const;
 
     QList<DependencyItem> depends() const;
 

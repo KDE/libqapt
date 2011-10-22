@@ -85,6 +85,16 @@ public:
     */
     bool isMultiArchEnabled() const;
 
+   /**
+    * Returns a list of the CPU architectures APT supports
+    */
+    QStringList architectures() const;
+
+   /**
+    * Returns the native CPU architecture of the computer
+    */
+    QString nativeArchitecture() const;
+
     /**
      * Returns whether the undo stack is empty
      */
