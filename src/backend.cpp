@@ -206,7 +206,7 @@ void Backend::reloadCache()
     int count = 0;
     QSet<Group> groupSet;
 
-    d->isMultiArch = APT::Configuration::getArchitectures(false).size() > 1;
+    d->isMultiArch = architectures().size() > 1;
     bool pkgMultiArch;
     QString arch;
 
@@ -217,17 +217,6 @@ void Backend::reloadCache()
         }
 
         Package *pkg = new Package(this, depCache, d->records, iter);
-
-        if (d->isMultiArch) {
-            // Do not add non-multiarch packages
-            pkgMultiArch = pkg->isMultiArchEnabled();
-            arch = pkg->architecture();
-
-            if (!pkgMultiArch && (arch != d->nativeArch) && (arch != QLatin1String("all"))) {
-                delete pkg;
-                continue;
-            }
-        }
 
         d->packagesIndex[iter->ID] = count;
         d->packages.append(pkg);
@@ -613,6 +602,28 @@ bool Backend::isMultiArchEnabled() const
     Q_D(const Backend);
 
     return d->isMultiArch;
+}
+
+QStringList Backend::architectures() const
+{
+    std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
+
+    QStringList archList;
+    for (std::vector<std::string>::const_iterator a = archs.begin();
+         a != archs.end(); ++a)
+    {
+         archList.append(QString::fromStdString(*a));
+    }
+
+
+    return archList;
+}
+
+QString Backend::nativeArchitecture() const
+{
+    Q_D(const Backend);
+
+    return d->nativeArch;
 }
 
 bool Backend::areChangesMarked() const

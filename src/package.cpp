@@ -55,7 +55,7 @@ class PackagePrivate
         PackagePrivate()
             : state(0)
             , staticStateCalculated(false)
-            , multiArchCalculated(false)
+            , foreignArchCalculated(false)
         {
         }
         ~PackagePrivate()
@@ -68,8 +68,8 @@ class PackagePrivate
         pkgCache::PkgIterator *packageIter;
         int state;
         bool staticStateCalculated;
-        bool isMultiArch;
-        bool multiArchCalculated;
+        bool isForeignArch;
+        bool foreignArchCalculated;
 
         pkgCache::PkgFileIterator searchPkgFileIter(QLatin1String label, const QString &release) const;
         QString getReleaseFileForOrigin(QLatin1String label, const QString &release) const;
@@ -768,14 +768,17 @@ bool Package::isSupported() const
 
 bool Package::isMultiArchEnabled() const
 {
-    if (!d->multiArchCalculated) {
-        QString multiArchStr = controlField(QLatin1String("Multi-Arch"));
-        d->isMultiArch = !multiArchStr.isEmpty();
+    return isForeignArch();
+}
 
-        d->multiArchCalculated = true;
+bool Package::isForeignArch() const
+{
+    if (!d->foreignArchCalculated) {
+        d->isForeignArch = (d->backend->nativeArchitecture() != architecture());
+        d->foreignArchCalculated = true;
     }
 
-    return d->isMultiArch;
+    return d->isForeignArch;
 }
 
 QList<DependencyItem> Package::depends() const
