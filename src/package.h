@@ -257,7 +257,9 @@ public:
     * Returns the archive of the package.
     * (E.g. oneiric, oneiric-updates, sid, etc)
     *
-    * \return The origin of the package
+    * @return The origin of the package
+    *
+    * @since 1.3
     */
     QString archive() const;
 
