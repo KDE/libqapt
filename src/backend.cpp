@@ -509,7 +509,7 @@ PackageList Backend::search(const QString &searchString) const
     }
 
     string unsplitSearchString = searchString.toStdString();
-    static int qualityCutoff = 25;
+    static int qualityCutoff = 15;
     PackageList searchResult;
 
     // Doesn't follow style guidelines to ease merging with synaptic
