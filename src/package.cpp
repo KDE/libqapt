@@ -486,16 +486,19 @@ QString Package::origin() const
     return QString();
 }
 
-QString Package::archive() const
+QStringList Package::archives() const
 {
     const pkgCache::VerIterator &Ver = (*d->depCache).GetCandidateVer(*d->packageIter);
 
     if(!Ver.end()) {
-         pkgCache::VerFileIterator VF = Ver.FileList();
-         return QLatin1String(VF.File().Archive());
+        QStringList archiveList;
+        for (pkgCache::VerFileIterator VF = Ver.FileList(); !VF.end(); VF++) {
+            archiveList << QLatin1String(VF.File().Archive());
+        }
+            return archiveList;
     }
 
-    return QString();
+    return QStringList();
 }
 
 QString Package::component() const
