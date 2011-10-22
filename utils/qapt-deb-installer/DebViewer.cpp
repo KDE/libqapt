@@ -212,7 +212,7 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     m_descriptionWidget->append(shortDesc + longDesc);
 
     m_versionLabel->setText(debFile->version());
-    m_sizeLabel->setText(KGlobal::locale()->formatByteSize(debFile->installedSize()));
+    m_sizeLabel->setText(KGlobal::locale()->formatByteSize(debFile->installedSize() * 1024));
     m_maintainerLabel->setText(debFile->maintainer());
     m_sectionLabel->setText(debFile->section());
     m_homepageLabel->setText(debFile->homepage());
