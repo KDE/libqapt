@@ -486,6 +486,18 @@ QString Package::origin() const
     return QString();
 }
 
+QString Package::archive() const
+{
+    const pkgCache::VerIterator &Ver = (*d->depCache).GetCandidateVer(*d->packageIter);
+
+    if(!Ver.end()) {
+         pkgCache::VerFileIterator VF = Ver.FileList();
+         return QLatin1String(VF.File().Archive());
+    }
+
+    return QString();
+}
+
 QString Package::component() const
 {
     pkgDepCache::StateCache &State = (*d->depCache)[*d->packageIter];

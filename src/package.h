@@ -254,6 +254,14 @@ public:
     QString origin() const;
 
    /**
+    * Returns the archive of the package.
+    * (E.g. oneiric, oneiric-updates, sid, etc)
+    *
+    * \return The origin of the package
+    */
+    QString archive() const;
+
+   /**
     * Returns the archive component of the package. (E.g. main, restricted,
     * universe, contrib, etc)
     *
