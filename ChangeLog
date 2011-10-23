@@ -1,3 +1,52 @@
+1.2.2:
+======
+- Bugfixes:
+  * Fixed a bug in QApt::Debfile where the reported install size was
+    always one unit too low. (E.g. showing 5 KiB instead of 5 MiB)
+    Fixes the QApt Deb Installer showing too small installed sizes.
+  * More fixes for MultiArch. The last round of fixes were made with the assumption that all
+    installable foreign-arch packages would be marked with a Multi-Arch field in their control
+    files. This was a bad assumption. Non-native foreign-arch packages need no changes made to
+    them as long as their dependencies are multi-arch.
+
+    As such, we cannot only add foreign-arch packages marked as MultiArch to the cache, or else
+    we lose foreign-arch binary packages such as Skype. (Which is what people actually want!)
+
+    Unfortunately, this means that there will be "duplicate" entries for most packages in the
+    cache, but these can be differentiated by placing (arch) after the names in your display
+    model.
+
+    Package::isMultiArchEnabled() has been deprecated, and a new Package::isForeignArch()
+    function has been added. It does the same thing, but includes all foreign-arch packages
+    that the APT install supports.
+  * Be a bit less strict about the quality cutoff for the quick search. Fixes very few
+    results being found for the "linux" search term. (BKO: #283523)
+
+1.2.1:
+======
+- Bugfixes:
+  * Added support for MultiArch packages when used with APT 0.8.16+. By default,
+    APT shows every foreign-arch package available. LibQApt filters these and
+    only shows foreign-arch packages that are explicitly marked as MultiArch.
+    To differentiate between the package names, LibQApt consumers can use the
+    new Package::architecture to get the arch as a QString to help disambiguate.
+    (BKO: #276389)
+  * Added Backend::isMultiArchEnabled() to return whether or not dpkg/apt are
+    set up for multiarch
+  * Added Package::isMultiArchEnabled() to return whether or not a package is
+    set up for multiarch
+  * Fixed a bug where the lack of an apt-xapian cache would not trigger a
+    cache rebuild. (A.K.A. search doesn't work on new installs of $DISTRO)
+    (LP: #839411)
+  * Fixed a bug where the QApt Worker would quit during a xapian cache update,
+    causing consumer apps to lose update progress notification.
+  * Fixed a bug where the QApt Worker would quit during long installations of
+    local .deb files with qapt-deb-installer. (BKO: #280890, LP: #830786)
+  * Fixed a crash when the qapt-gst-helper is given invalid GStreamer caps.
+    (LP: #847748)
+  * Fixed xdg compliance issues with the QApt Deb Thumbnailer's .desktop file.
+    Fixes warnings from kbuildsycoca4.
+
 1.2.0:
 ======
 - Features:
