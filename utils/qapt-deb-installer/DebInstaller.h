@@ -47,7 +47,7 @@ public:
 private:
     // Backend stuff
     QApt::Backend *m_backend;
-    QApt::DebFile m_debFile;
+    QApt::DebFile *m_debFile;
 
     // GUI
     QStackedWidget *m_stack;

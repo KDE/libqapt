@@ -20,6 +20,7 @@
 
 #include "DebInstaller.h"
 
+#include <QtCore/QFileInfo>
 #include <QtCore/QStringBuilder>
 #include <QtGui/QStackedWidget>
 
@@ -44,12 +45,14 @@
 DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     : KDialog(parent)
     , m_backend(new QApt::Backend)
-    , m_debFile(debFile)
     , m_commitWidget(0)
 {
     m_backend->init();
     connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode, QVariantMap)),
             this, SLOT(errorOccurred(QApt::ErrorCode, QVariantMap)));
+
+    QFileInfo fi(debFile);
+    m_debFile = new QApt::DebFile(fi.absoluteFilePath());
 
     initGUI();
 }
@@ -74,18 +77,18 @@ void DebInstaller::initGUI()
     m_debViewer = new DebViewer(m_stack);
     m_stack->addWidget(m_debViewer);
 
-    if (!m_debFile.isValid()) {
+    if (!m_debFile->isValid()) {
         QString text = i18nc("@label",
                              "Could not open <filename>%1</filename>. It does not appear to be a "
-                             "valid Debian package file.", m_debFile.filePath());
+                             "valid Debian package file.", m_debFile->filePath());
         KMessageBox::error(this, text, QString());
         KApplication::instance()->quit();
         return;
     }
 
     setWindowTitle(i18nc("@title:window",
-                         "Package Installer - %1", m_debFile.packageName()));
-    m_debViewer->setDebFile(&m_debFile);
+                         "Package Installer - %1", m_debFile->packageName()));
+    m_debViewer->setDebFile(m_debFile);
     bool canInstall = checkDeb();
 
     m_applyButton->setEnabled(canInstall);
@@ -135,7 +138,7 @@ void DebInstaller::workerEvent(QApt::WorkerEvent event)
             disconnect(m_backend, SIGNAL(commitProgress(const QString&, int)),
                        m_commitWidget, SLOT(updateCommitProgress(const QString&, int)));
 
-            m_backend->installDebFile(m_debFile);
+            m_backend->installDebFile(*m_debFile);
         }
         break;
     case QApt::DebInstallStarted:
@@ -203,7 +206,7 @@ void DebInstaller::installDebFile()
     if (m_backend->markedPackages().size()) {
         m_backend->commitChanges();
     } else {
-        m_backend->installDebFile(m_debFile);
+        m_backend->installDebFile(*m_debFile);
     }
 }
 
@@ -220,7 +223,7 @@ bool DebInstaller::checkDeb()
 {
     QString arch = m_backend->config()->readEntry(QLatin1String("APT::Architecture"),
                                                   QLatin1String(""));
-    QString debArch = m_debFile.architecture();
+    QString debArch = m_debFile->architecture();
 
     if (debArch != QLatin1String("all") && arch != debArch) {
         // Wrong arch
@@ -270,15 +273,15 @@ bool DebInstaller::checkDeb()
 
 void DebInstaller::compareDebWithCache()
 {
-    QApt::Package *pkg = m_backend->package(m_debFile.packageName());
+    QApt::Package *pkg = m_backend->package(m_debFile->packageName());
 
     if (!pkg) {
         return;
     }
 
-    QString version = m_debFile.version();
+    QString version = m_debFile->version();
 
-    int res = QApt::Package::compareVersion(m_debFile.version(), pkg->availableVersion());
+    int res = QApt::Package::compareVersion(m_debFile->version(), pkg->availableVersion());
 
     if (res == 0 && !pkg->isInstalled()) {
         m_versionTitle = i18nc("@info", "The same version is available in a software channel.");
@@ -297,7 +300,7 @@ void DebInstaller::compareDebWithCache()
 QApt::PackageList DebInstaller::checkConflicts()
 {
     QApt::PackageList conflictingPackages;
-    QList<QApt::DependencyItem> conflicts = m_debFile.conflicts();
+    QList<QApt::DependencyItem> conflicts = m_debFile->conflicts();
 
     QApt::Package *pkg = 0;
     bool ok = true;
@@ -334,7 +337,7 @@ QApt::PackageList DebInstaller::checkConflicts()
 QApt::Package *DebInstaller::checkBreaksSystem()
 {
     QApt::PackageList systemPackages = m_backend->availablePackages();
-    string debVer = m_debFile.version().toStdString();
+    string debVer = m_debFile->version().toStdString();
 
     foreach (QApt::Package *pkg, systemPackages) {
         if (!pkg->isInstalled()) {
@@ -344,7 +347,7 @@ QApt::Package *DebInstaller::checkBreaksSystem()
         // Check for broken depends
         foreach(const QApt::DependencyItem &item, pkg->depends()) {
             foreach (const QApt::DependencyInfo &dep, item) {
-                if (dep.packageName() != m_debFile.packageName()) {
+                if (dep.packageName() != m_debFile->packageName()) {
                     continue;
                 }
 
@@ -361,7 +364,7 @@ QApt::Package *DebInstaller::checkBreaksSystem()
         // FIXME: Check provided virtual packages too
         foreach(const QApt::DependencyItem &item, pkg->conflicts()) {
             foreach (const QApt::DependencyInfo &conflict, item) {
-                if (conflict.packageName() != m_debFile.packageName()) {
+                if (conflict.packageName() != m_debFile->packageName()) {
                     continue;
                 }
 
@@ -381,7 +384,7 @@ QApt::Package *DebInstaller::checkBreaksSystem()
 
 bool DebInstaller::satisfyDepends()
 {
-    foreach(const QApt::DependencyItem &item, m_debFile.depends()) {
+    foreach(const QApt::DependencyItem &item, m_debFile->depends()) {
         bool oneSatisfied = false;
         foreach (const QApt::DependencyInfo &dep, item) {
             QApt::Package *pkg = m_backend->package(dep.packageName());
