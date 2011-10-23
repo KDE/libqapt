@@ -62,6 +62,7 @@ QAptWorker::QAptWorker(int &argc, char **argv)
         , m_records(0)
         , m_questionBlock(0)
         , m_systemLocked(false)
+        , m_initialized(false)
 {
     new QaptworkerAdaptor(this);
 
@@ -123,24 +124,34 @@ bool QAptWorker::unlockSystem()
 
 bool QAptWorker::initializeApt()
 {
-    if (!pkgInitConfig(*_config) || !pkgInitSystem(*_config, _system)) {
-        throwInitError();
-        return false;
+    if (!m_initialized) {
+        if (!pkgInitConfig(*_config) || !pkgInitSystem(*_config, _system)) {
+            throwInitError();
+            return false;
+        }
+
+        if (!m_cache) {
+            m_cache = new QApt::Cache(this);
+        }
+
+        m_initialized = true;
     }
 
-    if (!m_cache) {
-        m_cache = new QApt::Cache(this);
-    }
+    reloadCache();
+
+    return true;
+}
+
+void QAptWorker::reloadCache()
+{
     if (!m_cache->open()) {
         aptDebug() << "Cache didn't open";
         throwInitError();
-        return false;
+        return;
     }
 
     delete m_records;
     m_records = new pkgRecords(*m_cache->depCache());
-
-    return true;
 }
 
 void QAptWorker::throwInitError()
@@ -180,6 +191,8 @@ void QAptWorker::updateCache()
         return;
     }
 
+    m_timeout->stop();
+
     emit workerStarted();
     emit workerEvent(QApt::CacheUpdateStarted);
 
@@ -218,6 +231,7 @@ void QAptWorker::updateCache()
     }
 
     emit workerEvent(QApt::CacheUpdateFinished);
+    m_timeout->start();
 }
 
 void QAptWorker::cancelDownload()
@@ -233,6 +247,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         emit workerFinished(false);
         return;
     }
+
+    m_timeout->stop();
 
     QVariantMap versionList;
 
@@ -468,6 +484,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     delete installProgress;
     installProgress = 0;
+
+    m_timeout->start();
 }
 
 void QAptWorker::downloadArchives(const QStringList &packageStrings, const QString &dest)
@@ -476,6 +494,8 @@ void QAptWorker::downloadArchives(const QStringList &packageStrings, const QStri
         emit workerFinished(false);
         return;
     }
+
+    m_timeout->stop();
 
     emit workerStarted();
 
@@ -535,6 +555,8 @@ void QAptWorker::downloadArchives(const QStringList &packageStrings, const QStri
         return;
     }
 
+    m_timeout->start();
+
     emit workerEvent(QApt::PackageDownloadFinished);
     emit workerFinished(true);
 }
@@ -556,6 +578,7 @@ void QAptWorker::installDebFile(const QString &fileName)
     if (arch != QLatin1String("all") &&
         arch != QString::fromStdString(_config->Find("APT::Architecture", ""))) {
         // TODO report what arch was provided vs needed
+        aptDebug() << arch << QString::fromStdString(_config->Find("APT::Architecture", ""));
         emit errorOccurred(QApt::WrongArchError, QVariantMap());
         emit workerFinished(false);
         return;
