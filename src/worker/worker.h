@@ -55,6 +55,7 @@ private:
     pkgPolicy *m_policy;
     pkgRecords *m_records;
     bool m_systemLocked;
+    bool m_initialized;
 
     QVariantMap m_questionResponse;
     WorkerAcquire *m_acquireStatus;
@@ -80,6 +81,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     bool initializeApt();
+    void reloadCache();
     void throwInitError();
     void initializeStatusWatcher();
     void dpkgStarted();
