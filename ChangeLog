@@ -21,6 +21,10 @@
     that the APT install supports.
   * Be a bit less strict about the quality cutoff for the quick search. Fixes very few
     results being found for the "linux" search term. (BKO: #283523)
+  * Fixed an issue with the QApt Deb Installer hanging during long installations.
+    (LP: #850902)
+  * Fixed random "this package is incompatible with your computer" errors with the
+    QApt Deb Installer.
 
 1.2.1:
 ======
