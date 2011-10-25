@@ -23,8 +23,6 @@
 
 #include <PolkitQt1/Authority>
 #include <PolkitQt1/Subject>
-// Remove when sid has libpolkit-qt 0.98.1 or higher
-#include <polkit-qt-1/polkitqt1-version.h>
 
 namespace QApt {
 namespace Auth {
@@ -33,14 +31,8 @@ inline bool authorize(const QString &action, const QString &service)
 {
     PolkitQt1::SystemBusNameSubject subject(service);
 
-    // Remove when sid has libpolkit-qt 0.98.1 or higher
-    #if POLKITQT1_IS_VERSION(0,98,1)
     PolkitQt1::Authority::Result result = PolkitQt1::Authority::instance()->checkAuthorizationSync(action, subject,
                                           PolkitQt1::Authority::AllowUserInteraction);
-    #else
-    PolkitQt1::Authority::Result result = PolkitQt1::Authority::instance()->checkAuthorizationSync(action, &subject,
-                                          PolkitQt1::Authority::AllowUserInteraction);
-    #endif
 
     switch (result) {
     case PolkitQt1::Authority::Yes:
