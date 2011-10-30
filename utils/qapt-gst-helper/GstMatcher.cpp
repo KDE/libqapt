@@ -114,24 +114,23 @@ GstMatcher::~GstMatcher()
 bool GstMatcher::matches(QApt::Package *package)
 {
     for (QVector<Match>::const_iterator i = m_matches.constBegin(); i != m_matches.constEnd(); ++i) {
-            // Tries to find "Gstreamer-version: xxx"
-            if (package->controlField(QLatin1String("Gstreamer-Version")) == QString::fromStdString(i->version)) {
-                QString typeData = package->controlField(QLatin1String(i->type.c_str()));
-
-                if (!typeData.isEmpty()) {
-                    // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
-                    QGst::CapsPtr caps = QGst::Caps::fromString(typeData);
-                    if (caps->isEmpty()) {
-                        continue;
-                    }
-
-                    // If the package's cap intersects with our cap from the
-                    // search string, return true
-                    return (i->caps)->canIntersect(caps);
+        // Tries to find "Gstreamer-version: xxx"
+        if (package->controlField(QLatin1String("Gstreamer-Version")) == QString::fromStdString(i->version)) {
+            QString typeData = package->controlField(QLatin1String(i->type.c_str()));
+            if (!typeData.isEmpty()) {
+                // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
+                QGst::CapsPtr caps = QGst::Caps::fromString(typeData);
+                if (caps->isEmpty()) {
+                    continue;
                 }
+
+                // If the package's cap intersects with our cap from the
+                // search string, return true
+                return (i->caps)->canIntersect(caps);
             }
         }
-        return false;
+    }
+    return false;
 }
 
 bool GstMatcher::hasMatches() const
