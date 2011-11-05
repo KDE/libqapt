@@ -47,8 +47,12 @@ public:
     ChangelogEntryPrivate(const ChangelogEntryPrivate &other)
         : QSharedData(other)
         , data(other.data)
-        {
-        }
+        , version(other.version)
+        , issueDate(other.issueDate)
+        , description(other.description)
+        , CVEUrls(other.CVEUrls)
+    {
+    }
 
     ~ChangelogEntryPrivate() {}
 
