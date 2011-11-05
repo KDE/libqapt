@@ -1150,7 +1150,7 @@ bool Package::isTrusted() const
         pkgIndexFile *Index;
 
         //FIXME: Should be done in apt
-        QHash<pkgCache::PkgFileIterator, pkgIndexFile*>::const_iterator trustIter = trustCache->constBegin();
+        auto trustIter = trustCache->constBegin();
         while (trustIter != trustCache->constEnd()) {
             if (trustIter.key() == i.File()) {
                 break;

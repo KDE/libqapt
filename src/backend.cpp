@@ -614,10 +614,9 @@ QStringList Backend::architectures() const
     std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
 
     QStringList archList;
-    for (std::vector<std::string>::const_iterator a = archs.begin();
-         a != archs.end(); ++a)
+    for (std::string &arch : archs)
     {
-         archList.append(QString::fromStdString(*a));
+         archList.append(QString::fromStdString(arch));
     }
 
 
@@ -1148,7 +1147,7 @@ bool Backend::loadSelections(const QString &path)
     pkgProblemResolver Fix(&cache);
 
     pkgCache::PkgIterator pkgIter;
-    QHash<QByteArray, int>::const_iterator mapIter = actionMap.begin();
+    auto mapIter = actionMap.begin();
     while (mapIter != actionMap.end()) {
         pkgIter = d->cache->depCache()->FindPkg(mapIter.key().constData());
         if (pkgIter.end()) {
