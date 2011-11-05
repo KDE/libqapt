@@ -1147,8 +1147,8 @@ bool Backend::loadSelections(const QString &path)
     pkgProblemResolver Fix(&cache);
 
     pkgCache::PkgIterator pkgIter;
-    auto mapIter = actionMap.begin();
-    while (mapIter != actionMap.end()) {
+    auto mapIter = actionMap.constBegin();
+    while (mapIter != actionMap.constEnd()) {
         pkgIter = d->cache->depCache()->FindPkg(mapIter.key().constData());
         if (pkgIter.end()) {
             return false;
