@@ -40,6 +40,7 @@
 #include <apt-pkg/tagfile.h>
 
 // Xapian includes
+#undef slots
 #include <xapian.h>
 
 // QApt includes
