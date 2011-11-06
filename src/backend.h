@@ -132,6 +132,7 @@ public:
      *
      * @return A QHash containing lists of changed packages for each
      *         Package::State change flag.
+     * @since 1.3
      */
     QHash<Package::State, PackageList> stateChanges(CacheState oldState, PackageList excluded) const;
 
