@@ -510,6 +510,7 @@ PackageList Backend::search(const QString &searchString) const
     Q_D(const Backend);
 
     if (d->xapianTimeStamp == 0) {
+        qDebug() << "Search index error, no timestamp";
         return QApt::PackageList();
     }
 
@@ -587,8 +588,12 @@ PackageList Backend::search(const QString &searchString) const
          searchResult.append(pkg);
          }
     } catch (const Xapian::Error & error) {
+        qDebug() << "Search error" << QString::fromStdString(error.get_msg());
         return QApt::PackageList();
     }
+
+    if (searchResult.isEmpty())
+        qDebug() << "Search seemed to go ok, but came up empty";
 
     return searchResult;
 }
