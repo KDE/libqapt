@@ -21,6 +21,7 @@
 #ifndef QAPT_BACKEND_H
 #define QAPT_BACKEND_H
 
+#include <QtCore/QHash>
 #include <QtCore/QVariantMap>
 
 #include "globals.h"
@@ -122,6 +123,17 @@ public:
      * \return The current state of the cache as a @c CacheState
      */
     CacheState currentCacheState() const;
+
+   /**
+     * Gets changes made to the cache since the given cache state.
+     *
+     * @param oldState The CacheState to compare against
+     * @param excluded List of packages to exlude from the check
+     *
+     * @return A QHash containing lists of changed packages for each
+     *         Package::State change flag.
+     */
+    QHash<Package::State, PackageList> stateChanges(CacheState oldState, PackageList excluded) const;
 
    /**
      * Returns the last event that the worker reported. When the worker is not

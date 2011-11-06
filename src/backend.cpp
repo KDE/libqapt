@@ -708,6 +708,56 @@ CacheState Backend::currentCacheState() const
     return state;
 }
 
+QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, PackageList excluded) const
+{
+    Q_D(const Backend);
+
+    QHash<Package::State, PackageList> changes;
+
+    for (int i = 0; i < d->packages.size(); ++i) {
+        Package *pkg = d->packages.at(i);
+        int flags = pkg->state();
+
+        if (oldState.at(i) != flags) {
+            // These flags will never be set together.
+            int status = flags & (Package::Held |
+                                  Package::NewInstall |
+                                  Package::ToReInstall |
+                                  Package::ToUpgrade |
+                                  Package::ToDowngrade |
+                                  Package::ToRemove);
+
+            if (excluded.contains(pkg))
+                continue;
+
+            PackageList list;
+            if (status & Package::ToUpgrade) {
+                list = changes.value(Package::ToUpgrade);
+                list.append(pkg);
+                changes[Package::ToUpgrade]= list;
+            } else if (status & Package::NewInstall) {
+                list = changes.value(Package::NewInstall);
+                list.append(pkg);
+                changes[Package::NewInstall]= list;
+            } else if (status & Package::ToReInstall) {
+                list = changes.value(Package::ToReInstall);
+                list.append(pkg);
+                changes[Package::ToReInstall]= list;
+            } else if (status & Package::ToDowngrade) {
+                list = changes.value(Package::ToDowngrade);
+                list.append(pkg);
+                changes[Package::ToDowngrade]= list;
+            } else if (status & Package::ToRemove) {
+                list = changes.value(Package::ToRemove);
+                list.append(pkg);
+                changes[Package::ToRemove]= list;
+            }
+        }
+    }
+
+    return changes;
+}
+
 WorkerEvent Backend::workerState() const
 {
     Q_D(const Backend);
