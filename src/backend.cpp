@@ -751,6 +751,10 @@ QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, Pa
                 list = changes.value(Package::ToRemove);
                 list.append(pkg);
                 changes[Package::ToRemove]= list;
+            } else if (status & Package::ToKeep) {
+                list = changes.value(Package::ToKeep);
+                list.append(pkg);
+                changes[Package::ToKeep]= list;
             }
         }
     }

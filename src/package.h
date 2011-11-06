@@ -614,6 +614,12 @@ private:
     PackagePrivate *const d;
 };
 
+/**
+ * Defines the StateChanges type, which is a QHash of Package States
+ * and QLists of packages which have those states.
+ */
+typedef QHash<Package::State, PackageList> StateChanges;
+
 }
 
 #endif
