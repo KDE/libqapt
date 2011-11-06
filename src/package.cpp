@@ -559,7 +559,7 @@ QUrl Package::changelogUrl() const
 
     Config *config = d->backend->config();
     QString server = config->readEntry(QLatin1String("Apt::Changelogs::Server"),
-                                       QLatin1String("http://changelogs.ubuntu.com/changelogs"));
+                                       QLatin1String("http://packages.debian.org/changelogs"));
 
     url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog"));
 
