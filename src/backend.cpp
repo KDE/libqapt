@@ -60,8 +60,8 @@ public:
         , records(0)
         , maxStackSize(20)
         , config(0)
+        , xapianDatabase(0)
         , xapianIndexExists(false)
-        , xapianIndexOpened(false)
         , compressEvents(false)
     {
     }
@@ -70,6 +70,7 @@ public:
         delete cache;
         delete records;
         delete config;
+        delete xapianDatabase;
     }
     // Caches
     // The canonical list of all unique, non-virutal package objects
@@ -97,9 +98,8 @@ public:
 
     // Xapian
     time_t xapianTimeStamp;
-    Xapian::Database xapianDatabase;
+    Xapian::Database *xapianDatabase;
     bool xapianIndexExists;
-    bool xapianIndexOpened;
 
     // DBus
     QDBusServiceWatcher *watcher;
@@ -524,10 +524,10 @@ PackageList Backend::search(const QString &searchString) const
 
     // Doesn't follow style guidelines to ease merging with synaptic
     try {
-        int maxItems = d->xapianDatabase.get_doccount();
-        Xapian::Enquire enquire(d->xapianDatabase);
+        int maxItems = d->xapianDatabase->get_doccount();
+        Xapian::Enquire enquire(*(d->xapianDatabase));
         Xapian::QueryParser parser;
-        parser.set_database(d->xapianDatabase);
+        parser.set_database(*(d->xapianDatabase));
         parser.add_prefix("name","XP");
         parser.add_prefix("section","XS");
         // default op is AND to narrow down the resultset
@@ -684,25 +684,15 @@ bool Backend::openXapianIndex()
     QFileInfo timeStamp(QLatin1String("/var/lib/apt-xapian-index/update-timestamp"));
     d->xapianTimeStamp = timeStamp.lastModified().toTime_t();
 
-    if (!d->xapianIndexOpened) {
-        try {
-            d->xapianDatabase.add_database(Xapian::Database("/var/lib/apt-xapian-index/index"));
-        } catch (Xapian::DatabaseOpeningError) {
-            d->xapianIndexExists = false;
-            return false;
-        };
-
-        d->xapianIndexExists = true;
-        d->xapianIndexOpened = true;
-    } else {
-        try {
-            qDebug() << "reopening xapian index";
-            d->xapianDatabase.reopen();
-        } catch (Xapian::DatabaseOpeningError) {
-            qDebug() << "search reopen failed";
-            return false;
-        };
+    if(d->xapianDatabase) {
+        delete d->xapianDatabase;
     }
+    try {
+        d->xapianDatabase = new Xapian::Database("/var/lib/apt-xapian-index/index");
+    } catch (Xapian::DatabaseOpeningError) {
+        d->xapianIndexExists = false;
+        return false;
+    };
 
     return true;
 }
