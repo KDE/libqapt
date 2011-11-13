@@ -60,6 +60,8 @@ public:
         , records(0)
         , maxStackSize(20)
         , config(0)
+        , xapianIndexExists(false)
+        , xapianIndexOpened(false)
         , compressEvents(false)
     {
     }
@@ -97,6 +99,7 @@ public:
     time_t xapianTimeStamp;
     Xapian::Database xapianDatabase;
     bool xapianIndexExists;
+    bool xapianIndexOpened;
 
     // DBus
     QDBusServiceWatcher *watcher;
@@ -681,14 +684,25 @@ bool Backend::openXapianIndex()
     QFileInfo timeStamp(QLatin1String("/var/lib/apt-xapian-index/update-timestamp"));
     d->xapianTimeStamp = timeStamp.lastModified().toTime_t();
 
-    try {
-        d->xapianDatabase.add_database(Xapian::Database("/var/lib/apt-xapian-index/index"));
-    } catch (Xapian::DatabaseOpeningError) {
-        d->xapianIndexExists = false;
-        return false;
-    };
+    if (!d->xapianIndexOpened) {
+        try {
+            d->xapianDatabase.add_database(Xapian::Database("/var/lib/apt-xapian-index/index"));
+        } catch (Xapian::DatabaseOpeningError) {
+            d->xapianIndexExists = false;
+            return false;
+        };
 
-    d->xapianIndexExists = true;
+        d->xapianIndexExists = true;
+        d->xapianIndexOpened = true;
+    } else {
+        try {
+            qDebug() << "reopening xapian index";
+            d->xapianDatabase.reopen();
+        } catch (Xapian::DatabaseOpeningError) {
+            qDebug() << "search reopen failed";
+            return false;
+        };
+    }
 
     return true;
 }
