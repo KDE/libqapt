@@ -124,6 +124,8 @@ bool QAptWorker::unlockSystem()
 
 bool QAptWorker::initializeApt()
 {
+    // Discard errors from past calls to initApt
+    _error->Discard();
     if (!m_initialized) {
         if (!pkgInitConfig(*_config) || !pkgInitSystem(*_config, _system)) {
             throwInitError();
