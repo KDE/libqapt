@@ -660,6 +660,17 @@ bool Backend::isBroken() const
     return false;
 }
 
+QDateTime Backend::timeCacheLastUpdated() const
+{
+    QDateTime sinceUpdate;
+
+    QFileInfo updateStamp("/var/lib/apt/periodic/update-success-stamp");
+    if (!updateStamp.exists())
+        return sinceUpdate;
+
+    return updateStamp.lastModified();
+}
+
 bool Backend::xapianIndexNeedsUpdate() const
 {
     Q_D(const Backend);

@@ -377,6 +377,17 @@ public:
      */
     bool isBroken() const;
 
+   /**
+    * Returns the last time the APT repository sources have been refreshed/checked
+    * for updates. (Either with updateCache() or externally via other tools
+    * like apt-get)
+    *
+    * @returns @c QDateTime The time that the cache was last checked for updates.
+    * If this cannot be determined, an invalid QDateTime will be returned,
+    * which can be checked with QDateTime::isValid()
+    */
+    QDateTime timeCacheLastUpdated() const;
+
 protected:
     BackendPrivate *const d_ptr;
 
