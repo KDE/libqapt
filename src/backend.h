@@ -586,8 +586,24 @@ public Q_SLOTS:
      */
     void markPackageForRemoval(const QString &name);
 
+    /**
+     * Marks multiple packages at once. This is more efficient than marking
+     * packages individually, as event compression is utilized to prevent
+     * post-marking calculations from being performed until after all packages
+     * have been marked.
+     *
+     * @param packages The list of packages to be marked
+     * @param action The action to perform on the list of packages
+     *
+     * @since 1.3
+     */
     void markPackages(const QApt::PackageList &packages, QApt::Package::State action);
 
+    /**
+     * Manual control for enabling/disabling event compression. Useful for when
+     * an application needs to have its own multiple marking loop, but still wants
+     * to utilize event compression
+     */
     void setCompressEvents(bool enabled);
 
     /**
