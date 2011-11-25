@@ -107,6 +107,14 @@ public:
      */
     bool isRedoStackEmpty() const;
 
+   /**
+     * Returns whether or not events are being compressed for multiple
+     * markings. Applications doing custom multiple marking loops can
+     * use this function to check whether or not to perform post-marking
+     * code.
+
+     * @since 1.3
+     */
     bool areEventsCompressed() const;
 
     /**
