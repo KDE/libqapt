@@ -30,6 +30,7 @@ Name[sv]=Debian-paketfiler
 Name[ug]=Debian بوغچا ھۆججەتلىرى
 Name[uk]=Файли пакунків Debian
 Name[x-test]=xxDebian Package Filesxx
+Name[zh_CN]=Debian 软件包文件
 Name[zh_TW]=Debian 套件檔
 X-KDE-ServiceTypes=ThumbCreator
 MimeType=application/x-deb;
