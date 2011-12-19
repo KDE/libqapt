@@ -561,7 +561,12 @@ QUrl Package::changelogUrl() const
     QString server = config->readEntry(QLatin1String("Apt::Changelogs::Server"),
                                        QLatin1String("http://packages.debian.org/changelogs"));
 
-    url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog"));
+    if(!server.contains(QLatin1String("debian"))) {
+        url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog"));
+    } else {
+        // Debian servers use changelog.txt
+        url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog.txt"));
+    }
 
     return url;
 }
