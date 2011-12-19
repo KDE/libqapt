@@ -252,8 +252,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     m_timeout->stop();
 
-    QVariantMap versionList;
-
     // Parse out the argument list and mark packages for operations
     QVariantMap::const_iterator mapIter = instructionsList.constBegin();
 
@@ -485,7 +483,6 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     emit workerFinished(success);
 
     delete installProgress;
-    installProgress = 0;
 
     m_timeout->start();
 }
