@@ -61,7 +61,7 @@ DebViewer::DebViewer(QWidget *parent)
 
     // nameStatusGrid, row 0
     QLabel *namePrefixLabel = new QLabel(nameStatusBox);
-    namePrefixLabel->setText(i18nc("@label Label preceeding the package name",
+    namePrefixLabel->setText(i18nc("@label Label preceding the package name",
                                    "Package:"));
     m_nameLabel = new QLabel(nameStatusBox);
     nameStatusGrid->addWidget(namePrefixLabel, 0, 0, Qt::AlignRight);
@@ -69,7 +69,7 @@ DebViewer::DebViewer(QWidget *parent)
 
     // nameStatusGrid, row 1
     QLabel *statusPrefixLabel = new QLabel(nameStatusBox);
-    statusPrefixLabel->setText(i18nc("@label Label preceeding the package status",
+    statusPrefixLabel->setText(i18nc("@label Label preceding the package status",
                                      "Status:"));
     m_statusLabel = new QLabel(nameStatusBox);
     nameStatusGrid->addWidget(statusPrefixLabel, 1, 0, Qt::AlignRight);
