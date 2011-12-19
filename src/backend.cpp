@@ -513,8 +513,7 @@ PackageList Backend::search(const QString &searchString) const
 {
     Q_D(const Backend);
 
-    if (d->xapianTimeStamp == 0) {
-        qDebug() << "Search index error, no timestamp";
+    if (d->xapianTimeStamp == 0 || !d->xapianDatabase) {
         return QApt::PackageList();
     }
 
