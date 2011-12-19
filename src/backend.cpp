@@ -696,6 +696,7 @@ bool Backend::openXapianIndex()
 
     if(d->xapianDatabase) {
         delete d->xapianDatabase;
+        d->xapianDatabase = 0;
     }
     try {
         d->xapianDatabase = new Xapian::Database("/var/lib/apt-xapian-index/index");
