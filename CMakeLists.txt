@@ -35,10 +35,12 @@ endmacro(dbus_add_activation_system_service _sources)
 
 find_package(Qt4 REQUIRED)
 find_package(Automoc4 REQUIRED)
-find_package(PolkitQt-1 REQUIRED)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
 find_package(QtGStreamer)
+
+set(POLKITQT-1_MIN_VERSION "0.98.1")
+find_package(PolkitQt-1 REQUIRED)
 
 # Find the required Libaries
 include_directories(
