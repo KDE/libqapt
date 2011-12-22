@@ -1,4 +1,4 @@
-1.3.0: (as of 1.3 alpha)
+1.3.0: (as of 1.3 beta)
 ======
 - Features:
   - Introducing the QApt::Changelog class, which provides an interface for retreiving
@@ -11,6 +11,9 @@
 - Bugfixes:
   - Fixed not being able to unmark a package when it is a dependency of another package
     that is also marked.
+  - Fixed build with PolkitQt-1 > 0.100
+  - Fixed a spelling error in the QApt Deb Installer
+  - Support Debian changelog servers, fixes changelogs containing HTML on Debian systems
 - Optimizations:
   - Added Backend::markPackages() to mark multiple packages at once.
     It utilizes event compression, avoiding additional internal dependency checking or
@@ -20,8 +23,9 @@
     compression speed benefits in their own custom marking loops if they can't use
     Backend::markPackages()
 - Other:
-  - Dropped legacy support for PolKit-Qt 0.98.x. Polkit-Qt 0.99 is now required.
-  - Utilize language features of C++11, GCC 4.6+ is now required.
+  - Dropped legacy support for PolKit-Qt 0.98.x. Polkit-Qt 0.99 or greater is now required.
+  - Utilize language features of C++11, GCC 4.6+ or similar is now required.
+  - API documentation updates
 
 1.2.2:
 ======
