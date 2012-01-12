@@ -3,7 +3,7 @@
 #
 #  QAPT_FOUND - system has QApt
 #  QAPT_INCLUDE_DIR - the QApt include directory
-#  QAPT_LIBRARIES - Link these to use all QApt libs
+#  QAPT_LIBRARY - Link these to use all QApt libs
 #  QAPT_DEFINITIONS - Compiler switches required for using QApt
 
 # Copyright (c) 2009, Dario Freddi, <drf@kde.org>
