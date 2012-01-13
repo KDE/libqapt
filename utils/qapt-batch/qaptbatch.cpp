@@ -262,7 +262,7 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
             KMessageBox::information(this, text, title);
             response["MediaChanged"] = true;
             m_worker->answerWorkerQuestion(response);
-        }
+        }   break;
         case QApt::InstallUntrusted: {
             QStringList untrustedItems = args["UntrustedItems"].toStringList();
 
@@ -277,19 +277,9 @@ void QAptBatch::questionOccurred(int code, const QVariantMap &args)
                         "security risk, as the presence of unverifiable software "
                         "can be a sign of tampering.</warning> Do you wish to continue?",
                         untrustedItems.size());
-            int result = KMessageBox::Cancel;
-            bool installUntrusted = false;
-
-            result = KMessageBox::warningContinueCancelList(this, text,
+            int result = KMessageBox::warningContinueCancelList(this, text,
                                                             untrustedItems, title);
-            switch (result) {
-                case KMessageBox::Continue:
-                    installUntrusted = true;
-                    break;
-                case KMessageBox::Cancel:
-                    installUntrusted = false;
-                    break;
-            }
+            bool installUntrusted = result==KMessageBox::Continue;
 
             response["InstallUntrusted"] = installUntrusted;
             m_worker->answerWorkerQuestion(response);
@@ -321,14 +311,14 @@ void QAptBatch::workerEvent(int code)
             break;
         case QApt::CacheUpdateFinished:
             setWindowTitle(i18nc("@title:window", "Refresh Complete"));
-            if (m_warningStack.size() > 0) {
+            if (!m_warningStack.isEmpty()) {
                 showQueuedWarnings();
             }
-            if (m_errorStack.size() > 0) {
+            if (!m_errorStack.isEmpty()) {
                 showQueuedErrors();
             }
 
-            if (m_errorStack.size() > 0) {
+            if (!m_errorStack.isEmpty()) {
                 setLabelText(i18nc("@info:status", "Refresh completed with errors"));
             } else {
                 setLabelText(i18nc("@label", "Package information successfully refreshed"));
@@ -362,16 +352,16 @@ void QAptBatch::workerEvent(int code)
             show(); // In case no download was necessary
             break;
         case QApt::CommitChangesFinished:
-            if (m_warningStack.size() > 0) {
+            if (!m_warningStack.isEmpty()) {
                 showQueuedWarnings();
             }
-            if (m_errorStack.size() > 0) {
+            if (!m_errorStack.isEmpty()) {
                 showQueuedErrors();
             }
             if (m_mode == "install") {
                 setWindowTitle(i18nc("@title:window", "Installation Complete"));
 
-                if (m_errorStack.size() > 0) {
+                if (!m_errorStack.isEmpty()) {
                     setLabelText(i18nc("@label",
                                        "Package installation finished with errors."));
                 } else {
@@ -382,7 +372,7 @@ void QAptBatch::workerEvent(int code)
             } else if (m_mode == "uninstall") {
                 setWindowTitle(i18nc("@title:window", "Removal Complete"));
 
-                if (m_errorStack.size() > 0) {
+                if (!m_errorStack.isEmpty()) {
                     setLabelText(i18nc("@label",
                                        "Package removal finished with errors."));
                 } else {
