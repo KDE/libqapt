@@ -593,8 +593,8 @@ void QAptWorker::installDebFile(const QString &fileName)
     }
 
     m_dpkgProcess = new QProcess(this);
-    QString program = QLatin1Literal("dpkg") %
-                      QLatin1Literal(" -i ") % fileName;
+    QString program = QLatin1String("dpkg") %
+            QLatin1String(" -i ") % '"' % fileName % '"';
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
     setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
