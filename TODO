@@ -1,4 +1,3 @@
--Provide API for marking multiple packages at once using an ActionGroup to avoid APT doing various cleanups after each package is marked.
 -Make the direct output of the dpkg process available, so that advanced package managers can have a console GUI for power users
 -grep -iR "FIMXE" src/
 -grep -iR "TODO" src/
