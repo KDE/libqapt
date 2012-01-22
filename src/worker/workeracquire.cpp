@@ -81,7 +81,7 @@ void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
    Update = true;
 
    updateStatus(item, 100, QApt::DownloadFetch);
-};
+}
 
 void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
 {

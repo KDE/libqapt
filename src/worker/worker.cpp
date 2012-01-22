@@ -278,6 +278,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             args[QLatin1String("NotFoundString")] = packageString;
             emit errorOccurred(QApt::NotFoundError, args);
             emit workerFinished(false);
+            m_timeout->start();
             return;
         }
 
@@ -353,6 +354,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         if (_error->PendingError() || !lockSystem()) {
             emit errorOccurred(QApt::LockError, QVariantMap());
             emit workerFinished(false);
+            m_timeout->start();
             return;
         }
     }
@@ -368,6 +370,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         _error->PendingError()) {
         emit errorOccurred(QApt::FetchError, QVariantMap());
         emit workerFinished(false);
+        m_timeout->start();
         return;
     }
 
@@ -388,6 +391,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         args[QLatin1String("DirectoryString")] = QLatin1String(OutputDir.c_str());
         emit errorOccurred(QApt::DiskSpaceError, args);
         emit workerFinished(false);
+        m_timeout->start();
         return;
     }
     if (unsigned(Buf.f_bfree) < (FetchBytes - FetchPBytes)/Buf.f_bsize)
@@ -400,6 +404,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             args[QLatin1String("DirectoryString")] = QLatin1String(OutputDir.c_str());
             emit errorOccurred(QApt::DiskSpaceError, args);
             emit workerFinished(false);
+            m_timeout->start();
             return;
         }
     }
@@ -432,6 +437,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             if(!m_installUntrusted) {
                 m_questionResponse = QVariantMap(); //Reset for next question
                 emit workerFinished(false);
+                m_timeout->start();
                 return;
             } else {
                 m_questionResponse = QVariantMap(); //Reset for next question
@@ -440,6 +446,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             // If disallowed in APT config, return a fatal error
             emit errorOccurred(QApt::UntrustedError, args);
             emit workerFinished(false);
+            m_timeout->start();
             return;
         }
     }
@@ -447,6 +454,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
         emit errorOccurred(QApt::AuthError, QVariantMap());
         emit workerFinished(false);
+        m_timeout->start();
         return;
     }
 
@@ -456,6 +464,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         // Our fetcher will report errors for itself, but we have to send the
         // finished signal
         emit workerFinished(false);
+        m_timeout->start();
         return;
     }
 
