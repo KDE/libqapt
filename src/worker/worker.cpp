@@ -44,6 +44,7 @@
 #include <sys/fcntl.h>
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusMessage>
@@ -51,7 +52,6 @@
 #define RAMFS_MAGIC     0x858458f6
 
 #include "../debfile.h"
-#include "debug.h"
 #include "qaptauthorization.h"
 #include "workeracquire.h"
 #include "workerinstallprogress.h"
@@ -147,7 +147,7 @@ bool QAptWorker::initializeApt()
 void QAptWorker::reloadCache()
 {
     if (!m_cache->open()) {
-        aptDebug() << "Cache didn't open";
+        qDebug() << "Cache didn't open";
         throwInitError();
         return;
     }
@@ -577,7 +577,7 @@ void QAptWorker::installDebFile(const QString &fileName)
     if (arch != QLatin1String("all") &&
         arch != QString::fromStdString(_config->Find("APT::Architecture", ""))) {
         // TODO report what arch was provided vs needed
-        aptDebug() << arch << QString::fromStdString(_config->Find("APT::Architecture", ""));
+        qDebug() << arch << QString::fromStdString(_config->Find("APT::Architecture", ""));
         emit errorOccurred(QApt::WrongArchError, QVariantMap());
         emit workerFinished(false);
         return;

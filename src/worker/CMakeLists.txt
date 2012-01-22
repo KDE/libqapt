@@ -11,7 +11,6 @@ else ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
 endif ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
 
 set(qapt_worker_SRCS
-    debug.cpp
     main.cpp
     worker.cpp
     workeracquire.cpp
