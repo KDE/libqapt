@@ -61,7 +61,7 @@ class PackagePrivate
         ~PackagePrivate()
         {
             delete packageIter;
-        };
+        }
         QApt::Backend *backend;
         pkgDepCache *depCache;
         pkgRecords *records;
@@ -492,7 +492,7 @@ QStringList Package::archives() const
 
     if(!Ver.end()) {
         QStringList archiveList;
-        for (pkgCache::VerFileIterator VF = Ver.FileList(); !VF.end(); VF++) {
+        for (pkgCache::VerFileIterator VF = Ver.FileList(); !VF.end(); ++VF) {
             archiveList << QLatin1String(VF.File().Archive());
         }
             return archiveList;
