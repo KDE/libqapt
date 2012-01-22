@@ -36,7 +36,7 @@ class HistoryItemPrivate
         HistoryItemPrivate(const QString &data) : isValid(true)
         {
             parseData(data);
-        };
+        }
 
         // Data
         QDateTime startDate;
