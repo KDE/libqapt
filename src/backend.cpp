@@ -138,7 +138,7 @@ void BackendPrivate::setWorkerLocale()
 
 void BackendPrivate::setWorkerProxy()
 {
-    worker->setProxy(QLatin1String(getenv("http_proxy")));
+    worker->setProxy(QLatin1String(qgetenv("http_proxy")));
 }
 
 Backend::Backend()
