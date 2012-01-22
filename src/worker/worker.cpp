@@ -172,18 +172,18 @@ void QAptWorker::throwInitError()
 void QAptWorker::initializeStatusWatcher()
 {
     m_acquireStatus = new WorkerAcquire(this);
-    connect(m_acquireStatus, SIGNAL(downloadProgress(int, int, int)),
-            this, SIGNAL(downloadProgress(int, int, int)));
-    connect(m_acquireStatus, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
-            this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
-    connect(m_acquireStatus, SIGNAL(downloadMessage(int, const QString&)),
-            this, SIGNAL(downloadMessage(int, const QString&)));
-    connect(m_acquireStatus, SIGNAL(fetchError(int, const QVariantMap&)),
-            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
-    connect(m_acquireStatus, SIGNAL(fetchWarning(int, const QVariantMap&)),
-            this, SIGNAL(warningOccurred(int, const QVariantMap&)));
-    connect(m_acquireStatus, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SIGNAL(questionOccurred(int, const QVariantMap&)));
+    connect(m_acquireStatus, SIGNAL(downloadProgress(int,int,int)),
+            this, SIGNAL(downloadProgress(int,int,int)));
+    connect(m_acquireStatus, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
+            this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
+    connect(m_acquireStatus, SIGNAL(downloadMessage(int,QString)),
+            this, SIGNAL(downloadMessage(int,QString)));
+    connect(m_acquireStatus, SIGNAL(fetchError(int,QVariantMap)),
+            this, SIGNAL(errorOccurred(int,QVariantMap)));
+    connect(m_acquireStatus, SIGNAL(fetchWarning(int,QVariantMap)),
+            this, SIGNAL(warningOccurred(int,QVariantMap)));
+    connect(m_acquireStatus, SIGNAL(workerQuestion(int,QVariantMap)),
+            this, SIGNAL(questionOccurred(int,QVariantMap)));
 }
 
 void QAptWorker::updateCache()
@@ -421,8 +421,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             // Ask if the user really wants to install untrusted packages, if
             // allowed in the APT config.
             m_questionBlock = new QEventLoop;
-            connect(this, SIGNAL(answerReady(const QVariantMap&)),
-                    this, SLOT(setAnswer(const QVariantMap&)));
+            connect(this, SIGNAL(answerReady(QVariantMap)),
+                    this, SLOT(setAnswer(QVariantMap)));
 
             emit questionOccurred(QApt::InstallUntrusted, args);
             m_questionBlock->exec();
@@ -464,12 +464,12 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     emit workerEvent(QApt::CommitChangesStarted);
 
     WorkerInstallProgress *installProgress = new WorkerInstallProgress(this);
-    connect(installProgress, SIGNAL(commitError(int, const QVariantMap&)),
-            this, SIGNAL(errorOccurred(int, const QVariantMap&)));
-    connect(installProgress, SIGNAL(commitProgress(const QString&, int)),
-            this, SIGNAL(commitProgress(const QString&, int)));
-    connect(installProgress, SIGNAL(workerQuestion(int, const QVariantMap&)),
-            this, SIGNAL(questionOccurred(int, const QVariantMap&)));
+    connect(installProgress, SIGNAL(commitError(int,QVariantMap)),
+            this, SIGNAL(errorOccurred(int,QVariantMap)));
+    connect(installProgress, SIGNAL(commitProgress(QString,int)),
+            this, SIGNAL(commitProgress(QString,int)));
+    connect(installProgress, SIGNAL(workerQuestion(int,QVariantMap)),
+            this, SIGNAL(questionOccurred(int,QVariantMap)));
 
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
@@ -598,8 +598,8 @@ void QAptWorker::installDebFile(const QString &fileName)
     m_dpkgProcess->start(program);
     connect(m_dpkgProcess, SIGNAL(started()), this, SLOT(dpkgStarted()));
     connect(m_dpkgProcess, SIGNAL(readyRead()), this, SLOT(updateDpkgProgress()));
-    connect(m_dpkgProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(dpkgFinished(int, QProcess::ExitStatus)));
+    connect(m_dpkgProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
+            this, SLOT(dpkgFinished(int,QProcess::ExitStatus)));
 
 }
 
@@ -637,8 +637,8 @@ void QAptWorker::answerWorkerQuestion(const QVariantMap &response)
 
 void QAptWorker::setAnswer(const QVariantMap &answer)
 {
-    disconnect(this, SIGNAL(answerReady(const QVariantMap&)),
-               this, SLOT(setAnswer(const QVariantMap&)));
+    disconnect(this, SIGNAL(answerReady(QVariantMap)),
+               this, SLOT(setAnswer(QVariantMap)));
     m_questionResponse = answer;
     m_questionBlock->quit();
 }

@@ -191,8 +191,8 @@ void WorkerAcquire::requestCancel()
 QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)
 {
     m_mediaBlock = new QEventLoop;
-    connect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
-            this, SLOT(setAnswer(const QVariantMap&)));
+    connect(m_worker, SIGNAL(answerReady(QVariantMap)),
+            this, SLOT(setAnswer(QVariantMap)));
 
     emit workerQuestion(questionCode, args);
     m_mediaBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
@@ -202,8 +202,8 @@ QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args
 
 void WorkerAcquire::setAnswer(const QVariantMap &answer)
 {
-    disconnect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
-               this, SLOT(setAnswer(const QVariantMap&)));
+    disconnect(m_worker, SIGNAL(answerReady(QVariantMap)),
+               this, SLOT(setAnswer(QVariantMap)));
     m_questionResponse = answer;
     m_mediaBlock->quit();
 }

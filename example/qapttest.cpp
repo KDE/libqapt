@@ -53,11 +53,11 @@ QAptTest::QAptTest()
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
     connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)), this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_backend, SIGNAL(downloadProgress(int, int, int)), this, SLOT(updateDownloadProgress(int, int, int)));
-    connect(m_backend, SIGNAL(downloadMessage(int, const QString&)),
-            this, SLOT(updateDownloadMessage(int, const QString&)));
-    connect(m_backend, SIGNAL(commitProgress(const QString&, int)),
-            this, SLOT(updateCommitProgress(const QString&, int)));
+    connect(m_backend, SIGNAL(downloadProgress(int,int,int)), this, SLOT(updateDownloadProgress(int,int,int)));
+    connect(m_backend, SIGNAL(downloadMessage(int,QString)),
+            this, SLOT(updateDownloadMessage(int,QString)));
+    connect(m_backend, SIGNAL(commitProgress(QString,int)),
+            this, SLOT(updateCommitProgress(QString,int)));
 
     m_stack = new QStackedWidget(this);
 

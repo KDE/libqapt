@@ -150,8 +150,8 @@ Backend::Backend()
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
 
-    connect(d->worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
-            this, SLOT(emitErrorOccurred(int, const QVariantMap&)));
+    connect(d->worker, SIGNAL(errorOccurred(int,QVariantMap)),
+            this, SLOT(emitErrorOccurred(int,QVariantMap)));
     connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
     connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
     connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
@@ -1419,22 +1419,22 @@ void Backend::workerStarted()
     Q_D(Backend);
 
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-            this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+            this, SLOT(serviceOwnerChanged(QString,QString,QString)));
 
-    connect(d->worker, SIGNAL(downloadProgress(int, int, int)),
-            this, SIGNAL(downloadProgress(int, int, int)));
-    connect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
-            this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
-    connect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
-            this, SIGNAL(downloadMessage(int, const QString&)));
-    connect(d->worker, SIGNAL(commitProgress(const QString&, int)),
-            this, SIGNAL(commitProgress(const QString&, int)));
-    connect(d->worker, SIGNAL(debInstallMessage(const QString&)),
-            this, SIGNAL(debInstallMessage(const QString&)));
-    connect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
-            this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
-    connect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
-            this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
+    connect(d->worker, SIGNAL(downloadProgress(int,int,int)),
+            this, SIGNAL(downloadProgress(int,int,int)));
+    connect(d->worker, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
+            this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
+    connect(d->worker, SIGNAL(downloadMessage(int,QString)),
+            this, SIGNAL(downloadMessage(int,QString)));
+    connect(d->worker, SIGNAL(commitProgress(QString,int)),
+            this, SIGNAL(commitProgress(QString,int)));
+    connect(d->worker, SIGNAL(debInstallMessage(QString)),
+            this, SIGNAL(debInstallMessage(QString)));
+    connect(d->worker, SIGNAL(questionOccurred(int,QVariantMap)),
+            this, SLOT(emitWorkerQuestionOccurred(int,QVariantMap)));
+    connect(d->worker, SIGNAL(warningOccurred(int,QVariantMap)),
+            this, SLOT(emitWarningOccurred(int,QVariantMap)));
 }
 
 void Backend::workerFinished(bool result)
@@ -1446,22 +1446,22 @@ void Backend::workerFinished(bool result)
     d->state = InvalidEvent;
 
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-               this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+               this, SLOT(serviceOwnerChanged(QString,QString,QString)));
 
-    disconnect(d->worker, SIGNAL(downloadProgress(int, int, int)),
-               this, SIGNAL(downloadProgress(int, int, int)));
-    disconnect(d->worker, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)),
-               this, SIGNAL(packageDownloadProgress(const QString&, int, const QString&, double, int)));
-    disconnect(d->worker, SIGNAL(downloadMessage(int, const QString&)),
-               this, SIGNAL(downloadMessage(int, const QString&)));
-    disconnect(d->worker, SIGNAL(commitProgress(const QString&, int)),
-               this, SIGNAL(commitProgress(const QString&, int)));
-    disconnect(d->worker, SIGNAL(debInstallMessage(const QString&)),
-               this, SIGNAL(debInstallMessage(const QString&)));
-    disconnect(d->worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
-               this, SLOT(emitWorkerQuestionOccurred(int, const QVariantMap&)));
-    disconnect(d->worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
-               this, SLOT(emitWarningOccurred(int, const QVariantMap&)));
+    disconnect(d->worker, SIGNAL(downloadProgress(int,int,int)),
+               this, SIGNAL(downloadProgress(int,int,int)));
+    disconnect(d->worker, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
+               this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
+    disconnect(d->worker, SIGNAL(downloadMessage(int,QString)),
+               this, SIGNAL(downloadMessage(int,QString)));
+    disconnect(d->worker, SIGNAL(commitProgress(QString,int)),
+               this, SIGNAL(commitProgress(QString,int)));
+    disconnect(d->worker, SIGNAL(debInstallMessage(QString)),
+               this, SIGNAL(debInstallMessage(QString)));
+    disconnect(d->worker, SIGNAL(questionOccurred(int,QVariantMap)),
+               this, SLOT(emitWorkerQuestionOccurred(int,QVariantMap)));
+    disconnect(d->worker, SIGNAL(warningOccurred(int,QVariantMap)),
+               this, SLOT(emitWarningOccurred(int,QVariantMap)));
 }
 
 void Backend::cancelDownload()

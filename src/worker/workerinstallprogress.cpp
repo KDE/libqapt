@@ -193,8 +193,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
 QVariantMap WorkerInstallProgress::askQuestion(int questionCode, const QVariantMap &args)
 {
     m_questionBlock = new QEventLoop;
-    connect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
-            this, SLOT(setAnswer(const QVariantMap&)));
+    connect(m_worker, SIGNAL(answerReady(QVariantMap)),
+            this, SLOT(setAnswer(QVariantMap)));
 
     emit workerQuestion(questionCode, args);
     m_questionBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
@@ -204,8 +204,8 @@ QVariantMap WorkerInstallProgress::askQuestion(int questionCode, const QVariantM
 
 void WorkerInstallProgress::setAnswer(const QVariantMap &answer)
 {
-    disconnect(m_worker, SIGNAL(answerReady(const QVariantMap&)),
-               this, SLOT(setAnswer(const QVariantMap&)));
+    disconnect(m_worker, SIGNAL(answerReady(QVariantMap)),
+               this, SLOT(setAnswer(QVariantMap)));
     m_questionResponse = answer;
     m_questionBlock->quit();
 }

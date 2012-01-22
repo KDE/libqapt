@@ -48,8 +48,8 @@ DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     , m_commitWidget(0)
 {
     m_backend->init();
-    connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode, QVariantMap)),
-            this, SLOT(errorOccurred(QApt::ErrorCode, QVariantMap)));
+    connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
+            this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
 
     QFileInfo fi(debFile);
     m_debFile = new QApt::DebFile(fi.absoluteFilePath());
@@ -112,14 +112,14 @@ void DebInstaller::workerEvent(QApt::WorkerEvent event)
             m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are downloading",
                                                 "<title>Downloading Dependencies</title>"));
 
-            connect(m_backend, SIGNAL(downloadProgress(int, int, int)),
-                m_commitWidget, SLOT(updateDownloadProgress(int, int, int)));
+            connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
+                m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
         }
         break;
     case QApt::PackageDownloadFinished:
         if (m_commitWidget) {
-            disconnect(m_backend, SIGNAL(downloadProgress(int, int, int)),
-                       m_commitWidget, SLOT(updateDownloadProgress(int, int, int)));
+            disconnect(m_backend, SIGNAL(downloadProgress(int,int,int)),
+                       m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
         }
         break;
     case QApt::CommitChangesStarted:
@@ -127,16 +127,16 @@ void DebInstaller::workerEvent(QApt::WorkerEvent event)
             m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are installing",
                                                 "<title>Installing Dependencies</title>"));
 
-            connect(m_backend, SIGNAL(commitProgress(const QString&, int)),
-                    m_commitWidget, SLOT(updateCommitProgress(const QString&, int)));
+            connect(m_backend, SIGNAL(commitProgress(QString,int)),
+                    m_commitWidget, SLOT(updateCommitProgress(QString,int)));
         }
         break;
     case QApt::CommitChangesFinished:
         if (m_commitWidget) {
             m_commitWidget->hideProgress();
 
-            disconnect(m_backend, SIGNAL(commitProgress(const QString&, int)),
-                       m_commitWidget, SLOT(updateCommitProgress(const QString&, int)));
+            disconnect(m_backend, SIGNAL(commitProgress(QString,int)),
+                       m_commitWidget, SLOT(updateCommitProgress(QString,int)));
 
             m_backend->installDebFile(*m_debFile);
         }
@@ -215,8 +215,8 @@ void DebInstaller::initCommitWidget()
     m_commitWidget = new DebCommitWidget(this);
     m_stack->addWidget(m_commitWidget);
 
-    connect(m_backend, SIGNAL(debInstallMessage(const QString &)),
-            m_commitWidget, SLOT(updateTerminal(const QString &)));
+    connect(m_backend, SIGNAL(debInstallMessage(QString)),
+            m_commitWidget, SLOT(updateTerminal(QString)));
 }
 
 bool DebInstaller::checkDeb()

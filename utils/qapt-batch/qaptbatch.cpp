@@ -49,10 +49,10 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     m_worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
                                                   "/", QDBusConnection::systemBus(),
                                                   this);
-    connect(m_worker, SIGNAL(errorOccurred(int, const QVariantMap&)),
-            this, SLOT(errorOccurred(int, const QVariantMap&)));
-    connect(m_worker, SIGNAL(warningOccurred(int, const QVariantMap&)),
-            this, SLOT(warningOccurred(int, const QVariantMap&)));
+    connect(m_worker, SIGNAL(errorOccurred(int,QVariantMap)),
+            this, SLOT(errorOccurred(int,QVariantMap)));
+    connect(m_worker, SIGNAL(warningOccurred(int,QVariantMap)),
+            this, SLOT(warningOccurred(int,QVariantMap)));
     connect(m_worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
     connect(m_worker, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
     connect(m_worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
@@ -118,14 +118,14 @@ void QAptBatch::workerStarted()
     // Reset the progresbar's maximum to default
     progressBar()->setMaximum(100);
     connect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-            this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+            this, SLOT(serviceOwnerChanged(QString,QString,QString)));
 
-    connect(m_worker, SIGNAL(questionOccurred(int, const QVariantMap&)),
-            this, SLOT(questionOccurred(int, const QVariantMap&)));
-    connect(m_worker, SIGNAL(downloadProgress(int, int, int)),
-            this, SLOT(updateDownloadProgress(int, int, int)));
-    connect(m_worker, SIGNAL(commitProgress(const QString&, int)),
-            this, SLOT(updateCommitProgress(const QString&, int)));
+    connect(m_worker, SIGNAL(questionOccurred(int,QVariantMap)),
+            this, SLOT(questionOccurred(int,QVariantMap)));
+    connect(m_worker, SIGNAL(downloadProgress(int,int,int)),
+            this, SLOT(updateDownloadProgress(int,int,int)));
+    connect(m_worker, SIGNAL(commitProgress(QString,int)),
+            this, SLOT(updateCommitProgress(QString,int)));
 }
 void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 {
@@ -393,12 +393,12 @@ void QAptBatch::workerFinished(bool success)
 {
     Q_UNUSED(success);
     disconnect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-               this, SLOT(serviceOwnerChanged(QString, QString, QString)));
+               this, SLOT(serviceOwnerChanged(QString,QString,QString)));
 
-    disconnect(m_worker, SIGNAL(downloadProgress(int, int, int)),
-               this, SLOT(updateDownloadProgress(int, int, int)));
-    disconnect(m_worker, SIGNAL(commitProgress(const QString&, int)),
-               this, SLOT(updateCommitProgress(const QString&, int)));
+    disconnect(m_worker, SIGNAL(downloadProgress(int,int,int)),
+               this, SLOT(updateDownloadProgress(int,int,int)));
+    disconnect(m_worker, SIGNAL(commitProgress(QString,int)),
+               this, SLOT(updateCommitProgress(QString,int)));
 }
 
 void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)

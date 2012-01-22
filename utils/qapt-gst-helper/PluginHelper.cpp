@@ -53,16 +53,16 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
 {
     connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)),
             this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode, QVariantMap)),
-            this, SLOT(errorOccurred(QApt::ErrorCode, QVariantMap)));
-    connect(m_backend, SIGNAL(warningOccurred(QApt::WarningCode, QVariantMap)),
-            this, SLOT(warningOccurred(QApt::WarningCode, QVariantMap)));
-    connect(m_backend, SIGNAL(questionOccurred(QApt::WorkerQuestion, QVariantMap)),
-            this, SLOT(questionOccurred(QApt::WorkerQuestion, QVariantMap)));
-    connect(m_backend, SIGNAL(downloadProgress(int, int, int)),
-            this, SLOT(updateDownloadProgress(int, int, int)));
-    connect(m_backend, SIGNAL(commitProgress(const QString&, int)),
-            this, SLOT(updateCommitProgress(const QString&, int)));
+    connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
+            this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
+    connect(m_backend, SIGNAL(warningOccurred(QApt::WarningCode,QVariantMap)),
+            this, SLOT(warningOccurred(QApt::WarningCode,QVariantMap)));
+    connect(m_backend, SIGNAL(questionOccurred(QApt::WorkerQuestion,QVariantMap)),
+            this, SLOT(questionOccurred(QApt::WorkerQuestion,QVariantMap)));
+    connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
+            this, SLOT(updateDownloadProgress(int,int,int)));
+    connect(m_backend, SIGNAL(commitProgress(QString,int)),
+            this, SLOT(updateCommitProgress(QString,int)));
 
     foreach (const QString &plugin, gstDetails) {
         PluginInfo *pluginInfo = new PluginInfo(plugin);
@@ -99,8 +99,8 @@ void PluginHelper::run()
     }
 
     m_finder = new PluginFinder(0, m_backend);
-    connect(m_finder, SIGNAL(foundCodec(QApt::Package *)),
-            this, SLOT(foundCodec(QApt::Package *)));
+    connect(m_finder, SIGNAL(foundCodec(QApt::Package*)),
+            this, SLOT(foundCodec(QApt::Package*)));
     connect(m_finder, SIGNAL(notFound()),
             this, SLOT(notFound()));
 
