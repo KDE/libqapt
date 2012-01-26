@@ -94,10 +94,14 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
 
     // make it nonblocking
     fcntl(readFromChildFD[0], F_SETFL, O_NONBLOCK);
+    fcntl(pty_master, F_SETFL, O_NONBLOCK);
 
     // Update the interface until the child dies
     int ret;
+    char masterbuf[1024];
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
+        // TODO: This is dpkg's raw output. Let's see if we can't do something with it
+        while(read(pty_master, masterbuf, sizeof(masterbuf)) > 0);
         updateInterface(readFromChildFD[0], pty_master);
     }
 
