@@ -461,8 +461,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     emit workerEvent(QApt::PackageDownloadStarted);
 
     if (fetcher.Run() != pkgAcquire::Continue) {
-        // Our fetcher will report errors for itself, but we have to send the
-        // finished signal
+        // Our fetcher will report warnings for itself, but if it fails entirely
+        // we have to send the error and finished signals
+        emit errorOccurred(QApt::FetchError, QVariantMap());
         emit workerFinished(false);
         m_timeout->start();
         return;
