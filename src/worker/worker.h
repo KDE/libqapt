@@ -93,6 +93,7 @@ private Q_SLOTS:
 Q_SIGNALS:
     void workerStarted();
     void workerEvent(int code);
+    // TODO QApt2: the result parameter is unused, remove it
     void workerFinished(bool result);
     // TODO QApt2: Rename globalDownloadProgress
     void downloadProgress(int percentage, int speed, int ETA);
