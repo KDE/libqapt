@@ -486,9 +486,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     pkgPackageManager::OrderResult res = installProgress->start(packageManager);
     bool success = (res == pkgPackageManager::Completed);
 
-    if (success) {
-        emit workerEvent(QApt::CommitChangesFinished);
-    }
+    emit workerEvent(QApt::CommitChangesFinished);
     emit workerFinished(success);
 
     delete installProgress;
