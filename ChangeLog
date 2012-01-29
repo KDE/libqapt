@@ -1,4 +1,4 @@
-1.3.0: (as of 1.3 beta)
+1.3.0: (as of 1.3 RC)
 ======
 - Features:
   - Introducing the QApt::Changelog class, which provides an interface for retreiving
@@ -14,6 +14,9 @@
   - Fixed build with PolkitQt-1 > 0.100
   - Fixed a spelling error in the QApt Deb Installer
   - Support Debian changelog servers, fixes changelogs containing HTML on Debian systems
+  - Fixed a documentation typo in QAptConfig.cmake
+  - Fix deprecated values and other desktop spec violations in the QApt Deb Installer's
+    desktop file.
 - Optimizations:
   - Added Backend::markPackages() to mark multiple packages at once.
     It utilizes event compression, avoiding additional internal dependency checking or
@@ -22,10 +25,25 @@
   - Added Backend::setCompressEvents() function so that programs can utilize the event
     compression speed benefits in their own custom marking loops if they can't use
     Backend::markPackages()
+  - Normalize all signals/slots for a (micro)optimization.
 - Other:
   - Dropped legacy support for PolKit-Qt 0.98.x. Polkit-Qt 0.99 or greater is now required.
   - Utilize language features of C++11, GCC 4.6+ or similar is now required.
   - API documentation updates
+
+1.2.3:
+======
+- Bugfixes:
+  * Fixed a bug with the QApt Deb Installer where files with spaces would fail to install.
+    (BKO: #290510)
+  * Read the dpkg pty regularly to prevent it from filling.Fixes an issue where long/verbose
+    commits would hang the QApt Worker, by extension causing QApt frontends to hang.
+    (BKO: #292423, LP: #840306)
+  * Restart the QApt Worker's timeout timer and note the end of a commit if commitChanges
+    fails. Otherwise, the QApt Worker will remain as a zombie indefinitely, hanging
+    frontends. (BKO: #292549)
+  * Emit a FetchFailed error if enough packages fail to download to prevent a commit from
+    happening at all. Fixes a hang on frontends when packages fail to download. (BKO: #287274)
 
 1.2.2:
 ======
