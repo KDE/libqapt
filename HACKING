@@ -1,6 +1,6 @@
 A few notes to hackers:
 
   - This library, for the most part, follows the Kubuntu coding style: https://wiki.kubuntu.org/Kubuntu/Specs/MaverickCodestylePolicy (Which in itself is quite similar to the kdelibs coding style) The exceptions are when code has been copied almost verbatim from places like synaptic, and for syncing purposes it would be better to have as little difference as possible.
-  - API and ABI are frozen until QApt2.
+  - API and ABI are frozen until QApt2. (Except for additions)
   - Strings are frozen for all point releases (e.g. 1.0.1 or 1.0.2), with freezes starting two weeks before a minor release. For example, there will be a string freeze before 1.1.0 and will remain frozen for 1.1.1 and 1.1.2.
 
