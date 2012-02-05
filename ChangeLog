@@ -1,3 +1,17 @@
+1.2.3:
+======
+- Bugfixes:
+  * Fixed a bug with the QApt Deb Installer where files with spaces would fail to install.
+    (BKO: #290510)
+  * Read the dpkg pty regularly to prevent it from filling.Fixes an issue where long/verbose
+    commits would hang the QApt Worker, by extension causing QApt frontends to hang.
+    (BKO: #292423, LP: #840306)
+  * Restart the QApt Worker's timeout timer and note the end of a commit if commitChanges
+    fails. Otherwise, the QApt Worker will remain as a zombie indefinitely, hanging
+    frontends. (BKO: #292549)
+  * Emit a FetchFailed error if enough packages fail to download to prevent a commit from
+    happening at all. Fixes a hang on frontends when packages fail to download. (BKO: #287274)
+
 1.2.2:
 ======
 - Bugfixes:
