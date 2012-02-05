@@ -99,7 +99,7 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
         QVariantMap args;
-        args[QLatin1String("FailedItem")] = QString::fromUtf8(item.Description.c_str());
+        args[QLatin1String("FailedItem")] = QString::fromUtf8(item.URI.c_str());
         args[QLatin1String("WarningText")] = QString::fromUtf8(item.Owner->ErrorText.c_str());
         emit fetchWarning(QApt::FetchFailedWarning, args);
     }
