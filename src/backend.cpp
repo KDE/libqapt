@@ -279,7 +279,7 @@ void Backend::reloadCache()
         if (!pinFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
             continue;
         }
-        FileFd Fd(pinFile.handle(), FileFd::ReadOnly, FileFd::Auto);
+        FileFd Fd(pinFile.handle(), FileFd::ReadOnly, FileFd::None);
 
         pkgTagFile tagFile(&Fd);
         if (_error->PendingError()) {
@@ -1329,7 +1329,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             if (!pinFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 continue;
             }
-            FileFd Fd(pinFile.handle(), FileFd::ReadOnly, FileFd::Auto);
+            FileFd Fd(pinFile.handle(), FileFd::ReadOnly, FileFd::None);
 
             pkgTagFile tagFile(&Fd);
             if (_error->PendingError()) {
