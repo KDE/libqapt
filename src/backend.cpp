@@ -267,19 +267,17 @@ void Backend::reloadCache()
 
     Q_FOREACH (const QString &pinName, pinFiles) {
         QString pinPath;
-
-        // Handle absolute paths
+        // Make all paths absolute
         if (!pinName.startsWith(QLatin1Char('/'))) {
             pinPath = dir % pinName;
         } else {
             pinPath = pinName;
         }
-        QFile pinFile(pinPath);
 
-        if (!pinFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            continue;
-        }
-        FileFd Fd(pinFile.handle(), FileFd::ReadOnly, FileFd::None);
+        if (!QFile::exists(pinPath))
+                continue;
+
+        FileFd Fd(pinPath.toUtf8().data(), FileFd::ReadOnly);
 
         pkgTagFile tagFile(&Fd);
         if (_error->PendingError()) {
@@ -1311,7 +1309,9 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             } else {
                 pinPath = pinName;
             }
-            QFile pinFile(pinPath);
+
+            if (!QFile::exists(pinPath))
+                continue;
 
             // Open to get a file name
             QTemporaryFile tempFile;
@@ -1326,10 +1326,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
                 return false;
             }
 
-            if (!pinFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                continue;
-            }
-            FileFd Fd(pinFile.handle(), FileFd::ReadOnly, FileFd::None);
+            FileFd Fd(pinPath.toUtf8().data(), FileFd::ReadOnly);
 
             pkgTagFile tagFile(&Fd);
             if (_error->PendingError()) {
