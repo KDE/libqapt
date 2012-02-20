@@ -153,7 +153,7 @@ QString Config::readEntry(const QString &key, const QString &defaultValue) const
 
 QString Config::findDirectory(const QString &key, const QString &defaultValue) const
 {
-    return QString::fromStdString(_config->FindDir(key.toStdString(), defaultValue.toStdString()));
+    return QString::fromStdString(_config->FindDir(key.toStdString().data(), defaultValue.toStdString().data()));
 }
 
 void Config::writeEntry(const QString &key, const bool value)
