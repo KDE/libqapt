@@ -1270,8 +1270,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 {
     Q_D(Backend);
 
-    QString dir = QString::fromStdString(_config->FindDir("Dir::Etc"))
-                  % QLatin1String("preferences.d/");
+    QString dir = d->config->findDirectory("Dir::Etc") % QLatin1String("preferences.d/");
     QString path = dir % package->latin1Name();
     QString pinDocument;
 
