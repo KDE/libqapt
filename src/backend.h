@@ -28,6 +28,7 @@
 #include "package.h"
 
 class pkgSourceList;
+class pkgRecords;
 
 namespace QApt {
     class Cache;
@@ -407,8 +408,17 @@ protected:
      */
     Cache *cache() const;
 
+    /**
+     * Returns a pointer to the internal package records object. Mainly used
+     * for internal purposes in QApt::Package
+     *
+     * @return the package records object used by the backend
+     * @since 1.4
+     */
+    pkgRecords *records() const;
+
 private:
-    Q_DECLARE_PRIVATE(Backend);
+    Q_DECLARE_PRIVATE(Backend)
     friend class Package;
     friend class PackagePrivate;
 

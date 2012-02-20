@@ -64,6 +64,7 @@ public:
     * @param records The underlying package records for fetching some info
     * @param packageIter The underlying object representing the package in APT
     */
+    // TODO QApt2: Remove unused pkgRecords param
     Package(QApt::Backend* parent, pkgDepCache *depcache,
             pkgRecords *records, pkgCache::PkgIterator &packageIter);
 

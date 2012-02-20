@@ -319,6 +319,13 @@ Cache *Backend::cache() const
     return d->cache;
 }
 
+pkgRecords *Backend::records() const
+{
+    Q_D(const Backend);
+
+    return d->records;
+}
+
 Package *Backend::package(pkgCache::PkgIterator &iter) const
 {
     Q_D(const Backend);
