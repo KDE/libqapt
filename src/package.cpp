@@ -121,11 +121,11 @@ QString PackagePrivate::getReleaseFileForOrigin(QLatin1String label, const QStri
         for(I=list->begin(); I != list->end(); ++I) {
             vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
             if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
-                QString uri = QString::fromStdString(_config->FindDir("Dir::State::lists"))
+                QString uri = backend->config()->findDirectory("Dir::State::lists")
                 % QString::fromStdString(URItoFileName((*I)->GetURI()))
-                % QLatin1Literal("dists_")
+                % QLatin1String("dists_")
                 % QString::fromStdString((*I)->GetDist())
-                % QLatin1Literal("_Release");
+                % QLatin1String("_Release");
 
                 return uri;
             }
