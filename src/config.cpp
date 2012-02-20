@@ -161,11 +161,7 @@ void Config::writeEntry(const QString &key, const bool value)
 
     QByteArray boolString;
 
-    if (value == true) {
-        boolString = "\"true\";";
-    } else {
-        boolString = "\"false\";";
-    }
+    boolString = value ? "\"true\";" : "\"false\";";
 
     if (d->newFile) {
         d->buffer.append(key + ' ' + boolString);
@@ -191,7 +187,6 @@ void Config::writeEntry(const QString &key, const int value)
         d->newFile = false;
     } else {
         d->writeBufferEntry(key.toAscii(), intString);
-        qDebug() << d->buffer;
     }
 
     _config->Set(key.toStdString().c_str(), value);
@@ -211,7 +206,6 @@ void Config::writeEntry(const QString &key, const QString &value)
         d->newFile = false;
     } else {
         d->writeBufferEntry(key.toAscii(), valueString);
-        qDebug() << d->buffer;
     }
 
     _config->Set(key.toStdString(), value.toStdString());
