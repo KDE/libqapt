@@ -26,7 +26,6 @@
 #include <QtCore/QHash>
 #include <QtCore/QLatin1String>
 #include <QtDBus/QDBusConnection>
-#include <QDebug>
 
 // APT includes
 #include <apt-pkg/configuration.h>
@@ -173,7 +172,6 @@ void Config::writeEntry(const QString &key, const bool value)
         d->newFile = false;
     } else {
         d->writeBufferEntry(key.toAscii(), boolString);
-        qDebug() << d->buffer;
     }
 
     _config->Set(key.toStdString().c_str(), value);
