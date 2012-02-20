@@ -185,12 +185,12 @@ if (KDE4_FOUND)
     #comments with appropriate doc and translation directories.
     #PO_SUBDIR
     #DOC_SUBDIR
-endif (KDE4_FOUND)
 
 macro_log_feature(QTGSTREAMER_FOUND "QtGStreamer" "Qt wrapper around the GStreamer multimedia framework"
                   "http://gstreamer.freedesktop.org" FALSE "" "Used to build an optional GStreamer plugin installer")
 
 macro_display_feature_log()
+endif (KDE4_FOUND)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig
