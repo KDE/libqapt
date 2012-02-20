@@ -256,12 +256,11 @@ void Backend::reloadCache()
     d->redoStack.clear();
 
     // Determine which packages are pinned for display purposes
-    QString dir = QString::fromStdString(_config->FindDir("Dir::Etc"))
-                  % QLatin1String("preferences.d/");
+    QString dirBase = d->config->findDirectory(QLatin1String("Dir::Etc"));
+    QString dir = dirBase % QLatin1String("preferences.d/");
     QDir logDirectory(dir);
     QStringList pinFiles = logDirectory.entryList(QDir::Files, QDir::Name);
-    pinFiles << QString::fromStdString(_config->FindDir("Dir::Etc")) %
-                QLatin1String("preferences");
+    pinFiles << dirBase % QLatin1String("preferences");
 
     Q_FOREACH (const QString &pinName, pinFiles) {
         QString pinPath;

@@ -65,10 +65,10 @@ public:
     /**
      * Reads the value of an entry specified by @p key
      *
-     * @param key The key to search for
-     * @param default The default value returned if the key was not found
+     * @param key the key to search for
+     * @param defaultValue the default value returned if the key was not found
      *
-     * @return The value for this key, or @p default if the key was not found
+     * @return the value for this key, or @p default if the key was not found
      *
      * @see writeEntry()
      */
@@ -79,6 +79,21 @@ public:
 
     /** Overload for readEntry(const QString&, const bool) */
     QString readEntry(const QString &key, const QString &defaultValue) const;
+
+    /**
+     * Locates the path of the given key. This uses APT's configuration
+     * key algorithm to return various apt-related directories. For example,
+     * a key of 'Dir::Etc' would return the location of the APT configuration
+     * directory (usually /etc/apt), and 'Dir::Etc::main' would return the
+     * location of apt.conf (usually /etc/apt/apt.conf)
+     *
+     * @param key the key to search for
+     * @param default the directory to use as default if the key isn't found
+     *
+     * @return the location of the config key, or the default if the key
+     * is not found
+     */
+    QString findDirectory(const QString &key, const QString &defaultValue = QString()) const;
 
     /**
      * Writes a value to the APT configuration object, and applies it
@@ -97,7 +112,7 @@ public:
     void writeEntry(const QString &key, const QString &value);
 
 private:
-    Q_DECLARE_PRIVATE(Config);
+    Q_DECLARE_PRIVATE(Config)
     ConfigPrivate *const d_ptr;
 };
 
