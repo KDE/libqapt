@@ -120,7 +120,7 @@ bool GstMatcher::matches(QApt::Package *package)
             if (!typeData.isEmpty()) {
                 // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
                 QGst::CapsPtr caps = QGst::Caps::fromString(typeData);
-                if (caps->isEmpty()) {
+                if (!caps || caps->isEmpty()) {
                     continue;
                 }
 
