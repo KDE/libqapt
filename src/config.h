@@ -92,6 +92,7 @@ public:
      *
      * @return the location of the config key, or the default if the key
      * is not found
+     * @since 1.4
      */
     QString findDirectory(const QString &key, const QString &defaultValue = QString()) const;
 
