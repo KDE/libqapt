@@ -250,9 +250,7 @@ void Backend::reloadCache()
         }
     }
 
-    if (d->originMap.contains(QLatin1String(""))) {
-        d->originMap.remove(QLatin1String(""));
-    }
+    d->originMap.remove(QString());
 
     d->undoStack.clear();
     d->redoStack.clear();
