@@ -651,12 +651,31 @@ public Q_SLOTS:
     */
     void downloadArchives(const QString &listFile, const QString &destination);
 
+   /**
+    * Installs a .deb package archive file.
+    *
+    * If the file has any additional dependencies that are not currently
+    * installed, the worker will install these. The backend sends out normal
+    * download event signals.
+    *
+    * When the commit process for the DebFile starts, the backend will emit the
+    * QApt::DebInstallStarted worker signal. Similarly, when the commit is
+    * finished the backend will emit the QApt::DebInstallFinished signal.
+    *
+    * @param file the DebFile to install
+    *
+    * @see workerEvent()
+    * @see packageDownloadProgress()
+    */
     void installDebFile(const DebFile &file);
 
     /**
      * A slot that Packages use to tell the backend they've changed.
      * (Used internally by QApt::Package. You likely will never use this)
+     *
+     * @param package the package which has changed
      */
+    // TODO QApt2: Make this a private slot.
     void packageChanged(Package *package);
 
     /**
