@@ -789,6 +789,16 @@ bool Package::isMultiArchEnabled() const
     return isForeignArch();
 }
 
+bool Package::isMultiArchDuplicate() const
+{
+    // Excludes installed packages, which are always "interesting"
+    if (isInstalled())
+        return false;
+
+    // Otherwise, check if the pkgIterator is the "best" from its group
+    return (d->packageIter->Group().FindPkg() != *d->packageIter);
+}
+
 bool Package::isForeignArch() const
 {
     if (!d->foreignArchCalculated) {

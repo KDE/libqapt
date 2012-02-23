@@ -398,8 +398,36 @@ public:
     * binary packages were considered MultiArch by APT. This is not true,
     * so this function was renamed to isForeignArch() and expanded to include
     * non-native binary packages.
+    *
+    * The purpose of this function was originally to filter out multi-arch
+    * functions that duplicated native ones. Due to the false assumptions
+    * made, this both didn't work and managed to poorly describe a boolean
+    * system to describe multi-arch duplicated. It was therefore renamed and
+    * re-implemented as isMultiArchDuplicate(). This function now just returns
+    * whether or not the package is foreign-arch.
+    *
+    * @return the result of isForeignArch()
+    *
+    * @see isForeignArch()
+    * @see isMultiArchDuplicate()
+    *
+    * @since 1.2
     */
     QT_DEPRECATED bool isMultiArchEnabled() const;
+
+    /**
+     * Returns whether or not a package is a foreign-arch version of a package
+     * that also has a native-architecture counterpart (a "duplicate")
+     *
+     * This includes installed packages, which are always considered
+     * "interesting".
+     *
+     * @return @c true when the same package is available for the native arch
+     * @return @c false when the package is a unique foreign-arch package
+     *
+     * @since 1.4
+     */
+    bool isMultiArchDuplicate() const;
 
    /**
     * Returns whether or not the package is for the native CPU architecture
