@@ -1288,6 +1288,19 @@ bool Package::setVersion(const QString &version)
 
     d->backend->cache()->depCache()->SetCandidateVersion(Ver);
 
+    string archive;
+    for (pkgCache::VerFileIterator VF = Ver.FileList();
+         VF.end() == false;
+         ++VF)
+    {
+        if (!VF.File() || !VF.File().Archive())
+            continue;
+
+        archive = VF.File().Archive();
+        d->backend->cache()->depCache()->SetCandidateRelease(Ver, archive);
+        break;
+    }
+
     if (isDefault) {
         d->state &= ~OverrideVersion;
     } else {
