@@ -113,8 +113,10 @@ public:
     bool compressEvents;
     pkgDepCache::ActionGroup *actionGroup;
 
+    // Other
     bool writeSelectionFile(const QString &file, const QString &path) const;
     void setWorkerLocale();
+    QString customProxy;
     void setWorkerProxy();
 };
 
@@ -138,7 +140,9 @@ void BackendPrivate::setWorkerLocale()
 
 void BackendPrivate::setWorkerProxy()
 {
-    worker->setProxy(QLatin1String(qgetenv("http_proxy")));
+    QString proxy;
+    customProxy.isEmpty() ? proxy = qgetenv("http_proxy") : proxy = customProxy;
+    worker->setProxy(proxy);
 }
 
 Backend::Backend()
@@ -1412,6 +1416,13 @@ bool Backend::addArchiveToCache(const DebFile &archive)
 
     // Add the package, but we'll need auth so the worker'll do it
     return d->worker->copyArchiveToCache(archive.filePath());
+}
+
+void Backend::setWorkerProxy(const QString &proxy)
+{
+    Q_D(Backend);
+
+    d->customProxy = proxy;
 }
 
 void Backend::workerStarted()

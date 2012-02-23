@@ -827,6 +827,22 @@ public Q_SLOTS:
     */
     bool addArchiveToCache(const DebFile &archive);
 
+   /**
+    * Sets the proxy to be used by the QApt Worker
+    *
+    * This function is used to aid in integration with environments that do not
+    * primarily use the proxy set by either APT or their shell environment's
+    * http_proxy environment variable. (Such as KDE)
+    *
+    * Once you call this function, the QApt Worker will use the custom proxy for
+    * the life of the QApt::Backend object.
+    *
+    * @param proxy the proxy to be used by the QApt Worker
+    *
+    * @since 1.4
+    */
+    void setWorkerProxy(const QString &proxy);
+
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void workerStarted();
