@@ -648,6 +648,8 @@ public Q_SLOTS:
     *
     * @param listFile The path to the package list file
     * @param destination The path of the directory to download the packages to
+    *
+    * @since 1.2
     */
     void downloadArchives(const QString &listFile, const QString &destination);
 
@@ -666,6 +668,8 @@ public Q_SLOTS:
     *
     * @see workerEvent()
     * @see packageDownloadProgress()
+    *
+    * @since 1.2
     */
     void installDebFile(const DebFile &file);
 
@@ -721,10 +725,10 @@ public Q_SLOTS:
      *
      * @param path The path to save the selection list to
      *
-     * \return @c true if saving succeeded
-     * \return @c false if the saving failed
+     * @return @c true if saving succeeded
+     * @return @c false if the saving failed
      *
-     * @since 1.1
+     * @since 1.2
      *
      * @see loadSelections()
      * @see saveSelections()
@@ -737,8 +741,10 @@ public Q_SLOTS:
      *
      * @param path The path to save the selection list to
      *
-     * \return @c true if saving succeeded
-     * \return @c false if the saving failed
+     * @return @c true if saving succeeded
+     * @return @c false if the saving failed
+     *
+     * @since 1.2
      *
      * @see saveInstalledPackagesList()
      * @see loadSelections()
@@ -751,8 +757,10 @@ public Q_SLOTS:
      *
      * @param path The path from which to read the selection list
      *
-     * \return @c true if reading/marking succeeded
-     * \return @c false if the reading/marking failed
+     * @return @c true if reading/marking succeeded
+     * @return @c false if the reading/marking failed
+     *
+     * @since 1.2
      *
      * @see saveSelections()
      * @see saveInstalledPackagesList()
@@ -767,6 +775,8 @@ public Q_SLOTS:
     * @param path The path to save the download list to
     *
     * @return @c true if savign succeeded, @c false if the saving failed
+    *
+    * @since 1.2
     */
     bool saveDownloadList(const QString &path) const;
 
@@ -780,6 +790,8 @@ public Q_SLOTS:
     * @param pin Whether to pin or unpin the package
     *
     * @return @c true on success, @c false on failure
+    *
+    * @since 1.2
     */
     bool setPackagePinned(QApt::Package *package, bool pin);
 
