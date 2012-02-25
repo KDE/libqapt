@@ -35,7 +35,7 @@ using namespace std;
 WorkerAcquire::WorkerAcquire(QAptWorker *parent)
         : QObject(parent)
         , m_worker(parent)
-        , m_canceled(false)
+        , m_cancelled(false)
         , m_calculatingSpeed(true)
         , m_questionResponse(QVariantMap())
 {
@@ -49,7 +49,7 @@ WorkerAcquire::~WorkerAcquire()
 void WorkerAcquire::Start()
 {
     // Cleanup from old fetches
-    m_canceled = false;
+    m_cancelled = false;
     m_calculatingSpeed = true;
 
     pkgAcquireStatus::Start();
@@ -179,12 +179,12 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 
     Update = false;
 
-    return !m_canceled;
+    return !m_cancelled;
 }
 
 void WorkerAcquire::requestCancel()
 {
-    m_canceled = true;
+    m_cancelled = true;
     emit fetchError(QApt::UserCancelError, QVariantMap());
 }
 
@@ -217,4 +217,9 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage
 
           emit packageDownloadProgress(name, percentage, URI, size, status);
     }
+}
+
+bool WorkerAcquire::wasCancelled() const
+{
+    return m_cancelled;
 }

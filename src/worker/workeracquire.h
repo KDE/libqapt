@@ -48,6 +48,8 @@ public:
 
     bool Pulse(pkgAcquire *Owner);
 
+    bool wasCancelled() const;
+
 private:
     QVariantMap askQuestion(int questionCode, const QVariantMap &args);
 
@@ -55,7 +57,7 @@ private:
     QEventLoop *m_mediaBlock;
     QVariantMap m_questionResponse;
     bool m_calculatingSpeed;
-    bool m_canceled;
+    bool m_cancelled;
 
 public Q_SLOTS:
     void requestCancel();

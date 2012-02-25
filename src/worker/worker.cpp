@@ -463,7 +463,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     if (fetcher.Run() != pkgAcquire::Continue) {
         // Our fetcher will report warnings for itself, but if it fails entirely
         // we have to send the error and finished signals
-        emit errorOccurred(QApt::FetchError, QVariantMap());
+        if (!m_acquireStatus->wasCancelled()) {
+            emit errorOccurred(QApt::FetchError, QVariantMap());
+        }
+
         emit workerFinished(false);
         m_timeout->start();
         return;
