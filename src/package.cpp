@@ -501,14 +501,16 @@ QStringList Package::archives() const
 
 QString Package::component() const
 {
-    pkgDepCache::StateCache &State = (*d->backend->cache()->depCache())[*d->packageIter];
-    if (!State.CandidateVer) {
+    QString section = latin1Section();
+    if(section.isEmpty())
         return QString();
-    }
-    const pkgCache::VerIterator &Ver = State.CandidateVerIter(*d->backend->cache()->depCache());
-    const pkgCache::PkgFileIterator &File = Ver.FileList().File();
 
-    return QLatin1String(File.Component());
+    QStringList split = section.split('/');
+
+    if (split.count())
+        return split.first();
+
+    return QString("main");
 }
 
 QByteArray Package::md5Sum() const
