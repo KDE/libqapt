@@ -252,6 +252,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     m_timeout->stop();
 
+    pkgDepCache::ActionGroup *actionGroup = new pkgDepCache::ActionGroup(*m_cache->depCache());
     // Parse out the argument list and mark packages for operations
     QVariantMap::const_iterator mapIter = instructionsList.constBegin();
 
@@ -279,6 +280,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             emit errorOccurred(QApt::NotFoundError, args);
             emit workerFinished(false);
             m_timeout->start();
+            delete actionGroup;
             return;
         }
 
@@ -343,6 +345,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         }
         mapIter++;
     }
+
+    delete actionGroup;
 
     emit workerStarted();
 
