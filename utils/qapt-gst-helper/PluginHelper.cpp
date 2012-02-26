@@ -484,6 +484,9 @@ void PluginHelper::incrementProgress()
     progressBar()->setValue(progressBar()->value() + 1);
     if (progressBar()->value() == progressBar()->maximum()) {
         if (m_foundCodecs.isEmpty()) {
+            QString text = i18nc("@info", "No plugins could be found");
+            QString title = i18nc("@title", "Plugins Not Found");
+            KMessageBox::error(this, text, title);
             exit(ERR_NO_PLUGINS);
         }
         offerInstallPackages();
