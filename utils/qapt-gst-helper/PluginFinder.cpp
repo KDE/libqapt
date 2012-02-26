@@ -52,6 +52,7 @@ void PluginFinder::find(const PluginInfo *pluginInfo)
 
     if (!matcher.hasMatches()) {
         // No such codec
+        emit notFound();
         return;
     }
 
