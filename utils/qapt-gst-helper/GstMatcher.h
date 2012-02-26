@@ -27,33 +27,24 @@
 
 #include <QGst/Caps>
 
-#include <string>
-
-using namespace std;
+class PluginInfo;
 
 namespace QApt {
     class Package;
 }
 
-typedef struct {
-    string   version;
-    string   type;
-    string   data;
-    string   opt;
-    QGst::CapsPtr    caps;
-} Match;
-
 class GstMatcher
 {
 public:
-    GstMatcher(const QStringList &values);
+    GstMatcher(const PluginInfo *info);
     ~GstMatcher();
 
     bool matches(QApt::Package *package);
     bool hasMatches() const;
 
 private:
-    QVector<Match> m_matches;
+    const PluginInfo *m_info;
+    QVector<QString> m_aptTypes;
 };
 
 #endif

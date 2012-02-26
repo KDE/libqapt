@@ -30,8 +30,11 @@ class PluginInfo
 public:
     enum PluginType {
         InvalidType = 0,
-        Encoder = 1,
-        Decoder = 2
+        Encoder,
+        Decoder,
+        UriSource,
+        UriSink,
+        Element
     };
 
     explicit PluginInfo(const QString &gstDetails = QString());
@@ -44,7 +47,6 @@ public:
     QString capsVariantInfo() const;
     int pluginType() const;
     QString data() const;
-    QString searchString() const;
     QString typeName() const;
 
     bool isValid() const;
@@ -55,7 +57,6 @@ private:
     QString m_name;
     QString m_typeName;
     QString m_capsInfo;
-    QString m_capsVariantInfo;
     QGst::Structure m_structure;
     int m_pluginType;
     QString m_data;
