@@ -21,90 +21,23 @@
 
 #include "GstMatcher.h"
 
-#include <QStringBuilder>
-
 #include <KDebug>
-
-#include <regex.h>
 
 #include <../../src/package.h>
 
-GstMatcher::GstMatcher(const QStringList &values)
+#include "PluginInfo.h"
+
+GstMatcher::GstMatcher(const PluginInfo *info)
 {
-    // The search term from PackageKit daemon:
-    // gstreamer0.10(urisource-foobar)
-    // gstreamer0.10(decoder-audio/x-wma)(wmaversion=3)
-    const char *pkreg = "^gstreamer\\([0-9\\.]\\+\\)"
-                "(\\(encoder\\|decoder\\|urisource\\|urisink\\|element\\)-\\([^)]\\+\\))"
-                "\\(([^\\(^\\)]*)\\)\\?";
+    m_aptTypes = QVector<QString>(6);
+    m_aptTypes[PluginInfo::InvalidType] = QLatin1String("");
+    m_aptTypes[PluginInfo::Encoder] = QLatin1String("Gstreamer-Encoders");
+    m_aptTypes[PluginInfo::Decoder] = QLatin1String("Gstreamer-Decoders");
+    m_aptTypes[PluginInfo::UriSource] = QLatin1String("Gstreamer-Uri-Sources");
+    m_aptTypes[PluginInfo::UriSink] = QLatin1String("Gstreamer-Uri-Sinks");
+    m_aptTypes[PluginInfo::Element] = QLatin1String("Gstreamer-Elements");
 
-    regex_t pkre;
-    if(regcomp(&pkre, pkreg, 0) != 0) {
-        return;
-    }
-
-    kDebug() << values;
-
-    for (int i = 0; i < values.size(); i++) {
-        string value = values.at(i).toStdString();
-        regmatch_t matches[5];
-        if (regexec(&pkre, value.c_str(), 5, matches, 0) == 0) {
-            Match values;
-            string version, type, data, opt;
-
-            // Appends the version
-            version = string(value.c_str(), matches[1].rm_so, matches[1].rm_eo - matches[1].rm_so);
-
-            // type (encode|decoder...)
-            type = string(value.c_str(), matches[2].rm_so, matches[2].rm_eo - matches[2].rm_so);
-
-            // data "audio/x-wma"
-            data = string(value.c_str(), matches[3].rm_so, matches[3].rm_eo - matches[3].rm_so);
-
-            // opt "wmaversion=3"
-            if (matches[4].rm_so != -1) {
-                // remove the '(' ')' that the regex matched
-                opt = string(value.c_str(), matches[4].rm_so + 1, matches[4].rm_eo - matches[4].rm_so - 2);
-                kDebug() << QString::fromStdString(opt);
-            }
-
-            if (type.compare("encoder") == 0) {
-                type = "Gstreamer-Encoders";
-            } else if (type.compare("decoder") == 0) {
-                type = "Gstreamer-Decoders";
-            } else if (type.compare("urisource") == 0) {
-                type = "Gstreamer-Uri-Sources";
-            } else if (type.compare("urisink") == 0) {
-                type = "Gstreamer-Uri-Sinks";
-            } else if (type.compare("element") == 0) {
-                type = "Gstreamer-Elements";
-            }
-
-            QString capsString;
-            if (opt.empty()) {
-                capsString = QLatin1String(data.c_str());
-            } else {
-                capsString = QLatin1String(data.c_str()) % QLatin1Literal(", ")
-                             % QLatin1String(opt.c_str());
-            }
-
-            QGst::CapsPtr caps = QGst::Caps::fromString(capsString);
-            if (!caps || caps->isEmpty()) {
-                continue;
-            }
-
-            values.version = version;
-            values.type    = type;
-            values.data    = data;
-            values.opt     = opt;
-            values.caps    = caps;
-
-            m_matches.append(values);
-        } else {
-            kDebug() << "Did not match: ";
-        }
-    }
-    regfree(&pkre);
+    m_info = info;
 }
 
 GstMatcher::~GstMatcher()
@@ -113,28 +46,38 @@ GstMatcher::~GstMatcher()
 
 bool GstMatcher::matches(QApt::Package *package)
 {
-    for (QVector<Match>::const_iterator i = m_matches.constBegin(); i != m_matches.constEnd(); ++i) {
-        // Tries to find "Gstreamer-version: xxx"
-        if (package->controlField(QLatin1String("Gstreamer-Version")) == QString::fromStdString(i->version)) {
-            QString typeData = package->controlField(QLatin1String(i->type.c_str()));
-            if (!typeData.isEmpty()) {
-                // Tries to find the type (e.g. "Gstreamer-Uri-Sinks: ")
-                QGst::CapsPtr caps = QGst::Caps::fromString(typeData);
-                if (!caps || caps->isEmpty()) {
-                    continue;
-                }
+    if (package->controlField(QLatin1String("Gstreamer-Version")) != m_info->version())
+        return false;
 
-                // If the package's cap intersects with our cap from the
-                // search string, return true
-                return (i->caps)->canIntersect(caps);
-            }
-        }
+    QString typeName = m_aptTypes[m_info->pluginType()];
+    QString typeData = package->controlField(typeName);
+
+    if (typeData.isEmpty())
+        return false;
+
+    QGst::CapsPtr packageCaps = QGst::Caps::fromString(typeData);
+    QGst::CapsPtr pluginCaps = QGst::Caps::fromString(m_info->capsInfo());
+
+    switch (m_info->pluginType()) {
+    case PluginInfo::Encoder:
+    case PluginInfo::Decoder:
+        if (!packageCaps || !pluginCaps || packageCaps->isEmpty() || pluginCaps->isEmpty())
+            return false;
+
+        return pluginCaps->canIntersect(packageCaps);
+    case PluginInfo::Element:
+    case PluginInfo::UriSink:
+    case PluginInfo::UriSource:
+        return typeData.contains(m_info->capsInfo());
+    default:
+        break;
     }
+
     return false;
 }
 
 bool GstMatcher::hasMatches() const
 {
-    return !m_matches.isEmpty();
+    return m_info->isValid();
 }
 

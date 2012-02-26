@@ -44,11 +44,7 @@ void PluginFinder::find(const PluginInfo *pluginInfo)
         return;
     }
 
-    QStringList details;
-    details << pluginInfo->searchString();
-    details << QString();
-
-    GstMatcher matcher(details);
+    GstMatcher matcher(pluginInfo);
 
     if (!matcher.hasMatches()) {
         // No such codec
