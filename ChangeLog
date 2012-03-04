@@ -1,32 +1,40 @@
-1.3.0: (as of 1.3 RC)
+1.3.0:
 ======
 - Features:
-  - Introducing the QApt::Changelog class, which provides an interface for retreiving
+  * Introducing the QApt::Changelog class, which provides an interface for retreiving
     information from a package's changelog. Individual entries in the changelog can
     be retreived along with other data such as version, date and an update description.
-  - Added Backend::stateChanges() to provide lists of changed packages since a given
+  * Added Backend::stateChanges() to provide lists of changed packages since a given
     CacheState.
-  - Added QApt::Package::archives() function to return a list of archives that a package
+  * Added QApt::Package::archives() function to return a list of archives that a package
     is available from. (E.g. oneiric, oneiric-updates, sid, etc)
 - Bugfixes:
-  - Fixed not being able to unmark a package when it is a dependency of another package
+  * Fixed not being able to unmark a package when it is a dependency of another package
     that is also marked.
-  - Fixed build with PolkitQt-1 > 0.100
-  - Fixed a spelling error in the QApt Deb Installer
-  - Support Debian changelog servers, fixes changelogs containing HTML on Debian systems
-  - Fixed a documentation typo in QAptConfig.cmake
-  - Fix deprecated values and other desktop spec violations in the QApt Deb Installer's
+  * Fixed build with PolkitQt-1 0.100+
+  * Fixed a spelling error in the QApt Deb Installer
+  * Support Debian changelog servers, fixes changelogs containing HTML on Debian systems
+  * Fixed a documentation typo in QAptConfig.cmake
+  * Fix deprecated values and other desktop spec violations in the QApt Deb Installer's
     desktop file.
+  * Fixed the GStreamer Plugin Installer not finding packages for entire GStreamer elements
+    (as opposed to plugins for specific element capabilities) (LP: #883604)
+  * Fixed the GStreamer Plugin Installer hanging when plugins can not be found.
+  * Fixed a crash in the GStreamer Plugin Installer where a QGst::CapsPtr was used without
+    a null check.
+  * Make the QApt Worker report the URI for fetch errors instead of the fetch description.
+  * Fix build issues with APT 0.8.16+
+  * Fix failure to build on systems without KDE development headers installed.
 - Optimizations:
-  - Added Backend::markPackages() to mark multiple packages at once.
+  * Added Backend::markPackages() for marking multiple packages at once.
     It utilizes event compression, avoiding additional internal dependency checking or
     emitting packageChanged() signals until everything is marked. Increases the speed
     of marking multiple packages by 300% in Muon.
-  - Added Backend::setCompressEvents() function so that programs can utilize the event
+  * Added Backend::setCompressEvents() function so that programs can utilize the event
     compression speed benefits in their own custom marking loops if they can't use
     Backend::markPackages()
-  - Normalize all signals/slots for a (micro)optimization.
-- Other:
+  * Normalize all signals/slots for a (micro)optimization.
+* Other:
   - Dropped legacy support for PolKit-Qt 0.98.x. Polkit-Qt 0.99 or greater is now required.
   - Utilize language features of C++11, GCC 4.6+ or similar is now required.
   - API documentation updates
