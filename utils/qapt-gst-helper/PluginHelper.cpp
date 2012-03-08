@@ -183,6 +183,9 @@ void PluginHelper::offerInstallPackages()
         package->setInstall();
     }
 
+    if (m_backend->markedPackages().size() == 0)
+        notFoundError();
+
     QStringList nameList;
 
     foreach (QApt::Package *package, m_backend->markedPackages()) {
@@ -479,15 +482,20 @@ void PluginHelper::notFound()
     incrementProgress();
 }
 
+void PluginHelper::notFoundError()
+{
+    QString text = i18nc("@info", "No plugins could be found");
+    QString title = i18nc("@title", "Plugins Not Found");
+    KMessageBox::error(this, text, title);
+    exit(ERR_NO_PLUGINS);
+}
+
 void PluginHelper::incrementProgress()
 {
     progressBar()->setValue(progressBar()->value() + 1);
     if (progressBar()->value() == progressBar()->maximum()) {
         if (m_foundCodecs.isEmpty()) {
-            QString text = i18nc("@info", "No plugins could be found");
-            QString title = i18nc("@title", "Plugins Not Found");
-            KMessageBox::error(this, text, title);
-            exit(ERR_NO_PLUGINS);
+            notFoundError();
         }
         offerInstallPackages();
     }

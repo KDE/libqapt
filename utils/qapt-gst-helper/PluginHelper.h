@@ -77,6 +77,7 @@ private Q_SLOTS:
     void workerEvent(QApt::WorkerEvent event);
     void foundCodec(QApt::Package *);
     void notFound();
+    void notFoundError();
     void incrementProgress();
     void install();
 
