@@ -183,6 +183,9 @@ void PluginHelper::offerInstallPackages()
         package->setInstall();
     }
 
+    if (m_backend->markedPackages().size() == 0)
+        exit(ERR_NO_PLUGINS);
+
     QStringList nameList;
 
     foreach (QApt::Package *package, m_backend->markedPackages()) {
