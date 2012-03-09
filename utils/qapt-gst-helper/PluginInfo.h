@@ -44,7 +44,6 @@ public:
     QString requestedBy() const;
     QString name() const;
     QString capsInfo() const;
-    QString capsVariantInfo() const;
     int pluginType() const;
     QString data() const;
     QString typeName() const;
