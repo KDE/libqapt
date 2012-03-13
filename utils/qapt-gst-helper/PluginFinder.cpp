@@ -53,7 +53,7 @@ void PluginFinder::find(const PluginInfo *pluginInfo)
     }
 
     foreach (QApt::Package *package, m_backend->availablePackages()) {
-        if (matcher.matches(package) && package->architecture() == m_backend()->nativeArchitecture()) {
+        if (matcher.matches(package) && package->architecture() == m_backend->nativeArchitecture()) {
             emit foundCodec(package);
             return;
         }
