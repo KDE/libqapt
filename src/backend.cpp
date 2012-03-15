@@ -288,8 +288,8 @@ void Backend::reloadCache()
 
         pkgTagSection tags;
         while (tagFile.Step(tags)) {
-            QLatin1String name(tags.FindS("Package").c_str());
-            Package *pkg = package(name);
+            string name = tags.FindS("Package");
+            Package *pkg = package(QLatin1String(name.c_str()));
             if (pkg) {
                 pkg->setPinned(true);
             }
