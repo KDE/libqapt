@@ -213,6 +213,7 @@ void Backend::reloadCache()
 
     int packageCount = depCache->Head().PackageCount;
     d->packagesIndex.resize(packageCount);
+    d->packagesIndex.fill(-1);
     d->packages.reserve(packageCount);
 
     // Populate internal package cache
