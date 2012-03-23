@@ -155,6 +155,11 @@ QString Config::findDirectory(const QString &key, const QString &defaultValue) c
     return QString::fromStdString(_config->FindDir(key.toStdString().data(), defaultValue.toStdString().data()));
 }
 
+QString Config::findFile(const QString& key, const QString& defaultValue) const
+{
+    return QString::fromStdString(_config->FindFile(key.toLocal8Bit().data(), defaultValue.toLocal8Bit().data()));
+}
+
 void Config::writeEntry(const QString &key, const bool value)
 {
     Q_D(Config);

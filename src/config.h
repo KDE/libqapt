@@ -112,6 +112,21 @@ public:
     /** Overload for writeEntry(const QString&, const bool) */
     void writeEntry(const QString &key, const QString &value);
 
+    /**
+     * Locates the file of the given key. This uses APT's configuration
+     * key algorithm to return various apt-related directories. For example,
+     * a key of 'Dir::Etc::sourcelist' would return the location of the APT
+     * sources.list file (usually /etc/apt/sources.list)
+     *
+     * @param key the key to search for
+     * @param default the directory to use as default if the key isn't found
+     *
+     * @return the location of the config key, or the default if the key
+     * is not found
+     * @since 1.4
+     */
+    QString findFile(const QString &key, const QString &defaultValue = QString()) const;
+
 private:
     Q_DECLARE_PRIVATE(Config)
     ConfigPrivate *const d_ptr;
