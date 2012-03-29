@@ -1294,7 +1294,7 @@ bool Package::setVersion(const QString &version)
 {
     QLatin1String defaultCandVer("");
     pkgDepCache::StateCache &state = (*d->backend->cache()->depCache())[*d->packageIter];
-    if (state.CandVersion != NULL) {
+    if (state.CandVersion != nullptr) {
         defaultCandVer = QLatin1String(state.CandVersion);
     }
 
