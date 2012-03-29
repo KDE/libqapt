@@ -440,7 +440,15 @@ QString Package::priority() const
 QStringList Package::installedFilesList() const
 {
     QStringList installedFilesList;
-    QFile infoFile(QLatin1Literal("/var/lib/dpkg/info/") % name() % QLatin1Literal(".list"));
+    QString path = QLatin1String("/var/lib/dpkg/info/") % name() % QLatin1String(".list");
+
+    // Fallback for multiarch packages
+    if (!QFile::exists(path)) {
+        path = QLatin1String("/var/lib/dpkg/info/") % name() % ':' %
+                             architecture() % QLatin1String(".list");
+    }
+
+    QFile infoFile(path);
 
     if (infoFile.open(QFile::ReadOnly)) {
         QTextStream stream(&infoFile);
