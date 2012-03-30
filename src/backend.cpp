@@ -140,8 +140,7 @@ void BackendPrivate::setWorkerLocale()
 
 void BackendPrivate::setWorkerProxy()
 {
-    QString proxy;
-    customProxy.isEmpty() ? proxy = qgetenv("http_proxy") : proxy = customProxy;
+    QString proxy = customProxy.isEmpty() ? qgetenv("http_proxy") : proxy = customProxy;
     worker->setProxy(proxy);
 }
 
@@ -218,11 +217,8 @@ void Backend::reloadCache()
 
     // Populate internal package cache
     int count = 0;
-    QSet<Group> groupSet;
 
     d->isMultiArch = architectures().size() > 1;
-    bool pkgMultiArch;
-    QString arch;
 
     pkgCache::PkgIterator iter;
     for (iter = depCache->PkgBegin(); !iter.end(); ++iter) {
