@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -28,6 +28,7 @@
 #include <QtDBus/QDBusConnection>
 
 // APT includes
+#include <apt-pkg/aptconfiguration.h>
 #include <apt-pkg/configuration.h>
 
 // Own includes
@@ -158,6 +159,19 @@ QString Config::findDirectory(const QString &key, const QString &defaultValue) c
 QString Config::findFile(const QString& key, const QString& defaultValue) const
 {
     return QString::fromStdString(_config->FindFile(key.toLocal8Bit().data(), defaultValue.toLocal8Bit().data()));
+}
+
+QStringList Config::architectures() const
+{
+    QStringList archList;
+    std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
+
+    for (std::string &arch : archs)
+    {
+         archList.append(QString::fromStdString(arch));
+    }
+
+    return archList;
 }
 
 void Config::writeEntry(const QString &key, const bool value)

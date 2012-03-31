@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -114,7 +114,7 @@ public:
 
     /**
      * Locates the file of the given key. This uses APT's configuration
-     * key algorithm to return various apt-related directories. For example,
+     * key algorithm to return various apt-related files. For example,
      * a key of 'Dir::Etc::sourcelist' would return the location of the APT
      * sources.list file (usually /etc/apt/sources.list)
      *
@@ -126,6 +126,13 @@ public:
      * @since 1.4
      */
     QString findFile(const QString &key, const QString &defaultValue = QString()) const;
+
+    /**
+     * Returns a list of the CPU architectures APT is configured to support
+     *
+     * @since 1.4
+     */
+    QStringList architectures() const;
 
 private:
     Q_DECLARE_PRIVATE(Config)

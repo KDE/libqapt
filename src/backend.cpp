@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010-2011 Jonathan Thomas <echidnaman@kubuntu.org>        *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -622,16 +622,9 @@ bool Backend::isMultiArchEnabled() const
 
 QStringList Backend::architectures() const
 {
-    std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
+    Q_D(const Backend);
 
-    QStringList archList;
-    for (std::string &arch : archs)
-    {
-         archList.append(QString::fromStdString(arch));
-    }
-
-
-    return archList;
+    return d->config->architectures();
 }
 
 QString Backend::nativeArchitecture() const
