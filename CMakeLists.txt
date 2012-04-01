@@ -3,10 +3,10 @@ project(libqapt)
 cmake_minimum_required(VERSION 2.6.0)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-set(qapt_VERSION 1.3.0)
+set(qapt_VERSION 1.3.1)
 
 set(qapt_lib_SOVERSION 1)
-set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.3.0)
+set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.3.1)
 
 configure_file(
        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/cmake_uninstall.cmake.in"
