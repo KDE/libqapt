@@ -1,3 +1,13 @@
+1.3.1:
+======
+- Bugfixes
+  * Fixed the QApt GStreamer Helper offering to install a blank list of packages if no
+    plugin was found.
+  * Fixed the QApt GStreamer Helper offering plugins for the wrong architecture,
+    preventing the proper ones from being installed.
+  * Fixed Package::installedFilesList() returning an empty list on foreign-architecture
+    packages
+
 1.3.0:
 ======
 - Features:
