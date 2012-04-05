@@ -298,9 +298,8 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
                 m_cache->depCache()->MarkInstall(iter, true, 0, fromUser);
                 if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
                     pkgProblemResolver Fix(m_cache->depCache());
-                    Fix.Clear(iter);
                     Fix.Protect(iter);
-                    Fix.Resolve(true);
+                    Fix.ResolveByKeep();
                 }
                 break;
             }
@@ -344,6 +343,13 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
                 break;
         }
         mapIter++;
+    }
+
+    if (_error->PendingError() && (m_cache->depCache()->BrokenCount() == 0))
+    {
+        // We had dep errors, but fixed them
+        _error->Discard();
+        qDebug() << "fixed errors";
     }
 
     delete actionGroup;
