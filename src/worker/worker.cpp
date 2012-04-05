@@ -350,6 +350,20 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     emit workerStarted();
 
+    if (_error->PendingError()) {
+        string message;
+        QVariantMap details;
+
+        _error->PopMessage(message);
+        details[QLatin1String("FromWorker")] = true;
+        details[QLatin1String("ErrorText")] = QString::fromStdString(message);
+
+        emit errorOccurred(QApt::InitError, details);
+        emit workerFinished(false);
+        m_timeout->start();
+        return;
+    }
+
     // Lock the archive directory
     FileFd Lock;
     if (_config->FindB("Debug::NoLocking",false) == false)
