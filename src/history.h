@@ -39,7 +39,7 @@ namespace QApt {
  */
 class HistoryItemPrivate;
 
-// TODO QApt2: Rework private classes to derive from QSharedData, like the Changelog
+// TODO: QApt2: Rework private classes to derive from QSharedData, like the Changelog
 // Class does
 
 /**

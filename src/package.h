@@ -64,14 +64,14 @@ public:
     * @param records The underlying package records for fetching some info
     * @param packageIter The underlying object representing the package in APT
     */
-    // TODO QApt2: Remove unused pkgRecords param
+    // TODO: QApt2: Remove unused pkgRecords param
     Package(QApt::Backend* parent, pkgDepCache *depcache,
             pkgRecords *records, pkgCache::PkgIterator &packageIter);
 
    /**
     * Default destructor
     */
-    // TODO QApt2: Nope
+    // TODO: QApt2: Nope
     virtual ~Package();
 
    /**
@@ -88,7 +88,7 @@ public:
     */
     QString name() const;
 
-    // TODO QApt2: Get rid of QString impl. and rename latin1Name() to name()
+    // TODO: QApt2: Get rid of QString impl. and rename latin1Name() to name()
    /**
     * Returns the name of the package. This is the better choice over the
     * regular name() since a QLatin1String is much cheaper to construct
@@ -156,7 +156,7 @@ public:
     */
     QStringList availableVersions() const;
 
-    // TODO QApt2: Get rid of QString impl. and rename latin1Section() to
+    // TODO: QApt2: Get rid of QString impl. and rename latin1Section() to
     // section()
    /**
     * Returns the categorical section where the package resides
@@ -165,7 +165,7 @@ public:
     */
     QString section() const;
 
-   // TODO QApt2: Get rid of QString impl. and rename latin1Section() to section()
+   // TODO: QApt2: Get rid of QString impl. and rename latin1Section() to section()
    /**
     * Returns the categorical section of the package. This is the better choice
     * over the regular section() since a QLatin1String is much cheaper to construct
@@ -296,7 +296,7 @@ public:
     */
     QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
-    // TODO QApt2: Return a QDateTime so that KDE apps can localize
+    // TODO: QApt2: Return a QDateTime so that KDE apps can localize
    /**
     * Returns the date when Canonical's support of the package ends.
     *
@@ -518,7 +518,7 @@ public:
     * \return A @c QHash of reasons why the package is broken, corresponding to a
     * QApt::BrokenReason
     */
-    // TODO QApt2: Get rid of this insane thing and use a proper OO scheme,
+    // TODO: QApt2: Get rid of this insane thing and use a proper OO scheme,
     // perhaps something like DependencyInfo
     QHash<int, QHash<QString, QVariantMap> > brokenReason() const;
 

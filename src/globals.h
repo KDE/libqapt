@@ -126,7 +126,7 @@ namespace QApt
    /**
     * An enumerator listing all the question types that the QApt Worker can ask
     */
-    // TODO QApt2: Rename to QuestionCode
+    // TODO: QApt2: Rename to QuestionCode
     enum WorkerQuestion {
         /// An invalid question
         InvalidQuestion  = 0,

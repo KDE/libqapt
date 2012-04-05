@@ -611,7 +611,7 @@ void QAptWorker::installDebFile(const QString &fileName)
 
     if (arch != QLatin1String("all") &&
         arch != QString::fromStdString(_config->Find("APT::Architecture", ""))) {
-        // TODO report what arch was provided vs needed
+        // TODO: report what arch was provided vs needed
         qDebug() << arch << QString::fromStdString(_config->Find("APT::Architecture", ""));
         emit errorOccurred(QApt::WrongArchError, QVariantMap());
         emit workerFinished(false);

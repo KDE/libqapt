@@ -67,7 +67,7 @@ public:
      /**
       * Default destructor
       */
-    // TODO QApt2: Heck no
+    // TODO: QApt2: Heck no
     virtual ~Backend();
 
     /**
@@ -209,7 +209,7 @@ public:
      */
     QString originLabel(const QString &origin) const;
 
-    // TODO QApt2: const QString &originLabel
+    // TODO: QApt2: const QString &originLabel
     /**
      * Returns the machine-readable name for the origin repository of the given
      * the human-readable name.
@@ -218,7 +218,7 @@ public:
      */
     QString origin(QString originLabel) const;
 
-    // TODO QApt2: Around that time it might be wise to use qint64 for count()'s
+    // TODO: QApt2: Around that time it might be wise to use qint64 for count()'s
     /**
      * Queries the backend for the total number of packages in the APT
      * database, discarding no-longer-existing packages that linger on in the
@@ -679,7 +679,7 @@ public Q_SLOTS:
      *
      * @param package the package which has changed
      */
-    // TODO QApt2: Make this a private slot.
+    // TODO: QApt2: Make this a private slot.
     void packageChanged(Package *package);
 
     /**
