@@ -174,7 +174,7 @@ void DebInstaller::errorOccurred(QApt::ErrorCode error, const QVariantMap &args)
                         "The package system could not be initialized, your "
                         "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            QString details = args["ErrorText"].toString();
+            details = args["ErrorText"].toString();
             KMessageBox::detailedError(this, text, details, title);
             KApplication::instance()->quit();
             break;
@@ -182,7 +182,10 @@ void DebInstaller::errorOccurred(QApt::ErrorCode error, const QVariantMap &args)
         case QApt::WrongArchError:
             text = i18nc("@label",
                          "This package is incompatible with your computer.");
-            KMessageBox::error(this, text, QString());
+            title = i18nc("@title:window", "Incompatible Package");
+            details =  i18nc("@info", "Error: Wrong architecture '%1'.",
+                             args["RequestedArch"].toString());
+            KMessageBox::detailedError(this, text, details, title);
             break;
         case QApt::AuthError:
             m_applyButton->setEnabled(true);
@@ -221,16 +224,22 @@ void DebInstaller::initCommitWidget()
 
 bool DebInstaller::checkDeb()
 {
-    QString arch = m_backend->config()->readEntry(QLatin1String("APT::Architecture"),
-                                                  QLatin1String(""));
+    QStringList arches = m_backend->architectures();
+    arches.append(QLatin1String("all"));
     QString debArch = m_debFile->architecture();
 
-    if (debArch != QLatin1String("all") && arch != debArch) {
-        // Wrong arch
-        m_statusString = i18nc("@info", "Error: Wrong architecture '%1'", debArch);
-        m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
-        m_statusString.append(QLatin1String("</font>"));
-        return false;
+    // Check if we support the arch at all
+    if (debArch != m_backend->nativeArchitecture()) {
+        if (!arches.contains(debArch)) {
+            // Wrong arch
+            m_statusString = i18nc("@info", "Error: Wrong architecture '%1'", debArch);
+            m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
+            m_statusString.append(QLatin1String("</font>"));
+            return false;
+        }
+
+        // We support this foreign arch
+        m_foreignArch = debArch;
     }
 
     compareDebWithCache();
@@ -297,16 +306,51 @@ void DebInstaller::compareDebWithCache()
     }
 }
 
+QString DebInstaller::maybeAppendArchSuffix(const QString &pkgName, bool checkingConflicts)
+{
+    // Trivial cases where we don't append
+    if (m_foreignArch.isEmpty())
+        return pkgName;
+
+    QApt::Package *pkg = m_backend->package(pkgName);
+    if (!pkg || pkg->architecture() == QLatin1String("all"))
+        return pkgName;
+
+    // Real multiarch checks
+    QString multiArchName = pkgName % ':' % m_foreignArch;
+    QApt::Package *multiArchPkg = m_backend->package(multiArchName);
+
+    // Check for a new dependency, we'll handle that later
+    if (!multiArchPkg)
+        return multiArchName;
+
+    // Check the multi arch state
+    QApt::MultiArchType type = multiArchPkg->multiArchType();
+
+    // Add the suffix, unless it's a pkg that can satify foreign deps
+    if (type == QApt::MultiArchForeign)
+        return pkgName;
+
+    // If this is called as part of a conflicts check, any not-multiarch
+    // enabled package is a conflict implicitly
+    if (checkingConflicts && type == QApt::MultiArchSame)
+        return pkgName;
+
+    return multiArchName;
+}
+
 QApt::PackageList DebInstaller::checkConflicts()
 {
     QApt::PackageList conflictingPackages;
     QList<QApt::DependencyItem> conflicts = m_debFile->conflicts();
 
     QApt::Package *pkg = 0;
+    QString packageName;
     bool ok = true;
     foreach(const QApt::DependencyItem &item, conflicts) {
         foreach (const QApt::DependencyInfo &info, item) {
-            pkg = m_backend->package(info.packageName());
+            packageName = maybeAppendArchSuffix(info.packageName(), true);
+            pkg = m_backend->package(packageName);
 
             if (!pkg) {
                 // FIXME: Virtual package, must check provides
@@ -384,10 +428,14 @@ QApt::Package *DebInstaller::checkBreaksSystem()
 
 bool DebInstaller::satisfyDepends()
 {
+    QApt::Package *pkg = 0;
+    QString packageName;
+
     foreach(const QApt::DependencyItem &item, m_debFile->depends()) {
         bool oneSatisfied = false;
         foreach (const QApt::DependencyInfo &dep, item) {
-            QApt::Package *pkg = m_backend->package(dep.packageName());
+            packageName = maybeAppendArchSuffix(dep.packageName());
+            pkg = m_backend->package(packageName);
             if (!pkg) {
                 // FIXME: virtual package handling
                 continue;

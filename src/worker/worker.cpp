@@ -607,20 +607,31 @@ void QAptWorker::installDebFile(const QString &fileName)
 
     QApt::DebFile deb(fileName);
 
-    QString arch = deb.architecture();
+    QString debArch = deb.architecture();
 
-    if (arch != QLatin1String("all") &&
-        arch != QString::fromStdString(_config->Find("APT::Architecture", ""))) {
-        // TODO: report what arch was provided vs needed
-        qDebug() << arch << QString::fromStdString(_config->Find("APT::Architecture", ""));
-        emit errorOccurred(QApt::WrongArchError, QVariantMap());
+    QStringList archList;
+    archList.append(QLatin1String("all"));
+    std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
+
+    for (std::string &arch : archs)
+    {
+         archList.append(QString::fromStdString(arch));
+    }
+
+    if (!archList.contains(debArch)) {
+        QVariantMap details;
+        details["RequestedArch"] = debArch;
+
+        emit errorOccurred(QApt::WrongArchError, details);
         emit workerFinished(false);
+        m_timeout->start();
         return;
     }
 
     if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.commitChanges"), message().service())) {
         emit errorOccurred(QApt::AuthError, QVariantMap());
         emit workerFinished(false);
+        m_timeout->start();
         return;
     }
 
@@ -635,7 +646,6 @@ void QAptWorker::installDebFile(const QString &fileName)
     connect(m_dpkgProcess, SIGNAL(readyRead()), this, SLOT(updateDpkgProgress()));
     connect(m_dpkgProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
             this, SLOT(dpkgFinished(int,QProcess::ExitStatus)));
-
 }
 
 void QAptWorker::dpkgStarted()

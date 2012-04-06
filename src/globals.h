@@ -69,6 +69,7 @@ namespace QApt
     * DownloadDisallowedError: No fields
     * NotFoundError: <"NotFoundString", QString> (String of the nonexistent package)
     *                <"WarningText", QString> (APT's warning description)
+    * WrongArchError: <"RequestedArch", QString> (String of the unsupported architecture)
     */
     typedef QVariantMap Error;
 
@@ -273,6 +274,25 @@ namespace QApt
         Equals = 0x5,
         /// Depends on any version not equal to (!=) the specified version
         NotEqual = 0x6
+    };
+
+    enum MultiArchType {
+        /// Junk type
+        InvalidMultiArchType = 0,
+        /* This package is co-installable with itself, but it must not be used to
+         * satisfy the dependency of any package of a different architecture from itself.
+         * (Basically, not a multi-arch package)
+         */
+        MultiArchSame,
+        /* The package is @b not co-installable with itself, but should be allowed to
+         * satisfy the dependencies of a package of a different arch from itself.
+         */
+        MultiArchForeign,
+        /* This permits the reverse-dependencies of the package to annotate their Depends:
+         * field to indicate that a foreign architecture version of the package satisfies
+         * the dependencies, but does not change the resolution of any existing dependencies.
+         */
+        MultiArchAllowed
     };
 }
 

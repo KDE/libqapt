@@ -415,6 +415,46 @@ public:
     */
     QT_DEPRECATED bool isMultiArchEnabled() const;
 
+   /**
+    * A package prepared for MultiArch can have any of three MultiArch "states"
+    * that control how dpkg treats the package as a dependency. A package can
+    * either be MultiArch: same, MultiArch: foreign, or MultiArch: Allowed.
+    *
+    * MultiArch: same:
+    * - This package is co-installable with itself, but it must not be used to
+    *   satisfy the dependency of any package of a different architecture from itself.
+    *   (Basically, this package is not multiarch)
+    *
+    * MultiArch: foreign:
+    * - The package is @b not co-installable with itself, but should be allowed to
+    *   satisfy the dependencies of a package of a different arch from itself.
+    *
+    * MultiArch: allowed:
+    * - This permits the reverse-dependencies of the package to annotate their Depends:
+    *   field to indicate that a foreign architecture version of the package satisfies
+    *   the dependencies, but does not change the resolution of any existing dependencies.
+    *
+    * @return a @c QString for the package's MultiArch state
+    *
+    * @see multiArchType()
+    *
+    * @since 1.4
+    */
+    QString multiArchTypeString() const;
+
+    /**
+     * A package prepared for MultiArch can have any of three MultiArch "states"
+     * that control how dpkg treats the package as a dependency. A package can
+     * either be MultiArch: same, MultiArch: foreign, or MultiArch: Allowed.
+     *
+     * @return a @c MultiArchType for the package's MultiArch state
+     *
+     * @see multiArchTypeString()
+     *
+     * @since 1.4
+     */
+    MultiArchType multiArchType() const;
+
     /**
      * Returns whether or not a package is a foreign-arch version of a package
      * that also has a native-architecture counterpart (a "duplicate")

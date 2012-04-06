@@ -48,6 +48,7 @@ private:
     // Backend stuff
     QApt::Backend *m_backend;
     QApt::DebFile *m_debFile;
+    QString m_foreignArch;
 
     // GUI
     QStackedWidget *m_stack;
@@ -65,6 +66,7 @@ private:
     // Functions
     bool checkDeb();
     void compareDebWithCache();
+    QString maybeAppendArchSuffix(const QString& pkgName, bool checkingConflicts = false);
     QApt::PackageList checkConflicts();
     QApt::Package *checkBreaksSystem();
     bool satisfyDepends();

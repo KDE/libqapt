@@ -809,6 +809,26 @@ bool Package::isMultiArchDuplicate() const
     return (d->packageIter->Group().FindPkg() != *d->packageIter);
 }
 
+QString Package::multiArchTypeString() const
+{
+    return controlField(QLatin1String("Multi-Arch"));
+}
+
+MultiArchType Package::multiArchType() const
+{
+    QString typeString = multiArchTypeString();
+    MultiArchType archType = InvalidMultiArchType;
+
+    if (typeString == QLatin1String("same"))
+        archType = MultiArchSame;
+    else if (typeString == QLatin1String("foreign"))
+        archType = MultiArchForeign;
+    else if (typeString == QLatin1String("allowed"))
+        archType = MultiArchAllowed;
+
+    return archType;
+}
+
 bool Package::isForeignArch() const
 {
     if (!d->foreignArchCalculated) {
