@@ -380,6 +380,13 @@ QString Package::upstreamVersion(const QString &version)
 
 QString Package::architecture() const
 {
+    pkgDepCache *depCache = d->backend->cache()->depCache();
+    pkgCache::VerIterator ver = (*depCache)[*d->packageIter].InstVerIter(*depCache);
+
+    // the arch:all property is part of the version
+    if (ver && ver.Arch())
+        return ver.Arch();
+
     return d->packageIter->Arch();
 }
 
