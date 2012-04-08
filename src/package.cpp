@@ -839,7 +839,8 @@ MultiArchType Package::multiArchType() const
 bool Package::isForeignArch() const
 {
     if (!d->foreignArchCalculated) {
-        d->isForeignArch = (d->backend->nativeArchitecture() != architecture());
+        QString arch = architecture();
+        d->isForeignArch = (d->backend->nativeArchitecture() != arch) & (arch != QLatin1String("all"));
         d->foreignArchCalculated = true;
     }
 
