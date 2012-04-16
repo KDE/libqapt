@@ -67,6 +67,7 @@ public:
     }
     ~BackendPrivate()
     {
+        qDeleteAll(packages);
         delete cache;
         delete records;
         delete config;
