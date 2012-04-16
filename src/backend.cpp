@@ -371,6 +371,13 @@ Package *Backend::packageForFile(const QString &file) const
     return 0;
 }
 
+QStringList Backend::origins() const
+{
+    Q_D(const Backend);
+
+    return d->originMap.keys();
+}
+
 QStringList Backend::originLabels() const
 {
     Q_D(const Backend);

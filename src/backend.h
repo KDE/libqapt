@@ -195,6 +195,15 @@ public:
     Package *packageForFile(const QString &file) const;
 
     /**
+     * Returns a list of all package origins, as machine-readable strings
+     *
+     * @return The list of machine-readable origin labels
+     *
+     * @since 1.4
+     */
+    QStringList origins() const;
+
+    /**
      * Returns a list of all package origins, as user readable strings.
      *
      * @return The list of human-readable origin labels
