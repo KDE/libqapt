@@ -82,6 +82,8 @@ public:
     QSet<Group> groups;
     // Cache of origin/human-readable name pairings
     QHash<QString, QString> originMap;
+    // Relation of an origin and its hostname
+    QHash<QString, QString> siteMap;
     WorkerEvent state;
 
     // Counts
@@ -208,6 +210,7 @@ void Backend::reloadCache()
     d->packages.clear();
     d->groups.clear();
     d->originMap.clear();
+    d->siteMap.clear();
     d->packagesIndex.clear();
     d->installedCount = 0;
 
@@ -248,7 +251,9 @@ void Backend::reloadCache()
 
         if(!Ver.end()) {
             pkgCache::VerFileIterator VF = Ver.FileList();
-            d->originMap[QLatin1String(VF.File().Origin())] = QLatin1String(VF.File().Label());
+            QLatin1String origin(QLatin1String(VF.File().Origin()));
+            d->originMap[origin] = VF.File().Label();
+            d->siteMap[VF.File().Site()] = origin;
         }
     }
 
@@ -1523,6 +1528,12 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
         emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
         workerFinished(false);
     }
+}
+
+QString Backend::originForSite(const QString& host) const
+{
+    Q_D(const Backend);
+    return d->siteMap[host];
 }
 
 }
