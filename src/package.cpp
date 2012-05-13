@@ -588,19 +588,17 @@ QUrl Package::changelogUrl() const
 
 QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
 {
-    QUrl url;
+    QString urlBase;
     switch (type) {
         case QApt::Thumbnail:
-            url = QUrl(controlField(QLatin1String("Thumbnail-Url")));
-            if (url.isEmpty()) // Fallback, some extras.ubuntu.com don't have thumbnails
-                url = QUrl(controlField(QLatin1String("Screenshot-Url")));
+            urlBase = QLatin1String("http://screenshots.debian.net/thumbnail/");
             break;
-        case QApt::UnknownType:
         case QApt::Screenshot:
-            url = QUrl(controlField(QLatin1String("Screenshot-Url")));
-        break;
+            urlBase = QLatin1String("http://screenshots.debian.net/screenshot/");
+            break;
     }
-    return url;
+
+    return QUrl(urlBase % latin1Name());
 }
 
 QString Package::supportedUntil() const
