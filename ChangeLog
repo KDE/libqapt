@@ -9,6 +9,29 @@
 - Optimizations:
   * Use a faster QString -> const char * conversion when looking up packages by name
 
+1.3.2:
+======
+- Bugfixes
+  * Report APT errors that occur during marking in the worker as InitErrors with details.
+    There wasn't a check for these errors before, so the APT error stack still had them
+    on top, and we were getting them when we checked for LockErrors. (BKO: #285787)
+  * Resolve all dependency problems on package upgrades using the ResolveByKeep paradigm.
+    Often when a package that is to be upgraded has dependencies which also depend on packages
+    that need upgraded, APT will not be able to immediately resolve potential breaks by marking
+    these. However, since we are passed a list of other packages that will also be marked for
+    upgrade, we will most likely resolve this situation manually later. With ResolveByKeep we
+    can avoid trying to remove to-be-upgraded packages with dep problems until we can manually
+    fix them. (Matching the behavior of libapt-pkg's pkgAllUpgrade method)
+  * After package marking on commit, clear errors on the error stack caused by marking packages
+    as long as there are no breaks currently. This fixes a bug where dependency issues that
+    were fixed by the end of the commit marking would stay on the error stack, failing the
+    entire commit.
+  * Fix usage of transient apt-pkg headers which caused FTBFS with APT 0.9.x
+  * Fixed an issue with the duplicate directory entry detection in Package::installedFilesList
+    which caused similarly named files to be incorrectly deleted from the list.
+    (E.g. /usr/bin/kppp was being removed since the next entry was /usr/bin/kppplogviewer, and
+    we were incorrectly considering /usr/bin/kppp as a directory)
+
 1.3.1:
 ======
 - Bugfixes
