@@ -31,6 +31,12 @@
     which caused similarly named files to be incorrectly deleted from the list.
     (E.g. /usr/bin/kppp was being removed since the next entry was /usr/bin/kppplogviewer, and
     we were incorrectly considering /usr/bin/kppp as a directory)
+  * Fixed unallocated memory access when loading pinned packages in the QApt Backend.
+  * Reset the package index vector to be filled with -1 on reload, to prevent weird things
+    happening with uninitialized fields.
+  * Delete all package objects in the Backend destructor to make memory leak checking easier.
+    (Technically a memory leak, but the Backend class is usually a singleton-type class that
+    lives throughout an application's lifetime)
 
 1.3.1:
 ======
