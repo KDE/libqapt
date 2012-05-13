@@ -471,7 +471,7 @@ QStringList Package::installedFilesList() const
 
         // Remove non-file directory listings
         for (int i = 0; i < installedFilesList.size() - 1; ++i) {
-            if (installedFilesList.at(i+1).contains(installedFilesList.at(i))) {
+            if (installedFilesList.at(i+1).contains(installedFilesList.at(i) + '/')) {
                 installedFilesList[i] = QString(QLatin1Char(' '));
             }
         }
