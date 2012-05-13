@@ -29,7 +29,7 @@ namespace QApt {
 class CacheBuildProgress : public OpProgress
 {
 public:
-    CacheBuildProgress(){};
+    CacheBuildProgress(){}
 
     virtual void Update() {
         // Evil but Necessary, libapt-pkg not thread safe, afaict
@@ -77,7 +77,7 @@ bool Cache::open()
     delete d->cache;
     d->cache = 0;
 
-    bool shouldLock = (geteuid == 0);
+    bool shouldLock = (geteuid() == 0);
 
     d->cache = new pkgCacheFile();
 
