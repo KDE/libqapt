@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -27,7 +27,7 @@
 static const char description[] =
     I18N_NOOP2("@info", "A batch installer using QApt");
 
-static const char version[] = "1.3";
+static const char version[] = "1.4";
 
 int main(int argc, char **argv)
 {
