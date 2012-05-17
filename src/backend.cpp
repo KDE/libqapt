@@ -338,7 +338,7 @@ Package *Backend::package(pkgCache::PkgIterator &iter) const
     Q_D(const Backend);
 
     int index = d->packagesIndex.at(iter->ID);
-    if (index != -1) {
+    if (index != -1 && index < d->packages.size()) {
         return d->packages.at(index);
     }
     return 0;
