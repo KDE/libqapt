@@ -588,17 +588,21 @@ QUrl Package::changelogUrl() const
 
 QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
 {
-    QString urlBase;
+    QUrl url;
     switch (type) {
         case QApt::Thumbnail:
-            urlBase = QLatin1String("http://screenshots.debian.net/thumbnail/");
+            url = QUrl(controlField(QLatin1String("Thumbnail-Url")));
+            if(url.isEmpty())
+                url = QUrl("http://screenshots.debian.net/thumbnail/" % latin1Name());
             break;
         case QApt::Screenshot:
-            urlBase = QLatin1String("http://screenshots.debian.net/screenshot/");
+            url = QUrl(controlField(QLatin1String("Screenshot-Url")));
+            if(url.isEmpty())
+                url = QUrl("http://screenshots.debian.net/screenshot/" % latin1Name());
             break;
     }
 
-    return QUrl(urlBase % latin1Name());
+    return url;
 }
 
 QString Package::supportedUntil() const
