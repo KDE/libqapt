@@ -77,7 +77,7 @@ bool Cache::open()
     delete d->cache;
     d->cache = 0;
 
-    bool shouldLock = (geteuid() == 0);
+    bool shouldLock = false;//(geteuid() == 0);
 
     d->cache = new pkgCacheFile();
 
