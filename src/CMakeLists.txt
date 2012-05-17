@@ -43,6 +43,13 @@ set_target_properties(qapt PROPERTIES
     SOVERSION ${qapt_lib_SOVERSION}
     )
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+    # FIXME: temporarily only set for the libqapt target due to
+    # GCC 4.7 bug (LP: 1000508)
+    set_property(TARGET qapt APPEND_STRING PROPERTY
+                 COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif (CMAKE_COMPILER_IS_GNUCXX)
+
 target_link_libraries(qapt
     ${QT_QTDBUS_LIBRARIES}
     ${QT_QTCORE_LIBRARIES}

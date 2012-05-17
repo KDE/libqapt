@@ -110,7 +110,9 @@ MACRO(MACRO_ENSURE_VERSION_RANGE min_version found_version max_version var_ok)
 ENDMACRO(MACRO_ENSURE_VERSION_RANGE)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    # FIXME: temporarily only set for the libqapt target due to
+    # GCC 4.7 bug (LP: 1000508)
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
   include(CheckCXXCompilerFlag)
 
