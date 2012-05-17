@@ -497,6 +497,24 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         return;
     }
 
+    bool failed = false;
+    for (pkgAcquire::ItemIterator i = fetcher.ItemsBegin(); i != fetcher.ItemsEnd(); ++i) {
+        if((*i)->Status == pkgAcquire::Item::StatDone && (*i)->Complete)
+            continue;
+        if((*i)->Status == pkgAcquire::Item::StatIdle)
+            continue;
+
+        failed = true;
+        break;
+    }
+
+    if (failed && !packageManager->FixMissing()) {
+        emit errorOccurred(QApt::FetchError, QVariantMap());
+        emit workerFinished(false);
+        m_timeout->start();
+        return;
+    }
+
     emit workerEvent(QApt::PackageDownloadFinished);
 
     emit workerEvent(QApt::CommitChangesStarted);
