@@ -91,7 +91,6 @@ public:
 
     // Pointer to the apt cache object
     Cache *cache;
-    pkgPolicy *policy;
     pkgRecords *records;
 
     // Undo/redo stuff
