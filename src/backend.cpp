@@ -253,7 +253,7 @@ void Backend::reloadCache()
             pkgCache::VerFileIterator VF = Ver.FileList();
             QLatin1String origin(QLatin1String(VF.File().Origin()));
             d->originMap[origin] = VF.File().Label();
-            d->siteMap[VF.File().Site()] = origin;
+            d->siteMap[origin] = VF.File().Site();
         }
     }
 
@@ -1530,10 +1530,10 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
     }
 }
 
-QString Backend::originForSite(const QString& host) const
+QStringList Backend::originsForHost(const QString& host) const
 {
     Q_D(const Backend);
-    return d->siteMap[host];
+    return d->siteMap.keys(host);
 }
 
 }

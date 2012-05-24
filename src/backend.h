@@ -228,9 +228,9 @@ public:
     QString origin(QString originLabel) const;
 
     /** 
-     * @returns the origin for a given @p host
+     * @returns the origins for a given @p host
      */
-    QString originForSite(const QString& host) const;
+    QStringList originsForHost(const QString& host) const;
 
     // TODO: QApt2: Around that time it might be wise to use qint64 for count()'s
     /**
