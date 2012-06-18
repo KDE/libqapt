@@ -1018,6 +1018,7 @@ void Backend::setCompressEvents(bool enabled)
         delete d->actionGroup;
         d->actionGroup = 0;
         d->compressEvents = false;
+        emit packageChanged();
     }
 }
 
