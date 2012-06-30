@@ -632,9 +632,9 @@ void QAptWorker::installDebFile(const QString &fileName)
     archList.append(QLatin1String("all"));
     std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
 
-    for (int i = 0; i < archs.size(); i++)
+    for (std::string &arch : archs)
     {
-         archList.append(QString::fromStdString(archs.at(i)));
+         archList.append(QString::fromStdString(arch));
     }
 
     if (!archList.contains(debArch)) {
