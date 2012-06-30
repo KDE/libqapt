@@ -186,6 +186,8 @@ if (KDE4_FOUND)
     #PO_SUBDIR
     #DOC_SUBDIR
 
+macro_log_feature(KDE4_FOUND "KDE" "Development libraries for the KDE Platform"
+                  "http://kde.org" FALSE "" "Used to build optional utilities that use QApt")
 macro_log_feature(QTGSTREAMER_FOUND "QtGStreamer" "Qt wrapper around the GStreamer multimedia framework"
                   "http://gstreamer.freedesktop.org" FALSE "" "Used to build an optional GStreamer plugin installer")
 
