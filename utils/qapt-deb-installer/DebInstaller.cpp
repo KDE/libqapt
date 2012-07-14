@@ -75,6 +75,7 @@ void DebInstaller::initGUI()
     setMainWidget(m_stack);
 
     m_debViewer = new DebViewer(m_stack);
+    m_debViewer->setBackend(m_backend);
     m_stack->addWidget(m_debViewer);
 
     if (!m_debFile->isValid()) {
@@ -268,6 +269,7 @@ bool DebInstaller::checkDeb()
     }
 
     int toInstall = m_backend->markedPackages().size();
+    m_debViewer->showDetailsButton(toInstall);
     if (toInstall) {
         m_statusString = i18ncp("@label A note saying that additional packages are needed",
                                 "Requires the installation of %1 additional package.",

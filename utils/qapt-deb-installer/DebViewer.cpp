@@ -24,6 +24,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QStringBuilder>
 #include <QtGui/QLabel>
+#include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
 
 #include <KGlobal>
@@ -37,9 +38,12 @@
 #include "../../src/backend.h"
 #include "../../src/debfile.h"
 
+#include "ChangesDialog.h"
+
 DebViewer::DebViewer(QWidget *parent)
     : QWidget(parent)
-    , m_debFile(0)
+    , m_backend(nullptr)
+    , m_debFile(nullptr)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
@@ -72,13 +76,16 @@ DebViewer::DebViewer(QWidget *parent)
     statusPrefixLabel->setText(i18nc("@label Label preceding the package status",
                                      "Status:"));
     m_statusLabel = new QLabel(nameStatusBox);
+    m_detailsButton = new QPushButton(i18nc("@label", "Details..."), nameStatusBox);
+    m_detailsButton->hide();
+    connect(m_detailsButton, SIGNAL(clicked()), this, SLOT(detailsButtonClicked()));
     nameStatusGrid->addWidget(statusPrefixLabel, 1, 0, Qt::AlignRight);
     nameStatusGrid->addWidget(m_statusLabel, 1, 1, Qt::AlignLeft);
+    nameStatusGrid->addWidget(m_detailsButton, 1, 2, Qt::AlignLeft);
 
     headerLayout->addWidget(m_iconLabel);
     headerLayout->addWidget(nameStatusBox);
     headerLayout->addWidget(headerSpacer);
-    //
 
 
     // Version info box
@@ -168,6 +175,12 @@ DebViewer::~DebViewer()
 {
 }
 
+void DebViewer::setBackend(QApt::Backend *backend)
+{
+    m_backend = backend;
+    m_oldCacheState = m_backend->currentCacheState();
+}
+
 void DebViewer::setDebFile(QApt::DebFile *debFile)
 {
     m_debFile = debFile;
@@ -235,6 +248,11 @@ void DebViewer::setStatusText(const QString &text)
     m_statusLabel->setText(text);
 }
 
+void DebViewer::showDetailsButton(bool show)
+{
+    m_detailsButton->setVisible(show);
+}
+
 void DebViewer::hideVersionInfo()
 {
     m_versionInfoWidget->hide();
@@ -250,4 +268,15 @@ void DebViewer::setVersionInfo(const QString &info)
     m_versionInfoLabel->setText(info);
 }
 
-#include "DebViewer.moc"
+void DebViewer::detailsButtonClicked()
+{
+    QList<QApt::Package *> excluded;
+    excluded.append(m_backend->package(m_debFile->packageName()));
+    auto changes = m_backend->stateChanges(m_oldCacheState, excluded);
+
+    if (changes.isEmpty())
+        return;
+
+    ChangesDialog *dialog = new ChangesDialog(this, changes);
+    dialog->exec();
+}

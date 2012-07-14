@@ -18,61 +18,28 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef DEBVIEWER_H
-#define DEBVIEWER_H
+#ifndef CHANGESDIALOG_H
+#define CHANGESDIALOG_H
 
-#include <QtGui/QWidget>
+// Qt includes
+#include <QStandardItemModel>
+#include <QtGui/QDialog>
 
-#include "../../src/globals.h"
+// LibQApt includes
+#include <LibQApt/Package>
 
-class QLabel;
-class QPushButton;
+class QStandardItemModel;
 
-class KTextBrowser;
-
-namespace QApt {
-    class Backend;
-    class DebFile;
-}
-
-class DebViewer : public QWidget
+class ChangesDialog : public QDialog
 {
-    Q_OBJECT
 public:
-    explicit DebViewer(QWidget *parent);
-    ~DebViewer();
+    ChangesDialog(QWidget *parent, const QApt::StateChanges &changes);
 
 private:
-    QApt::Backend *m_backend;
-    QApt::DebFile *m_debFile;
-    QApt::CacheState m_oldCacheState;
+    QStandardItemModel *m_model;
 
-    QLabel *m_iconLabel;
-    QLabel *m_nameLabel;
-    QLabel *m_statusLabel;
-    QPushButton *m_detailsButton;
-    QWidget *m_versionInfoWidget;
-    QLabel *m_versionTitleLabel;
-    QLabel *m_versionInfoLabel;
-    KTextBrowser *m_descriptionWidget;
-    QLabel *m_versionLabel;
-    QLabel *m_sizeLabel;
-    QLabel *m_maintainerLabel;
-    QLabel *m_sectionLabel;
-    QLabel *m_homepageLabel;
-    KTextBrowser *m_fileWidget;
-
-public Q_SLOTS:
-    void setBackend(QApt::Backend *backend);
-    void setDebFile(QApt::DebFile *debFile);
-    void setStatusText(const QString &text);
-    void showDetailsButton(bool show);
-    void hideVersionInfo();
-    void setVersionTitle(const QString &title);
-    void setVersionInfo(const QString &info);
-
-private Q_SLOTS:
-    void detailsButtonClicked();
+    void addPackages(const QApt::StateChanges &changes);
+    int countChanges(const QApt::StateChanges &changes);
 };
 
-#endif
+#endif // CHANGESDIALOG_H
