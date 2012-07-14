@@ -26,7 +26,7 @@
 #include <QtGui/QDialog>
 
 // LibQApt includes
-#include <LibQApt/Package>
+#include "../../src/package.h"
 
 class QStandardItemModel;
 
