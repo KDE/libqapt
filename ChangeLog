@@ -1,4 +1,4 @@
-1.4 (As of beta 1)
+1.4.0
 ======
 - Features:
   * Make the supported architectures list available from the Config class.
@@ -6,10 +6,8 @@
   * Add an origins() function to QApt::Backend to return a list of machine-readable
     origin names.
   * Add a function for retrieving a list of origins by its host URL.
-- Bugfixes:
-  * Temporarily compile the QApt Worker without the std=c++11 CXXFLAG, due to a bug in
-    GCC 4.7 that causes APT's error system to erronously report a constant error state.
-    The rest of QApt is compiled with std=c++11, however.
+  * Add a dialog to show additional changes to packages when installing a .deb package with
+    the QApt Deb Installer. (LP: #1021966)
 - Optimizations:
   * Use a faster QString -> const char * conversion when looking up packages by name
 
