@@ -97,7 +97,7 @@ protected:
     CachePrivate *const d_ptr;
 
 private:
-    Q_DECLARE_PRIVATE(Cache);
+    Q_DECLARE_PRIVATE(Cache)
 };
 
 }
