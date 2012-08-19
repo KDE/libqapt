@@ -24,6 +24,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QSharedDataPointer>
 #include <QtCore/QString>
 
 #include "package.h"
@@ -38,9 +39,6 @@ namespace QApt {
  * HistoryItemPrivate is a class containing all private members of the HistoryItem class
  */
 class HistoryItemPrivate;
-
-// TODO: QApt2: Rework private classes to derive from QSharedData, like the Changelog
-// Class does
 
 /**
  * The HistoryItem class represents a single entry in the APT history logs
@@ -59,9 +57,18 @@ public:
     HistoryItem(const QString &data);
 
    /**
-    * Default destructor
+    * Shallow copy constructor
+    *
+    * @param other The HistoryItem to be copied
     */
-    ~HistoryItem();
+    HistoryItem(const HistoryItem &other);
+
+    /**
+     * Equality operator implementing a shallow copy
+     *
+     * @param rhs The object to be copied
+     */
+    HistoryItem &operator=(const HistoryItem &rhs);
 
    /**
     * Returns the date upon which the transaction occurred.
@@ -120,11 +127,10 @@ public:
     bool isValid() const;
 
 private:
-    Q_DECLARE_PRIVATE(HistoryItem)
-    HistoryItemPrivate *const d_ptr;
+    QSharedDataPointer<HistoryItemPrivate> d;
 };
 
-typedef QList<HistoryItem *> HistoryItemList;
+typedef QList<HistoryItem> HistoryItemList;
 
 /**
  * HistoryPrivate is a class containing all private members of the History class
@@ -143,14 +149,14 @@ class Q_DECL_EXPORT History : public QObject
 {
     Q_OBJECT
 public:
-     /**
-      * Constructor
-      */
+    /**
+     * Constructor
+     */
     explicit History(QObject *parent);
 
-     /**
-      * Destructor
-      */
+    /**
+     * Destructor
+     */
     ~History();
 
     HistoryItemList historyItems() const;
