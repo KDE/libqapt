@@ -24,6 +24,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
+#include <QtCore/QStringBuilder>
 
 // APT includes
 #include <apt-pkg/configuration.h>
@@ -241,17 +242,19 @@ void HistoryPrivate::init()
     QDir logDirectory(directoryPath);
     QStringList logFiles = logDirectory.entryList(QDir::Files, QDir::Name);
 
-    Q_FOREACH (QString file, logFiles) {
-        file.prepend(directoryPath + QLatin1Char('/'));
-        if (file.contains(QLatin1String("history"))) {
-            if (file.endsWith(QLatin1String(".gz"))) {
+    QString fullPath;
+
+    for (const QString &file : logFiles) {
+        fullPath = directoryPath % '/' % file;
+        if (fullPath.contains(QLatin1String("history"))) {
+            if (fullPath.endsWith(QLatin1String(".gz"))) {
                 QProcess gunzip;
-                gunzip.start(QLatin1String("gunzip"), QStringList() << QLatin1String("-c") << file);
+                gunzip.start(QLatin1String("gunzip"), QStringList() << QLatin1String("-c") << fullPath);
                 gunzip.waitForFinished();
 
                 data.append(gunzip.readAll());
             } else {
-                QFile historyFile(file);
+                QFile historyFile(fullPath);
 
                 if (historyFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
                     data.append(historyFile.readAll());
@@ -262,7 +265,7 @@ void HistoryPrivate::init()
 
     data = data.trimmed();
     QStringList stanzas = data.split(QLatin1String("\n\n"));
-    Q_FOREACH(const QString &stanza, stanzas) {
+    for (const QString &stanza : stanzas) {
         HistoryItem *historyItem = new HistoryItem(stanza);
         if (historyItem->isValid()) {
             historyItemList << historyItem;

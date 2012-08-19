@@ -144,15 +144,14 @@ class Q_DECL_EXPORT History : public QObject
     Q_OBJECT
 public:
      /**
-      * Default constructor
+      * Constructor
       */
     explicit History(QObject *parent);
 
      /**
-      * Default destructor
+      * Destructor
       */
-     // TODO QApt2: lolno
-    virtual ~History();
+    ~History();
 
     HistoryItemList historyItems() const;
 
