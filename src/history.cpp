@@ -269,6 +269,8 @@ void HistoryPrivate::init()
         HistoryItem *historyItem = new HistoryItem(stanza);
         if (historyItem->isValid()) {
             historyItemList << historyItem;
+        } else {
+            delete historyItem;
         }
     }
 }
