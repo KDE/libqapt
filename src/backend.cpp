@@ -229,7 +229,7 @@ void Backend::reloadCache()
             continue; // Exclude virtual packages.
         }
 
-        Package *pkg = new Package(this, depCache, d->records, iter);
+        Package *pkg = new Package(this, iter);
 
         d->packagesIndex[iter->ID] = count;
         d->packages.append(pkg);
@@ -348,7 +348,7 @@ Package *Backend::package(const QString &name) const
     return package(QLatin1String(name.toLatin1()));
 }
 
-Package *Backend::package(const QLatin1String &name) const
+Package *Backend::package(QLatin1String name) const
 {
     Q_D(const Backend);
 
@@ -393,18 +393,14 @@ QString Backend::originLabel(const QString &origin) const
 {
     Q_D(const Backend);
 
-    QString originLabel = d->originMap.value(origin);
-
-    return originLabel;
+    return d->originMap.value(origin);
 }
 
-QString Backend::origin(QString originLabel) const
+QString Backend::origin(const QString &originLabel) const
 {
     Q_D(const Backend);
 
-    QString origin = d->originMap.key(originLabel);
-
-    return origin;
+    return d->originMap.key(originLabel);
 }
 
 int Backend::packageCount() const
@@ -1285,7 +1281,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
     Q_D(Backend);
 
     QString dir = d->config->findDirectory("Dir::Etc") % QLatin1String("preferences.d/");
-    QString path = dir % package->latin1Name();
+    QString path = dir % package->name();
     QString pinDocument;
 
     if (pin) {
@@ -1293,7 +1289,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             return true;
         }
 
-        pinDocument = QLatin1Literal("Package: ") % package->latin1Name()
+        pinDocument = QLatin1Literal("Package: ") % package->name()
                       % QLatin1Char('\n');
 
         if (package->installedVersion().isEmpty()) {
@@ -1352,7 +1348,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
                 }
 
                 // Include all but the matching name in the new pinfile
-                if (name != package->latin1Name()) {
+                if (name != package->name()) {
                     TFRewriteData tfrd;
                     tfrd.Tag = 0;
                     tfrd.Rewrite = 0;

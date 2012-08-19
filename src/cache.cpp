@@ -46,7 +46,7 @@ public:
     {
     }
 
-    virtual ~CachePrivate()
+    ~CachePrivate()
     {
         delete cache;
         delete trustCache;

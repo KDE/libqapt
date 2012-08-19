@@ -32,9 +32,6 @@
 #include "dependencyinfo.h"
 #include "globals.h"
 
-class pkgRecords;
-class pkgDepCache;
-
 namespace QApt {
 
 class Backend;
@@ -60,19 +57,14 @@ public:
     * become private in QApt2.
     *
     * @param parent The backend that this package is being made a child of
-    * @param depcache The underlying dependency cache for fetching some info
-    * @param records The underlying package records for fetching some info
     * @param packageIter The underlying object representing the package in APT
     */
-    // TODO: QApt2: Remove unused pkgRecords param
-    Package(QApt::Backend* parent, pkgDepCache *depcache,
-            pkgRecords *records, pkgCache::PkgIterator &packageIter);
+    Package(QApt::Backend* parent, pkgCache::PkgIterator &packageIter);
 
    /**
-    * Default destructor
+    * Destructor.
     */
-    // TODO: QApt2: Nope
-    virtual ~Package();
+    ~Package();
 
    /**
     * Returns the internal APT representation of the package
@@ -86,20 +78,7 @@ public:
     *
     * \return The name of the package
     */
-    QString name() const;
-
-    // TODO: QApt2: Get rid of QString impl. and rename latin1Name() to name()
-   /**
-    * Returns the name of the package. This is the better choice over the
-    * regular name() since a QLatin1String is much cheaper to construct
-    * than a QString, since we don't have to convert from ascii. QLatin1String
-    * can also be used everywhere a QString is needed.
-    *
-    * \return The name of the package as a \c QLatin1String
-    *
-    * @since 1.1
-    */
-    QLatin1String latin1Name() const;
+    QLatin1String name() const;
 
    /**
     * Returns the unique internal identifier for the package
@@ -156,27 +135,12 @@ public:
     */
     QStringList availableVersions() const;
 
-    // TODO: QApt2: Get rid of QString impl. and rename latin1Section() to
-    // section()
    /**
     * Returns the categorical section where the package resides
     *
     * \return The section of the package
     */
-    QString section() const;
-
-   // TODO: QApt2: Get rid of QString impl. and rename latin1Section() to section()
-   /**
-    * Returns the categorical section of the package. This is the better choice
-    * over the regular section() since a QLatin1String is much cheaper to construct
-    * than a QString, since we don't have to convert from ascii. QLatin1String can
-    * also be used everywhere a QString is needed.
-    *
-    * \return The name of the package as a \c QLatin1String
-    *
-    * @since 1.1
-    */
-    QLatin1String latin1Section() const;
+    QLatin1String section() const;
 
    /**
     * Returns the source package corresponding to the package
@@ -322,9 +286,9 @@ public:
     *
     * @since 1.1
     */
-    QString controlField(const QLatin1String &name) const;
+    QString controlField(QLatin1String name) const;
 
-    /** Overload for QString controlField(const QLatin1String &name) const; **/
+    /** Overload for QString controlField(QLatin1String name) const; **/
     QString controlField(const QString &name) const;
 
    /**
@@ -390,30 +354,6 @@ public:
     * Returns whether the package is supported by Canonical
     */
     bool isSupported() const;
-
-   /**
-    * Returns whether or not a package is MultiArch-enabled.
-    *
-    * This function was made under the false assumption that non-native
-    * binary packages were considered MultiArch by APT. This is not true,
-    * so this function was renamed to isForeignArch() and expanded to include
-    * non-native binary packages.
-    *
-    * The purpose of this function was originally to filter out multi-arch
-    * functions that duplicated native ones. Due to the false assumptions
-    * made, this both didn't work and managed to poorly describe a boolean
-    * system to describe multi-arch duplicated. It was therefore renamed and
-    * re-implemented as isMultiArchDuplicate(). This function now just returns
-    * whether or not the package is foreign-arch.
-    *
-    * @return the result of isForeignArch()
-    *
-    * @see isForeignArch()
-    * @see isMultiArchDuplicate()
-    *
-    * @since 1.2
-    */
-    QT_DEPRECATED bool isMultiArchEnabled() const;
 
    /**
     * A package prepared for MultiArch can have any of three MultiArch "states"
@@ -677,7 +617,7 @@ public:
         /// The package has been pinned
         IsPinned            = 1 << 25
     };
-    Q_DECLARE_FLAGS(States, State);
+    Q_DECLARE_FLAGS(States, State)
 
 private:
     PackagePrivate *const d;

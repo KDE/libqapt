@@ -54,10 +54,9 @@ public:
     explicit Cache(QObject* parent);
 
      /**
-      * Default destructor
+      * Destructor
       */
-     // TODO: QApt2: Nah
-    virtual ~Cache();
+    ~Cache();
 
     /**
      * Returns a pointer to the interal dependency cache, which keeps track of

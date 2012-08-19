@@ -254,7 +254,7 @@ bool DebInstaller::checkDeb()
     if (willBreak) {
         m_statusString = i18nc("@info Error string when installing would break an existing package",
                                "Error: Breaks the existing package \"%1\"",
-                               willBreak->latin1Name());
+                               willBreak->name());
         m_statusString.prepend(QLatin1String("<font color=\"#ff0000\">"));
         m_statusString.append(QLatin1String("</font>"));
         return false;

@@ -197,12 +197,9 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
     staticStateCalculated = true;
 }
 
-Package::Package(QApt::Backend* backend, pkgDepCache *depCache,
-                 pkgRecords *records, pkgCache::PkgIterator &packageIter)
+Package::Package(QApt::Backend* backend, pkgCache::PkgIterator &packageIter)
         : d(new PackagePrivate())
 {
-    Q_UNUSED(depCache)
-    Q_UNUSED(records)
     // We have to make our own pkgIterator, since the one passed here will
     // keep on iterating while all the packages are being built
     d->packageIter = new pkgCache::PkgIterator(packageIter);
@@ -220,12 +217,7 @@ pkgCache::PkgIterator *Package::packageIterator() const
     return d->packageIter;
 }
 
-QString Package::name() const
-{
-    return latin1Name();
-}
-
-QLatin1String Package::latin1Name() const
+QLatin1String Package::name() const
 {
     return QLatin1String(d->packageIter->Name());
 }
@@ -235,12 +227,7 @@ int Package::id() const
     return (*d->packageIter)->ID;
 }
 
-QString Package::section() const
-{
-    return latin1Section();
-}
-
-QLatin1String Package::latin1Section() const
+QLatin1String Package::section() const
 {
     return QLatin1String(d->packageIter->Section());
 }
@@ -516,11 +503,11 @@ QStringList Package::archives() const
 
 QString Package::component() const
 {
-    QString section = latin1Section();
-    if(section.isEmpty())
+    QString sect = section();
+    if(sect.isEmpty())
         return QString();
 
-    QStringList split = section.split('/');
+    QStringList split = sect.split('/');
 
     if (split.count())
         return split.first();
@@ -593,12 +580,12 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
         case QApt::Thumbnail:
             url = QUrl(controlField(QLatin1String("Thumbnail-Url")));
             if(url.isEmpty())
-                url = QUrl("http://screenshots.debian.net/thumbnail/" % latin1Name());
+                url = QUrl("http://screenshots.debian.net/thumbnail/" % name());
             break;
         case QApt::Screenshot:
             url = QUrl(controlField(QLatin1String("Screenshot-Url")));
             if(url.isEmpty())
-                url = QUrl("http://screenshots.debian.net/screenshot/" % latin1Name());
+                url = QUrl("http://screenshots.debian.net/screenshot/" % name());
             break;
     }
 
@@ -676,7 +663,7 @@ QString Package::supportedUntil() const
     return supportEnd.toString(QLatin1String("MMMM yyyy"));
 }
 
-QString Package::controlField(const QLatin1String &name) const
+QString Package::controlField(QLatin1String name) const
 {
     QString field;
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(*d->packageIter);
@@ -803,11 +790,6 @@ bool Package::isSupported() const
     }
 
     return false;
-}
-
-bool Package::isMultiArchEnabled() const
-{
-    return isForeignArch();
 }
 
 bool Package::isMultiArchDuplicate() const
@@ -1076,8 +1058,8 @@ QStringList Package::enhancedByList() const
     QStringList enhancedByList;
 
     Q_FOREACH (QApt::Package *package, d->backend->availablePackages()) {
-        if (package->enhancesList().contains(latin1Name())) {
-            enhancedByList << package->latin1Name();
+        if (package->enhancesList().contains(name())) {
+            enhancedByList << package->name();
         }
     }
 

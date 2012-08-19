@@ -67,8 +67,7 @@ public:
      /**
       * Default destructor
       */
-    // TODO: QApt2: Heck no
-    virtual ~Backend();
+    ~Backend();
 
     /**
      * Initializes the Apt database for usage. It sets up everything the backend
@@ -177,7 +176,7 @@ public:
     Package *package(const QString &name) const;
 
     /** Overload for package(const QString &name) **/
-    Package *package(const QLatin1String &name) const;
+    Package *package(QLatin1String name) const;
 
     /**
      * Queries the backend for a Package object that installs the specified
@@ -218,21 +217,19 @@ public:
      */
     QString originLabel(const QString &origin) const;
 
-    // TODO: QApt2: const QString &originLabel
     /**
      * Returns the machine-readable name for the origin repository of the given
      * the human-readable name.
      *
      * @return The machine-readable origin label
      */
-    QString origin(QString originLabel) const;
+    QString origin(const QString &originLabel) const;
 
     /** 
      * @returns the origins for a given @p host
      */
     QStringList originsForHost(const QString& host) const;
 
-    // TODO: QApt2: Around that time it might be wise to use qint64 for count()'s
     /**
      * Queries the backend for the total number of packages in the APT
      * database, discarding no-longer-existing packages that linger on in the
@@ -688,15 +685,6 @@ public Q_SLOTS:
     void installDebFile(const DebFile &file);
 
     /**
-     * A slot that Packages use to tell the backend they've changed.
-     * (Used internally by QApt::Package. You likely will never use this)
-     *
-     * @param package the package which has changed
-     */
-    // TODO: QApt2: Make this a private slot.
-    void packageChanged(Package *package);
-
-    /**
      * Checks for and downloads new package source lists.
      *
      * This function is asynchronous. Worker events that occur while
@@ -859,6 +847,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    void packageChanged(Package *package);
     void workerStarted();
     void workerFinished(bool result);
 
