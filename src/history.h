@@ -50,7 +50,7 @@ class Q_DECL_EXPORT HistoryItem
 {
 public:
    /**
-    * Default constructor
+    * Constructor
     *
     * @param data The raw text from the history log
     */
@@ -62,6 +62,11 @@ public:
     * @param other The HistoryItem to be copied
     */
     HistoryItem(const HistoryItem &other);
+
+    /**
+     * Constructor
+     */
+    ~HistoryItem();
 
     /**
      * Equality operator implementing a shallow copy

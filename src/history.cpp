@@ -171,6 +171,10 @@ HistoryItem::HistoryItem(const HistoryItem &other)
     d = other.d;
 }
 
+HistoryItem::~HistoryItem()
+{
+}
+
 QDateTime HistoryItem::startDate() const
 {
     return d->startDate;
