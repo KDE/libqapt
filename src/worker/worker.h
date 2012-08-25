@@ -25,6 +25,7 @@
 #include <QtCore/QProcess>
 #include <QtDBus/QDBusContext>
 
+class pkgCacheFile;
 class pkgPolicy;
 class pkgRecords;
 
@@ -51,7 +52,7 @@ public:
 private:
     pid_t m_child_pid;
 
-    QApt::Cache *m_cache;
+    pkgCacheFile *m_cache;
     pkgPolicy *m_policy;
     pkgRecords *m_records;
     bool m_systemLocked;

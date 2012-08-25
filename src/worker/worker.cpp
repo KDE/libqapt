@@ -30,8 +30,9 @@
 // Apt includes
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/acquire-item.h>
-#include <apt-pkg/configuration.h>
 #include <apt-pkg/aptconfiguration.h>
+#include <apt-pkg/cachefile.h>
+#include <apt-pkg/configuration.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/init.h>
@@ -134,7 +135,7 @@ bool QAptWorker::initializeApt()
         }
 
         if (!m_cache) {
-            m_cache = new QApt::Cache(this);
+            m_cache = new pkgCacheFile();
         }
 
         m_initialized = true;
@@ -147,14 +148,14 @@ bool QAptWorker::initializeApt()
 
 void QAptWorker::reloadCache()
 {
-    if (!m_cache->open()) {
+    if (!m_cache->Open(nullptr, true)) {
         qDebug() << "Cache didn't open";
         throwInitError();
         return;
     }
 
     delete m_records;
-    m_records = new pkgRecords(*m_cache->depCache());
+    m_records = new pkgRecords(*m_cache);
 }
 
 void QAptWorker::throwInitError()
@@ -219,14 +220,14 @@ void QAptWorker::updateCache()
     fetcher.Setup(m_acquireStatus);
     // Populate it with the source selection and get all Indexes
     // (GetAll=true)
-    if (!m_cache->list()->GetIndexes(&fetcher,true)) {
+    if (!m_cache->GetSourceList()->GetIndexes(&fetcher,true)) {
         emit workerFinished(false);
         return;
     }
 
     // do the work
     if (_config->FindB("APT::Get::Download",true)) {
-        bool result = ListUpdate(*m_acquireStatus, *m_cache->list());
+        bool result = ListUpdate(*m_acquireStatus, *m_cache->GetSourceList());
         emit workerFinished(result);
     } else {
         emit errorOccurred(QApt::DownloadDisallowedError, QVariantMap());
@@ -253,7 +254,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
 
     m_timeout->stop();
 
-    pkgDepCache::ActionGroup *actionGroup = new pkgDepCache::ActionGroup(*m_cache->depCache());
+    pkgDepCache::ActionGroup *actionGroup = new pkgDepCache::ActionGroup(*m_cache);
     // Parse out the argument list and mark packages for operations
     QVariantMap::const_iterator mapIter = instructionsList.constBegin();
 
@@ -268,10 +269,10 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         // Check if a version is specified
         if (packageString.contains(QLatin1Char(','))) {
             QStringList split = packageString.split(QLatin1Char(','));
-            iter = m_cache->depCache()->FindPkg(split.at(0).toStdString());
+            iter = (*m_cache)->FindPkg(split.at(0).toStdString());
             version = split.at(1);
         } else {
-            iter = m_cache->depCache()->FindPkg(packageString.toStdString());
+            iter = (*m_cache)->FindPkg(packageString.toStdString());
         }
 
         // Somehow the package searched for doesn't exist.
@@ -285,46 +286,46 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
             return;
         }
 
-        pkgDepCache::StateCache & State = (*m_cache->depCache())[iter];
-        pkgProblemResolver Fix(m_cache->depCache());
+        pkgDepCache::StateCache & State = (*m_cache)[iter];
+        pkgProblemResolver Fix(*m_cache);
 
         // Then mark according to the instruction
         switch (operation) {
             case QApt::Package::Held:
-                m_cache->depCache()->MarkKeep(iter, false);
-                m_cache->depCache()->SetReInstall(iter, false);
+                (*m_cache)->MarkKeep(iter, false);
+                (*m_cache)->SetReInstall(iter, false);
                 break;
             case QApt::Package::ToUpgrade: {
                 bool fromUser = !(State.Flags & pkgCache::Flag::Auto);
-                m_cache->depCache()->MarkInstall(iter, true, 0, fromUser);
-                if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
-                    pkgProblemResolver Fix(m_cache->depCache());
+                (*m_cache)->MarkInstall(iter, true, 0, fromUser);
+                if (!State.Install() || (*m_cache)->BrokenCount() > 0) {
+                    pkgProblemResolver Fix(*m_cache);
                     Fix.Protect(iter);
                     Fix.ResolveByKeep();
                 }
                 break;
             }
             case QApt::Package::ToInstall:
-                m_cache->depCache()->MarkInstall(iter, true);
-                if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
-                    pkgProblemResolver Fix(m_cache->depCache());
+                (*m_cache)->MarkInstall(iter, true);
+                if (!State.Install() || (*m_cache)->BrokenCount() > 0) {
+                    pkgProblemResolver Fix(*m_cache);
                     Fix.Clear(iter);
                     Fix.Protect(iter);
                     Fix.Resolve(true);
                 }
                 break;
             case QApt::Package::ToReInstall:
-                m_cache->depCache()->SetReInstall(iter, true);
+                (*m_cache)->SetReInstall(iter, true);
                 break;
             case QApt::Package::ToDowngrade: {
                 pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
                 pkgCache::VerIterator Ver = Match.Find(iter);
 
-                m_cache->depCache()->SetCandidateVersion(Ver);
+                (*m_cache)->SetCandidateVersion(Ver);
 
-                m_cache->depCache()->MarkInstall(iter, true);
-                if (!State.Install() || m_cache->depCache()->BrokenCount() > 0) {
-                    pkgProblemResolver Fix(m_cache->depCache());
+                (*m_cache)->MarkInstall(iter, true);
+                if (!State.Install() || (*m_cache)->BrokenCount() > 0) {
+                    pkgProblemResolver Fix(*m_cache);
                     Fix.Clear(iter);
                     Fix.Protect(iter);
                     Fix.Resolve(true);
@@ -332,12 +333,12 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
                 break;
             }
             case QApt::Package::ToPurge:
-                m_cache->depCache()->SetReInstall(iter, false);
-                m_cache->depCache()->MarkDelete(iter, true);
+                (*m_cache)->SetReInstall(iter, false);
+                (*m_cache)->MarkDelete(iter, true);
                 break;
             case QApt::Package::ToRemove:
-                m_cache->depCache()->SetReInstall(iter, false);
-                m_cache->depCache()->MarkDelete(iter, false);
+                (*m_cache)->SetReInstall(iter, false);
+                (*m_cache)->MarkDelete(iter, false);
                 break;
             default:
                 // Unsupported operation. Should emit something here?
@@ -346,7 +347,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
         mapIter++;
     }
 
-    if (_error->PendingError() && (m_cache->depCache()->BrokenCount() == 0))
+    if (_error->PendingError() && ((*m_cache)->BrokenCount() == 0))
     {
         // We had dep errors, but fixed them
         _error->Discard();
@@ -389,9 +390,9 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     fetcher.Setup(m_acquireStatus);
 
     pkgPackageManager *packageManager;
-    packageManager = _system->CreatePM(m_cache->depCache());
+    packageManager = _system->CreatePM(*m_cache);
 
-    if (!packageManager->GetArchives(&fetcher, m_cache->list(), m_records) ||
+    if (!packageManager->GetArchives(&fetcher, m_cache->GetSourceList(), m_records) ||
         _error->PendingError()) {
         emit errorOccurred(QApt::FetchError, QVariantMap());
         emit workerFinished(false);
@@ -403,7 +404,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     double FetchBytes = fetcher.FetchNeeded();
     double FetchPBytes = fetcher.PartialPresent();
     double DebBytes = fetcher.TotalNeeded();
-    if (DebBytes != m_cache->depCache()->DebSize())
+    if (DebBytes != (*m_cache)->DebSize())
     {
         emit warningOccurred(QApt::SizeMismatchWarning, QVariantMap());
     }
@@ -559,14 +560,14 @@ void QAptWorker::downloadArchives(const QStringList &packageStrings, const QStri
     pkgIndexFile *index;
 
     foreach (const QString &packageString, packageStrings) {
-        pkgCache::PkgIterator iter = m_cache->depCache()->FindPkg(packageString.toStdString());
+        pkgCache::PkgIterator iter = (*m_cache)->FindPkg(packageString.toStdString());
 
         if (!iter) {
             // Package not found
             continue;
         }
 
-        pkgCache::VerIterator ver = (*m_cache->depCache()).GetCandidateVer(iter);
+        pkgCache::VerIterator ver = (*m_cache)->GetCandidateVer(iter);
 
         if (!ver || !ver.Downloadable() || !ver.Arch()) {
             // Virtual package or not downloadable or broken
@@ -578,7 +579,7 @@ void QAptWorker::downloadArchives(const QStringList &packageStrings, const QStri
         pkgRecords::Parser &rec = m_records->Lookup(ver.FileList());
 
         // Try to cross match against the source list
-        if (!m_cache->list()->FindIndex(vf.File(), index)) {
+        if (!m_cache->GetSourceList()->FindIndex(vf.File(), index)) {
             continue;
         }
 

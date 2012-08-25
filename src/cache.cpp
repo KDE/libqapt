@@ -76,7 +76,7 @@ bool Cache::open()
     d->trustCache->clear();
 
     // Build the cache, return whether it opened
-    return d->cache->Open(&d->progressMeter, false);
+    return d->cache->ReadOnlyOpen(&d->progressMeter);
 }
 
 pkgDepCache *Cache::depCache() const
