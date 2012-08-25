@@ -49,7 +49,7 @@ class Q_DECL_EXPORT Cache : public QObject
     Q_OBJECT
 public:
      /**
-      * Default constructor
+      * Constructor
       */
     explicit Cache(QObject* parent);
 
