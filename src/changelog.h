@@ -50,6 +50,7 @@ public:
     QString version() const;
     QDateTime issueDateTime() const;
     QString description() const;
+    QStringList CVEUrls() const;
 
 private:
     QT_END_NAMESPACE
