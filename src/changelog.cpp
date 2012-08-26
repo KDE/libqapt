@@ -98,7 +98,6 @@ void ChangelogEntryPrivate::parseData(const QString &sourcePackage)
 
             continue;
         }
-        qDebug() << CVEUrls;
 
         QRegExp rxDate("^ -- (.+) (<.+>)  (.+)$");
         rxDate.indexIn(line);
@@ -236,7 +235,7 @@ ChangelogEntryList Changelog::entries() const
         entryTexts[curIndex] = curEntry;
     }
 
-    foreach (const QString &stanza, entryTexts) {
+    for (const QString &stanza : entryTexts) {
         ChangelogEntry entry(stanza, d->sourcePackage);
 
         entries << entry;
@@ -249,8 +248,7 @@ ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
 {
     ChangelogEntryList newEntries;
 
-    foreach (const ChangelogEntry &entry, entries()) {
-
+    for (const ChangelogEntry &entry : entries()) {
         int res = Package::compareVersion(entry.version(), version);
 
         // Add entries newer than the given version
