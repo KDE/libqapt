@@ -268,7 +268,7 @@ void Backend::reloadCache()
     QStringList pinFiles = logDirectory.entryList(QDir::Files, QDir::Name);
     pinFiles << dirBase % QLatin1String("preferences");
 
-    Q_FOREACH (const QString &pinName, pinFiles) {
+    for (const QString &pinName : pinFiles) {
         QString pinPath;
         // Make all paths absolute
         if (!pinName.startsWith(QLatin1Char('/'))) {
@@ -367,7 +367,7 @@ Package *Backend::packageForFile(const QString &file) const
         return 0;
     }
 
-    Q_FOREACH (Package *package, d->packages) {
+    for (Package *package : d->packages) {
         if (package->installedFilesList().contains(file)) {
             return package;
         }
@@ -416,7 +416,7 @@ int Backend::packageCount(const Package::States &states) const
 
     int packageCount = 0;
 
-    Q_FOREACH(const Package *package, d->packages) {
+    for (const Package *package: d->packages) {
         if ((package->state() & states)) {
             packageCount++;
         }
@@ -495,7 +495,7 @@ PackageList Backend::upgradeablePackages() const
 
     PackageList upgradeablePackages;
 
-    Q_FOREACH (Package *package, d->packages) {
+    for (Package *package : d->packages) {
         if (package->state() & Package::Upgradeable) {
             upgradeablePackages << package;
         }
@@ -510,7 +510,7 @@ PackageList Backend::markedPackages() const
 
     PackageList markedPackages;
 
-    Q_FOREACH(Package *package, d->packages) {
+    for (Package *package : d->packages) {
         if (package->state() & (Package::ToInstall | Package::ToReInstall |
                                 Package::ToUpgrade | Package::ToDowngrade |
                                 Package::ToRemove | Package::ToPurge)) {
@@ -1024,7 +1024,7 @@ void Backend::commitChanges()
 
     QVariantMap packageList;
 
-    Q_FOREACH (const Package *package, d->packages) {
+    for (const Package *package : d->packages) {
         int flags = package->state();
         std::string fullName = package->packageIterator()->FullName();
         // Cannot have any of these flags simultaneously
@@ -1308,7 +1308,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
                     QLatin1String("preferences");
 
         // Search all pin files, delete package stanza from file
-        Q_FOREACH (const QString &pinName, pinFiles) {
+        for (const QString &pinName : pinFiles) {
             QString pinPath;
             if (!pinName.startsWith(QLatin1Char('/'))) {
                 pinPath = dir % pinName;
