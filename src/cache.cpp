@@ -29,7 +29,7 @@ namespace QApt {
 class CacheBuildProgress : public OpProgress
 {
 public:
-    virtual void Update() {
+    void Update() {
         // Evil but Necessary, libapt-pkg not thread safe, afaict
         QCoreApplication::processEvents();
     }
