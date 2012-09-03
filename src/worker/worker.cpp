@@ -91,6 +91,11 @@ QAptWorker::~QAptWorker()
     delete m_records;
 }
 
+int QAptWorker::dbusSenderPid() const
+{
+    return connection().interface()->servicePid( message().service()).value();
+}
+
 void QAptWorker::setLocale(const QString &locale) const
 {
     std::setlocale(LC_ALL, locale.toAscii());

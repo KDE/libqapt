@@ -65,6 +65,8 @@ private:
     QProcess *m_dpkgProcess;
     QTimer *m_timeout;
 
+    int dbusSenderPid() const;
+
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
     void setProxy(const QString &proxy) const;
