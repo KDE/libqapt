@@ -65,7 +65,7 @@ private:
     QProcess *m_dpkgProcess;
     QTimer *m_timeout;
 
-    int dbusSenderPid() const;
+    int dbusSenderUid() const;
 
     bool initializeApt();
     void initializeStatusWatcher();

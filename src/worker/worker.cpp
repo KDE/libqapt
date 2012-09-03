@@ -91,9 +91,9 @@ QAptWorker::~QAptWorker()
     delete m_records;
 }
 
-int QAptWorker::dbusSenderPid() const
+int QAptWorker::dbusSenderUid() const
 {
-    return connection().interface()->servicePid( message().service()).value();
+    return connection().interface()->serviceUid( message().service()).value();
 }
 
 void QAptWorker::setLocale(const QString &locale) const
