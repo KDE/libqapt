@@ -67,6 +67,11 @@ private:
 
     int dbusSenderPid() const;
 
+    bool initializeApt();
+    void initializeStatusWatcher();
+    void reloadCache();
+    void throwInitError();
+
 public Q_SLOTS:
     void setLocale(const QString &locale) const;
     void setProxy(const QString &proxy) const;
@@ -83,10 +88,6 @@ public Q_SLOTS:
     bool copyArchiveToCache(const QString &archivePath);
 
 private Q_SLOTS:
-    bool initializeApt();
-    void reloadCache();
-    void throwInitError();
-    void initializeStatusWatcher();
     void dpkgStarted();
     void updateDpkgProgress();
     void dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus);
