@@ -12,5 +12,7 @@
       <arg type="b" direction="out"/>
       <arg name="role" type="i" direction="in"/>
     </method>
+    <method name="run">
+    </method>
   </interface>
 </node>
