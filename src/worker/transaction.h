@@ -40,10 +40,12 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(QString locale READ locale)
     Q_PROPERTY(QString proxy READ proxy)
     Q_PROPERTY(QString debconfPipe READ debconfPipe)
+    Q_PROPERTY(QVariantMap packages READ packages)
 public:
     Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
-                QQueue<Transaction *> *queue, int userId);
+                QQueue<Transaction *> *queue, int userId,
+                QVariantMap packagesList);
 
     QString transactionId() const;
     int userId() const;
@@ -52,6 +54,7 @@ public:
     QString locale() const;
     QString proxy() const;
     QString debconfPipe() const;
+    QVariantMap packages() const;
 
     void setStatus(int status);
 
@@ -67,10 +70,16 @@ private:
     QString m_locale;
     QString m_proxy;
     QString m_debconfPipe;
+    QVariantMap m_packages;
 
     // Private functions
     int dbusSenderUid() const;
     bool isForeignUser() const;
+    void setRole(int role);
+    void setLocale(QString locale);
+    void setProxy(QString proxy);
+    void setDebconfPipe(QString pipe);
+    void setPackages(QVariantMap packageList);
 
 Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
@@ -78,12 +87,6 @@ Q_SIGNALS:
 public Q_SLOTS:
     void setProperty(int property, QDBusVariant value);
     void run();
-
-private Q_SLOTS:
-    void setRole(int role);
-    void setLocale(QString locale);
-    void setProxy(QString proxy);
-    void setDebconfPipe(QString pipe);
 };
 
 #endif // TRANSACTION_H

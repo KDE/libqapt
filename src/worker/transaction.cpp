@@ -26,18 +26,19 @@
 #include "transactionadaptor.h"
 
 Transaction::Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId)
-    : Transaction(parent, QApt::EmptyRole, queue, userId)
+    : Transaction(parent, QApt::EmptyRole, queue, userId, QVariantMap())
 {
 }
 
 Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
-                         QQueue<Transaction *> *queue, int userId)
+                         QQueue<Transaction *> *queue, int userId, QVariantMap packagesList)
     : QObject(parent)
     , m_queue(queue)
     , m_tid(QUuid::createUuid().toString())
     , m_uid(userId)
     , m_role(role)
     , m_status(QApt::WaitingStatus)
+    , m_packages(packagesList)
 {
     new TransactionAdaptor(this);
     QDBusConnection connection = QDBusConnection::systemBus();
@@ -148,6 +149,22 @@ void Transaction::setDebconfPipe(QString pipe)
     emit propertyChanged(QApt::DebconfPipeProperty, QDBusVariant(pipe));
 }
 
+QVariantMap Transaction::packages() const
+{
+    return m_packages;
+}
+
+void Transaction::setPackages(QVariantMap packageList)
+{
+    if (m_status != QApt::SetupStatus) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        return;
+    }
+
+    m_packages = packageList;
+    emit propertyChanged(QApt::PackagesProperty, QDBusVariant(packageList));
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {
@@ -198,6 +215,9 @@ void Transaction::setProperty(int property, QDBusVariant value)
         break;
     case QApt::DebconfPipeProperty:
         setDebconfPipe(value.variant().toString());
+        break;
+    case QApt::PackagesProperty:
+        setPackages(value.variant().toMap());
         break;
     default:
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::InvalidArgs, QString()));

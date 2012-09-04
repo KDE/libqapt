@@ -319,13 +319,22 @@ namespace QApt
      * @brief Enumerates the data properties of worker transactions
      */
     enum TransactionProperty {
+        /// QString, the dbus path of the transaction
         TransactionIdProperty = 0,
+        /// int, the user id of the user who initiated the transaction
         UserIdProperty,
+        /// int, the TransactionRole of the transaction
         RoleProperty,
+        /// int, the TransactionStatus of the transaction
         StatusProperty,
+        /// QString, the locale for the worker to use
         LocaleProperty,
+        /// QString, the proxy for the worker to use
         ProxyProperty,
-        DebconfPipeProperty
+        /// QString, the debconf pipe for the worker to use
+        DebconfPipeProperty,
+        /// QVariantMap, the packages to be acted upon in the transaction
+        PackagesProperty
     };
 
     enum TransactionStatus {

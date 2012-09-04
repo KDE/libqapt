@@ -8,6 +8,9 @@
     <property name="locale" type="s" access="read"/>
     <property name="proxy" type="s" access="read"/>
     <property name="debconfPipe" type="s" access="read"/>
+    <property name="packages" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
