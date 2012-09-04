@@ -21,10 +21,6 @@
       <arg name="size" type="d" direction="out"/>
       <arg name="flag" type="i" direction="out"/>
     </signal>
-    <signal name="downloadMessage">
-      <arg name="flag" type="i" direction="out"/>
-      <arg name="message" type="s" direction="out"/>
-    </signal>
     <signal name="commitProgress">
       <arg name="status" type="s" direction="out"/>
       <arg name="percentage" type="i" direction="out"/>

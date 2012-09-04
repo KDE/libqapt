@@ -183,8 +183,6 @@ void QAptWorker::initializeStatusWatcher()
             this, SIGNAL(downloadProgress(int,int,int)));
     connect(m_acquireStatus, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
             this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
-    connect(m_acquireStatus, SIGNAL(downloadMessage(int,QString)),
-            this, SIGNAL(downloadMessage(int,QString)));
     connect(m_acquireStatus, SIGNAL(fetchError(int,QVariantMap)),
             this, SIGNAL(errorOccurred(int,QVariantMap)));
     connect(m_acquireStatus, SIGNAL(fetchWarning(int,QVariantMap)),

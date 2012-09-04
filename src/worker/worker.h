@@ -103,7 +103,6 @@ Q_SIGNALS:
     void downloadProgress(int percentage, int speed, int ETA);
     void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
                                  double size, int flag);
-    QT_DEPRECATED void downloadMessage(int flag, const QString &message);
     void commitProgress(const QString status, int percentage);
     void debInstallMessage(const QString &message);
     void errorOccurred(int code, const QVariantMap &details);
