@@ -134,7 +134,13 @@ void Transaction::setDebconfPipe(QString pipe)
 {
     if (m_status != QApt::SetupStatus) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        return;
+    }
 
+    QFileInfo pipeInfo(pipe);
+
+    if (!pipeInfo.exists() || pipeInfo.ownerId() != m_uid) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::InvalidArgs, QString()));
         return;
     }
 
