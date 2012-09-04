@@ -76,11 +76,14 @@ Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
     
 public Q_SLOTS:
+    void setProperty(int property, QDBusVariant value);
+    void run();
+
+private Q_SLOTS:
     void setRole(int role);
     void setLocale(QString locale);
     void setProxy(QString proxy);
     void setDebconfPipe(QString pipe);
-    void run();
 };
 
 #endif // TRANSACTION_H

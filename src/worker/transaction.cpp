@@ -22,8 +22,6 @@
 
 #include <QtCore/QUuid>
 #include <QtDBus/QDBusConnection>
-#include <QDebug>
-#include <QDBusError>
 
 #include "transactionadaptor.h"
 
@@ -72,8 +70,7 @@ void Transaction::setRole(int role)
 {
     // Cannot change role for an already determined transaction
     if (m_role != QApt::EmptyRole) {
-        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
-        QDBusConnection::systemBus().send(reply);
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
 
         return;
     }
@@ -102,8 +99,7 @@ QString Transaction::locale() const
 void Transaction::setLocale(QString locale)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
-        QDBusConnection::systemBus().send(reply);
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
 
         return;
     }
@@ -120,8 +116,7 @@ QString Transaction::proxy() const
 void Transaction::setProxy(QString proxy)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
-        QDBusConnection::systemBus().send(reply);
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
 
         return;
     }
@@ -138,8 +133,7 @@ QString Transaction::debconfPipe() const
 void Transaction::setDebconfPipe(QString pipe)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
-        QDBusConnection::systemBus().send(reply);
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
 
         return;
     }
@@ -151,8 +145,7 @@ void Transaction::setDebconfPipe(QString pipe)
 void Transaction::run()
 {
     if (isForeignUser()) {
-        QDBusMessage reply = QDBusMessage::createError(QDBusError::AccessDenied, QString());
-        QDBusConnection::systemBus().send(reply);
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
 
         return;
     }
@@ -168,4 +161,40 @@ int Transaction::dbusSenderUid() const
 bool Transaction::isForeignUser() const
 {
     return dbusSenderUid() != m_uid;
+}
+
+void Transaction::setProperty(int property, QDBusVariant value)
+{
+    if (isForeignUser()) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+
+        return;
+    }
+
+    switch (property)
+    {
+    case QApt::TransactionIdProperty:
+    case QApt::UserIdProperty:
+        // Read-only
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        break;
+    case QApt::RoleProperty:
+        setRole(value.variant().toInt());
+        break;
+    case QApt::StatusProperty:
+        setStatus(value.variant().toInt());
+        break;
+    case QApt::LocaleProperty:
+        setLocale(value.variant().toString());
+        break;
+    case QApt::ProxyProperty:
+        setProxy(value.variant().toString());
+        break;
+    case QApt::DebconfPipeProperty:
+        setDebconfPipe(value.variant().toString());
+        break;
+    default:
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::InvalidArgs, QString()));
+        break;
+    }
 }

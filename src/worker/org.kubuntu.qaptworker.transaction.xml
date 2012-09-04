@@ -12,17 +12,9 @@
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
     </signal>
-    <method name="setRole">
-      <arg name="role" type="i" direction="in"/>
-    </method>
-    <method name="setLocale">
-      <arg name="locale" type="s" direction="in"/>
-    </method>
-    <method name="setProxy">
-      <arg name="proxy" type="s" direction="in"/>
-    </method>
-    <method name="setDebconfPipe">
-      <arg name="pipe" type="s" direction="in"/>
+    <method name="setProperty">
+      <arg name="property" type="i" direction="in"/>
+      <arg name="value" type="v" direction="in"/>
     </method>
     <method name="run">
     </method>
