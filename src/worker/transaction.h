@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2008-2009 Sebastian Heinlein <devel@glatzor.de>           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -61,10 +62,12 @@ public:
     bool cancellable() const;
     bool cancelled() const;
     int exitStatus() const;
+    QString medium() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setCancellabe(bool cancellable);
     void setExitStatus(QApt::ExitStatus exitStatus);
+    void setMediumRequired(const QString &label, const QString &medium);
 
 private:
     // Pointers to external containers
@@ -82,6 +85,7 @@ private:
     bool m_cancellable;
     bool m_cancelled;
     QApt::ExitStatus m_exitStatus;
+    QString m_medium;
 
     // Private functions
     int dbusSenderUid() const;
@@ -95,11 +99,13 @@ private:
 Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
     Q_SCRIPTABLE void finished(int exitStatus);
+    Q_SCRIPTABLE void mediumRequired(QString label, QString mountPoint);
     
 public Q_SLOTS:
     void setProperty(int property, QDBusVariant value);
     void run();
     void cancel();
+    void provideMedium(const QString &medium);
 };
 
 #endif // TRANSACTION_H

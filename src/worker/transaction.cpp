@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2008-2009 Sebastian Heinlein <devel@glatzor.de>           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -41,6 +42,7 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
     , m_packages(packagesList)
     , m_cancellable(true)
     , m_cancelled(false)
+    , m_exitStatus(QApt::ExitUnfinished)
 {
     new TransactionAdaptor(this);
     QDBusConnection connection = QDBusConnection::systemBus();
@@ -196,6 +198,20 @@ void Transaction::setExitStatus(QApt::ExitStatus exitStatus)
     // TODO: Set deletion timeout (5s)
 }
 
+QString Transaction::medium() const
+{
+    return m_medium;
+}
+
+void Transaction::setMediumRequired(const QString &label, const QString &medium)
+{
+    m_medium = medium;
+
+    // TODO: pause
+
+    emit mediumRequired(label, medium);
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {
@@ -270,4 +286,20 @@ void Transaction::cancel()
 
     m_cancelled = true;
     emit propertyChanged(QApt::CancelledProperty, QDBusVariant(m_cancelled));
+}
+
+void Transaction::provideMedium(const QString &medium)
+{
+    if (isForeignUser()) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+        return;
+    }
+
+    // An incorrect medium was provided
+    if (medium != m_medium || m_medium.isEmpty()) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        return;
+    }
+
+    // TODO: unpause
 }

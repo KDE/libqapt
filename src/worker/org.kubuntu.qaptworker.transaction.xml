@@ -21,6 +21,10 @@
     <signal name="finished">
       <arg name="exitStatus" type="i" direction="out"/>
     </signal>
+    <signal name="mediumRequired">
+      <arg name="label" type="s" direction="out"/>
+      <arg name="mountPoint" type="s" direction="out"/>
+    </signal>
     <method name="setProperty">
       <arg name="property" type="i" direction="in"/>
       <arg name="value" type="v" direction="in"/>
@@ -28,6 +32,9 @@
     <method name="run">
     </method>
     <method name="cancel">
+    </method>
+    <method name="provideMedium">
+      <arg name="medium" type="s" direction="in"/>
     </method>
   </interface>
 </node>
