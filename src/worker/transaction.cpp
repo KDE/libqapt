@@ -62,6 +62,6 @@ bool Transaction::setRole(int role)
 
     m_role = (QApt::TransactionRole)role;
 
-    emit propertyChanged(QApt::Role, role);
+    emit propertyChanged(QApt::Role, QDBusVariant(role));
     return true;
 }
