@@ -88,10 +88,10 @@ int Transaction::status() const
     return m_status;
 }
 
-void Transaction::setStatus(int status)
+void Transaction::setStatus(QApt::TransactionStatus status)
 {
-    m_status = (QApt::TransactionStatus)status;
-    emit propertyChanged(QApt::StatusProperty, QDBusVariant(status));
+    m_status = status;
+    emit propertyChanged(QApt::StatusProperty, QDBusVariant((int)status));
 }
 
 QString Transaction::locale() const
@@ -181,6 +181,21 @@ bool Transaction::cancelled() const
     return m_cancelled;
 }
 
+int Transaction::exitStatus() const
+{
+    return (int)m_exitStatus;
+}
+
+void Transaction::setExitStatus(QApt::ExitStatus exitStatus)
+{
+    setStatus(QApt::FinishedStatus);
+    m_exitStatus = exitStatus;
+    emit propertyChanged(QApt::ExitStatusProperty, QDBusVariant(exitStatus));
+    emit finished(exitStatus);
+
+    // TODO: Set deletion timeout (5s)
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {
@@ -216,10 +231,10 @@ void Transaction::setProperty(int property, QDBusVariant value)
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
         break;
     case QApt::RoleProperty:
-        setRole(value.variant().toInt());
+        setRole((QApt::TransactionProperty)value.variant().toInt());
         break;
     case QApt::StatusProperty:
-        setStatus(value.variant().toInt());
+        setStatus((QApt::TransactionStatus)value.variant().toInt());
         break;
     case QApt::LocaleProperty:
         setLocale(value.variant().toString());

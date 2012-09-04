@@ -338,14 +338,31 @@ namespace QApt
         /// bool, whether or not the transaction can be cancelled at the moment
         CancellableProperty,
         /// bool, whether or not the transaction has been cancelled
-        CancelledProperty
+        CancelledProperty,
+        /// int, the exit status of the transaction
+        ExitStatusProperty
     };
 
+    /**
+     * @brief An enum for the statuses of ongoing transactions
+     */
     enum TransactionStatus {
         SetupStatus = 0,
         WaitingStatus,
         DownloadingStatus,
-        CommittingStatus
+        CommittingStatus,
+        FinishedStatus
+    };
+
+    /**
+     * @brief An enumeration for transaction exit statuses
+     */
+    enum ExitStatus {
+        ExitSuccess = 0,
+        ExitCancelled,
+        ExitFailed,
+        ExitPreviousFailed,
+        ExitUnfinished
     };
 }
 

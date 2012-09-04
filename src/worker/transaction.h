@@ -43,6 +43,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(QVariantMap packages READ packages)
     Q_PROPERTY(bool cancellable READ cancellable)
     Q_PROPERTY(bool cancelled READ cancelled)
+    Q_PROPERTY(int exitStatus READ exitStatus)
 public:
     Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
@@ -59,9 +60,11 @@ public:
     QVariantMap packages() const;
     bool cancellable() const;
     bool cancelled() const;
+    int exitStatus() const;
 
-    void setStatus(int status);
+    void setStatus(QApt::TransactionStatus status);
     void setCancellabe(bool cancellable);
+    void setExitStatus(QApt::ExitStatus exitStatus);
 
 private:
     // Pointers to external containers
@@ -78,6 +81,7 @@ private:
     QVariantMap m_packages;
     bool m_cancellable;
     bool m_cancelled;
+    QApt::ExitStatus m_exitStatus;
 
     // Private functions
     int dbusSenderUid() const;
@@ -90,6 +94,7 @@ private:
 
 Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
+    Q_SCRIPTABLE void finished(int exitStatus);
     
 public Q_SLOTS:
     void setProperty(int property, QDBusVariant value);

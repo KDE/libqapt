@@ -13,9 +13,13 @@
     </property>
     <property name="cancellable" type="b" access="read"/>
     <property name="cancelled" type="b" access="read"/>
+    <property name="exitStatus" type="i" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
+    </signal>
+    <signal name="finished">
+      <arg name="exitStatus" type="i" direction="out"/>
     </signal>
     <method name="setProperty">
       <arg name="property" type="i" direction="in"/>
