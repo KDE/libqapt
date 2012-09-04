@@ -33,15 +33,20 @@ class Transaction : public QObject
     Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker.transaction")
     Q_PROPERTY(QString transactionId READ transactionId)
     Q_PROPERTY(int role READ role)
+    Q_PROPERTY(int status READ status)
 public:
     explicit Transaction(QObject *parent = 0);
 
     QString transactionId() const;
     int role() const;
+    int status() const;
+
+    void setStatus(int status);
 
 private:
     QString m_tid;
     QApt::TransactionRole m_role;
+    QApt::TransactionStatus m_status;
 
 Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);

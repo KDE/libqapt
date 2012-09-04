@@ -319,8 +319,16 @@ namespace QApt
      * @brief Enumerates the data properties of worker transactions
      */
     enum TransactionProperty {
-        TransactionId = 0,
-        Role
+        TransactionIdProperty = 0,
+        RoleProperty,
+        StatusProperty
+    };
+
+    enum TransactionStatus {
+        SetupStatus = 0,
+        WaitingStatus,
+        DownloadingStatus,
+        CommittingStatus
     };
 }
 

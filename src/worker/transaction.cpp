@@ -31,16 +31,17 @@ Transaction::Transaction(QObject *parent)
     : QObject(parent)
     , m_tid(QUuid::createUuid().toString())
     , m_role(QApt::EmptyRole)
+    , m_status(QApt::WaitingStatus)
 {
     new TransactionAdaptor(this);
     QDBusConnection connection = QDBusConnection::systemBus();
 
+    QString tid = QUuid::createUuid().toString();
     // Remove parts of the uuid that can't be part of a D-Bus path
-    m_tid.remove('{');
-    m_tid.remove('}');
-    m_tid.remove('-');
+    tid.remove('{').remove('}').remove('-');
+    m_tid = "/org/kubuntu/qaptworker/transaction" + tid;
 
-    if (!connection.registerObject("/org/kubuntu/qaptworker/transaction/" + m_tid, this))
+    if (!connection.registerObject(m_tid, this))
         qWarning() << "Unable to register transaction on DBus";
 }
 
@@ -62,6 +63,17 @@ bool Transaction::setRole(int role)
 
     m_role = (QApt::TransactionRole)role;
 
-    emit propertyChanged(QApt::Role, QDBusVariant(role));
+    emit propertyChanged(QApt::RoleProperty, QDBusVariant(role));
     return true;
+}
+
+int Transaction::status() const
+{
+    return m_status;
+}
+
+void Transaction::setStatus(int status)
+{
+    m_status = (QApt::TransactionStatus)status;
+    emit propertyChanged(QApt::StatusProperty, QDBusVariant(status));
 }
