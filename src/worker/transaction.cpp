@@ -27,16 +27,17 @@
 
 #include "transactionadaptor.h"
 
-Transaction::Transaction(QObject *parent, QQueue<Transaction *> *queue)
-    : Transaction(parent, QApt::EmptyRole, queue)
+Transaction::Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId)
+    : Transaction(parent, QApt::EmptyRole, queue, userId)
 {
 }
 
 Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
-                         QQueue<Transaction *> *queue)
+                         QQueue<Transaction *> *queue, int userId)
     : QObject(parent)
     , m_queue(queue)
     , m_tid(QUuid::createUuid().toString())
+    , m_uid(userId)
     , m_role(role)
     , m_status(QApt::WaitingStatus)
 {
@@ -57,21 +58,29 @@ QString Transaction::transactionId() const
     return m_tid;
 }
 
+int Transaction::userId() const
+{
+    return m_uid;
+}
+
 int Transaction::role() const
 {
     return m_role;
 }
 
-bool Transaction::setRole(int role)
+void Transaction::setRole(int role)
 {
     // Cannot change role for an already determined transaction
-    if (m_role != QApt::EmptyRole)
-        return false;
+    if (m_role != QApt::EmptyRole) {
+        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
+        QDBusConnection::systemBus().send(reply);
+
+        return;
+    }
 
     m_role = (QApt::TransactionRole)role;
 
     emit propertyChanged(QApt::RoleProperty, QDBusVariant(role));
-    return true;
 }
 
 int Transaction::status() const
@@ -87,5 +96,22 @@ void Transaction::setStatus(int status)
 
 void Transaction::run()
 {
+    if (isForeignUser()) {
+        QDBusMessage reply = QDBusMessage::createError(QDBusError::AccessDenied, QString());
+        QDBusConnection::systemBus().send(reply);
+
+        return;
+    }
+
     // Place on queue
+}
+
+int Transaction::dbusSenderUid() const
+{
+    return connection().interface()->serviceUid( message().service()).value();
+}
+
+bool Transaction::isForeignUser() const
+{
+    return dbusSenderUid() != m_uid;
 }

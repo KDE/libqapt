@@ -2,6 +2,7 @@
 <node>
   <interface name="org.kubuntu.qaptworker.transaction">
     <property name="transactionId" type="s" access="read"/>
+    <property name="userId" type="i" access="read"/>
     <property name="role" type="i" access="read"/>
     <property name="status" type="i" access="read"/>
     <signal name="propertyChanged">
@@ -9,7 +10,6 @@
       <arg name="newValue" type="v" direction="out"/>
     </signal>
     <method name="setRole">
-      <arg type="b" direction="out"/>
       <arg name="role" type="i" direction="in"/>
     </method>
     <method name="run">

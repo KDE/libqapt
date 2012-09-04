@@ -320,6 +320,7 @@ namespace QApt
      */
     enum TransactionProperty {
         TransactionIdProperty = 0,
+        UserIdProperty,
         RoleProperty,
         StatusProperty
     };

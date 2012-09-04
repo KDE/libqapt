@@ -23,41 +23,51 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QQueue>
+#include <QtDBus/QDBusContext>
 #include <QtDBus/QDBusVariant>
 
 #include "globals.h"
 
-class Transaction : public QObject
+class Transaction : public QObject, protected QDBusContext
 {
     Q_OBJECT
 
     Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker.transaction")
     Q_PROPERTY(QString transactionId READ transactionId)
+    Q_PROPERTY(int userId READ userId CONSTANT)
     Q_PROPERTY(int role READ role)
     Q_PROPERTY(int status READ status)
 public:
-    Transaction(QObject *parent, QQueue<Transaction *> *queue);
+    Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
-                QQueue<Transaction *> *queue);
+                QQueue<Transaction *> *queue, int userId);
 
     QString transactionId() const;
+    int userId() const;
     int role() const;
     int status() const;
 
     void setStatus(int status);
 
 private:
+    // Pointers to external containers
     QQueue<Transaction *> *m_queue;
 
+    // Data members
     QString m_tid;
+    int m_uid;
     QApt::TransactionRole m_role;
     QApt::TransactionStatus m_status;
+
+    // Private functions
+    int dbusSenderUid() const;
+    bool isForeignUser() const;
 
 Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
     
 public Q_SLOTS:
-    bool setRole(int role);
+    void setRole(int role);
     void run();
 };
 
