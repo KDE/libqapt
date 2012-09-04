@@ -324,7 +324,8 @@ namespace QApt
         RoleProperty,
         StatusProperty,
         LocaleProperty,
-        ProxyProperty
+        ProxyProperty,
+        DebconfPipeProperty
     };
 
     enum TransactionStatus {

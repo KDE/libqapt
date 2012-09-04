@@ -130,6 +130,24 @@ void Transaction::setProxy(QString proxy)
     emit propertyChanged(QApt::ProxyProperty, QDBusVariant(proxy));
 }
 
+QString Transaction::debconfPipe() const
+{
+    return m_debconfPipe;
+}
+
+void Transaction::setDebconfPipe(QString pipe)
+{
+    if (m_status != QApt::SetupStatus) {
+        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
+        QDBusConnection::systemBus().send(reply);
+
+        return;
+    }
+
+    m_debconfPipe = pipe;
+    emit propertyChanged(QApt::DebconfPipeProperty, QDBusVariant(pipe));
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {

@@ -7,6 +7,7 @@
     <property name="status" type="i" access="read"/>
     <property name="locale" type="s" access="read"/>
     <property name="proxy" type="s" access="read"/>
+    <property name="debconfPipe" type="s" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
@@ -19,6 +20,9 @@
     </method>
     <method name="setProxy">
       <arg name="proxy" type="s" direction="in"/>
+    </method>
+    <method name="setDebconfPipe">
+      <arg name="pipe" type="s" direction="in"/>
     </method>
     <method name="run">
     </method>

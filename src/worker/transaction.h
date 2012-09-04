@@ -39,6 +39,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(int status READ status)
     Q_PROPERTY(QString locale READ locale)
     Q_PROPERTY(QString proxy READ proxy)
+    Q_PROPERTY(QString debconfPipe READ debconfPipe)
 public:
     Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
@@ -50,6 +51,7 @@ public:
     int status() const;
     QString locale() const;
     QString proxy() const;
+    QString debconfPipe() const;
 
     void setStatus(int status);
 
@@ -64,6 +66,7 @@ private:
     QApt::TransactionStatus m_status;
     QString m_locale;
     QString m_proxy;
+    QString m_debconfPipe;
 
     // Private functions
     int dbusSenderUid() const;
@@ -76,6 +79,7 @@ public Q_SLOTS:
     void setRole(int role);
     void setLocale(QString locale);
     void setProxy(QString proxy);
+    void setDebconfPipe(QString pipe);
     void run();
 };
 
