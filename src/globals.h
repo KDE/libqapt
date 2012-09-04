@@ -322,7 +322,9 @@ namespace QApt
         TransactionIdProperty = 0,
         UserIdProperty,
         RoleProperty,
-        StatusProperty
+        StatusProperty,
+        LocaleProperty,
+        ProxyProperty
     };
 
     enum TransactionStatus {

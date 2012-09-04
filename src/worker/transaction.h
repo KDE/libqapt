@@ -37,6 +37,8 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(int userId READ userId CONSTANT)
     Q_PROPERTY(int role READ role)
     Q_PROPERTY(int status READ status)
+    Q_PROPERTY(QString locale READ locale)
+    Q_PROPERTY(QString proxy READ proxy)
 public:
     Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
@@ -46,6 +48,8 @@ public:
     int userId() const;
     int role() const;
     int status() const;
+    QString locale() const;
+    QString proxy() const;
 
     void setStatus(int status);
 
@@ -58,6 +62,8 @@ private:
     int m_uid;
     QApt::TransactionRole m_role;
     QApt::TransactionStatus m_status;
+    QString m_locale;
+    QString m_proxy;
 
     // Private functions
     int dbusSenderUid() const;
@@ -68,6 +74,8 @@ Q_SIGNALS:
     
 public Q_SLOTS:
     void setRole(int role);
+    void setLocale(QString locale);
+    void setProxy(QString proxy);
     void run();
 };
 

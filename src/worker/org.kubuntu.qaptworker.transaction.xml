@@ -5,12 +5,20 @@
     <property name="userId" type="i" access="read"/>
     <property name="role" type="i" access="read"/>
     <property name="status" type="i" access="read"/>
+    <property name="locale" type="s" access="read"/>
+    <property name="proxy" type="s" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
     </signal>
     <method name="setRole">
       <arg name="role" type="i" direction="in"/>
+    </method>
+    <method name="setLocale">
+      <arg name="locale" type="s" direction="in"/>
+    </method>
+    <method name="setProxy">
+      <arg name="proxy" type="s" direction="in"/>
     </method>
     <method name="run">
     </method>

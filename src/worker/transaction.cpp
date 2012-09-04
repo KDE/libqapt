@@ -94,6 +94,42 @@ void Transaction::setStatus(int status)
     emit propertyChanged(QApt::StatusProperty, QDBusVariant(status));
 }
 
+QString Transaction::locale() const
+{
+    return m_locale;
+}
+
+void Transaction::setLocale(QString locale)
+{
+    if (m_status != QApt::SetupStatus) {
+        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
+        QDBusConnection::systemBus().send(reply);
+
+        return;
+    }
+
+    m_locale = locale;
+    emit propertyChanged(QApt::LocaleProperty, QDBusVariant(locale));
+}
+
+QString Transaction::proxy() const
+{
+    return m_locale;
+}
+
+void Transaction::setProxy(QString proxy)
+{
+    if (m_status != QApt::SetupStatus) {
+        QDBusMessage reply = QDBusMessage::createError(QDBusError::Failed, QString());
+        QDBusConnection::systemBus().send(reply);
+
+        return;
+    }
+
+    m_proxy = proxy;
+    emit propertyChanged(QApt::ProxyProperty, QDBusVariant(proxy));
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {
