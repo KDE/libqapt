@@ -342,7 +342,9 @@ namespace QApt
         /// int, the exit status of the transaction
         ExitStatusProperty,
         /// bool, whether or not the transaction is paused and waiting
-        PausedProperty
+        PausedProperty,
+        /// QString, status details from APT
+        StatusDetailsProperty
     };
 
     /**

@@ -216,6 +216,18 @@ bool Transaction::paused() const
     return m_paused;
 }
 
+QString Transaction::statusDetails() const
+{
+    return m_statusDetails;
+}
+
+void Transaction::setStatusDetails(const QString &details)
+{
+    m_statusDetails = details;
+
+    emit propertyChanged(QApt::StatusDetailsProperty, QDBusVariant(details));
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {
