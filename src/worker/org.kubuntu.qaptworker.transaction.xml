@@ -1,0 +1,15 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.kubuntu.qaptworker.transaction">
+    <property name="transactionId" type="s" access="read"/>
+    <property name="role" type="i" access="read"/>
+    <signal name="propertyChanged">
+      <arg name="role" type="i" direction="out"/>
+      <arg name="newValue" type="v" direction="out"/>
+    </signal>
+    <method name="setRole">
+      <arg type="b" direction="out"/>
+      <arg name="role" type="i" direction="in"/>
+    </method>
+  </interface>
+</node>

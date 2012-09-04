@@ -295,6 +295,9 @@ namespace QApt
         MultiArchAllowed
     };
 
+    /**
+     * @brief TransactionRole enumerates the different types of worker transactions
+     */
     enum TransactionRole {
         /// The transaction role has not yet been determined
         EmptyRole = 0,
@@ -310,6 +313,14 @@ namespace QApt
         DownloadArchivesRole,
         /// The transaction will install a .deb file
         InstallFileRole
+    };
+
+    /**
+     * @brief Enumerates the data properties of worker transactions
+     */
+    enum TransactionProperty {
+        TransactionId = 0,
+        Role
     };
 }
 

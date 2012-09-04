@@ -61,5 +61,7 @@ bool Transaction::setRole(int role)
         return false;
 
     m_role = (QApt::TransactionRole)role;
+
+    emit propertyChanged(QApt::Role, role);
     return true;
 }

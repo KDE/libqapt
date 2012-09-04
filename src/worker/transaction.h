@@ -22,6 +22,7 @@
 #define TRANSACTION_H
 
 #include <QtCore/QObject>
+#include <QtDBus/QDBusVariant>
 
 #include "globals.h"
 
@@ -41,10 +42,11 @@ public:
 private:
     QString m_tid;
     QApt::TransactionRole m_role;
+
+Q_SIGNALS:
+    Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
     
-signals:
-    
-public slots:
+public Q_SLOTS:
     bool setRole(int role);
 };
 
