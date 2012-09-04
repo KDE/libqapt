@@ -294,6 +294,23 @@ namespace QApt
          */
         MultiArchAllowed
     };
+
+    enum TransactionRole {
+        /// The transaction role has not yet been determined
+        EmptyRole = 0,
+        /// The transaction will run a full update on the package cache
+        UpdateCacheRole,
+        /// The transaction will fully upgrade the system
+        UpgradeSystemRole,
+        /// The transaction will commit changes to packages
+        CommitPackagesRole,
+        /// The transaction will update the APT Xapian search index
+        UpdateXapianRole,
+        /// The transaction will download package archives
+        DownloadArchivesRole,
+        /// The transaction will install a .deb file
+        InstallFileRole
+    };
 }
 
 #endif

@@ -353,11 +353,7 @@ void QAptWorker::commitChanges(QMap<QString, QVariant> instructionsList)
     }
 
     if (_error->PendingError() && ((*m_cache)->BrokenCount() == 0))
-    {
-        // We had dep errors, but fixed them
-        _error->Discard();
-        qDebug() << "fixed errors";
-    }
+        _error->Discard(); // We had dep errors, but fixed them
 
     delete actionGroup;
 

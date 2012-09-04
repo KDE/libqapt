@@ -12,6 +12,7 @@ endif ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
 
 set(qapt_worker_SRCS
     main.cpp
+    transaction.cpp
     worker.cpp
     workeracquire.cpp
     workerinstallprogress.cpp
@@ -21,6 +22,12 @@ qt4_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker.xml
     worker.h
     QAptWorker
+)
+
+qt4_add_dbus_adaptor(qapt_worker_SRCS
+    org.kubuntu.qaptworker.transaction.xml
+    transaction.h
+    Transaction
 )
 
 automoc4_add_executable(qaptworker
