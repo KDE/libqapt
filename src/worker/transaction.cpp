@@ -27,10 +27,17 @@
 
 #include "transactionadaptor.h"
 
-Transaction::Transaction(QObject *parent)
+Transaction::Transaction(QObject *parent, QQueue<Transaction *> *queue)
+    : Transaction(parent, QApt::EmptyRole, queue)
+{
+}
+
+Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
+                         QQueue<Transaction *> *queue)
     : QObject(parent)
+    , m_queue(queue)
     , m_tid(QUuid::createUuid().toString())
-    , m_role(QApt::EmptyRole)
+    , m_role(role)
     , m_status(QApt::WaitingStatus)
 {
     new TransactionAdaptor(this);
@@ -76,4 +83,9 @@ void Transaction::setStatus(int status)
 {
     m_status = (QApt::TransactionStatus)status;
     emit propertyChanged(QApt::StatusProperty, QDBusVariant(status));
+}
+
+void Transaction::run()
+{
+    // Place on queue
 }

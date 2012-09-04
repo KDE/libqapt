@@ -22,6 +22,7 @@
 #define TRANSACTION_H
 
 #include <QtCore/QObject>
+#include <QtCore/QQueue>
 #include <QtDBus/QDBusVariant>
 
 #include "globals.h"
@@ -35,7 +36,9 @@ class Transaction : public QObject
     Q_PROPERTY(int role READ role)
     Q_PROPERTY(int status READ status)
 public:
-    explicit Transaction(QObject *parent = 0);
+    Transaction(QObject *parent, QQueue<Transaction *> *queue);
+    Transaction(QObject *parent, QApt::TransactionRole role,
+                QQueue<Transaction *> *queue);
 
     QString transactionId() const;
     int role() const;
@@ -44,6 +47,8 @@ public:
     void setStatus(int status);
 
 private:
+    QQueue<Transaction *> *m_queue;
+
     QString m_tid;
     QApt::TransactionRole m_role;
     QApt::TransactionStatus m_status;
@@ -53,6 +58,7 @@ Q_SIGNALS:
     
 public Q_SLOTS:
     bool setRole(int role);
+    void run();
 };
 
 #endif // TRANSACTION_H
