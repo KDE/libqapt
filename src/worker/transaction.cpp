@@ -206,10 +206,14 @@ QString Transaction::medium() const
 void Transaction::setMediumRequired(const QString &label, const QString &medium)
 {
     m_medium = medium;
-
-    // TODO: pause
+    m_paused = true;
 
     emit mediumRequired(label, medium);
+}
+
+bool Transaction::paused() const
+{
+    return m_paused;
 }
 
 void Transaction::run()
@@ -285,6 +289,7 @@ void Transaction::cancel()
     }
 
     m_cancelled = true;
+    m_paused = false;
     emit propertyChanged(QApt::CancelledProperty, QDBusVariant(m_cancelled));
 }
 
@@ -301,5 +306,5 @@ void Transaction::provideMedium(const QString &medium)
         return;
     }
 
-    // TODO: unpause
+    m_paused = false;
 }

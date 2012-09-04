@@ -14,6 +14,7 @@
     <property name="cancellable" type="b" access="read"/>
     <property name="cancelled" type="b" access="read"/>
     <property name="exitStatus" type="i" access="read"/>
+    <property name="paused" type="b" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>

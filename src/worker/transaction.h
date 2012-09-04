@@ -45,6 +45,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(bool cancellable READ cancellable)
     Q_PROPERTY(bool cancelled READ cancelled)
     Q_PROPERTY(int exitStatus READ exitStatus)
+    Q_PROPERTY(bool paused READ paused)
 public:
     Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
@@ -63,6 +64,7 @@ public:
     bool cancelled() const;
     int exitStatus() const;
     QString medium() const;
+    bool paused() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setCancellabe(bool cancellable);
@@ -86,6 +88,7 @@ private:
     bool m_cancelled;
     QApt::ExitStatus m_exitStatus;
     QString m_medium;
+    bool m_paused;
 
     // Private functions
     int dbusSenderUid() const;

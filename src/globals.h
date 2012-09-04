@@ -340,7 +340,9 @@ namespace QApt
         /// bool, whether or not the transaction has been cancelled
         CancelledProperty,
         /// int, the exit status of the transaction
-        ExitStatusProperty
+        ExitStatusProperty,
+        /// bool, whether or not the transaction is paused and waiting
+        PausedProperty
     };
 
     /**
