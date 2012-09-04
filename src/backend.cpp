@@ -1435,8 +1435,6 @@ void Backend::workerStarted()
             this, SIGNAL(downloadProgress(int,int,int)));
     connect(d->worker, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
             this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
-    connect(d->worker, SIGNAL(downloadMessage(int,QString)),
-            this, SIGNAL(downloadMessage(int,QString)));
     connect(d->worker, SIGNAL(commitProgress(QString,int)),
             this, SIGNAL(commitProgress(QString,int)));
     connect(d->worker, SIGNAL(debInstallMessage(QString)),
@@ -1462,8 +1460,6 @@ void Backend::workerFinished(bool result)
                this, SIGNAL(downloadProgress(int,int,int)));
     disconnect(d->worker, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
                this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
-    disconnect(d->worker, SIGNAL(downloadMessage(int,QString)),
-               this, SIGNAL(downloadMessage(int,QString)));
     disconnect(d->worker, SIGNAL(commitProgress(QString,int)),
                this, SIGNAL(commitProgress(QString,int)));
     disconnect(d->worker, SIGNAL(debInstallMessage(QString)),

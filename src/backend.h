@@ -511,17 +511,6 @@ Q_SIGNALS:
                                  double size, int flag);
 
     /**
-     * Emitted whenever an item has been downloaded.
-     *
-     * This signal is deprecated. You should connect to packageDownloadProgress
-     * which provides a lot more information about the fetch.
-     *
-     * @param flag Fetch type (is a QApt::Global enum member)
-     * @param message Usually the URI of the item that's being downloaded
-     */
-    QT_DEPRECATED void downloadMessage(int flag, const QString &message);
-
-    /**
      * Emits the progress of a current package installation/removal/
      * operation.
      *
