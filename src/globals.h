@@ -334,7 +334,11 @@ namespace QApt
         /// QString, the debconf pipe for the worker to use
         DebconfPipeProperty,
         /// QVariantMap, the packages to be acted upon in the transaction
-        PackagesProperty
+        PackagesProperty,
+        /// bool, whether or not the transaction can be cancelled at the moment
+        CancellableProperty,
+        /// bool, whether or not the transaction has been cancelled
+        CancelledProperty
     };
 
     enum TransactionStatus {

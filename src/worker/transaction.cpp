@@ -39,6 +39,8 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
     , m_role(role)
     , m_status(QApt::WaitingStatus)
     , m_packages(packagesList)
+    , m_cancellable(true)
+    , m_cancelled(false)
 {
     new TransactionAdaptor(this);
     QDBusConnection connection = QDBusConnection::systemBus();
@@ -101,7 +103,6 @@ void Transaction::setLocale(QString locale)
 {
     if (m_status != QApt::SetupStatus) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
-
         return;
     }
 
@@ -118,7 +119,6 @@ void Transaction::setProxy(QString proxy)
 {
     if (m_status != QApt::SetupStatus) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
-
         return;
     }
 
@@ -165,11 +165,26 @@ void Transaction::setPackages(QVariantMap packageList)
     emit propertyChanged(QApt::PackagesProperty, QDBusVariant(packageList));
 }
 
+bool Transaction::cancellable() const
+{
+    return m_cancellable;
+}
+
+void Transaction::setCancellabe(bool cancellable)
+{
+    m_cancellable = cancellable;
+    emit propertyChanged(QApt::CancellableProperty, QDBusVariant(cancellable));
+}
+
+bool Transaction::cancelled() const
+{
+    return m_cancelled;
+}
+
 void Transaction::run()
 {
     if (isForeignUser()) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
-
         return;
     }
 
@@ -190,7 +205,6 @@ void Transaction::setProperty(int property, QDBusVariant value)
 {
     if (isForeignUser()) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
-
         return;
     }
 
@@ -223,4 +237,22 @@ void Transaction::setProperty(int property, QDBusVariant value)
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::InvalidArgs, QString()));
         break;
     }
+}
+
+void Transaction::cancel()
+{
+    // TODO: Allow foreign cancel after auth
+    if (isForeignUser()) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+        return;
+    }
+
+    // We can only cancel cancellable transactions, obviously
+    if (!m_cancellable) {
+        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        return;
+    }
+
+    m_cancelled = true;
+    emit propertyChanged(QApt::CancelledProperty, QDBusVariant(m_cancelled));
 }
