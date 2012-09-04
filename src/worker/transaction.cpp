@@ -21,9 +21,12 @@
 
 #include "transaction.h"
 
+// Qt includes
 #include <QtCore/QUuid>
 #include <QtDBus/QDBusConnection>
 
+// D-Bus/Polkit includes
+#include "qaptauthorization.h"
 #include "transactionadaptor.h"
 
 Transaction::Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId)
@@ -288,10 +291,12 @@ void Transaction::setProperty(int property, QDBusVariant value)
 
 void Transaction::cancel()
 {
-    // TODO: Allow foreign cancel after auth
     if (isForeignUser()) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
-        return;
+        if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.foreignCancel"),
+                                   QLatin1String("org.kubuntu.qaptworker"))) {
+            QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+            return;
+        }
     }
 
     // We can only cancel cancellable transactions, obviously
@@ -312,7 +317,7 @@ void Transaction::provideMedium(const QString &medium)
         return;
     }
 
-    // An incorrect medium was provided
+    // An incorrect medium was provided, or no medium was requested
     if (medium != m_medium || m_medium.isEmpty()) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
         return;
