@@ -34,7 +34,7 @@ inline bool authorize(const QString &action, const QString &service)
     PolkitQt1::Authority::Result result = PolkitQt1::Authority::instance()->checkAuthorizationSync(action, subject,
                                           PolkitQt1::Authority::AllowUserInteraction);
 
-    return (result == PolkitQt1::Authority::Yes) ? true : false;
+    return (result == PolkitQt1::Authority::Yes);
 }
 
 }
