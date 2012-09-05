@@ -16,6 +16,7 @@
     <property name="exitStatus" type="i" access="read"/>
     <property name="paused" type="b" access="read"/>
     <property name="statusDetails" type="s" access="read"/>
+    <property name="progress" type="i" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
