@@ -22,12 +22,15 @@
 #ifndef TRANSACTION_H
 #define TRANSACTION_H
 
+// Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QQueue>
 #include <QtDBus/QDBusContext>
 #include <QtDBus/QDBusVariant>
 
+// Own includes
 #include "globals.h"
+
+class TransactionQueue;
 
 class Transaction : public QObject, protected QDBusContext
 {
@@ -49,9 +52,9 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(QString statusDetails READ statusDetails)
     Q_PROPERTY(int progress READ progress)
 public:
-    Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
+    Transaction(QObject *parent, TransactionQueue *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
-                QQueue<Transaction *> *queue, int userId,
+                TransactionQueue *queue, int userId,
                 QVariantMap packagesList);
 
     QString transactionId() const;
@@ -68,7 +71,7 @@ public:
     QString medium() const;
     bool paused() const;
     QString statusDetails() const;
-    int progress();
+    int progress() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setCancellable(bool cancellable);
@@ -79,7 +82,7 @@ public:
 
 private:
     // Pointers to external containers
-    QQueue<Transaction *> *m_queue;
+    TransactionQueue *m_queue;
 
     // Data members
     QString m_tid;

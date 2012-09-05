@@ -13,6 +13,7 @@ endif ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
 set(qapt_worker_SRCS
     main.cpp
     transaction.cpp
+    transactionqueue.cpp
     worker.cpp
     workeracquire.cpp
     workerinstallprogress.cpp

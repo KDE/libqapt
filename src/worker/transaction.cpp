@@ -25,17 +25,18 @@
 #include <QtCore/QUuid>
 #include <QtDBus/QDBusConnection>
 
-// D-Bus/Polkit includes
+// Own includes
 #include "qaptauthorization.h"
 #include "transactionadaptor.h"
+#include "transactionqueue.h"
 
-Transaction::Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId)
+Transaction::Transaction(QObject *parent, TransactionQueue *queue, int userId)
     : Transaction(parent, QApt::EmptyRole, queue, userId, QVariantMap())
 {
 }
 
 Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
-                         QQueue<Transaction *> *queue, int userId, QVariantMap packagesList)
+                         TransactionQueue *queue, int userId, QVariantMap packagesList)
     : QObject(parent)
     , m_queue(queue)
     , m_tid(QUuid::createUuid().toString())
@@ -57,6 +58,8 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
 
     if (!connection.registerObject(m_tid, this))
         qWarning() << "Unable to register transaction on DBus";
+
+    m_queue->addPending(this);
 }
 
 QString Transaction::transactionId() const
@@ -197,8 +200,6 @@ void Transaction::setExitStatus(QApt::ExitStatus exitStatus)
     m_exitStatus = exitStatus;
     emit propertyChanged(QApt::ExitStatusProperty, QDBusVariant(exitStatus));
     emit finished(exitStatus);
-
-    // TODO: Set deletion timeout (5s)
 }
 
 QString Transaction::medium() const
@@ -250,7 +251,7 @@ void Transaction::run()
         return;
     }
 
-    // Place on queue
+    m_queue->enqueue(m_tid);
 }
 
 int Transaction::dbusSenderUid() const
