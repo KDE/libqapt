@@ -153,7 +153,7 @@ bool QAptWorker::initializeApt()
 
 void QAptWorker::reloadCache()
 {
-    if (!m_cache->Open(nullptr, true)) {
+    if (!m_cache->ReadOnlyOpen(nullptr)) {
         qDebug() << "Cache didn't open";
         throwInitError();
         return;
