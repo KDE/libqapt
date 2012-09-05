@@ -44,7 +44,16 @@ private:
     Transaction *m_trans;
     bool m_ready;
 
+    /**
+     * If the locks on the package system cannot be immediately taken, this
+     * function will wait until the package system is unlocked, and proceed
+     * to lock it.
+     */
     void waitForLock();
+
+    /**
+     * Builds the package cache and package records
+     */
     void openCache();
 
 signals:
@@ -65,8 +74,6 @@ public slots:
      * @param trans
      */
     void runTransaction(Transaction *trans);
-
-private slots:
 };
 
 #endif // APTWORKER_H
