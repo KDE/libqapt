@@ -34,10 +34,12 @@ public:
     TransactionQueue(QObject *parent = nullptr/*, QAptWorker *worker*/);
 
     QList<Transaction *> transactions() const;
+    Transaction *activeTransaction() const;
 
 private:
     QQueue<Transaction *> m_queue;
     QList<Transaction *> m_pending;
+    Transaction *m_activeTransaction;
 
     Transaction *transactionById(const QString &id);
     
@@ -51,6 +53,7 @@ public slots:
 
 private slots:
     void onTransactionFinished(int exitCode);
+    void runNextTransaction();
 };
 
 #endif // TRANSACTIONQUEUE_H

@@ -29,12 +29,18 @@
 
 TransactionQueue::TransactionQueue(QObject *parent)
     : QObject(parent)
+    , m_activeTransaction(nullptr)
 {
 }
 
 QList<Transaction *> TransactionQueue::transactions() const
 {
     return m_queue;
+}
+
+Transaction *TransactionQueue::activeTransaction() const
+{
+    return m_activeTransaction;
 }
 
 Transaction *TransactionQueue::transactionById(const QString &id)
@@ -99,4 +105,11 @@ void TransactionQueue::onTransactionFinished(int exitCode)
 
     remove(trans->transactionId());
     emit queueChanged();
+    runNextTransaction();
+}
+
+void TransactionQueue::runNextTransaction()
+{
+    m_activeTransaction = m_queue.head();
+    //worker->run(m_activeTransaction);
 }
