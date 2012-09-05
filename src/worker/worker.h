@@ -33,10 +33,6 @@ class QEventLoop;
 class QProcess;
 class QTimer;
 
-namespace QApt {
-    class Cache;
-}
-
 class WorkerAcquire;
 class WorkerInstallProgress;
 

@@ -41,14 +41,15 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(int userId READ userId CONSTANT)
     Q_PROPERTY(int role READ role)
     Q_PROPERTY(int status READ status)
+    Q_PROPERTY(int error READ error)
     Q_PROPERTY(QString locale READ locale)
     Q_PROPERTY(QString proxy READ proxy)
     Q_PROPERTY(QString debconfPipe READ debconfPipe)
     Q_PROPERTY(QVariantMap packages READ packages)
-    Q_PROPERTY(bool cancellable READ cancellable)
-    Q_PROPERTY(bool cancelled READ cancelled)
+    Q_PROPERTY(bool isCancellable READ isCancellable)
+    Q_PROPERTY(bool isCancelled READ isCancelled)
     Q_PROPERTY(int exitStatus READ exitStatus)
-    Q_PROPERTY(bool paused READ paused)
+    Q_PROPERTY(bool idPaused READ idPaused)
     Q_PROPERTY(QString statusDetails READ statusDetails)
     Q_PROPERTY(int progress READ progress)
 public:
@@ -61,20 +62,22 @@ public:
     int userId() const;
     int role() const;
     int status() const;
+    int error() const;
     QString locale() const;
     QString proxy() const;
     QString debconfPipe() const;
     QVariantMap packages() const;
-    bool cancellable() const;
-    bool cancelled() const;
+    bool isCancellable() const;
+    bool isCancelled() const;
     int exitStatus() const;
     QString medium() const;
-    bool paused() const;
+    bool idPaused() const;
     QString statusDetails() const;
     int progress() const;
 
     void setStatus(QApt::TransactionStatus status);
-    void setCancellable(bool cancellable);
+    void setError(QApt::ErrorCode code);
+    void setCancellable(bool isCancellable);
     void setExitStatus(QApt::ExitStatus exitStatus);
     void setMediumRequired(const QString &label, const QString &medium);
     void setStatusDetails(const QString &details);
@@ -89,15 +92,16 @@ private:
     int m_uid;
     QApt::TransactionRole m_role;
     QApt::TransactionStatus m_status;
+    QApt::ErrorCode m_error;
     QString m_locale;
     QString m_proxy;
     QString m_debconfPipe;
     QVariantMap m_packages;
-    bool m_cancellable;
-    bool m_cancelled;
+    bool m_isCancellable;
+    bool m_isCancelled;
     QApt::ExitStatus m_exitStatus;
     QString m_medium;
-    bool m_paused;
+    bool m_isPaused;
     QString m_statusDetails;
     int m_progress;
 

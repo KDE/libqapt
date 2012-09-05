@@ -43,9 +43,10 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
     , m_uid(userId)
     , m_role(role)
     , m_status(QApt::WaitingStatus)
+    , m_error(QApt::Success)
     , m_packages(packagesList)
-    , m_cancellable(true)
-    , m_cancelled(false)
+    , m_isCancellable(true)
+    , m_isCancelled(false)
     , m_exitStatus(QApt::ExitUnfinished)
 {
     new TransactionAdaptor(this);
@@ -100,6 +101,17 @@ void Transaction::setStatus(QApt::TransactionStatus status)
 {
     m_status = status;
     emit propertyChanged(QApt::StatusProperty, QDBusVariant((int)status));
+}
+
+int Transaction::error() const
+{
+    return m_error;
+}
+
+void Transaction::setError(QApt::ErrorCode code)
+{
+    m_error = code;
+    emit propertyChanged(QApt::ErrorProperty, QDBusVariant((int)code));
 }
 
 QString Transaction::locale() const
@@ -173,20 +185,20 @@ void Transaction::setPackages(QVariantMap packageList)
     emit propertyChanged(QApt::PackagesProperty, QDBusVariant(packageList));
 }
 
-bool Transaction::cancellable() const
+bool Transaction::isCancellable() const
 {
-    return m_cancellable;
+    return m_isCancellable;
 }
 
 void Transaction::setCancellable(bool cancellable)
 {
-    m_cancellable = cancellable;
+    m_isCancellable = cancellable;
     emit propertyChanged(QApt::CancellableProperty, QDBusVariant(cancellable));
 }
 
-bool Transaction::cancelled() const
+bool Transaction::isCancelled() const
 {
-    return m_cancelled;
+    return m_isCancelled;
 }
 
 int Transaction::exitStatus() const
@@ -210,14 +222,14 @@ QString Transaction::medium() const
 void Transaction::setMediumRequired(const QString &label, const QString &medium)
 {
     m_medium = medium;
-    m_paused = true;
+    m_isPaused = true;
 
     emit mediumRequired(label, medium);
 }
 
-bool Transaction::paused() const
+bool Transaction::idPaused() const
 {
-    return m_paused;
+    return m_isPaused;
 }
 
 QString Transaction::statusDetails() const
@@ -313,14 +325,14 @@ void Transaction::cancel()
     }
 
     // We can only cancel cancellable transactions, obviously
-    if (!m_cancellable) {
+    if (!m_isCancellable) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
         return;
     }
 
-    m_cancelled = true;
-    m_paused = false;
-    emit propertyChanged(QApt::CancelledProperty, QDBusVariant(m_cancelled));
+    m_isCancelled = true;
+    m_isPaused = false;
+    emit propertyChanged(QApt::CancelledProperty, QDBusVariant(m_isCancelled));
 }
 
 void Transaction::provideMedium(const QString &medium)
@@ -337,5 +349,5 @@ void Transaction::provideMedium(const QString &medium)
     }
 
     // The medium has now been provided, and the installation should be able to continue
-    m_paused = false;
+    m_isPaused = false;
 }

@@ -168,7 +168,9 @@ namespace QApt
         /// Emitted when the selected package does not exist
         NotFoundError           = 11,
         /// Emitted when a .deb package cannot be installed due to an arch mismatch
-        WrongArchError          = 12
+        WrongArchError          = 12,
+        /// An error code representing no error
+        Success
     };
 
    /**
@@ -327,6 +329,8 @@ namespace QApt
         RoleProperty,
         /// int, the TransactionStatus of the transaction
         StatusProperty,
+        /// int, the ErrorCode of the transaction
+        ErrorProperty,
         /// QString, the locale for the worker to use
         LocaleProperty,
         /// QString, the proxy for the worker to use
@@ -353,10 +357,17 @@ namespace QApt
      * @brief An enum for the statuses of ongoing transactions
      */
     enum TransactionStatus {
+        /// The status when a client is still setting pre-run properties
         SetupStatus = 0,
+        /// The status when the transaction is waiting for any user interaction
         WaitingStatus,
+        /// The status when a transaction first starts running
+        RunningStatus,
+        /// The status when a transaction is downloading archives
         DownloadingStatus,
+        /// The status when a transation is committing changes to the APT cache
         CommittingStatus,
+        /// The status when a transaction is complete
         FinishedStatus
     };
 
