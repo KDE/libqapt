@@ -63,6 +63,7 @@ void AptWorker::runTransaction(Transaction *trans)
 
     m_trans = trans;
     trans->setStatus(QApt::RunningStatus);
+    waitForLock();
 
     // Process transactions requiring no cache
     switch (trans->role()) {
