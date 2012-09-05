@@ -37,6 +37,10 @@ qt4_add_dbus_interface(qapt_SRCS
                        worker/org.kubuntu.qaptworker.xml
                        workerdbus)
 
+qt4_add_dbus_interface(qapt_SRCS
+                       worker/org.kubuntu.qaptworker.transaction.xml
+                       transactioninterface)
+
 add_library(qapt SHARED ${qapt_SRCS})
 set_target_properties(qapt PROPERTIES
     VERSION ${qapt_lib_VERSION}

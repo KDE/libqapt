@@ -47,6 +47,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(int exitStatus READ exitStatus)
     Q_PROPERTY(bool paused READ paused)
     Q_PROPERTY(QString statusDetails READ statusDetails)
+    Q_PROPERTY(int progress READ progress)
 public:
     Transaction(QObject *parent, QQueue<Transaction *> *queue, int userId);
     Transaction(QObject *parent, QApt::TransactionRole role,
@@ -67,12 +68,14 @@ public:
     QString medium() const;
     bool paused() const;
     QString statusDetails() const;
+    int progress();
 
     void setStatus(QApt::TransactionStatus status);
-    void setCancellabe(bool cancellable);
+    void setCancellable(bool cancellable);
     void setExitStatus(QApt::ExitStatus exitStatus);
     void setMediumRequired(const QString &label, const QString &medium);
     void setStatusDetails(const QString &details);
+    void setProgress(int progress);
 
 private:
     // Pointers to external containers
@@ -93,6 +96,7 @@ private:
     QString m_medium;
     bool m_paused;
     QString m_statusDetails;
+    int m_progress;
 
     // Private functions
     int dbusSenderUid() const;

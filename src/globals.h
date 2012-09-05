@@ -344,7 +344,9 @@ namespace QApt
         /// bool, whether or not the transaction is paused and waiting
         PausedProperty,
         /// QString, status details from APT
-        StatusDetailsProperty
+        StatusDetailsProperty,
+        /// int, progress as percent, 1-100, -1 if indeterminate
+        ProgressProperty
     };
 
     /**

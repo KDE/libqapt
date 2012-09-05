@@ -175,7 +175,7 @@ bool Transaction::cancellable() const
     return m_cancellable;
 }
 
-void Transaction::setCancellabe(bool cancellable)
+void Transaction::setCancellable(bool cancellable)
 {
     m_cancellable = cancellable;
     emit propertyChanged(QApt::CancellableProperty, QDBusVariant(cancellable));
@@ -229,6 +229,18 @@ void Transaction::setStatusDetails(const QString &details)
     m_statusDetails = details;
 
     emit propertyChanged(QApt::StatusDetailsProperty, QDBusVariant(details));
+}
+
+int Transaction::progress() const
+{
+    return m_progress;
+}
+
+void Transaction::setProgress(int progress)
+{
+    m_progress = progress;
+
+    emit propertyChanged(QApt::ProgressProperty, QDBusVariant(progress));
 }
 
 void Transaction::run()
@@ -323,5 +335,6 @@ void Transaction::provideMedium(const QString &medium)
         return;
     }
 
+    // The medium has now been provided, and the installation should be able to continue
     m_paused = false;
 }
