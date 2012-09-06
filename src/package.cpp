@@ -665,33 +665,21 @@ QString Package::supportedUntil() const
 
 QString Package::controlField(QLatin1String name) const
 {
-    QString field;
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(*d->packageIter);
     if (ver.end()) {
-        return field;
+        return QString();
     }
 
     pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
-    const char *start, *stop;
-    rec.GetRec(start, stop);
 
-    pkgTagSection sec;
+    qDebug() << "control field:" << QString::fromStdString(rec.RecordField(name.latin1()));
 
-    if(!sec.Scan(start, stop-start+1)) {
-        return field;
-    }
-
-    field = QString::fromStdString(sec.FindS(name.latin1()));
-
-    // Can replace the above with this if my APT patch gets accepted
-    // field = QString::fromStdString(rec.RecordField(name.latin1()));
-
-    return field;
+    return QString::fromStdString(rec.RecordField(name.latin1()));
 }
 
 QString Package::controlField(const QString &name) const
 {
-    return controlField(QLatin1String(name.toStdString().c_str()));
+    return controlField(QLatin1String(name.toLatin1()));
 }
 
 qint64 Package::currentInstalledSize() const
