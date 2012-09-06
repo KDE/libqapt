@@ -113,7 +113,8 @@ void TransactionQueue::onTransactionFinished(int exitCode)
     // TODO: Transaction chaining
 
     remove(trans->transactionId());
-    runNextTransaction();
+    if (m_queue.count())
+        runNextTransaction();
     emitQueueChanged();
 }
 
