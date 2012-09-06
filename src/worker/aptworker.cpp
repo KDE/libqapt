@@ -21,7 +21,10 @@
 #include "aptworker.h"
 
 // Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QStringList>
+#include <QtCore/QDebug>
 
 // Apt-pkg includes
 #include <apt-pkg/algorithms.h>
@@ -29,6 +32,7 @@
 #include <apt-pkg/init.h>
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/pkgsystem.h>
+#include <string>
 
 // Own includes
 #include "aptlock.h"
@@ -67,12 +71,14 @@ void AptWorker::init()
     m_cache = new QApt::Cache(this);
 
     // Prepare locks to be used later
+    QApt::Config *config = new QApt::Config(this);
     QStringList dirs;
-    dirs << QLatin1String("Dir::State::status")
-         << QLatin1String("Dir::Cache::Archives")
-         << QLatin1String("Dir::State::lists");
+    dirs << config->findDirectory("Dir::Cache::Archives")
+         << config->findDirectory("Dir::State::lists");
 
-    m_locks = QVector<AptLock *>();
+    QString statusFile = config->findDirectory("Dir::State::status");
+    QFileInfo info(statusFile);
+    dirs << info.dir().absolutePath();
 
     for (const QString &dir : dirs) {
         m_locks << new AptLock(dir);
@@ -169,7 +175,13 @@ void AptWorker::waitForLocks()
 
 void AptWorker::openCache()
 {
-    m_cache->open();
+    if (!m_cache->open()) {
+        std::string message;
+        bool isError = _error->PopMessage(message);
+        if (isError)
+            qWarning() << QString::fromStdString(message);
+        return;
+    }
 
     delete m_records;
     m_records = new pkgRecords(*(m_cache->depCache()));

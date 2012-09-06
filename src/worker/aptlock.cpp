@@ -20,8 +20,6 @@
 
 #include "aptlock.h"
 
-#include <apt-pkg/configuration.h>
-
 AptLock::AptLock(const QString &path)
     : m_path(path.toUtf8())
     , m_fd(0)
@@ -38,7 +36,8 @@ bool AptLock::acquire()
     if (isLocked())
         return true;
 
-    m_fd = GetLock(_config->FindDir(m_path.data()) + "lock");
+    std::string str = m_path.data();
+    m_fd = GetLock(str + "lock");
     m_lock.Fd(m_fd);
 }
 
