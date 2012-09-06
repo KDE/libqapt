@@ -72,7 +72,7 @@ void AptWorker::init()
          << QLatin1String("Dir::Cache::Archives")
          << QLatin1String("Dir::State::lists");
 
-    m_locks = QVector<AptLock *>(dirs.count());
+    m_locks = QVector<AptLock *>();
 
     for (const QString &dir : dirs) {
         m_locks << new AptLock(dir);
