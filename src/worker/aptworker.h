@@ -40,6 +40,8 @@ public:
     explicit AptWorker(QObject *parent = 0);
     ~AptWorker();
 
+    Transaction *currentTransaction();
+
 private:
     QApt::Cache *m_cache;
     pkgRecords *m_records;

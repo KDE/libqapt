@@ -79,6 +79,8 @@ void TransactionQueue::enqueue(QString tid)
     // Check if worker is running trans
     // If true, set trans status to wating
     // else, run trans
+    if (!m_worker->currentTransaction())
+        runNextTransaction();
 }
 
 void TransactionQueue::remove(QString tid)

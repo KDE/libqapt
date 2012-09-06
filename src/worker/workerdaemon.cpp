@@ -47,6 +47,7 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     connect(m_queue, SIGNAL(queueChanged(QString,QStringList)),
             this, SIGNAL(transactionQueueChanged(QString,QStringList)),
             Qt::QueuedConnection);
+    qRegisterMetaType<Transaction *>("Transaction *");
 
     // Start up D-Bus service
     new QaptworkerAdaptor(this);

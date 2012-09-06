@@ -52,6 +52,11 @@ AptWorker::~AptWorker()
     qDeleteAll(m_locks);
 }
 
+Transaction *AptWorker::currentTransaction()
+{
+    return m_trans;
+}
+
 void AptWorker::init()
 {
     if (m_ready)
