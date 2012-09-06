@@ -42,7 +42,7 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
     , m_tid(QUuid::createUuid().toString())
     , m_uid(userId)
     , m_role(role)
-    , m_status(QApt::WaitingStatus)
+    , m_status(QApt::SetupStatus)
     , m_error(QApt::Success)
     , m_packages(packagesList)
     , m_isCancellable(true)
@@ -59,6 +59,14 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
 
     if (!connection.registerObject(m_tid, this))
         qWarning() << "Unable to register transaction on DBus";
+
+    m_roleActionMap[QApt::EmptyRole] = QString();
+    m_roleActionMap[QApt::UpdateCacheRole] = QLatin1String("org.kubuntu.qaptworker.updateCache");
+    m_roleActionMap[QApt::UpgradeSystemRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
+    m_roleActionMap[QApt::CommitPackagesRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
+    m_roleActionMap[QApt::UpdateXapianRole] = QString();
+    m_roleActionMap[QApt::DownloadArchivesRole] = QString();
+    m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
 
     m_queue->addPending(this);
 }
@@ -263,12 +271,13 @@ void Transaction::setProgress(int progress)
 
 void Transaction::run()
 {
-    if (isForeignUser()) {
+    if (isForeignUser() || !authorizeRun()) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
         return;
     }
 
     m_queue->enqueue(m_tid);
+    setStatus(QApt::WaitingStatus);
 }
 
 int Transaction::dbusSenderUid() const
@@ -279,6 +288,20 @@ int Transaction::dbusSenderUid() const
 bool Transaction::isForeignUser() const
 {
     return dbusSenderUid() != m_uid;
+}
+
+bool Transaction::authorizeRun()
+{
+    QString action = m_roleActionMap.value(m_role);
+
+    // Some actions don't need authorizing, and are run in the worker
+    // for the sake of asynchronicity.
+    if (action.isEmpty())
+        return true;
+
+    setStatus(QApt::AuthenticationStatus);
+
+    return QApt::Auth::authorize(action, QLatin1String("org.kubuntu.qaptworker"));
 }
 
 void Transaction::setProperty(int property, QDBusVariant value)

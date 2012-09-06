@@ -359,6 +359,8 @@ namespace QApt
     enum TransactionStatus {
         /// The status when a client is still setting pre-run properties
         SetupStatus = 0,
+        /// The status while the transaction is waiting for authentication
+        AuthenticationStatus,
         /// The status when the transaction is waiting in the queue
         WaitingStatus,
         /// The status when a transaction is waiting for a media change prompt

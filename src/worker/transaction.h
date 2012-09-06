@@ -88,7 +88,7 @@ private:
     // Pointers to external containers
     TransactionQueue *m_queue;
 
-    // Data members
+    // Transaction data
     QString m_tid;
     int m_uid;
     QApt::TransactionRole m_role;
@@ -106,6 +106,9 @@ private:
     QString m_statusDetails;
     int m_progress;
 
+    // Other data
+    QMap<int, QString> m_roleActionMap;
+
     // Private functions
     int dbusSenderUid() const;
     bool isForeignUser() const;
@@ -114,6 +117,7 @@ private:
     void setProxy(QString proxy);
     void setDebconfPipe(QString pipe);
     void setPackages(QVariantMap packageList);
+    bool authorizeRun();
 
 Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
