@@ -24,6 +24,7 @@
 #include <QtCore/QStringList>
 
 // Apt-pkg includes
+#include <apt-pkg/algorithms.h>
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/init.h>
 #include <apt-pkg/pkgrecords.h>
@@ -102,7 +103,7 @@ void AptWorker::runTransaction(Transaction *trans)
     switch (trans->role()) {
     // Transactions that can use a broken cache
     case QApt::UpdateCacheRole:
-        //updateCache();
+        updateCache();
         break;
     // Transactions that need a consistent cache
     case QApt::UpgradeSystemRole:
@@ -171,5 +172,23 @@ void AptWorker::openCache()
 
 void AptWorker::updateCache()
 {
+    WorkerAcquire *acquire = new WorkerAcquire(this, 10, 90);
+    acquire->setTransaction(m_trans);
 
+    // Initialize fetcher with our progress watcher
+    pkgAcquire fetcher;
+    fetcher.Setup(acquire);
+
+    // Fetch the lists.
+    if (!ListUpdate(*acquire, *m_cache->list())) {
+        if (!m_trans->isCancelled()) {
+            m_trans->setError(QApt::FetchError);
+        }
+    }
+
+    // Clean up
+    delete acquire;
+
+    // FIXME: This is the last 10% of the progress...
+    openCache();
 }

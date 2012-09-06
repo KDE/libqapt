@@ -1,84 +1,24 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="org.kubuntu.qaptworker">
-    <signal name="workerStarted">
+    <signal name="transactionQueueChanged">
+      <arg name="active" type="s" direction="out"/>
+      <arg name="queued" type="as" direction="out"/>
     </signal>
-    <signal name="workerEvent">
-      <arg name="code" type="i" direction="out"/>
-    </signal>
-    <signal name="workerFinished">
-      <arg name="result" type="b" direction="out"/>
-    </signal>
-    <signal name="downloadProgress">
-      <arg name="percentage" type="i" direction="out"/>
-      <arg name="speed" type="i" direction="out"/>
-      <arg name="ETA" type="i" direction="out"/>
-    </signal>
-    <signal name="packageDownloadProgress">
-      <arg name="name" type="s" direction="out"/>
-      <arg name="percentage" type="i" direction="out"/>
-      <arg name="URI" type="s" direction="out"/>
-      <arg name="size" type="d" direction="out"/>
-      <arg name="flag" type="i" direction="out"/>
-    </signal>
-    <signal name="commitProgress">
-      <arg name="status" type="s" direction="out"/>
-      <arg name="percentage" type="i" direction="out"/>
-    </signal>
-    <signal name="debInstallMessage">
-      <arg name="status" type="s" direction="out"/>
-    </signal>
-    <signal name="errorOccurred">
-      <arg name="code" type="i" direction="out"/>
-      <arg name="details" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
-    </signal>
-    <signal name="warningOccurred">
-      <arg name="code" type="i" direction="out"/>
-      <arg name="details" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
-    </signal>
-    <signal name="questionOccurred">
-      <arg name="questionCode" type="i" direction="out"/>
-      <arg name="details" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
-    </signal>
-    <signal name="xapianUpdateProgress">
-      <arg name="percentage" type="i" direction="out"/>
-    </signal>
-    <method name="setLocale">
-      <arg name="locale" type="s" direction="in"/>
-    </method>
-    <method name="setProxy">
-      <arg name="proxy" type="s" direction="in"/>
-    </method>
-    <method name="lockSystem">
-      <arg type="b" direction="out"/>
-    </method>
-    <method name="unlockSystem">
-      <arg type="b" direction="out"/>
-    </method>
     <method name="updateCache">
+      <arg type="s" direction="out"/>
     </method>
-    <method name="cancelDownload">
+    <method name="installFile">
+      <arg type="s" direction="out"/>
+      <arg name="file" type="s" direction="in"/>
     </method>
     <method name="commitChanges">
+      <arg type="s" direction="out"/>
       <arg name="instructionsList" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
-    </method>
-    <method name="downloadArchives">
-      <arg name="packages" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QStringList"/>
-      <arg name="destination" type="s" direction="in"/>
-    </method>
-    <method name="installDebFile">
-      <arg name="debFile" type="s" direction="in"/>
-    </method>
-    <method name="answerWorkerQuestion">
-      <arg name="response" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
     <method name="updateXapianIndex">
+      <arg type="s" direction="out"/>
     </method>
     <method name="writeFileToDisk">
       <arg type="b" direction="out"/>
@@ -87,8 +27,7 @@
     </method>
     <method name="copyArchiveToCache">
       <arg type="b" direction="out"/>
-      <arg name="archive" type="s" direction="in"/>
+      <arg name="archivePath" type="s" direction="in"/>
     </method>
-
   </interface>
 </node>

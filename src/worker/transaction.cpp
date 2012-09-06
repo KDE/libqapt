@@ -30,14 +30,14 @@
 #include "transactionadaptor.h"
 #include "transactionqueue.h"
 
-Transaction::Transaction(QObject *parent, TransactionQueue *queue, int userId)
-    : Transaction(parent, QApt::EmptyRole, queue, userId, QVariantMap())
+Transaction::Transaction(TransactionQueue *queue, int userId)
+    : Transaction(queue, userId, QApt::EmptyRole, QVariantMap())
 {
 }
 
-Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
-                         TransactionQueue *queue, int userId, QVariantMap packagesList)
-    : QObject(parent)
+Transaction::Transaction(TransactionQueue *queue, int userId,
+                         QApt::TransactionRole role, QVariantMap packagesList)
+    : QObject(queue)
     , m_queue(queue)
     , m_tid(QUuid::createUuid().toString())
     , m_uid(userId)
@@ -63,7 +63,7 @@ Transaction::Transaction(QObject *parent, QApt::TransactionRole role,
     m_roleActionMap[QApt::EmptyRole] = QString();
     m_roleActionMap[QApt::UpdateCacheRole] = QLatin1String("org.kubuntu.qaptworker.updateCache");
     m_roleActionMap[QApt::UpgradeSystemRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
-    m_roleActionMap[QApt::CommitPackagesRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
+    m_roleActionMap[QApt::CommitChangesRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
     m_roleActionMap[QApt::UpdateXapianRole] = QString();
     m_roleActionMap[QApt::DownloadArchivesRole] = QString();
     m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");

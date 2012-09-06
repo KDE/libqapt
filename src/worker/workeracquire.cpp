@@ -20,20 +20,23 @@
 
 #include "workeracquire.h"
 
+// Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QEventLoop>
 
+// Apt-pkg includes
 #include <apt-pkg/error.h>
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/acquire-worker.h>
 
+// Own includes
+#include "aptworker.h"
 #include "transaction.h"
-#include "worker.h"
 
 using namespace std;
 
-WorkerAcquire::WorkerAcquire(QAptWorker *parent, int begin, int end)
+WorkerAcquire::WorkerAcquire(QObject *parent, int begin, int end)
         : QObject(parent)
         , m_calculatingSpeed(true)
         , m_progressBegin(begin)
@@ -101,7 +104,8 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         QVariantMap args;
         args[QLatin1String("FailedItem")] = QString::fromUtf8(item.URI.c_str());
         args[QLatin1String("WarningText")] = QString::fromUtf8(item.Owner->ErrorText.c_str());
-        emit fetchWarning(QApt::FetchFailedWarning, args);
+        // FIXME: Transactify
+        //emit fetchWarning(QApt::FetchFailedWarning, args);
     }
 
     Update = true;
@@ -194,26 +198,12 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         ETA = 0;
     }
 
-    emit downloadProgress(percentage, speed, ETA);
+    // FIXME: Transactify
+    //emit downloadProgress(percentage, speed, ETA);
 
     Update = false;
 
     return true;
-}
-
-// FIXME: remove
-void WorkerAcquire::requestCancel()
-{
-}
-
-// FIXME: remove
-QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)
-{
-}
-
-// FIXME: remove
-void WorkerAcquire::setAnswer(const QVariantMap &answer)
-{
 }
 
 void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status)
@@ -223,11 +213,7 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage
           QString URI = QLatin1String(Itm.Description.c_str());
           qint64 size = Itm.Owner->FileSize;
 
-          emit packageDownloadProgress(name, percentage, URI, size, status);
+          // FIXME: Transactify
+          //emit packageDownloadProgress(name, percentage, URI, size, status);
     }
-}
-
-// FIXME: remove
-bool WorkerAcquire::wasCancelled() const
-{
 }

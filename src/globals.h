@@ -308,7 +308,7 @@ namespace QApt
         /// The transaction will fully upgrade the system
         UpgradeSystemRole,
         /// The transaction will commit changes to packages
-        CommitPackagesRole,
+        CommitChangesRole,
         /// The transaction will update the APT Xapian search index
         UpdateXapianRole,
         /// The transaction will download package archives

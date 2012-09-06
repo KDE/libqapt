@@ -16,15 +16,15 @@ set(qapt_worker_SRCS
     aptworker.cpp
     transaction.cpp
     transactionqueue.cpp
-    worker.cpp
     workeracquire.cpp
+    workerdaemon.cpp
     workerinstallprogress.cpp
 )
 
 qt4_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker.xml
-    worker.h
-    QAptWorker
+    workerdaemon.h
+    WorkerDaemon
 )
 
 qt4_add_dbus_adaptor(qapt_worker_SRCS

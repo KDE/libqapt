@@ -21,21 +21,19 @@
 #ifndef WORKERACQUIRE_H
 #define WORKERACQUIRE_H
 
-#include <QtCore/QVariantMap>
+// Qt includes
+#include <QtCore/QObject>
 
+// Apt-pkg includes
 #include <apt-pkg/acquire.h>
 
-#include "globals.h"
-
 class Transaction;
-class QAptWorker;
 
 class WorkerAcquire : public QObject, public pkgAcquireStatus
 {
     Q_OBJECT
-    Q_ENUMS(FetchType)
 public:
-    explicit WorkerAcquire(QAptWorker *parent, int begin = 0, int end = 100);
+    explicit WorkerAcquire(QObject *parent, int begin = 0, int end = 100);
 
     void Start();
     void IMSHit(pkgAcquire::ItemDesc &Itm);
@@ -47,32 +45,17 @@ public:
 
     bool Pulse(pkgAcquire *Owner);
 
-    bool wasCancelled() const;
     void setTransaction(Transaction *trans);
 
 private:
-    QVariantMap askQuestion(int questionCode, const QVariantMap &args);
-
     Transaction *m_trans;
     bool m_calculatingSpeed;
     int m_progressBegin;
     int m_progressEnd;
     int m_lastProgress;
 
-public Q_SLOTS:
-    void requestCancel();
-
 private Q_SLOTS:
-    void setAnswer(const QVariantMap &response);
     void updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status);
-
-signals:
-    void fetchError(int errorCode, const QVariantMap &details);
-    void fetchWarning(int warningCode, const QVariantMap &details);
-    void workerQuestion(int questionCode, const QVariantMap &args);
-    void downloadProgress(int percentage, int speed, int ETA);
-    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
-                                 double size, int flag);
 };
 
 #endif

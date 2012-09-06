@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
- *   Copyright © 2008-2009 Sebastian Heinlein <devel@glatzor.de>           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -19,45 +18,52 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef TRANSACTIONQUEUE_H
-#define TRANSACTIONQUEUE_H
+#ifndef WORKERDAEMON_H
+#define WORKERDAEMON_H
 
-#include <QtCore/QObject>
-#include <QtCore/QQueue>
+#include <QtCore/QCoreApplication>
+#include <QtDBus/QDBusContext>
+
+#include "globals.h"
+
+class QThread;
 
 class AptWorker;
 class Transaction;
+class TransactionQueue;
 
-class TransactionQueue : public QObject
+class WorkerDaemon : public QCoreApplication, protected QDBusContext
 {
     Q_OBJECT
-public:
-    TransactionQueue(QObject *parent, AptWorker *worker);
 
-    QList<Transaction *> transactions() const;
-    Transaction *activeTransaction() const;
+    Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker")
+public:
+    WorkerDaemon(int &argc, char **argv);
+    ~WorkerDaemon();
 
 private:
+    TransactionQueue *m_queue;
     AptWorker *m_worker;
-    QQueue<Transaction *> m_queue;
-    QList<Transaction *> m_pending;
-    Transaction *m_activeTransaction;
+    QThread *m_workerThread;
 
-    Transaction *transactionById(const QString &id);
-    
+    int dbusSenderUid() const;
+    Transaction *createTranscation(QApt::TransactionRole role,
+                                   QVariantMap instructionsList = QVariantMap());
+
 signals:
-    void queueChanged(const QString &active,
-                      const QStringList &queued);
-
+    Q_SCRIPTABLE void transactionQueueChanged(const QString &active,
+                                              const QStringList &queued);
+    
 public slots:
-    void addPending(Transaction *trans);
-    void enqueue(QString tid);
-    void remove(QString tid);
+    // Transation-based methods. Return transaction ids.
+    QString updateCache();
+    QString installFile(const QString &file);
+    QString commitChanges(QVariantMap instructionsList);
+    QString updateXapianIndex();
 
-private slots:
-    void onTransactionFinished(int exitCode);
-    void runNextTransaction();
-    void emitQueueChanged();
+    // Synchronous methods
+    bool writeFileToDisk(const QString &contents, const QString &path);
+    bool copyArchiveToCache(const QString &archivePath);
 };
 
-#endif // TRANSACTIONQUEUE_H
+#endif // WORKERDAEMON_H

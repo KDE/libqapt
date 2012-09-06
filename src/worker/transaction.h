@@ -53,10 +53,9 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(QString statusDetails READ statusDetails)
     Q_PROPERTY(int progress READ progress)
 public:
-    Transaction(QObject *parent, TransactionQueue *queue, int userId);
-    Transaction(QObject *parent, QApt::TransactionRole role,
-                TransactionQueue *queue, int userId,
-                QVariantMap packagesList);
+    Transaction(TransactionQueue *queue, int userId);
+    Transaction(TransactionQueue *queue, int userId,
+                QApt::TransactionRole role, QVariantMap packagesList);
 
     QString transactionId() const;
     int userId() const;

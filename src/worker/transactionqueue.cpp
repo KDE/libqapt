@@ -22,13 +22,16 @@
 #include "transactionqueue.h"
 
 // Qt includes
+#include <QtCore/QStringList>
 #include <QtCore/QTimer>
 
 // Own includes
+#include "aptworker.h"
 #include "transaction.h"
 
-TransactionQueue::TransactionQueue(QObject *parent)
+TransactionQueue::TransactionQueue(QObject *parent, AptWorker *worker)
     : QObject(parent)
+    , m_worker(worker)
     , m_activeTransaction(nullptr)
 {
 }
@@ -71,7 +74,7 @@ void TransactionQueue::enqueue(QString tid)
 
     connect(trans, SIGNAL(finished(int)), this, SLOT(onTransactionFinished(int)));
     m_queue.enqueue(trans);
-    emit queueChanged();
+    emitQueueChanged();
 
     // Check if worker is running trans
     // If true, set trans status to wating
@@ -86,7 +89,11 @@ void TransactionQueue::remove(QString tid)
         return;
 
     m_queue.removeAll(trans);
-    emit queueChanged();
+
+    if (trans == m_activeTransaction)
+        m_activeTransaction = nullptr;
+
+    emitQueueChanged();
 
     // Wait in case clients are a bit slow.
     QTimer::singleShot(5000, trans, SLOT(deleteLater()));
@@ -104,12 +111,28 @@ void TransactionQueue::onTransactionFinished(int exitCode)
     // TODO: Transaction chaining
 
     remove(trans->transactionId());
-    emit queueChanged();
     runNextTransaction();
+    emitQueueChanged();
 }
 
 void TransactionQueue::runNextTransaction()
 {
     m_activeTransaction = m_queue.head();
-    //worker->run(m_activeTransaction);
+
+    QMetaObject::invokeMethod(m_worker, "runTransaction", Qt::QueuedConnection,
+                              Q_ARG(Transaction *, m_activeTransaction));
+}
+
+void TransactionQueue::emitQueueChanged()
+{
+    QString tid;
+    QStringList queued;
+
+    if (m_activeTransaction)
+        tid = m_activeTransaction->transactionId();
+
+    for (Transaction *trans : m_queue)
+        queued << trans->transactionId();
+
+    emit queueChanged(tid, queued);
 }

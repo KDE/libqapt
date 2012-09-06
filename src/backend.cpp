@@ -137,13 +137,13 @@ bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const 
 
 void BackendPrivate::setWorkerLocale()
 {
-    worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+    //worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
 }
 
 void BackendPrivate::setWorkerProxy()
 {
     QString proxy = customProxy.isEmpty() ? qgetenv("http_proxy") : proxy = customProxy;
-    worker->setProxy(proxy);
+    //worker->setProxy(proxy);
 }
 
 Backend::Backend()
@@ -1100,7 +1100,7 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
 
     d->setWorkerLocale();
     d->setWorkerProxy();
-    d->worker->downloadArchives(packages, destination);
+    //d->worker->downloadArchives(packages, destination);
 }
 
 void Backend::installDebFile(const DebFile &debFile)
@@ -1109,7 +1109,7 @@ void Backend::installDebFile(const DebFile &debFile)
 
     d->setWorkerLocale();
     d->setWorkerProxy();
-    d->worker->installDebFile(debFile.filePath());
+    //d->worker->installDebFile(debFile.filePath());
 }
 
 void Backend::packageChanged(Package *package)
@@ -1474,14 +1474,14 @@ void Backend::cancelDownload()
 {
     Q_D(Backend);
 
-    d->worker->cancelDownload();
+    //d->worker->cancelDownload();
 }
 
 void Backend::answerWorkerQuestion(const QVariantMap &response)
 {
     Q_D(Backend);
 
-    d->worker->answerWorkerQuestion(response);
+    //d->worker->answerWorkerQuestion(response);
 }
 
 void Backend::emitErrorOccurred(int errorCode, const QVariantMap &details)
