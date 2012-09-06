@@ -672,8 +672,6 @@ QString Package::controlField(QLatin1String name) const
 
     pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
 
-    qDebug() << "control field:" << QString::fromStdString(rec.RecordField(name.latin1()));
-
     return QString::fromStdString(rec.RecordField(name.latin1()));
 }
 
