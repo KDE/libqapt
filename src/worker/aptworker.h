@@ -55,11 +55,19 @@ private:
     void waitForLocks();
 
     /**
-     * Builds the package cache and package records
+     * Releases APT locks and sets the transaction as done.
+     */
+    void cleanupCurrentTransaction();
+
+    /**
+     * Builds the package cache and package records.
      */
     void openCache();
 
-    void cleanupCurrentTransaction();
+    /**
+     * Checks for and downloads new package source lists.
+     */
+    void updateCache();
 
 signals:
     

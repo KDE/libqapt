@@ -28,29 +28,32 @@
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/acquire-worker.h>
 
+#include "transaction.h"
 #include "worker.h"
 
 using namespace std;
 
-WorkerAcquire::WorkerAcquire(QAptWorker *parent)
+WorkerAcquire::WorkerAcquire(QAptWorker *parent, int begin, int end)
         : QObject(parent)
-        , m_worker(parent)
-        , m_cancelled(false)
         , m_calculatingSpeed(true)
-        , m_questionResponse(QVariantMap())
+        , m_progressBegin(begin)
+        , m_progressEnd(end)
+        , m_lastProgress(0)
 {
     MorePulses = true;
 }
 
-WorkerAcquire::~WorkerAcquire()
+void WorkerAcquire::setTransaction(Transaction *trans)
 {
+    m_trans = trans;
 }
 
 void WorkerAcquire::Start()
 {
     // Cleanup from old fetches
-    m_cancelled = false;
     m_calculatingSpeed = true;
+
+    m_trans->setCancellable(true);
 
     pkgAcquireStatus::Start();
 }
@@ -106,26 +109,34 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
 
 void WorkerAcquire::Stop()
 {
-   pkgAcquireStatus::Stop();
+    m_trans->setProgress(m_progressEnd);
+    m_trans->setCancellable(false);
+    pkgAcquireStatus::Stop();
 }
 
 bool WorkerAcquire::MediaChange(string Media, string Drive)
 {
-    QVariantMap args;
-    args[QLatin1String("Media")] = QString::fromUtf8(Media.c_str());
-    args[QLatin1String("Drive")] = QString::fromUtf8(Drive.c_str());
+    // Notify listeners to the transaction
+    m_trans->setMediumRequired(QString::fromUtf8(Media.c_str()),
+                               QString::fromUtf8(Drive.c_str()));
+    m_trans->setStatus(QApt::WaitingMediumStatus);
 
-    QVariantMap result = askQuestion(QApt::MediaChange, args);
+    // Wait until the media is provided or the user cancels
+    while (m_trans->isPaused());
 
-    bool mediaChanged = result[QLatin1String("MediaChanged")].toBool();
+    m_trans->setStatus(QApt::DownloadingStatus);
 
-    return mediaChanged;
+    // As long as the user didn't cancel, we're ok to proceed
+    return (!m_trans->isCancelled());
 }
 
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
+    if (m_trans->isCancelled())
+        return false;
+
     // FIXME: processEvents() is dangerous. Proper threading is needed
-    QCoreApplication::processEvents();
+    //QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
 
     int packagePercentage = 0;
@@ -144,9 +155,20 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     }
 
     int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
+    int progress = 0;
     // work-around a stupid problem with libapt-pkg
     if(CurrentItems == TotalItems) {
         percentage = 100;
+    }
+
+    // Calculate global progress, adjusted for given beginning and ending points
+    progress = qRound(m_progressBegin + percentage/100 * (m_progressEnd - m_progressBegin));
+
+    if (m_lastProgress > progress)
+        m_trans->setProgress(101);
+    else {
+        m_trans->setProgress(progress);
+        m_lastProgress = progress;
     }
 
     int speed;
@@ -176,33 +198,22 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 
     Update = false;
 
-    return !m_cancelled;
+    return true;
 }
 
+// FIXME: remove
 void WorkerAcquire::requestCancel()
 {
-    m_cancelled = true;
-    emit fetchError(QApt::UserCancelError, QVariantMap());
 }
 
+// FIXME: remove
 QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)
 {
-    m_mediaBlock = new QEventLoop;
-    connect(m_worker, SIGNAL(answerReady(QVariantMap)),
-            this, SLOT(setAnswer(QVariantMap)));
-
-    emit workerQuestion(questionCode, args);
-    m_mediaBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
-
-    return m_questionResponse;
 }
 
+// FIXME: remove
 void WorkerAcquire::setAnswer(const QVariantMap &answer)
 {
-    disconnect(m_worker, SIGNAL(answerReady(QVariantMap)),
-               this, SLOT(setAnswer(QVariantMap)));
-    m_questionResponse = answer;
-    m_mediaBlock->quit();
 }
 
 void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status)
@@ -216,7 +227,7 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage
     }
 }
 
+// FIXME: remove
 bool WorkerAcquire::wasCancelled() const
 {
-    return m_cancelled;
 }

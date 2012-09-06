@@ -27,7 +27,7 @@
 
 #include "globals.h"
 
-class QEventLoop;
+class Transaction;
 class QAptWorker;
 
 class WorkerAcquire : public QObject, public pkgAcquireStatus
@@ -35,29 +35,29 @@ class WorkerAcquire : public QObject, public pkgAcquireStatus
     Q_OBJECT
     Q_ENUMS(FetchType)
 public:
-    explicit WorkerAcquire(QAptWorker *parent);
-    virtual ~WorkerAcquire();
+    explicit WorkerAcquire(QAptWorker *parent, int begin = 0, int end = 100);
 
-    virtual void Start();
-    virtual void IMSHit(pkgAcquire::ItemDesc &Itm);
-    virtual void Fetch(pkgAcquire::ItemDesc &Itm);
-    virtual void Done(pkgAcquire::ItemDesc &Itm);
-    virtual void Fail(pkgAcquire::ItemDesc &Itm);
-    virtual void Stop();
-    virtual bool MediaChange(string Media, string Drive);
+    void Start();
+    void IMSHit(pkgAcquire::ItemDesc &Itm);
+    void Fetch(pkgAcquire::ItemDesc &Itm);
+    void Done(pkgAcquire::ItemDesc &Itm);
+    void Fail(pkgAcquire::ItemDesc &Itm);
+    void Stop();
+    bool MediaChange(string Media, string Drive);
 
     bool Pulse(pkgAcquire *Owner);
 
     bool wasCancelled() const;
+    void setTransaction(Transaction *trans);
 
 private:
     QVariantMap askQuestion(int questionCode, const QVariantMap &args);
 
-    QAptWorker *m_worker;
-    QEventLoop *m_mediaBlock;
-    QVariantMap m_questionResponse;
+    Transaction *m_trans;
     bool m_calculatingSpeed;
-    bool m_cancelled;
+    int m_progressBegin;
+    int m_progressEnd;
+    int m_lastProgress;
 
 public Q_SLOTS:
     void requestCancel();

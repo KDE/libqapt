@@ -34,6 +34,7 @@
 #include "cache.h"
 #include "config.h"
 #include "transaction.h"
+#include "workeracquire.h"
 
 AptWorker::AptWorker(QObject *parent)
     : QObject(parent)
@@ -119,8 +120,10 @@ void AptWorker::runTransaction(Transaction *trans)
 
 void AptWorker::cleanupCurrentTransaction()
 {
+    // Well, we're finished now.
     m_trans->setProgress(100);
 
+    // Release locks
     for (AptLock *lock : m_locks) {
         lock->release();
     }
@@ -164,4 +167,9 @@ void AptWorker::openCache()
 
     delete m_records;
     m_records = new pkgRecords(*(m_cache->depCache()));
+}
+
+void AptWorker::updateCache()
+{
+
 }
