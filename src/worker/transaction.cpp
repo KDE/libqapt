@@ -227,9 +227,14 @@ void Transaction::setMediumRequired(const QString &label, const QString &medium)
     emit mediumRequired(label, medium);
 }
 
-bool Transaction::idPaused() const
+bool Transaction::isPaused() const
 {
     return m_isPaused;
+}
+
+void Transaction::setIsPaused(bool paused)
+{
+    m_isPaused = paused;
 }
 
 QString Transaction::statusDetails() const

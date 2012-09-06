@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 20120-2012 Jonathan Thomas <echidnaman@kubuntu.org>       *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -20,6 +20,9 @@
 
 #include "aptworker.h"
 
+// Qt includes
+#include <QtCore/QStringList>
+
 // Apt-pkg includes
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/init.h>
@@ -27,7 +30,9 @@
 #include <apt-pkg/pkgsystem.h>
 
 // Own includes
+#include "aptlock.h"
 #include "cache.h"
+#include "config.h"
 #include "transaction.h"
 
 AptWorker::AptWorker(QObject *parent)
@@ -42,6 +47,7 @@ AptWorker::AptWorker(QObject *parent)
 AptWorker::~AptWorker()
 {
     delete m_records;
+    qDeleteAll(m_locks);
 }
 
 void AptWorker::init()
@@ -52,6 +58,19 @@ void AptWorker::init()
     pkgInitConfig(*_config);
     pkgInitSystem(*_config, _system);
     m_cache = new QApt::Cache(this);
+
+    // Prepare locks to be used later
+    QStringList dirs;
+    dirs << QLatin1String("Dir::State::status")
+         << QLatin1String("Dir::Cache::Archives")
+         << QLatin1String("Dir::State::lists");
+
+    m_locks = QVector<AptLock *>(dirs.count());
+
+    for (const QString &dir : dirs) {
+        m_locks << new AptLock(dir);
+    }
+
     m_ready = true;
 }
 
@@ -63,7 +82,11 @@ void AptWorker::runTransaction(Transaction *trans)
 
     m_trans = trans;
     trans->setStatus(QApt::RunningStatus);
-    waitForLock();
+    waitForLocks();
+    if (trans->isCancelled()) {
+        cleanupCurrentTransaction();
+        return;
+    }
 
     // Process transactions requiring no cache
     switch (trans->role()) {
@@ -91,24 +114,48 @@ void AptWorker::runTransaction(Transaction *trans)
     }
 
     // Cleanup
-    trans->setProgress(100);
-    //unlockCache();
+    cleanupCurrentTransaction();
+}
+
+void AptWorker::cleanupCurrentTransaction()
+{
+    m_trans->setProgress(100);
+
+    for (AptLock *lock : m_locks) {
+        lock->release();
+    }
 
     // Set transaction exit status
     // This will notify the transaction queue of the transaction's completion
     // as well as mark the transaction for deletion in 5 seconds
-    if (trans->isCancelled())
-        trans->setExitStatus(QApt::ExitCancelled);
-    else if (trans->error() != QApt::Success)
-        trans->setExitStatus(QApt::ExitFailed);
+    if (m_trans->isCancelled())
+        m_trans->setExitStatus(QApt::ExitCancelled);
+    else if (m_trans->error() != QApt::Success)
+        m_trans->setExitStatus(QApt::ExitFailed);
     else
-        trans->setExitStatus(QApt::ExitSuccess);
+        m_trans->setExitStatus(QApt::ExitSuccess);
 
     m_trans = nullptr;
 }
 
-void AptWorker::waitForLock()
+void AptWorker::waitForLocks()
 {
+    for (AptLock *lock : m_locks) {
+        if (lock->acquire())
+            continue;
+
+        // Couldn't get lock
+        m_trans->setIsPaused(true);
+        m_trans->setStatus(QApt::WaitingLockStatus);
+
+        while (!lock->isLocked() && m_trans->isPaused() && !m_trans->isCancelled()) {
+            // Wait 3 seconds and try again
+            sleep(3);
+            lock->acquire();
+        }
+
+        m_trans->setIsPaused(false);
+    }
 }
 
 void AptWorker::openCache()

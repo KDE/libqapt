@@ -361,6 +361,8 @@ namespace QApt
         SetupStatus = 0,
         /// The status when the transaction is waiting for any user interaction
         WaitingStatus,
+        /// The status when the transaction is waiting for the APT lock
+        WaitingLockStatus,
         /// The status when a transaction first starts running
         RunningStatus,
         /// The status when a transaction is downloading archives

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
+ *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,67 +18,26 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef APTWORKER_H
-#define APTWORKER_H
+#ifndef APTLOCK_H
+#define APTLOCK_H
 
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QtCore/QString>
 
-class pkgRecords;
+#include <apt-pkg/fileutl.h>
 
-namespace QApt {
-    class Cache;
-}
-
-class AptLock;
-class Transaction;
-
-class AptWorker : public QObject
+class AptLock
 {
-    Q_OBJECT
 public:
-    explicit AptWorker(QObject *parent = 0);
-    ~AptWorker();
+    AptLock(const QString &path);
+
+    bool isLocked() const;
+    bool acquire();
+    void release();
 
 private:
-    QApt::Cache *m_cache;
-    pkgRecords *m_records;
-    Transaction *m_trans;
-    bool m_ready;
-    QVector<AptLock *> m_locks;
-
-    /**
-     * If the locks on the package system cannot be immediately taken, this
-     * function will wait until the package system is unlocked, and proceed
-     * to lock it.
-     */
-    void waitForLocks();
-
-    /**
-     * Builds the package cache and package records
-     */
-    void openCache();
-
-    void cleanupCurrentTransaction();
-
-signals:
-    
-public slots:
-    /**
-     * Initializes the worker's package system. This is done lazily to allow
-     * the object to first be put in to another thread.
-     */
-    void init();
-
-    /**
-     * This function will run the provided transaction in a blocking fashion
-     * until the transaction is complete. As such, it is suggested that this
-     * class be run in a thread separate from ones e.g. looking for D-Bus
-     * messages.
-     *
-     * @param trans
-     */
-    void runTransaction(Transaction *trans);
+    QByteArray m_path;
+    int m_fd;
+    FileFd m_lock;
 };
 
-#endif // APTWORKER_H
+#endif // APTLOCK_H

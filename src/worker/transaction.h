@@ -49,7 +49,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(bool isCancellable READ isCancellable)
     Q_PROPERTY(bool isCancelled READ isCancelled)
     Q_PROPERTY(int exitStatus READ exitStatus)
-    Q_PROPERTY(bool idPaused READ idPaused)
+    Q_PROPERTY(bool isPaused READ isPaused)
     Q_PROPERTY(QString statusDetails READ statusDetails)
     Q_PROPERTY(int progress READ progress)
 public:
@@ -71,7 +71,7 @@ public:
     bool isCancelled() const;
     int exitStatus() const;
     QString medium() const;
-    bool idPaused() const;
+    bool isPaused() const;
     QString statusDetails() const;
     int progress() const;
 
@@ -80,6 +80,7 @@ public:
     void setCancellable(bool isCancellable);
     void setExitStatus(QApt::ExitStatus exitStatus);
     void setMediumRequired(const QString &label, const QString &medium);
+    void setIsPaused(bool paused);
     void setStatusDetails(const QString &details);
     void setProgress(int progress);
 

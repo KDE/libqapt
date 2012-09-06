@@ -12,6 +12,7 @@ endif ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
 
 set(qapt_worker_SRCS
     main.cpp
+    aptlock.cpp
     aptworker.cpp
     transaction.cpp
     transactionqueue.cpp
