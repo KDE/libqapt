@@ -15,7 +15,7 @@
     <property name="isCancellable" type="b" access="read"/>
     <property name="isCancelled" type="b" access="read"/>
     <property name="exitStatus" type="i" access="read"/>
-    <property name="idPaused" type="b" access="read"/>
+    <property name="isPaused" type="b" access="read"/>
     <property name="statusDetails" type="s" access="read"/>
     <property name="progress" type="i" access="read"/>
     <signal name="propertyChanged">
