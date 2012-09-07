@@ -144,16 +144,6 @@ public:
      */
     QHash<Package::State, PackageList> stateChanges(CacheState oldState, PackageList excluded) const;
 
-   /**
-     * Returns the last event that the worker reported. When the worker is not
-     * running, this returns InvalidEvent
-     *
-     * \return The last reported @c WorkerEvent of the worker
-     *
-     * @since 1.1
-     */
-    WorkerEvent workerState() const;
-
     /**
      * Pointer to the QApt Backend's config object.
      *
@@ -459,20 +449,6 @@ Q_SIGNALS:
     void warningOccurred(QApt::WarningCode warning, const QVariantMap &details);
 
     /**
-     * Emitted whenever the worker asks a question. You should listen to this
-     * signal and present the question to the user when your app receives it.
-     *
-     * You should send the response back to the worker as a QVariantMap
-     * using the Backend's answerWorkerQuestion() function.
-     *
-     * @param question A @c QApt::WorkerQuestion enum member indicating question type
-     * @param details A @c QVariantMap containing info about the question, if available
-     *
-     * @see answerWorkerQuestion()
-     */
-    void questionOccurred(QApt::WorkerQuestion question, const QVariantMap &details);
-
-    /**
      * Emitted whenever a package changes state. Useful for knowning when to
      * react to state changes.
      */
@@ -690,27 +666,6 @@ public Q_SLOTS:
     void updateCache();
 
     /**
-     * Cancels download operations in the worker initialized by the
-     * updateCache() or commitChanges() functions. This function
-     * will only have an effect if a download operation is in progress.
-     * The actual committing of changes cannot be canceled once in progress.
-     *
-     * This function is asynchronous. The backend will report a
-     * \c UserCancelError using the errorOccurred() signal
-     *
-     * @see errorOccurred()
-     */
-    void cancelDownload();
-
-    /**
-     * This function should be used to return the answer the user has given
-     * to a worker question delivered by the questionOccurred() signal
-     *
-     * @see questionOccurred()
-     */
-    void answerWorkerQuestion(const QVariantMap &response);
-
-    /**
      * Exports a list of all packages currently installed on the system. This
      * list can be read by the readSelections() function or by Synaptic.
      *
@@ -818,32 +773,11 @@ public Q_SLOTS:
     */
     bool addArchiveToCache(const DebFile &archive);
 
-   /**
-    * Sets the proxy to be used by the QApt Worker
-    *
-    * This function is used to aid in integration with environments that do not
-    * primarily use the proxy set by either APT or their shell environment's
-    * http_proxy environment variable. (Such as KDE)
-    *
-    * Once you call this function, the QApt Worker will use the custom proxy for
-    * the life of the QApt::Backend object.
-    *
-    * @param proxy the proxy to be used by the QApt Worker
-    *
-    * @since 1.4
-    */
-    void setWorkerProxy(const QString &proxy);
-
 private Q_SLOTS:
     void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void packageChanged(Package *package);
     void workerStarted();
     void workerFinished(bool result);
-
-    void emitErrorOccurred(int errorCode, const QVariantMap &details);
-    void emitWarningOccurred(int warningCode, const QVariantMap &details);
-    void emitWorkerEvent(int event);
-    void emitWorkerQuestionOccurred(int question, const QVariantMap &details);
 };
 
 }

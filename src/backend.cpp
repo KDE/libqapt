@@ -55,8 +55,7 @@ class BackendPrivate
 {
 public:
     BackendPrivate()
-        : state(InvalidEvent)
-        , cache(0)
+        : cache(0)
         , records(0)
         , maxStackSize(20)
         , config(0)
@@ -84,7 +83,6 @@ public:
     QHash<QString, QString> originMap;
     // Relation of an origin and its hostname
     QHash<QString, QString> siteMap;
-    WorkerEvent state;
 
     // Counts
     int installedCount;
@@ -117,9 +115,7 @@ public:
 
     // Other
     bool writeSelectionFile(const QString &file, const QString &path) const;
-    void setWorkerLocale();
     QString customProxy;
-    void setWorkerProxy();
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -135,17 +131,6 @@ bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const 
     return true;
 }
 
-void BackendPrivate::setWorkerLocale()
-{
-    //worker->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
-}
-
-void BackendPrivate::setWorkerProxy()
-{
-    QString proxy = customProxy.isEmpty() ? qgetenv("http_proxy") : proxy = customProxy;
-    //worker->setProxy(proxy);
-}
-
 Backend::Backend()
         : d_ptr(new BackendPrivate)
 {
@@ -154,13 +139,6 @@ Backend::Backend()
     d->worker = new OrgKubuntuQaptworkerInterface(QLatin1String("org.kubuntu.qaptworker"),
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
-
-    connect(d->worker, SIGNAL(errorOccurred(int,QVariantMap)),
-            this, SLOT(emitErrorOccurred(int,QVariantMap)));
-    connect(d->worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
-    connect(d->worker, SIGNAL(workerEvent(int)), this, SLOT(emitWorkerEvent(int)));
-    connect(d->worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
-    connect(d->worker, SIGNAL(xapianUpdateProgress(int)), this, SIGNAL(xapianUpdateProgress(int)));
 
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
@@ -308,7 +286,8 @@ void Backend::throwInitError()
         details[QLatin1String("ErrorText")] = QString::fromStdString(message);
     }
 
-    emitErrorOccurred(QApt::InitError, details);
+    // FIXME
+    //emitErrorOccurred(QApt::InitError, details);
 }
 
 pkgSourceList *Backend::packageSourceList() const
@@ -403,6 +382,12 @@ QString Backend::origin(const QString &originLabel) const
     return d->originMap.key(originLabel);
 }
 
+QStringList Backend::originsForHost(const QString& host) const
+{
+    Q_D(const Backend);
+    return d->siteMap.keys(host);
+}
+
 int Backend::packageCount() const
 {
     Q_D(const Backend);
@@ -416,7 +401,7 @@ int Backend::packageCount(const Package::States &states) const
 
     int packageCount = 0;
 
-    for (const Package *package: d->packages) {
+    for (const Package *package : d->packages) {
         if ((package->state() & states)) {
             packageCount++;
         }
@@ -606,9 +591,6 @@ PackageList Backend::search(const QString &searchString) const
         return QApt::PackageList();
     }
 
-    if (searchResult.isEmpty())
-        qDebug() << "Search seemed to go ok, but came up empty";
-
     return searchResult;
 }
 
@@ -785,13 +767,6 @@ QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, Pa
     }
 
     return changes;
-}
-
-WorkerEvent Backend::workerState() const
-{
-    Q_D(const Backend);
-
-    return d->state;
 }
 
 void Backend::saveCacheState()
@@ -1062,8 +1037,6 @@ void Backend::commitChanges()
         }
     }
 
-    d->setWorkerLocale();
-    d->setWorkerProxy();
     d->worker->commitChanges(packageList);
 }
 
@@ -1098,8 +1071,6 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
     QDir dir(dirName);
     dir.mkdir(QLatin1String("packages"));
 
-    d->setWorkerLocale();
-    d->setWorkerProxy();
     //d->worker->downloadArchives(packages, destination);
 }
 
@@ -1107,8 +1078,6 @@ void Backend::installDebFile(const DebFile &debFile)
 {
     Q_D(Backend);
 
-    d->setWorkerLocale();
-    d->setWorkerProxy();
     //d->worker->installDebFile(debFile.filePath());
 }
 
@@ -1123,8 +1092,6 @@ void Backend::updateCache()
 {
     Q_D(Backend);
 
-    d->setWorkerLocale();
-    d->setWorkerProxy();
     d->worker->updateCache();
 }
 
@@ -1417,32 +1384,12 @@ bool Backend::addArchiveToCache(const DebFile &archive)
     return d->worker->copyArchiveToCache(archive.filePath());
 }
 
-void Backend::setWorkerProxy(const QString &proxy)
-{
-    Q_D(Backend);
-
-    d->customProxy = proxy;
-}
-
 void Backend::workerStarted()
 {
     Q_D(Backend);
 
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString,QString,QString)));
-
-    connect(d->worker, SIGNAL(downloadProgress(int,int,int)),
-            this, SIGNAL(downloadProgress(int,int,int)));
-    connect(d->worker, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
-            this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
-    connect(d->worker, SIGNAL(commitProgress(QString,int)),
-            this, SIGNAL(commitProgress(QString,int)));
-    connect(d->worker, SIGNAL(debInstallMessage(QString)),
-            this, SIGNAL(debInstallMessage(QString)));
-    connect(d->worker, SIGNAL(questionOccurred(int,QVariantMap)),
-            this, SLOT(emitWorkerQuestionOccurred(int,QVariantMap)));
-    connect(d->worker, SIGNAL(warningOccurred(int,QVariantMap)),
-            this, SLOT(emitWarningOccurred(int,QVariantMap)));
 }
 
 void Backend::workerFinished(bool result)
@@ -1451,60 +1398,8 @@ void Backend::workerFinished(bool result)
 
     Q_UNUSED(result);
 
-    d->state = InvalidEvent;
-
     disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
                this, SLOT(serviceOwnerChanged(QString,QString,QString)));
-
-    disconnect(d->worker, SIGNAL(downloadProgress(int,int,int)),
-               this, SIGNAL(downloadProgress(int,int,int)));
-    disconnect(d->worker, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
-               this, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)));
-    disconnect(d->worker, SIGNAL(commitProgress(QString,int)),
-               this, SIGNAL(commitProgress(QString,int)));
-    disconnect(d->worker, SIGNAL(debInstallMessage(QString)),
-               this, SIGNAL(debInstallMessage(QString)));
-    disconnect(d->worker, SIGNAL(questionOccurred(int,QVariantMap)),
-               this, SLOT(emitWorkerQuestionOccurred(int,QVariantMap)));
-    disconnect(d->worker, SIGNAL(warningOccurred(int,QVariantMap)),
-               this, SLOT(emitWarningOccurred(int,QVariantMap)));
-}
-
-void Backend::cancelDownload()
-{
-    Q_D(Backend);
-
-    //d->worker->cancelDownload();
-}
-
-void Backend::answerWorkerQuestion(const QVariantMap &response)
-{
-    Q_D(Backend);
-
-    //d->worker->answerWorkerQuestion(response);
-}
-
-void Backend::emitErrorOccurred(int errorCode, const QVariantMap &details)
-{
-    emit errorOccurred((ErrorCode) errorCode, details);
-}
-
-void Backend::emitWarningOccurred(int warningCode, const QVariantMap &details)
-{
-    emit warningOccurred((WarningCode) warningCode, details);
-}
-
-void Backend::emitWorkerEvent(int event)
-{
-    Q_D(Backend);
-
-    d->state = (WorkerEvent)event;
-    emit workerEvent((WorkerEvent) event);
-}
-
-void Backend::emitWorkerQuestionOccurred(int question, const QVariantMap &details)
-{
-    emit questionOccurred((WorkerQuestion) question, details);
 }
 
 void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
@@ -1520,12 +1415,6 @@ void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, 
         emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
         workerFinished(false);
     }
-}
-
-QStringList Backend::originsForHost(const QString& host) const
-{
-    Q_D(const Backend);
-    return d->siteMap.keys(host);
 }
 
 }
