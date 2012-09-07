@@ -23,8 +23,12 @@
 // Qt includes
 #include <QtCore/QThread>
 
+// Apt-pkg includes
+#include <apt-pkg/configuration.h>
+
 // Own includes
 #include "aptworker.h"
+#include "qaptauthorization.h"
 #include "qaptworkeradaptor.h"
 #include "transaction.h"
 #include "transactionqueue.h"
@@ -120,14 +124,35 @@ QString WorkerDaemon::updateXapianIndex()
 
 bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 {
-    // TODO: Put impl. in AptWorker?
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writeFileToDisk"), message().service())) {
+        return false;
+    }
+
+    QFile file(path);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        file.write(contents.toStdString().c_str());
+
+        return true;
+    }
 
     return false;
 }
 
 bool WorkerDaemon::copyArchiveToCache(const QString &archivePath)
 {
-    // TODO: Put impl. in AptWorker?
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writeFileToDisk"), message().service())) {
+        return false;
+    }
 
-    return false;
+    QString cachePath = QString::fromStdString(_config->FindDir("Dir::Cache::Archives"));
+    // Filename
+    cachePath += archivePath.right(archivePath.size() - archivePath.lastIndexOf('/'));
+
+    if (QFile::exists(cachePath)) {
+        // Already copied
+        return true;
+    }
+
+    return QFile::copy(archivePath, cachePath);
 }
