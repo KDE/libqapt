@@ -73,6 +73,7 @@ public:
     bool isPaused() const;
     QString statusDetails() const;
     int progress() const;
+    QString service() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -82,6 +83,7 @@ public:
     void setIsPaused(bool paused);
     void setStatusDetails(const QString &details);
     void setProgress(int progress);
+    void setService(const QString &service);
 
 private:
     // Pointers to external containers
@@ -104,6 +106,7 @@ private:
     bool m_isPaused;
     QString m_statusDetails;
     int m_progress;
+    QString m_service;
 
     // Other data
     QMap<int, QString> m_roleActionMap;

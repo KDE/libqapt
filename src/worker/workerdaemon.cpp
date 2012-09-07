@@ -80,9 +80,12 @@ int WorkerDaemon::dbusSenderUid() const
 Transaction *WorkerDaemon::createTranscation(QApt::TransactionRole role, QVariantMap instructionsList)
 {
     int uid = dbusSenderUid();
-    // Create a transaction. It will add itself to the queue
 
-    return new Transaction(m_queue, uid, role, instructionsList);;
+    // Create a transaction. It will add itself to the queue
+    Transaction *trans = new Transaction(m_queue, uid, role, instructionsList);
+    trans->setService(message().service());
+
+    return trans;
 }
 
 QString WorkerDaemon::updateCache()

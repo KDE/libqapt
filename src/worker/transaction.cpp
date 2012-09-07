@@ -269,9 +269,19 @@ void Transaction::setProgress(int progress)
     emit propertyChanged(QApt::ProgressProperty, QDBusVariant(progress));
 }
 
+QString Transaction::service() const
+{
+    return m_service;
+}
+
+void Transaction::setService(const QString &service)
+{
+    m_service = service;
+}
+
 void Transaction::run()
 {
-    if (isForeignUser() /*||!authorizeRun()*/) {
+    if (isForeignUser() ||!authorizeRun()) {
         QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
         return;
     }
@@ -301,7 +311,7 @@ bool Transaction::authorizeRun()
 
     setStatus(QApt::AuthenticationStatus);
 
-    return QApt::Auth::authorize(action, QLatin1String("org.kubuntu.qaptworker"));
+    return QApt::Auth::authorize(action, m_service);
 }
 
 void Transaction::setProperty(int property, QDBusVariant value)
