@@ -126,7 +126,8 @@ bool WorkerAcquire::MediaChange(string Media, string Drive)
     m_trans->setStatus(QApt::WaitingMediumStatus);
 
     // Wait until the media is provided or the user cancels
-    while (m_trans->isPaused());
+    while (m_trans->isPaused())
+        usleep(200000);
 
     m_trans->setStatus(QApt::DownloadingStatus);
 
@@ -139,8 +140,6 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     if (m_trans->isCancelled())
         return false;
 
-    // FIXME: processEvents() is dangerous. Proper threading is needed
-    //QCoreApplication::processEvents();
     pkgAcquireStatus::Pulse(Owner);
 
     int packagePercentage = 0;
