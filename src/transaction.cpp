@@ -24,7 +24,6 @@
 #include <QDebug>
 
 // Own includes
-#include "globals.h"
 #include "transactiondbus.h"
 
 namespace QApt {
@@ -44,6 +43,10 @@ class TransactionPrivate
             : dbus(other.dbus)
             , tid(other.tid)
             , uid(0)
+            , role(EmptyRole)
+            , status(QApt::SetupStatus)
+            , error(QApt::Success)
+            , exitStatus(QApt::ExitUnfinished)
         {
         }
 
@@ -58,6 +61,10 @@ class TransactionPrivate
         // Data
         QString tid;
         int uid;
+        TransactionRole role;
+        TransactionStatus status;
+        ErrorCode error;
+        ExitStatus exitStatus;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -105,6 +112,46 @@ void Transaction::setUserId(int uid)
     d->uid = uid;
 }
 
+QApt::TransactionRole Transaction::role() const
+{
+    return d->role;
+}
+
+void Transaction::updateRole(QApt::TransactionRole role)
+{
+    d->role = role;
+}
+
+QApt::TransactionStatus Transaction::status() const
+{
+    return d->status;
+}
+
+void Transaction::updateStatus(TransactionStatus status)
+{
+    d->status = status;
+}
+
+QApt::ErrorCode Transaction::error() const
+{
+    return d->error;
+}
+
+void Transaction::setError(ErrorCode error)
+{
+    d->error = error;
+}
+
+QApt::ExitStatus Transaction::exitStatus() const
+{
+    return d->exitStatus;
+}
+
+void Transaction::setExitStatus(ExitStatus exitStatus)
+{
+    d->exitStatus = exitStatus;
+}
+
 void Transaction::sync()
 {
     QDBusMessage call = QDBusMessage::createMethodCall(d->dbus->service(), d->tid,
@@ -119,8 +166,20 @@ void Transaction::sync()
         return;
 
     for (auto iter = propertyMap.constBegin(); iter != propertyMap.constEnd(); ++iter) {
-        if (!setProperty(iter.key().toLatin1(), iter.value()))
-            qDebug() << "failed to set:" << iter.key();
+        if (!setProperty(iter.key().toLatin1(), iter.value())) {
+            // Qt won't support arbitrary enums over dbus until "maybe Qt 6 or 7"
+            // when c++11 is prevalent, so do some ugly hacks here...
+            if (iter.key() == QLatin1String("role"))
+                setProperty(iter.key().toLatin1(), (TransactionRole)iter.value().toInt());
+            else if (iter.key() == QLatin1String("status"))
+                setProperty(iter.key().toLatin1(), (TransactionStatus)iter.value().toInt());
+            else if (iter.key() == QLatin1String("error"))
+                setProperty(iter.key().toLatin1(), (ErrorCode)iter.value().toInt());
+            else if (iter.key() == QLatin1String("exitStatus"))
+                setProperty(iter.key().toLatin1(), (ExitStatus)iter.value().toInt());
+            else
+                qDebug() << "failed to set:" << iter.key();
+        }
     }
 }
 
@@ -132,6 +191,17 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
     case UserIdProperty:
         setUserId(variant.variant().toInt());
         break;
+    case RoleProperty:
+        updateRole((TransactionRole)variant.variant().toInt());
+        break;
+    case StatusProperty:
+        updateStatus((TransactionStatus)variant.variant().toInt());
+        break;
+    case ErrorProperty:
+        setError((ErrorCode)variant.variant().toInt());
+        break;
+    case ExitStatusProperty:
+        setExitStatus((ExitStatus)variant.variant().toInt());
     default:
         break;
     }

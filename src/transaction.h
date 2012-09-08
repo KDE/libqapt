@@ -25,6 +25,8 @@
 #include <QtCore/QSharedPointer>
 #include <QtDBus/QDBusVariant>
 
+#include "globals.h"
+
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
@@ -49,6 +51,24 @@ class Q_DECL_EXPORT Transaction : public QObject
 
     Q_PROPERTY(QString transactionId READ transactionId)
     Q_PROPERTY(int userId READ userId WRITE setUserId)
+    Q_PROPERTY(TransactionRole role READ role WRITE updateRole)
+    Q_PROPERTY(TransactionStatus status READ status WRITE updateStatus)
+    Q_PROPERTY(ErrorCode error READ error)
+//    Q_PROPERTY(QString locale READ locale)
+//    Q_PROPERTY(QString proxy READ proxy)
+//    Q_PROPERTY(QString debconfPipe READ debconfPipe)
+//    Q_PROPERTY(QVariantMap packages READ packages)
+//    Q_PROPERTY(bool isCancellable READ isCancellable)
+//    Q_PROPERTY(bool isCancelled READ isCancelled)
+    Q_PROPERTY(ExitStatus exitStatus READ exitStatus)
+//    Q_PROPERTY(bool isPaused READ isPaused)
+//    Q_PROPERTY(QString statusDetails READ statusDetails)
+//    Q_PROPERTY(int progress READ progress)
+
+    Q_ENUMS(TransactionRole)
+    Q_ENUMS(TransactionStatus)
+    Q_ENUMS(ErrorCode)
+    Q_ENUMS(ExitStatus)
 public:
     /**
      * Constructor
@@ -69,11 +89,19 @@ public:
 
     QString transactionId() const;
     int userId() const;
+    QApt::TransactionRole role() const;
+    QApt::TransactionStatus status() const;
+    QApt::ErrorCode error() const;
+    QApt::ExitStatus exitStatus() const;
 
 private:
     QSharedPointer<TransactionPrivate> d;
 
     void setUserId(int id);
+    void updateRole(QApt::TransactionRole role);
+    void updateStatus(QApt::TransactionStatus status);
+    void setError(QApt::ErrorCode);
+    void setExitStatus(QApt::ExitStatus exitStatus);
 
 Q_SIGNALS:
 
