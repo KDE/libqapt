@@ -1080,11 +1080,16 @@ void Backend::emitPackageChanged()
     emit packageChanged();
 }
 
-void Backend::updateCache()
+Transaction Backend::updateCache()
 {
     Q_D(Backend);
 
-    d->worker->updateCache();
+    QDBusPendingReply<QString> rep = d->worker->updateCache();
+    Transaction trans(rep.value());
+
+    Transaction trans2 = trans;
+
+    return trans;
 }
 
 bool Backend::saveInstalledPackagesList(const QString &path) const

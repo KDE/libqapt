@@ -8,4 +8,5 @@ install( FILES
     DebFile
     DependencyInfo
     Changelog
+    Transaction
 DESTINATION include/LibQApt COMPONENT Devel)

@@ -29,7 +29,7 @@ qt4_add_dbus_adaptor(qapt_worker_SRCS
 
 qt4_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker.transaction.xml
-    transaction.h
+    src/worker/transaction.h
     Transaction
 )
 

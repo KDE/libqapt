@@ -26,6 +26,7 @@
 
 #include "globals.h"
 #include "package.h"
+#include "transaction.h"
 
 class pkgSourceList;
 class pkgRecords;
@@ -34,6 +35,7 @@ namespace QApt {
     class Cache;
     class Config;
     class DebFile;
+    class Transaction;
 }
 
 /**
@@ -663,7 +665,7 @@ public Q_SLOTS:
      * @see downloadProgress()
      * @see packageDownloadProgress()
      */
-    void updateCache();
+    Transaction updateCache();
 
     /**
      * Exports a list of all packages currently installed on the system. This
