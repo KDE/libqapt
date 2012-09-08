@@ -774,10 +774,7 @@ public Q_SLOTS:
     bool addArchiveToCache(const DebFile &archive);
 
 private Q_SLOTS:
-    void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void packageChanged(Package *package);
-    void workerStarted();
-    void workerFinished(bool result);
 };
 
 }

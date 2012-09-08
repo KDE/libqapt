@@ -25,7 +25,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QTemporaryFile>
 #include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusServiceWatcher>
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
@@ -102,9 +101,9 @@ public:
     bool xapianIndexExists;
 
     // DBus
-    QDBusServiceWatcher *watcher;
     OrgKubuntuQaptworkerInterface *worker;
 
+    // Config
     Config *config;
     bool isMultiArch;
     QString nativeArch;
@@ -139,11 +138,6 @@ Backend::Backend()
     d->worker = new OrgKubuntuQaptworkerInterface(QLatin1String("org.kubuntu.qaptworker"),
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
-
-    d->watcher = new QDBusServiceWatcher(this);
-    d->watcher->setConnection(QDBusConnection::systemBus());
-    d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
-    d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker"));
 }
 
 Backend::~Backend()
@@ -1382,39 +1376,6 @@ bool Backend::addArchiveToCache(const DebFile &archive)
 
     // Add the package, but we'll need auth so the worker'll do it
     return d->worker->copyArchiveToCache(archive.filePath());
-}
-
-void Backend::workerStarted()
-{
-    Q_D(Backend);
-
-    connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-            this, SLOT(serviceOwnerChanged(QString,QString,QString)));
-}
-
-void Backend::workerFinished(bool result)
-{
-    Q_D(Backend);
-
-    Q_UNUSED(result);
-
-    disconnect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-               this, SLOT(serviceOwnerChanged(QString,QString,QString)));
-}
-
-void Backend::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
-{
-    Q_UNUSED(name);
-
-    if (oldOwner.isEmpty()) {
-        return; // Don't care if empty, just appearing
-    }
-
-    if (newOwner.isEmpty()) {
-        // Ok, something got screwed. Report and flee
-        emit errorOccurred(QApt::WorkerDisappeared, QVariantMap());
-        workerFinished(false);
-    }
 }
 
 }
