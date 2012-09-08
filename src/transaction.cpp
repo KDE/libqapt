@@ -65,13 +65,11 @@ Transaction::Transaction(const QString &tid)
 {
     // Fetch property data from D-Bus
     sync();
-    qDebug() << &d;
 }
 
 Transaction::Transaction(const Transaction &other)
 {
     d = other.d;
-    qDebug() << &d;
 }
 
 Transaction::~Transaction()
