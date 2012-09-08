@@ -1220,7 +1220,7 @@ void Package::setKeep()
     }
 
     if (!d->backend->areEventsCompressed()) {
-        d->backend->emitPackageChanged(this);
+        d->backend->emitPackageChanged();
     }
 }
 
@@ -1238,7 +1238,7 @@ void Package::setInstall()
     }
 
     if (!d->backend->areEventsCompressed()) {
-        d->backend->emitPackageChanged(this);
+        d->backend->emitPackageChanged();
     }
 }
 
@@ -1247,7 +1247,7 @@ void Package::setReInstall()
     d->backend->cache()->depCache()->SetReInstall(*d->packageIter, true);
 
     if (!d->backend->areEventsCompressed()) {
-        d->backend->emitPackageChanged(this);
+        d->backend->emitPackageChanged();
     }
 }
 
@@ -1267,7 +1267,7 @@ void Package::setRemove()
     d->backend->cache()->depCache()->MarkDelete(*d->packageIter, false);
 
     if (!d->backend->areEventsCompressed()) {
-        d->backend->emitPackageChanged(this);
+        d->backend->emitPackageChanged();
     }
 }
 
@@ -1286,7 +1286,7 @@ void Package::setPurge()
     d->backend->cache()->depCache()->MarkDelete(*d->packageIter, true);
 
     if (!d->backend->areEventsCompressed()) {
-        d->backend->emitPackageChanged(this);
+        d->backend->emitPackageChanged();
     }
 }
 
