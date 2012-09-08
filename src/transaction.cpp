@@ -284,6 +284,8 @@ void Transaction::sync()
                 setProperty(iter.key().toLatin1(), (ErrorCode)iter.value().toInt());
             else if (iter.key() == QLatin1String("exitStatus"))
                 setProperty(iter.key().toLatin1(), (ExitStatus)iter.value().toInt());
+            else if (iter.key() == QLatin1String("packages"))
+                setProperty(iter.key().toLatin1(), d->dbus->property(iter.key().toLatin1()));
             else
                 qDebug() << "failed to set:" << iter.key();
         }
