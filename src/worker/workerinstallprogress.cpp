@@ -49,8 +49,8 @@ WorkerInstallProgress::WorkerInstallProgress(QAptWorker* parent)
 {
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
     setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
-    // TODO: apt-listchanges
-    setenv("APT_LISTCHANGES_FRONTEND", "none", 1);
+    setenv("APT_LISTBUGS_FRONTEND", "none", 1);
+    setenv("APT_LISTCHANGES_FRONTEND", "debconf", 1);
 }
 
 WorkerInstallProgress::~WorkerInstallProgress()
