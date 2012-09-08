@@ -28,12 +28,11 @@
 
 namespace QApt {
 
-class TransactionPrivate : public QSharedData
+class TransactionPrivate
 {
     public:
         TransactionPrivate(const QString &id)
-            : QSharedData()
-            , tid(id)
+            : tid(id)
         {
             dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
                                                                        tid, QDBusConnection::systemBus(),
@@ -41,8 +40,7 @@ class TransactionPrivate : public QSharedData
         }
 
         TransactionPrivate(const TransactionPrivate &other)
-            : QSharedData(other)
-            , dbus(other.dbus)
+            : dbus(other.dbus)
             , tid(other.tid)
             , uid(0)
         {
@@ -67,11 +65,13 @@ Transaction::Transaction(const QString &tid)
 {
     // Fetch property data from D-Bus
     sync();
+    qDebug() << &d;
 }
 
 Transaction::Transaction(const Transaction &other)
 {
     d = other.d;
+    qDebug() << &d;
 }
 
 Transaction::~Transaction()
