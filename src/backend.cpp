@@ -1087,8 +1087,6 @@ Transaction Backend::updateCache()
     QDBusPendingReply<QString> rep = d->worker->updateCache();
     Transaction trans(rep.value());
 
-    Transaction trans2 = trans;
-
     return trans;
 }
 
