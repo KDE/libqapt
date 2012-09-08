@@ -78,6 +78,16 @@ public:
      */
     Transaction(const QString &tid);
 
+    /**
+     * The copy constructor.
+     *
+     * This will create a new transaction instance pointing to the same data as
+     * the transaction being copied. When all Transaction instances tied to a
+     * transaction on D-Bus go out of scope, the transaction data will be
+     * automatically deleted.
+     *
+     * @param other The transaction to be copied
+     */
     Transaction(const Transaction &other);
 
     /**
@@ -85,6 +95,16 @@ public:
      */
     ~Transaction();
 
+    /**
+     * Assignment operator.
+     *
+     * This will create a new transaction instance pointing to the same data as
+     * the transaction being copied. When all Transaction instances tied to a
+     * transaction on D-Bus go out of scope, the transaction data will be
+     * automatically deleted.
+     *
+     * @param other The transaction to be copied
+     */
     Transaction &operator=(const Transaction& rhs);
 
     QString transactionId() const;
