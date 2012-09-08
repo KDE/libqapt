@@ -774,7 +774,7 @@ public Q_SLOTS:
     bool addArchiveToCache(const DebFile &archive);
 
 private Q_SLOTS:
-    void packageChanged(Package *package);
+    void emitPackageChanged();
 };
 
 }

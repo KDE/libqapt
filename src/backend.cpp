@@ -1075,10 +1075,8 @@ void Backend::installDebFile(const DebFile &debFile)
     //d->worker->installDebFile(debFile.filePath());
 }
 
-void Backend::packageChanged(Package *package)
+void Backend::emitPackageChanged()
 {
-    Q_UNUSED(package);
-
     emit packageChanged();
 }
 
