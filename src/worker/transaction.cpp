@@ -71,6 +71,11 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     m_queue->addPending(this);
 }
 
+Transaction::~Transaction()
+{
+    QDBusConnection::systemBus().unregisterObject(m_tid);
+}
+
 QString Transaction::transactionId() const
 {
     return m_tid;

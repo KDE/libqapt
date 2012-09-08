@@ -56,6 +56,7 @@ public:
     Transaction(TransactionQueue *queue, int userId);
     Transaction(TransactionQueue *queue, int userId,
                 QApt::TransactionRole role, QVariantMap packagesList);
+    ~Transaction();
 
     QString transactionId() const;
     int userId() const;
