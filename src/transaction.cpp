@@ -285,6 +285,8 @@ void Transaction::sync()
             else if (iter.key() == QLatin1String("exitStatus"))
                 setProperty(iter.key().toLatin1(), (ExitStatus)iter.value().toInt());
             else if (iter.key() == QLatin1String("packages"))
+                // iter.value() for the QVariantMap is QDBusArgument, so we have to
+                // set this manually
                 setProperty(iter.key().toLatin1(), d->dbus->property(iter.key().toLatin1()));
             else
                 qDebug() << "failed to set:" << iter.key();
