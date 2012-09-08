@@ -24,6 +24,7 @@
 #include <QDebug>
 
 // Own includes
+#include "globals.h"
 #include "transactiondbus.h"
 
 namespace QApt {
@@ -65,6 +66,9 @@ Transaction::Transaction(const QString &tid)
 {
     // Fetch property data from D-Bus
     sync();
+
+    connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
+            this, SLOT(updateProperty(int,QDBusVariant)));
 }
 
 Transaction::Transaction(const Transaction &other)
@@ -117,6 +121,19 @@ void Transaction::sync()
     for (auto iter = propertyMap.constBegin(); iter != propertyMap.constEnd(); ++iter) {
         if (!setProperty(iter.key().toLatin1(), iter.value()))
             qDebug() << "failed to set:" << iter.key();
+    }
+}
+
+void Transaction::updateProperty(int type, const QDBusVariant &variant)
+{
+    switch (type) {
+    case TransactionIdProperty:
+        break; // Read-only
+    case UserIdProperty:
+        setUserId(variant.variant().toInt());
+        break;
+    default:
+        break;
     }
 }
 

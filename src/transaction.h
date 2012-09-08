@@ -23,6 +23,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
+#include <QtDBus/QDBusVariant>
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
@@ -80,6 +81,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void sync();
+    void updateProperty(int type, const QDBusVariant &variant);
 };
 
 }
