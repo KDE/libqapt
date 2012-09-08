@@ -107,7 +107,7 @@ int Transaction::userId() const
     return d->uid;
 }
 
-void Transaction::setUserId(int uid)
+void Transaction::updateUserId(int uid)
 {
     d->uid = uid;
 }
@@ -137,7 +137,7 @@ QApt::ErrorCode Transaction::error() const
     return d->error;
 }
 
-void Transaction::setError(ErrorCode error)
+void Transaction::updateError(ErrorCode error)
 {
     d->error = error;
 }
@@ -147,7 +147,7 @@ QApt::ExitStatus Transaction::exitStatus() const
     return d->exitStatus;
 }
 
-void Transaction::setExitStatus(ExitStatus exitStatus)
+void Transaction::updateExitStatus(ExitStatus exitStatus)
 {
     d->exitStatus = exitStatus;
 }
@@ -159,7 +159,6 @@ void Transaction::sync()
     call.setArguments(QList<QVariant>() << "org.kubuntu.qaptworker.transaction");
 
     QDBusReply<QVariantMap> reply = QDBusConnection::systemBus().call(call);
-
     QVariantMap propertyMap = reply.value();
 
     if (propertyMap.isEmpty())
@@ -189,7 +188,7 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
     case TransactionIdProperty:
         break; // Read-only
     case UserIdProperty:
-        setUserId(variant.variant().toInt());
+        updateUserId(variant.variant().toInt());
         break;
     case RoleProperty:
         updateRole((TransactionRole)variant.variant().toInt());
@@ -198,10 +197,10 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         updateStatus((TransactionStatus)variant.variant().toInt());
         break;
     case ErrorProperty:
-        setError((ErrorCode)variant.variant().toInt());
+        updateError((ErrorCode)variant.variant().toInt());
         break;
     case ExitStatusProperty:
-        setExitStatus((ExitStatus)variant.variant().toInt());
+        updateExitStatus((ExitStatus)variant.variant().toInt());
     default:
         break;
     }

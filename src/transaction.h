@@ -50,7 +50,7 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString transactionId READ transactionId)
-    Q_PROPERTY(int userId READ userId WRITE setUserId)
+    Q_PROPERTY(int userId READ userId WRITE updateUserId)
     Q_PROPERTY(TransactionRole role READ role WRITE updateRole)
     Q_PROPERTY(TransactionStatus status READ status WRITE updateStatus)
     Q_PROPERTY(ErrorCode error READ error)
@@ -117,11 +117,11 @@ public:
 private:
     QSharedPointer<TransactionPrivate> d;
 
-    void setUserId(int id);
+    void updateUserId(int id);
     void updateRole(QApt::TransactionRole role);
     void updateStatus(QApt::TransactionStatus status);
-    void setError(QApt::ErrorCode);
-    void setExitStatus(QApt::ExitStatus exitStatus);
+    void updateError(QApt::ErrorCode);
+    void updateExitStatus(QApt::ExitStatus exitStatus);
 
 Q_SIGNALS:
 
