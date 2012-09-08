@@ -140,7 +140,7 @@ void Transaction::setLocale(QString locale)
 
 QString Transaction::proxy() const
 {
-    return m_locale;
+    return m_proxy;
 }
 
 void Transaction::setProxy(QString proxy)
