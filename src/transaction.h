@@ -23,6 +23,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVariantMap>
 #include <QtDBus/QDBusVariant>
 
 #include "globals.h"
@@ -49,21 +50,21 @@ class Q_DECL_EXPORT Transaction : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString transactionId READ transactionId)
+    Q_PROPERTY(QString transactionId READ transactionId WRITE updateTransactionId)
     Q_PROPERTY(int userId READ userId WRITE updateUserId)
     Q_PROPERTY(TransactionRole role READ role WRITE updateRole)
     Q_PROPERTY(TransactionStatus status READ status WRITE updateStatus)
     Q_PROPERTY(ErrorCode error READ error)
-//    Q_PROPERTY(QString locale READ locale)
-//    Q_PROPERTY(QString proxy READ proxy)
-//    Q_PROPERTY(QString debconfPipe READ debconfPipe)
-//    Q_PROPERTY(QVariantMap packages READ packages)
-//    Q_PROPERTY(bool isCancellable READ isCancellable)
-//    Q_PROPERTY(bool isCancelled READ isCancelled)
-    Q_PROPERTY(ExitStatus exitStatus READ exitStatus)
-//    Q_PROPERTY(bool isPaused READ isPaused)
-//    Q_PROPERTY(QString statusDetails READ statusDetails)
-//    Q_PROPERTY(int progress READ progress)
+    Q_PROPERTY(QString locale READ locale WRITE updateLocale)
+    Q_PROPERTY(QString proxy READ proxy WRITE updateProxy)
+    Q_PROPERTY(QString debconfPipe READ debconfPipe WRITE updateDebconfPipe)
+    Q_PROPERTY(QVariantMap packages READ packages WRITE updatePackages)
+    Q_PROPERTY(bool isCancellable READ isCancellable WRITE updateCancellable)
+    Q_PROPERTY(bool isCancelled READ isCancelled WRITE updateCancelled)
+    Q_PROPERTY(ExitStatus exitStatus READ exitStatus WRITE updateExitStatus)
+    Q_PROPERTY(bool isPaused READ isPaused WRITE updatePaused)
+    Q_PROPERTY(QString statusDetails READ statusDetails WRITE updateStatusDetails)
+    Q_PROPERTY(int progress READ progress WRITE updateProgress)
 
     Q_ENUMS(TransactionRole)
     Q_ENUMS(TransactionStatus)
@@ -112,16 +113,35 @@ public:
     QApt::TransactionRole role() const;
     QApt::TransactionStatus status() const;
     QApt::ErrorCode error() const;
+    QString locale() const;
+    QString proxy() const;
+    QString debconfPipe() const;
+    QVariantMap packages() const;
+    bool isCancellable() const;
+    bool isCancelled() const;
     QApt::ExitStatus exitStatus() const;
+    bool isPaused() const;
+    QString statusDetails() const;
+    int progress() const;
 
 private:
     QSharedPointer<TransactionPrivate> d;
 
+    void updateTransactionId(const QString &tid);
     void updateUserId(int id);
     void updateRole(QApt::TransactionRole role);
     void updateStatus(QApt::TransactionStatus status);
     void updateError(QApt::ErrorCode);
+    void updateLocale(const QString &locale);
+    void updateProxy(const QString &proxy);
+    void updateDebconfPipe(const QString &pipe);
+    void updatePackages(const QVariantMap &packages);
+    void updateCancellable(bool cancellable);
+    void updateCancelled(bool cancelled);
     void updateExitStatus(QApt::ExitStatus exitStatus);
+    void updatePaused(bool paused);
+    void updateStatusDetails(const QString &details);
+    void updateProgress(int progress);
 
 Q_SIGNALS:
 

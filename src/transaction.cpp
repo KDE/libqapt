@@ -46,7 +46,11 @@ class TransactionPrivate
             , role(EmptyRole)
             , status(QApt::SetupStatus)
             , error(QApt::Success)
+            , isCancellable(true)
+            , isCancelled(false)
             , exitStatus(QApt::ExitUnfinished)
+            , isPaused(false)
+            , progress(0)
         {
         }
 
@@ -64,7 +68,16 @@ class TransactionPrivate
         TransactionRole role;
         TransactionStatus status;
         ErrorCode error;
+        QString locale;
+        QString proxy;
+        QString debconfPipe;
+        QVariantMap packages;
+        bool isCancellable;
+        bool isCancelled;
         ExitStatus exitStatus;
+        bool isPaused;
+        QString statusDetails;
+        int progress;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -100,6 +113,11 @@ Transaction &Transaction::operator=(const Transaction& rhs)
 QString Transaction::transactionId() const
 {
     return d->tid;
+}
+
+void Transaction::updateTransactionId(const QString &tid)
+{
+    d->tid = tid;
 }
 
 int Transaction::userId() const
@@ -142,6 +160,66 @@ void Transaction::updateError(ErrorCode error)
     d->error = error;
 }
 
+QString Transaction::locale() const
+{
+    return d->locale;
+}
+
+void Transaction::updateLocale(const QString &locale)
+{
+    d->locale = locale;
+}
+
+QString Transaction::proxy() const
+{
+    return d->proxy;
+}
+
+void Transaction::updateProxy(const QString &proxy)
+{
+    d->proxy = proxy;
+}
+
+QString Transaction::debconfPipe() const
+{
+    return d->debconfPipe;
+}
+
+void Transaction::updateDebconfPipe(const QString &pipe)
+{
+    d->debconfPipe = pipe;
+}
+
+QVariantMap Transaction::packages() const
+{
+    return d->packages;
+}
+
+void Transaction::updatePackages(const QVariantMap &packages)
+{
+    d->packages = packages;
+}
+
+bool Transaction::isCancellable() const
+{
+    return d->isCancellable;
+}
+
+void Transaction::updateCancellable(bool cancellable)
+{
+    d->isCancellable = cancellable;
+}
+
+bool Transaction::isCancelled() const
+{
+    return d->isCancelled;
+}
+
+void Transaction::updateCancelled(bool cancelled)
+{
+    d->isCancelled = cancelled;
+}
+
 QApt::ExitStatus Transaction::exitStatus() const
 {
     return d->exitStatus;
@@ -150,6 +228,36 @@ QApt::ExitStatus Transaction::exitStatus() const
 void Transaction::updateExitStatus(ExitStatus exitStatus)
 {
     d->exitStatus = exitStatus;
+}
+
+bool Transaction::isPaused() const
+{
+    return d->isPaused;
+}
+
+void Transaction::updatePaused(bool paused)
+{
+    d->isPaused = paused;
+}
+
+QString Transaction::statusDetails() const
+{
+    return d->statusDetails;
+}
+
+void Transaction::updateStatusDetails(const QString &details)
+{
+    d->statusDetails = details;
+}
+
+int Transaction::progress() const
+{
+    return d->progress;
+}
+
+void Transaction::updateProgress(int progress)
+{
+    d->progress = progress;
 }
 
 void Transaction::sync()
@@ -186,7 +294,7 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
 {
     switch (type) {
     case TransactionIdProperty:
-        break; // Read-only
+        break; // Read-only after it has been set
     case UserIdProperty:
         updateUserId(variant.variant().toInt());
         break;
@@ -199,8 +307,36 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
     case ErrorProperty:
         updateError((ErrorCode)variant.variant().toInt());
         break;
+    case LocaleProperty:
+        updateLocale(variant.variant().toString());
+        break;
+    case ProxyProperty:
+        updateProxy(variant.variant().toString());
+        break;
+    case DebconfPipeProperty:
+        updateDebconfPipe(variant.variant().toString());
+        break;
+    case PackagesProperty:
+        updatePackages(variant.variant().toMap());
+        break;
+    case CancellableProperty:
+        updateCancellable(variant.variant().toBool());
+        break;
+    case CancelledProperty:
+        updateCancelled(variant.variant().toBool());
+        break;
     case ExitStatusProperty:
         updateExitStatus((ExitStatus)variant.variant().toInt());
+        break;
+    case PausedProperty:
+        updatePaused(variant.variant().toBool());
+        break;
+    case StatusDetailsProperty:
+        updateStatusDetails(variant.variant().toString());
+        break;
+    case ProgressProperty:
+        updateProgress(variant.variant().toInt());
+        break;
     default:
         break;
     }
