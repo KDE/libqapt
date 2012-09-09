@@ -152,12 +152,14 @@ Q_SIGNALS:
     void finished(QApt::ExitStatus exitStatus);
 
 public Q_SLOTS:
+    void setLocale(const QString &locale);
+    void setProxy(const QString &proxy);
     void run();
 
 private Q_SLOTS:
     void sync();
     void updateProperty(int type, const QDBusVariant &variant);
-    void onRunCallFinished(QDBusPendingCallWatcher *watcher);
+    void onCallFinished(QDBusPendingCallWatcher *watcher);
     void emitFinished(int exitStatus);
 };
 

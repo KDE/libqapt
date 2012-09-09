@@ -264,23 +264,50 @@ void Transaction::updateProgress(int progress)
     d->progress = progress;
 }
 
-void Transaction::run()
+void Transaction::setLocale(const QString &locale)
 {
-    QDBusPendingCall call = d->dbus->asyncCall("run");
+    QDBusPendingCall call = d->dbus->setProperty(QApt::LocaleProperty,
+                                                 QDBusVariant(locale));
 
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
-            this, SLOT(onRunCallFinished(QDBusPendingCallWatcher*)));
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
 }
 
-void Transaction::onRunCallFinished(QDBusPendingCallWatcher *watcher)
+void Transaction::setProxy(const QString &proxy)
+{
+    QDBusPendingCall call = d->dbus->setProperty(QApt::ProxyProperty,
+                                                 QDBusVariant(proxy));
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::run()
+{
+    QDBusPendingCall call = d->dbus->run();
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
 {
     qDebug() << "reply";
     QDBusPendingReply<> reply = *watcher;
 
     if (reply.isError()) {
-        qDebug() << reply.error();
-        // Emit error
+        switch (reply.error().type())
+        {
+        case QDBusError::AccessDenied:
+            emit errorOccurred(QApt::AuthError);
+            break;
+        default:
+            emit errorOccurred(QApt::UnknownError);
+            break;
+        }
     }
 
     watcher->deleteLater();
