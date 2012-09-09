@@ -72,7 +72,7 @@ QAptTest::QAptTest()
     layout->addWidget(topHBox);
 
     m_lineEdit = new KLineEdit(topHBox);
-    m_lineEdit->setText("kdelibs5");
+    m_lineEdit->setText("muon");
     m_lineEdit->setClearButtonShown(true);
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(updateLabels()));
 
