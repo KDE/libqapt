@@ -90,7 +90,6 @@ Transaction::Transaction(const QString &tid)
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
-    connect(d->dbus, SIGNAL(finished(int)), this, SLOT(emitFinished(int)));
 }
 
 Transaction::Transaction(const Transaction &other)
@@ -99,7 +98,6 @@ Transaction::Transaction(const Transaction &other)
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
-    connect(d->dbus, SIGNAL(finished(int)), this, SLOT(emitFinished(int)));
 }
 
 Transaction::~Transaction()
@@ -328,16 +326,17 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
     case TransactionIdProperty:
         break; // Read-only after it has been set
     case UserIdProperty:
-        updateUserId(variant.variant().toInt());
-        break;
+        break; // Read-only after it has been set
     case RoleProperty:
         updateRole((TransactionRole)variant.variant().toInt());
         break;
     case StatusProperty:
         updateStatus((TransactionStatus)variant.variant().toInt());
+        emit statusChanged(status());
         break;
     case ErrorProperty:
         updateError((ErrorCode)variant.variant().toInt());
+        emit errorOccurred(error());
         break;
     case LocaleProperty:
         updateLocale(variant.variant().toString());
@@ -353,21 +352,30 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         break;
     case CancellableProperty:
         updateCancellable(variant.variant().toBool());
+        emit cancellableChanged(isCancellable());
         break;
     case CancelledProperty:
         updateCancelled(variant.variant().toBool());
         break;
     case ExitStatusProperty:
         updateExitStatus((ExitStatus)variant.variant().toInt());
+        if (exitStatus() != QApt::ExitUnfinished)
+            emit finished(exitStatus());
         break;
     case PausedProperty:
         updatePaused(variant.variant().toBool());
+        if (isPaused())
+            emit paused();
+        else
+            emit resumed();
         break;
     case StatusDetailsProperty:
         updateStatusDetails(variant.variant().toString());
+        emit statusDetailsChanged(statusDetails());
         break;
     case ProgressProperty:
         updateProgress(variant.variant().toInt());
+        emit progressChanged(progress());
         break;
     default:
         break;

@@ -46,6 +46,7 @@
 #include "cache.h"
 #include "config.h"
 #include "debfile.h"
+#include "transaction.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
 
 namespace QApt {

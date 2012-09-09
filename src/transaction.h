@@ -142,6 +142,13 @@ private:
     void updateProgress(int progress);
 
 Q_SIGNALS:
+    void errorOccurred(QApt::ErrorCode error);
+    void statusChanged(QApt::TransactionStatus status);
+    void cancellableChanged(bool cancellable);
+    void paused();
+    void resumed();
+    void statusDetailsChanged(const QString &statusDetails);
+    void progressChanged(int progress);
     void finished(QApt::ExitStatus exitStatus);
 
 public Q_SLOTS:

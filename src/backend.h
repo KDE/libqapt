@@ -26,7 +26,6 @@
 
 #include "globals.h"
 #include "package.h"
-#include "transaction.h"
 
 class pkgSourceList;
 class pkgRecords;
