@@ -46,6 +46,7 @@
 
 QAptTest::QAptTest()
     : KMainWindow()
+    , m_trans(0)
     , m_stack(0)
 {
     setWindowIcon(KIcon("application-x-deb"));
