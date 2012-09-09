@@ -31,6 +31,8 @@
 #include <KLocale>
 #include <KDebug>
 
+#include <LibQApt/Transaction>
+
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     : KVBox(parent)
 {
@@ -47,17 +49,29 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     m_cancelButton = new QPushButton(this);
     m_cancelButton->setText(i18n("Cancel"));
     m_cancelButton->setIcon(KIcon("dialog-cancel"));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelButtonPressed()));
-}
-
-CacheUpdateWidget::~CacheUpdateWidget()
-{
 }
 
 void CacheUpdateWidget::clear()
 {
     m_downloadModel->clear();
     m_totalProgress->setValue(0);
+}
+
+void CacheUpdateWidget::setTransaction(QApt::Transaction *trans)
+{
+    m_trans = trans;
+    clear();
+    m_cancelButton->setEnabled(m_trans->isCancellable());
+    connect(m_cancelButton, SIGNAL(pressed()),
+            m_trans, SLOT(cancel()));
+
+    // Listen for changes to the transaction
+    connect(m_trans, SIGNAL(cancellableChanged(bool)),
+            m_cancelButton, SLOT(setEnabled(bool)));
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(progressChanged(int)),
+            m_totalProgress, SLOT(setValue(int)));
 }
 
 void CacheUpdateWidget::setHeaderText(const QString &text)
@@ -97,9 +111,32 @@ void CacheUpdateWidget::setTotalProgress(int percentage, int speed, int ETA)
     m_downloadLabel->setText(downloadSpeed + timeRemaining);
 }
 
-void CacheUpdateWidget::cancelButtonPressed()
+void CacheUpdateWidget::onTransactionStatusChanged(QApt::TransactionStatus status)
 {
-    emit(cancelCacheUpdate());
-}
+    QString headerText;
 
-#include "cacheupdatewidget.moc"
+    qDebug() << "cache widget: transaction status changed";
+
+    switch (status) {
+    case QApt::DownloadingStatus:
+        switch (m_trans->role()) {
+        case QApt::UpdateCacheRole:
+            headerText = i18n("<b>Updating software sources</b>");
+            break;
+        case QApt::DownloadArchivesRole:
+        case QApt::CommitChangesRole:
+            headerText = i18n("<b>Downloading Packages</b>");
+            break;
+        default:
+            break;
+        }
+
+        m_headerLabel->setText(headerText);
+        break;
+    case QApt::FinishedStatus:
+        clear();
+        break;
+    default:
+        break;
+    }
+}

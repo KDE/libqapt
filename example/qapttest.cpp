@@ -32,10 +32,12 @@
 #include <KGlobal>
 #include <KLocale>
 #include <KLineEdit>
+#include <KProtocolManager>
 #include <KStatusBar>
 #include <KVBox>
 
-#include <libqapt/debfile.h>
+#include <LibQApt/Backend>
+#include <LibQApt/Transaction>
 
 #include <DebconfGui.h>
 
@@ -52,12 +54,6 @@ QAptTest::QAptTest()
     m_backend->init();
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
-    connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)), this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_backend, SIGNAL(downloadProgress(int,int,int)), this, SLOT(updateDownloadProgress(int,int,int)));
-    connect(m_backend, SIGNAL(downloadMessage(int,QString)),
-            this, SLOT(updateDownloadMessage(int,QString)));
-    connect(m_backend, SIGNAL(commitProgress(QString,int)),
-            this, SLOT(updateCommitProgress(QString,int)));
 
     m_stack = new QStackedWidget(this);
 
@@ -198,7 +194,25 @@ void QAptTest::updateLabels()
 
 void QAptTest::updateCache()
 {
-    m_backend->updateCache();
+    if (m_trans) // Transaction running
+        return;
+
+    m_trans = m_backend->updateCache();
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Pass the new current transaction on to our child widgets
+    m_cacheUpdateWidget->setTransaction(m_trans);
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+
+    m_trans->run();
+    qDebug() << "running transaction";
 }
 
 void QAptTest::upgrade()
@@ -224,6 +238,32 @@ void QAptTest::commitAction()
     m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
 
     m_backend->commitChanges();
+}
+
+void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
+{
+    QString headerText;
+
+    switch (status) {
+    case QApt::DownloadingStatus:
+        m_stack->setCurrentWidget(m_cacheUpdateWidget);
+        break;
+    case QApt::CommittingStatus:
+        m_stack->setCurrentWidget(m_commitWidget);
+        break;
+    case QApt::FinishedStatus:
+        // FIXME: Determine which transactions need to reload cache on completion
+        m_backend->reloadCache();
+        m_stack->setCurrentWidget(m_mainWidget);
+        updateStatusBar();
+
+        // Clean up transaction object
+        m_trans->deleteLater();
+        m_trans = 0;
+        break;
+    default:
+        break;
+    }
 }
 
 void QAptTest::workerEvent(QApt::WorkerEvent event)

@@ -27,11 +27,17 @@
 
 #include <KVBox>
 
+#include <LibQApt/Globals>
+
 class QLabel;
 class QListView;
 class QProgressBar;
 class QStandardItemModel;
 class QPushButton;
+
+namespace QApt {
+    class Transaction;
+}
 
 class CacheUpdateWidget : public KVBox
 {
@@ -39,14 +45,15 @@ class CacheUpdateWidget : public KVBox
 public:
     CacheUpdateWidget(QWidget *parent);
 
-    ~CacheUpdateWidget();
-
     void clear();
+    void setTransaction(QApt::Transaction *trans);
     void addItem(const QString &message);
     void setTotalProgress(int percentage, int speed, int ETA);
     void setHeaderText(const QString &text);
 
 private:
+    QApt::Transaction *m_trans;
+
     QLabel *m_headerLabel;
     QListView *m_downloadView;
     QStandardItemModel *m_downloadModel;
@@ -54,8 +61,8 @@ private:
     QLabel *m_downloadLabel;
     QPushButton *m_cancelButton;
 
-private Q_SLOTS:
-    void cancelButtonPressed();
+private slots:
+    void onTransactionStatusChanged(QApt::TransactionStatus status);
 
 signals:
     void cancelCacheUpdate();
