@@ -21,34 +21,65 @@
 #include "transaction.h"
 
 // Qt includes
+#include <QtDBus/QDBusPendingCallWatcher>
 #include <QDebug>
 
 // Own includes
-#include "transaction_p.h"
+#include "transactiondbus.h"
 
 namespace QApt {
 
-void TransactionPrivate::run()
+class TransactionPrivate
 {
-    QDBusPendingCall call = dbus->asyncCall("run");
+    public:
+        TransactionPrivate(const QString &id)
+            : tid(id)
+        {
+            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
+                                                                       tid, QDBusConnection::systemBus(),
+                                                                       0);
+        }
 
-    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
-            this, SLOT(onRunCallFinished(QDBusPendingCallWatcher*)));
-}
+        TransactionPrivate(const TransactionPrivate &other)
+            : dbus(other.dbus)
+            , tid(other.tid)
+            , uid(0)
+            , role(EmptyRole)
+            , status(QApt::SetupStatus)
+            , error(QApt::Success)
+            , isCancellable(true)
+            , isCancelled(false)
+            , exitStatus(QApt::ExitUnfinished)
+            , isPaused(false)
+            , progress(0)
+        {
+        }
 
-void TransactionPrivate::onRunCallFinished(QDBusPendingCallWatcher *watcher)
-{
-    qDebug() << "reply";
-    QDBusPendingReply<> reply = *watcher;
+        ~TransactionPrivate()
+        {
+            delete dbus;
+        }
 
-    if (reply.isError()) {
-        qDebug() << reply.error();
-        // Emit error
-    }
+        // DBus
+        OrgKubuntuQaptworkerTransactionInterface *dbus;
 
-    watcher->deleteLater();
-}
+        // Data
+        QString tid;
+        int uid;
+        TransactionRole role;
+        TransactionStatus status;
+        ErrorCode error;
+        QString locale;
+        QString proxy;
+        QString debconfPipe;
+        QVariantMap packages;
+        bool isCancellable;
+        bool isCancelled;
+        ExitStatus exitStatus;
+        bool isPaused;
+        QString statusDetails;
+        int progress;
+};
 
 Transaction::Transaction(const QString &tid)
     : QObject()
@@ -59,11 +90,16 @@ Transaction::Transaction(const QString &tid)
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
+    connect(d->dbus, SIGNAL(finished(int)), this, SLOT(emitFinished(int)));
 }
 
 Transaction::Transaction(const Transaction &other)
 {
     d = other.d;
+
+    connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
+            this, SLOT(updateProperty(int,QDBusVariant)));
+    connect(d->dbus, SIGNAL(finished(int)), this, SLOT(emitFinished(int)));
 }
 
 Transaction::~Transaction()
@@ -232,7 +268,24 @@ void Transaction::updateProgress(int progress)
 
 void Transaction::run()
 {
-    d->run();
+    QDBusPendingCall call = d->dbus->asyncCall("run");
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onRunCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::onRunCallFinished(QDBusPendingCallWatcher *watcher)
+{
+    qDebug() << "reply";
+    QDBusPendingReply<> reply = *watcher;
+
+    if (reply.isError()) {
+        qDebug() << reply.error();
+        // Emit error
+    }
+
+    watcher->deleteLater();
 }
 
 void Transaction::sync()
@@ -319,6 +372,11 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
     default:
         break;
     }
+}
+
+void Transaction::emitFinished(int exitStatus)
+{
+    emit finished((QApt::ExitStatus)exitStatus);
 }
 
 }

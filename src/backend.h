@@ -661,11 +661,8 @@ public Q_SLOTS:
      * signal, and per-package download progress can be tracked by the
      * packageDownloadProgress() signal.
      *
-     * @see workerEvent()
-     * @see downloadProgress()
-     * @see packageDownloadProgress()
      */
-    Transaction updateCache();
+    Transaction *updateCache();
 
     /**
      * Exports a list of all packages currently installed on the system. This

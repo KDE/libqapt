@@ -84,10 +84,8 @@ public:
     /**
      * The copy constructor.
      *
-     * This will create a new transaction instance pointing to the same data as
-     * the transaction being copied. When all Transaction instances tied to a
-     * transaction on D-Bus go out of scope, the transaction data will be
-     * automatically deleted.
+     * This will create a new transaction instance representing the same worker
+     * transaction as the one being copied. Delete it when you are done with it.
      *
      * @param other The transaction to be copied
      */
@@ -101,10 +99,8 @@ public:
     /**
      * Assignment operator.
      *
-     * This will create a new transaction instance pointing to the same data as
-     * the transaction being copied. When all Transaction instances tied to a
-     * transaction on D-Bus go out of scope, the transaction data will be
-     * automatically deleted.
+     * This will create a new transaction instance representing the same worker
+     * transaction as the one being copied. Delete it when you are done with it.
      *
      * @param other The transaction to be copied
      */
@@ -146,6 +142,7 @@ private:
     void updateProgress(int progress);
 
 Q_SIGNALS:
+    void finished(QApt::ExitStatus exitStatus);
 
 public Q_SLOTS:
     void run();
@@ -153,6 +150,8 @@ public Q_SLOTS:
 private Q_SLOTS:
     void sync();
     void updateProperty(int type, const QDBusVariant &variant);
+    void onRunCallFinished(QDBusPendingCallWatcher *watcher);
+    void emitFinished(int exitStatus);
 };
 
 }

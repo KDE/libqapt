@@ -31,65 +31,7 @@
 
 namespace QApt {
 
-class TransactionPrivate : public QObject
-{
-    Q_OBJECT
-    public:
-        TransactionPrivate(const QString &id)
-            : QObject(0)
-            , tid(id)
-        {
-            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
-                                                                       tid, QDBusConnection::systemBus(),
-                                                                       0);
-        }
 
-        TransactionPrivate(const TransactionPrivate &other)
-            : QObject(0)
-            , dbus(other.dbus)
-            , tid(other.tid)
-            , uid(0)
-            , role(EmptyRole)
-            , status(QApt::SetupStatus)
-            , error(QApt::Success)
-            , isCancellable(true)
-            , isCancelled(false)
-            , exitStatus(QApt::ExitUnfinished)
-            , isPaused(false)
-            , progress(0)
-        {
-        }
-
-        ~TransactionPrivate()
-        {
-            delete dbus;
-        }
-
-        // DBus
-        OrgKubuntuQaptworkerTransactionInterface *dbus;
-
-        // Data
-        QString tid;
-        int uid;
-        TransactionRole role;
-        TransactionStatus status;
-        ErrorCode error;
-        QString locale;
-        QString proxy;
-        QString debconfPipe;
-        QVariantMap packages;
-        bool isCancellable;
-        bool isCancelled;
-        ExitStatus exitStatus;
-        bool isPaused;
-        QString statusDetails;
-        int progress;
-
-        void run();
-
-    private Q_SLOTS:
-        void onRunCallFinished(QDBusPendingCallWatcher *watcher);
-};
 
 }
 

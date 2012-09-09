@@ -113,7 +113,7 @@ public:
     pkgDepCache::ActionGroup *actionGroup;
 
     // Transactions
-    QList<Transaction> transactions;
+    QList<Transaction *> transactions;
 
     // Other
     bool writeSelectionFile(const QString &file, const QString &path) const;
@@ -1083,17 +1083,16 @@ void Backend::emitPackageChanged()
     emit packageChanged();
 }
 
-Transaction Backend::updateCache()
+Transaction *Backend::updateCache()
 {
     Q_D(Backend);
 
     QDBusPendingReply<QString> rep = d->worker->updateCache();
-    Transaction trans(rep.value());
-    trans.run();
+    Transaction *trans = new Transaction(rep.value());
 
     d->transactions.append(trans);
 
-    return trans;
+    return new Transaction(*trans);
 }
 
 bool Backend::saveInstalledPackagesList(const QString &path) const
