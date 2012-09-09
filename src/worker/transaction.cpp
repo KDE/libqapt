@@ -95,7 +95,7 @@ void Transaction::setRole(int role)
 {
     // Cannot change role for an already determined transaction
     if (m_role != QApt::EmptyRole) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
 
         return;
     }
@@ -135,7 +135,7 @@ QString Transaction::locale() const
 void Transaction::setLocale(QString locale)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         return;
     }
 
@@ -151,7 +151,7 @@ QString Transaction::proxy() const
 void Transaction::setProxy(QString proxy)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         return;
     }
 
@@ -167,14 +167,14 @@ QString Transaction::debconfPipe() const
 void Transaction::setDebconfPipe(QString pipe)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         return;
     }
 
     QFileInfo pipeInfo(pipe);
 
     if (!pipeInfo.exists() || pipeInfo.ownerId() != m_uid) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::InvalidArgs, QString()));
+        sendErrorReply(QDBusError::InvalidArgs);
         return;
     }
 
@@ -190,7 +190,7 @@ QVariantMap Transaction::packages() const
 void Transaction::setPackages(QVariantMap packageList)
 {
     if (m_status != QApt::SetupStatus) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         return;
     }
 
@@ -286,8 +286,10 @@ void Transaction::setService(const QString &service)
 
 void Transaction::run()
 {
-    if (isForeignUser() ||!authorizeRun()) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+    setDelayedReply(true);
+    if (!isForeignUser() ||!authorizeRun()) {
+        qDebug() << "auth error";
+        sendErrorReply(QDBusError::AccessDenied);
         return;
     }
 
@@ -322,7 +324,7 @@ bool Transaction::authorizeRun()
 void Transaction::setProperty(int property, QDBusVariant value)
 {
     if (isForeignUser()) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+        sendErrorReply(QDBusError::AccessDenied);
         return;
     }
 
@@ -331,7 +333,7 @@ void Transaction::setProperty(int property, QDBusVariant value)
     case QApt::TransactionIdProperty:
     case QApt::UserIdProperty:
         // Read-only
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         break;
     case QApt::RoleProperty:
         setRole((QApt::TransactionProperty)value.variant().toInt());
@@ -352,7 +354,7 @@ void Transaction::setProperty(int property, QDBusVariant value)
         setPackages(value.variant().toMap());
         break;
     default:
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::InvalidArgs, QString()));
+        sendErrorReply(QDBusError::InvalidArgs);
         break;
     }
 }
@@ -362,14 +364,14 @@ void Transaction::cancel()
     if (isForeignUser()) {
         if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.foreignCancel"),
                                    QLatin1String("org.kubuntu.qaptworker"))) {
-            QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+            sendErrorReply(QDBusError::AccessDenied);
             return;
         }
     }
 
     // We can only cancel cancellable transactions, obviously
     if (!m_isCancellable) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         return;
     }
 
@@ -381,13 +383,13 @@ void Transaction::cancel()
 void Transaction::provideMedium(const QString &medium)
 {
     if (isForeignUser()) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::AccessDenied, QString()));
+        sendErrorReply(QDBusError::AccessDenied);
         return;
     }
 
     // An incorrect medium was provided, or no medium was requested
     if (medium != m_medium || m_medium.isEmpty()) {
-        QDBusConnection::systemBus().send(QDBusMessage::createError(QDBusError::Failed, QString()));
+        sendErrorReply(QDBusError::Failed);
         return;
     }
 

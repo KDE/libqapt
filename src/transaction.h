@@ -28,6 +28,8 @@
 
 #include "globals.h"
 
+class QDBusPendingCallWatcher;
+
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
@@ -146,6 +148,7 @@ private:
 Q_SIGNALS:
 
 public Q_SLOTS:
+    void run();
 
 private Q_SLOTS:
     void sync();

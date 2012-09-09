@@ -24,61 +24,31 @@
 #include <QDebug>
 
 // Own includes
-#include "transactiondbus.h"
+#include "transaction_p.h"
 
 namespace QApt {
 
-class TransactionPrivate
+void TransactionPrivate::run()
 {
-    public:
-        TransactionPrivate(const QString &id)
-            : tid(id)
-        {
-            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
-                                                                       tid, QDBusConnection::systemBus(),
-                                                                       0);
-        }
+    QDBusPendingCall call = dbus->asyncCall("run");
 
-        TransactionPrivate(const TransactionPrivate &other)
-            : dbus(other.dbus)
-            , tid(other.tid)
-            , uid(0)
-            , role(EmptyRole)
-            , status(QApt::SetupStatus)
-            , error(QApt::Success)
-            , isCancellable(true)
-            , isCancelled(false)
-            , exitStatus(QApt::ExitUnfinished)
-            , isPaused(false)
-            , progress(0)
-        {
-        }
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onRunCallFinished(QDBusPendingCallWatcher*)));
+}
 
-        ~TransactionPrivate()
-        {
-            delete dbus;
-        }
+void TransactionPrivate::onRunCallFinished(QDBusPendingCallWatcher *watcher)
+{
+    qDebug() << "reply";
+    QDBusPendingReply<> reply = *watcher;
 
-        // DBus
-        OrgKubuntuQaptworkerTransactionInterface *dbus;
+    if (reply.isError()) {
+        qDebug() << reply.error();
+        // Emit error
+    }
 
-        // Data
-        QString tid;
-        int uid;
-        TransactionRole role;
-        TransactionStatus status;
-        ErrorCode error;
-        QString locale;
-        QString proxy;
-        QString debconfPipe;
-        QVariantMap packages;
-        bool isCancellable;
-        bool isCancelled;
-        ExitStatus exitStatus;
-        bool isPaused;
-        QString statusDetails;
-        int progress;
-};
+    watcher->deleteLater();
+}
 
 Transaction::Transaction(const QString &tid)
     : QObject()
@@ -258,6 +228,11 @@ int Transaction::progress() const
 void Transaction::updateProgress(int progress)
 {
     d->progress = progress;
+}
+
+void Transaction::run()
+{
+    d->run();
 }
 
 void Transaction::sync()

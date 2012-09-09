@@ -23,6 +23,7 @@ set(qapt_MOC_HDRS
     config.h
     history.h
     transaction.h
+    transaction_p.h
    )
 
 set(qapt_HDRS

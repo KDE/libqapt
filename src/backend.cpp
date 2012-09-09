@@ -112,6 +112,9 @@ public:
     bool compressEvents;
     pkgDepCache::ActionGroup *actionGroup;
 
+    // Transactions
+    QList<Transaction> transactions;
+
     // Other
     bool writeSelectionFile(const QString &file, const QString &path) const;
     QString customProxy;
@@ -1086,6 +1089,9 @@ Transaction Backend::updateCache()
 
     QDBusPendingReply<QString> rep = d->worker->updateCache();
     Transaction trans(rep.value());
+    trans.run();
+
+    d->transactions.append(trans);
 
     return trans;
 }
