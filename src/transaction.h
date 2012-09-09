@@ -157,6 +157,7 @@ public Q_SLOTS:
     void setLocale(const QString &locale);
     void setProxy(const QString &proxy);
     void run();
+    void cancel();
 
 private Q_SLOTS:
     void sync();

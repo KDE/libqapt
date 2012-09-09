@@ -287,7 +287,7 @@ void Transaction::setService(const QString &service)
 void Transaction::run()
 {
     setDelayedReply(true);
-    if (isForeignUser() ||!authorizeRun()) {
+    if (isForeignUser() || !authorizeRun()) {
         qDebug() << "auth error";
         sendErrorReply(QDBusError::AccessDenied);
         return;

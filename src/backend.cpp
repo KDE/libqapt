@@ -22,7 +22,6 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QStringList>
 #include <QtCore/QTemporaryFile>
 #include <QtDBus/QDBusConnection>
 
@@ -55,11 +54,11 @@ class BackendPrivate
 {
 public:
     BackendPrivate()
-        : cache(0)
-        , records(0)
+        : cache(nullptr)
+        , records(nullptr)
         , maxStackSize(20)
-        , config(0)
-        , xapianDatabase(0)
+        , config(nullptr)
+        , xapianDatabase(nullptr)
         , xapianIndexExists(false)
         , compressEvents(false)
     {
@@ -113,9 +112,6 @@ public:
     bool compressEvents;
     pkgDepCache::ActionGroup *actionGroup;
 
-    // Transactions
-    QList<Transaction *> transactions;
-
     // Other
     bool writeSelectionFile(const QString &file, const QString &path) const;
     QString customProxy;
@@ -142,6 +138,8 @@ Backend::Backend()
     d->worker = new OrgKubuntuQaptworkerInterface(QLatin1String("org.kubuntu.qaptworker"),
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
+    connect(d->worker, SIGNAL(transactionQueueChanged(QString,QStringList)),
+            this, SIGNAL(transactionQueueChanged(QString, QStringList)));
 }
 
 Backend::~Backend()
@@ -1091,9 +1089,7 @@ Transaction *Backend::updateCache()
     QDBusPendingReply<QString> rep = d->worker->updateCache();
     Transaction *trans = new Transaction(rep.value());
 
-    d->transactions.append(trans);
-
-    return new Transaction(trans);
+    return trans;
 }
 
 bool Backend::saveInstalledPackagesList(const QString &path) const

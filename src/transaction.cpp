@@ -288,6 +288,16 @@ void Transaction::run()
             this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
 }
 
+void Transaction::cancel()
+{
+    QDBusPendingCall call = d->dbus->cancel();
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+
 void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
 {
     qDebug() << "reply";

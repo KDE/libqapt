@@ -22,6 +22,7 @@
 #define QAPT_BACKEND_H
 
 #include <QtCore/QHash>
+#include <QtCore/QStringList>
 #include <QtCore/QVariantMap>
 
 #include "globals.h"
@@ -514,6 +515,8 @@ Q_SIGNALS:
     * @param progress The progress percentage of the indexer
     */
     void xapianUpdateProgress(int percentage);
+
+    void transactionQueueChanged(QString active, QStringList queue);
 
 public Q_SLOTS:
    /**

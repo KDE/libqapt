@@ -57,6 +57,7 @@ void WorkerAcquire::Start()
     m_calculatingSpeed = true;
 
     m_trans->setCancellable(true);
+    m_trans->setStatus(QApt::DownloadingStatus);
 
     pkgAcquireStatus::Start();
 }
@@ -168,7 +169,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     progress = qRound(m_progressBegin + percentage/100 * (m_progressEnd - m_progressBegin));
 
     if (m_lastProgress > progress)
-        m_trans->setProgress(101);
+        m_trans->setProgress(-1);
     else {
         m_trans->setProgress(progress);
         m_lastProgress = progress;
