@@ -92,9 +92,9 @@ Transaction::Transaction(const QString &tid)
             this, SLOT(updateProperty(int,QDBusVariant)));
 }
 
-Transaction::Transaction(const Transaction &other)
+Transaction::Transaction(const Transaction *other)
 {
-    d = other.d;
+    d = other->d;
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
@@ -104,14 +104,9 @@ Transaction::~Transaction()
 {
 }
 
-Transaction &Transaction::operator=(const Transaction& rhs)
+bool Transaction::operator==(const Transaction* rhs)
 {
-    // Protect against self-assignment
-    if (this == &rhs) {
-        return *this;
-    }
-    d = rhs.d;
-    return *this;
+    return d->tid == rhs->d->tid;
 }
 
 QString Transaction::transactionId() const

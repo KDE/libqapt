@@ -89,7 +89,7 @@ public:
      *
      * @param other The transaction to be copied
      */
-    Transaction(const Transaction &other);
+    Transaction(const Transaction *other);
 
     /**
      * Destructor
@@ -97,14 +97,16 @@ public:
     ~Transaction();
 
     /**
-     * Assignment operator.
+     * Equality operator.
      *
-     * This will create a new transaction instance representing the same worker
-     * transaction as the one being copied. Delete it when you are done with it.
+     * This will compare the transaction IDs of the two Transaction objects to
+     * determine whether or not the two transactions are "the same". They will
+     * usually not point to the same address, but they still represent the same
+     * transaction on D-Bus
      *
-     * @param other The transaction to be copied
+     * @param other The transaction to be compared to
      */
-    Transaction &operator=(const Transaction& rhs);
+    bool operator==(const Transaction* rhs);
 
     QString transactionId() const;
     int userId() const;

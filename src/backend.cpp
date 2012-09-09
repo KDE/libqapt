@@ -1093,7 +1093,7 @@ Transaction *Backend::updateCache()
 
     d->transactions.append(trans);
 
-    return new Transaction(*trans);
+    return new Transaction(trans);
 }
 
 bool Backend::saveInstalledPackagesList(const QString &path) const
