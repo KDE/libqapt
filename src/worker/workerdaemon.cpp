@@ -75,6 +75,7 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     m_idleTimer = new QTimer(this);
     // Five minutes
     m_idleTimer->start(IDLE_TIMEOUT);
+    connect(m_idleTimer, SIGNAL(timeout()), this, SLOT(checkIdle()), Qt::QueuedConnection);
 }
 
 WorkerDaemon::~WorkerDaemon()
