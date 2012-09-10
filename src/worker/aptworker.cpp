@@ -28,6 +28,7 @@
 
 // Apt-pkg includes
 #include <apt-pkg/algorithms.h>
+#include <apt-pkg/cachefile.h>
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/init.h>
 #include <apt-pkg/pkgrecords.h>
@@ -41,6 +42,61 @@
 #include "transaction.h"
 #include "workeracquire.h"
 
+class CacheOpenProgress : public OpProgress
+{
+public:
+    CacheOpenProgress(Transaction *trans = nullptr,
+                      int begin = 0, int end = 100)
+        : m_trans(trans)
+        , m_begin(begin)
+        , m_lastProgress(0)
+    {
+        // APT opens the cache in 4 "steps", and the progress bar will go to 100
+        // 4 times. As such, we use modifiers for the current step to show progress
+        // relative to the whole job of opening the cache
+        QList<qreal> modifiers;
+        modifiers << 0.25 << 0.50 << 0.75 << 1.0;
+
+        for (qreal modifier : modifiers) {
+            m_steps.append((qreal)begin + ((qreal)end - (qreal)begin) * modifier);
+        }
+
+        m_end = m_steps.takeFirst();
+    }
+
+    void Update() {
+        int progress;
+        if (Percent < 101) {
+            progress = qRound(m_begin + (Percent / 100) * (m_end - m_begin));
+            if (m_lastProgress == progress)
+                        return;
+        } else {
+            progress = 101;
+        }
+
+        m_lastProgress = progress;
+        if (m_trans)
+            m_trans->setProgress(progress);
+    }
+
+    void Done() {
+        // Make sure the progress is set correctly
+        m_lastProgress = m_end;
+        // Update beginning progress for the next "step"
+        m_begin = m_end;
+
+        if (m_steps.size())
+            m_end = m_steps.takeFirst();
+    }
+
+private:
+    Transaction *m_trans;
+    QList<qreal> m_steps;
+    qreal m_begin;
+    qreal m_end;
+    int m_lastProgress;
+};
+
 AptWorker::AptWorker(QObject *parent)
     : QObject(parent)
     , m_cache(nullptr)
@@ -52,6 +108,7 @@ AptWorker::AptWorker(QObject *parent)
 
 AptWorker::~AptWorker()
 {
+    delete m_cache;
     delete m_records;
     qDeleteAll(m_locks);
 }
@@ -68,7 +125,7 @@ void AptWorker::init()
 
     pkgInitConfig(*_config);
     pkgInitSystem(*_config, _system);
-    m_cache = new QApt::Cache(this);
+    m_cache = new pkgCacheFile;
 
     // Prepare locks to be used later
     QApt::Config *config = new QApt::Config(this);
@@ -96,10 +153,6 @@ void AptWorker::runTransaction(Transaction *trans)
     m_trans = trans;
     trans->setStatus(QApt::RunningStatus);
     waitForLocks();
-    if (trans->isCancelled()) {
-        cleanupCurrentTransaction();
-        return;
-    }
 
     // Process transactions requiring no cache
     switch (trans->role()) {
@@ -156,8 +209,10 @@ void AptWorker::cleanupCurrentTransaction()
 void AptWorker::waitForLocks()
 {
     for (AptLock *lock : m_locks) {
-        if (lock->acquire())
+        if (lock->acquire()) {
+            qDebug() << "locked?" << lock->isLocked();
             continue;
+        }
 
         // Couldn't get lock
         m_trans->setIsPaused(true);
@@ -173,18 +228,23 @@ void AptWorker::waitForLocks()
     }
 }
 
-void AptWorker::openCache()
+void AptWorker::openCache(int begin, int end)
 {
-    if (!m_cache->open()) {
+    m_trans->setStatus(QApt::LoadingCacheStatus);
+    CacheOpenProgress *progress = new CacheOpenProgress(m_trans, begin, end);
+    if (!m_cache->ReadOnlyOpen(progress)) {
         std::string message;
         bool isError = _error->PopMessage(message);
         if (isError)
             qWarning() << QString::fromStdString(message);
+
+        delete progress;
         return;
     }
 
+    delete progress;
     delete m_records;
-    m_records = new pkgRecords(*(m_cache->depCache()));
+    m_records = new pkgRecords(*(m_cache));
 }
 
 void AptWorker::updateCache()
@@ -197,7 +257,7 @@ void AptWorker::updateCache()
     fetcher.Setup(acquire);
 
     // Fetch the lists.
-    if (!ListUpdate(*acquire, *m_cache->list())) {
+    if (!ListUpdate(*acquire, *m_cache->GetSourceList())) {
         if (!m_trans->isCancelled()) {
             m_trans->setError(QApt::FetchError);
         }
@@ -206,6 +266,5 @@ void AptWorker::updateCache()
     // Clean up
     delete acquire;
 
-    // FIXME: This is the last 10% of the progress...
-    openCache();
+    openCache(91, 95);
 }

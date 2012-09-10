@@ -166,10 +166,10 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     }
 
     // Calculate global progress, adjusted for given beginning and ending points
-    progress = qRound(m_progressBegin + percentage/100 * (m_progressEnd - m_progressBegin));
+    progress = qRound(m_progressBegin + (percentage / 100) * (m_progressEnd - m_progressBegin));
 
     if (m_lastProgress > progress)
-        m_trans->setProgress(-1);
+        m_trans->setProgress(101);
     else {
         m_trans->setProgress(progress);
         m_lastProgress = progress;

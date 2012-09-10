@@ -24,11 +24,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
+class pkgCacheFile;
 class pkgRecords;
-
-namespace QApt {
-    class Cache;
-}
 
 class AptLock;
 class Transaction;
@@ -43,7 +40,7 @@ public:
     Transaction *currentTransaction();
 
 private:
-    QApt::Cache *m_cache;
+    pkgCacheFile *m_cache;
     pkgRecords *m_records;
     Transaction *m_trans;
     bool m_ready;
@@ -64,7 +61,7 @@ private:
     /**
      * Builds the package cache and package records.
      */
-    void openCache();
+    void openCache(int begin = 0, int end = 5);
 
     /**
      * Checks for and downloads new package source lists.

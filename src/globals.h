@@ -369,6 +369,8 @@ namespace QApt
         WaitingLockStatus,
         /// The status when a transaction first starts running
         RunningStatus,
+        /// The status when the worker is opening the package cache
+        LoadingCacheStatus,
         /// The status when a transaction is downloading archives
         DownloadingStatus,
         /// The status when a transation is committing changes to the APT cache

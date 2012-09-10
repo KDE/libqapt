@@ -20,15 +20,18 @@
 
 #include "aptlock.h"
 
+#include <apt-pkg/error.h>
+#include <QDebug>
+
 AptLock::AptLock(const QString &path)
     : m_path(path.toUtf8())
-    , m_fd(0)
+    , m_fd(-1)
 {
 }
 
 bool AptLock::isLocked() const
 {
-    return m_fd != 0;
+    return m_fd != -1;
 }
 
 bool AptLock::acquire()
@@ -39,6 +42,8 @@ bool AptLock::acquire()
     std::string str = m_path.data();
     m_fd = GetLock(str + "lock");
     m_lock.Fd(m_fd);
+
+    return isLocked();
 }
 
 void AptLock::release()
@@ -47,5 +52,5 @@ void AptLock::release()
         return;
 
     m_lock.Close();
-    m_fd = 0;
+    m_fd = -1;
 }
