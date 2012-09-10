@@ -63,6 +63,7 @@ private:
 
 private slots:
     void onTransactionStatusChanged(QApt::TransactionStatus status);
+    void progressChanged(int progress);
 
 signals:
     void cancelCacheUpdate();

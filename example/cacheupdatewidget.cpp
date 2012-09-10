@@ -71,7 +71,7 @@ void CacheUpdateWidget::setTransaction(QApt::Transaction *trans)
     connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
             this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
     connect(m_trans, SIGNAL(progressChanged(int)),
-            m_totalProgress, SLOT(setValue(int)));
+            this, SLOT(progressChanged(int)));
 }
 
 void CacheUpdateWidget::setHeaderText(const QString &text)
@@ -133,10 +133,19 @@ void CacheUpdateWidget::onTransactionStatusChanged(QApt::TransactionStatus statu
 
         m_headerLabel->setText(headerText);
         break;
-    case QApt::FinishedStatus:
-        clear();
-        break;
     default:
         break;
+    }
+}
+
+void CacheUpdateWidget::progressChanged(int progress)
+{
+    if (m_trans->status() == QApt::RunningStatus)
+        qDebug() << progress;
+    if (progress > 100) {
+        m_totalProgress->setMaximum(0);
+    } else {
+        m_totalProgress->setMaximum(100);
+        m_totalProgress->setValue(progress);
     }
 }

@@ -213,7 +213,6 @@ void QAptTest::updateCache()
             this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
 
     m_trans->run();
-    qDebug() << "running transaction";
 }
 
 void QAptTest::upgrade()
@@ -246,6 +245,14 @@ void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
     QString headerText;
 
     switch (status) {
+    case QApt::RunningStatus:
+        // For roles that start by downloading something, switch to download view
+        if (m_trans->role() == (QApt::UpdateCacheRole || QApt::UpgradeSystemRole ||
+                                QApt::CommitChangesRole || QApt::DownloadArchivesRole ||
+                                QApt::InstallFileRole)) {
+            m_stack->setCurrentWidget(m_cacheUpdateWidget);
+        }
+        break;
     case QApt::DownloadingStatus:
         m_stack->setCurrentWidget(m_cacheUpdateWidget);
         break;
