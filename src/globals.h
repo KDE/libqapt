@@ -85,18 +85,6 @@ namespace QApt
     typedef QVariantMap Warning;
 
    /**
-    * Defines the Warning type, a QVariantMap with info about worker questions
-    *
-    * These are the fields that each WorkerQuestion can have:
-    *                 <"Key", ValueType> (Description of value)
-    * ConfFilePrompt: <"OldConfFile", QString> (Old conf file)
-    *                 <"NewConfFile", QString> (New conf file)
-    * MediaChange: <"Media", QString> (Name of the CD needed)
-    *              <"Drive", QString> (The drive to insert the CD into)
-    */
-    typedef QVariantMap Question;
-
-   /**
     * An enumerator listing all the events that the QApt Worker can emit
     */
     enum WorkerEvent {
@@ -122,21 +110,6 @@ namespace QApt
         DebInstallStarted       = 9,
         /// The worker has finished installing a .deb with dpkg
         DebInstallFinished      = 10
-    };
-
-   /**
-    * An enumerator listing all the question types that the QApt Worker can ask
-    */
-    // TODO: QApt2: Rename to QuestionCode
-    enum WorkerQuestion {
-        /// An invalid question
-        InvalidQuestion  = 0,
-        /// Emitted when a configuration file has been changed in an update
-        ConfFilePrompt   = 1,
-        /// Emitted to request a CD-ROM change or the like
-        MediaChange      = 2,
-        /// Emitted to check whether or not to install untrusted packages
-        InstallUntrusted = 3
     };
 
    /**
@@ -349,7 +322,7 @@ namespace QApt
         PausedProperty,
         /// QString, status details from APT
         StatusDetailsProperty,
-        /// int, progress as percent, 1-100, -1 if indeterminate
+        /// int, progress as percent, 1-100, 101 if indeterminate
         ProgressProperty
     };
 
