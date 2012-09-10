@@ -25,34 +25,21 @@
 
 #include <apt-pkg/packagemanager.h>
 
-class QEventLoop;
-
-class QAptWorker;
-
 class WorkerInstallProgress : public QObject
 {
     Q_OBJECT
 public:
-    WorkerInstallProgress(QAptWorker *parent);
-    ~WorkerInstallProgress();
+    WorkerInstallProgress(QObject *parent);
 
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);
 
 private:
     pid_t m_child_id;
-    QAptWorker *m_worker;
-    QEventLoop *m_questionBlock;
-    QVariantMap m_questionResponse;
     bool m_startCounting;
 
     void updateInterface(int fd, int writeFd);
-    QVariantMap askQuestion(int questionCode, const QVariantMap &args);
-
-private Q_SLOTS:
-    void setAnswer(const QVariantMap &response);
 
 signals:
-    void workerQuestion(int questionCode, const QVariantMap &args);
     void commitProgress(QString status, int percentage);
     void commitError(int code, const QVariantMap &details);
 };

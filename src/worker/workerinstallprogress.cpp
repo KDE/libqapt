@@ -37,24 +37,17 @@
 #include <stdlib.h>
 
 #include "../globals.h"
-#include "worker.h"
 
 using namespace std;
 
-WorkerInstallProgress::WorkerInstallProgress(QAptWorker* parent)
+WorkerInstallProgress::WorkerInstallProgress(QObject* parent)
         : QObject(parent)
-        , m_worker(parent)
-        , m_questionResponse(QVariantMap())
         , m_startCounting(false)
 {
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
     setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
     setenv("APT_LISTBUGS_FRONTEND", "none", 1);
     setenv("APT_LISTCHANGES_FRONTEND", "debconf", 1);
-}
-
-WorkerInstallProgress::~WorkerInstallProgress()
-{
 }
 
 pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *pm)
@@ -159,9 +152,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 args[QLatin1String("NewConfFile")] = newFile;
                 //TODO: diff support
 
-                QVariantMap result = askQuestion(QApt::ConfFilePrompt, args);
-
-                bool replaceFile = result[QLatin1String("ReplaceFile")].toBool();
+                // FIXME: use transaction to query user, wait for resume
+                bool replaceFile;
 
                 if (replaceFile) {
                     ssize_t reply = write(writeFd, "Y\n", 2);
@@ -192,24 +184,4 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
     }
     // 30 frames per second
     usleep(1000000/30);
-}
-
-QVariantMap WorkerInstallProgress::askQuestion(int questionCode, const QVariantMap &args)
-{
-    m_questionBlock = new QEventLoop;
-    connect(m_worker, SIGNAL(answerReady(QVariantMap)),
-            this, SLOT(setAnswer(QVariantMap)));
-
-    emit workerQuestion(questionCode, args);
-    m_questionBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
-
-    return m_questionResponse;
-}
-
-void WorkerInstallProgress::setAnswer(const QVariantMap &answer)
-{
-    disconnect(m_worker, SIGNAL(answerReady(QVariantMap)),
-               this, SLOT(setAnswer(QVariantMap)));
-    m_questionResponse = answer;
-    m_questionBlock->quit();
 }
