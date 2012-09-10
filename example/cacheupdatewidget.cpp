@@ -35,6 +35,8 @@
 
 CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     : KVBox(parent)
+    , m_trans(0)
+    , m_lastRealProgress(0)
 {
     m_headerLabel = new QLabel(this);
 
@@ -115,7 +117,7 @@ void CacheUpdateWidget::onTransactionStatusChanged(QApt::TransactionStatus statu
 {
     QString headerText;
 
-    qDebug() << "cache widget: transaction status changed";
+    qDebug() << "cache widget: transaction status changed" << status;
 
     switch (status) {
     case QApt::DownloadingStatus:
@@ -142,8 +144,9 @@ void CacheUpdateWidget::progressChanged(int progress)
 {
     if (progress > 100) {
         m_totalProgress->setMaximum(0);
-    } else {
+    } else if (progress > m_lastRealProgress) {
         m_totalProgress->setMaximum(100);
         m_totalProgress->setValue(progress);
+        m_lastRealProgress = progress;
     }
 }

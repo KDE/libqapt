@@ -53,6 +53,7 @@ public:
 
 private:
     QApt::Transaction *m_trans;
+    int m_lastRealProgress;
 
     QLabel *m_headerLabel;
     QListView *m_downloadView;
