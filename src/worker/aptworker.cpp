@@ -212,6 +212,7 @@ void AptWorker::cleanupCurrentTransaction()
         m_trans->setExitStatus(QApt::ExitSuccess);
 
     m_trans = nullptr;
+    m_lastActiveTimestamp = QDateTime::currentMSecsSinceEpoch();
 }
 
 void AptWorker::waitForLocks()
