@@ -140,8 +140,6 @@ void CacheUpdateWidget::onTransactionStatusChanged(QApt::TransactionStatus statu
 
 void CacheUpdateWidget::progressChanged(int progress)
 {
-    if (m_trans->status() == QApt::RunningStatus)
-        qDebug() << progress;
     if (progress > 100) {
         m_totalProgress->setMaximum(0);
     } else {
