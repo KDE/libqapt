@@ -22,6 +22,7 @@
 #include "transaction.h"
 
 // Qt includes
+#include <QtCore/QTimer>
 #include <QtCore/QUuid>
 #include <QtDBus/QDBusConnection>
 
@@ -69,6 +70,9 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker.commitChanges");
 
     m_queue->addPending(this);
+    m_idleTimer = new QTimer(this);
+    connect(m_idleTimer, SIGNAL(timeout()),
+            this, SIGNAL(emitIdleTimeout()));
 }
 
 Transaction::~Transaction()
@@ -114,6 +118,13 @@ void Transaction::setStatus(QApt::TransactionStatus status)
 {
     m_status = status;
     emit propertyChanged(QApt::StatusProperty, QDBusVariant((int)status));
+
+    if (m_status != QApt::SetupStatus) {
+        m_idleTimer->stop(); // We are now queued and are no longer idle
+        // We don't need the timer anymore
+        m_idleTimer->deleteLater();
+        m_idleTimer = nullptr;
+    }
 }
 
 int Transaction::error() const
@@ -395,4 +406,9 @@ void Transaction::provideMedium(const QString &medium)
 
     // The medium has now been provided, and the installation should be able to continue
     m_isPaused = false;
+}
+
+void Transaction::emitIdleTimeout()
+{
+    emit idleTimeout(this);
 }

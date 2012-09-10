@@ -63,6 +63,15 @@ Transaction *TransactionQueue::transactionById(const QString &id)
 void TransactionQueue::addPending(Transaction *trans)
 {
     m_pending.append(trans);
+    connect(trans, SIGNAL(idleTimeout(Transaction*)),
+            this, SLOT(removePending(Transaction*)));
+}
+
+void TransactionQueue::removePending(Transaction *trans)
+{
+    m_pending.removeAll(trans);
+
+    trans->deleteLater();
 }
 
 void TransactionQueue::enqueue(QString tid)
@@ -76,11 +85,11 @@ void TransactionQueue::enqueue(QString tid)
     m_queue.enqueue(trans);
     emitQueueChanged();
 
-    // Check if worker is running trans
-    // If true, set trans status to wating
-    // else, run trans
     if (!m_worker->currentTransaction())
         runNextTransaction();
+    else {
+        trans->setStatus(QApt::WaitingStatus);
+    }
 }
 
 void TransactionQueue::remove(QString tid)

@@ -30,6 +30,7 @@
 // Own includes
 #include "globals.h"
 
+class QTimer;
 class TransactionQueue;
 
 class Transaction : public QObject, protected QDBusContext
@@ -111,6 +112,7 @@ private:
 
     // Other data
     QMap<int, QString> m_roleActionMap;
+    QTimer *m_idleTimer;
 
     // Private functions
     int dbusSenderUid() const;
@@ -126,12 +128,16 @@ Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
     Q_SCRIPTABLE void finished(int exitStatus);
     Q_SCRIPTABLE void mediumRequired(QString label, QString mountPoint);
+    void idleTimeout(Transaction *trans);
     
 public Q_SLOTS:
     void setProperty(int property, QDBusVariant value);
     void run();
     void cancel();
     void provideMedium(const QString &medium);
+
+private Q_SLOTS:
+    void emitIdleTimeout();
 };
 
 #endif // TRANSACTION_H

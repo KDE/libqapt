@@ -51,6 +51,7 @@ signals:
 
 public slots:
     void addPending(Transaction *trans);
+    void removePending(Transaction *trans);
     void enqueue(QString tid);
     void remove(QString tid);
 
