@@ -119,7 +119,7 @@ void Transaction::setStatus(QApt::TransactionStatus status)
     m_status = status;
     emit propertyChanged(QApt::StatusProperty, QDBusVariant((int)status));
 
-    if (m_status != QApt::SetupStatus) {
+    if (m_status != QApt::SetupStatus && m_idleTimer) {
         m_idleTimer->stop(); // We are now queued and are no longer idle
         // We don't need the timer anymore
         m_idleTimer->deleteLater();
