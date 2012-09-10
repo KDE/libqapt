@@ -22,6 +22,7 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
 
 // Apt-pkg includes
 #include <apt-pkg/configuration.h>
@@ -32,6 +33,8 @@
 #include "qaptworkeradaptor.h"
 #include "transaction.h"
 #include "transactionqueue.h"
+
+#define IDLE_TIMEOUT 300000 // 300 seconds
 
 WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     : QCoreApplication(argc, argv)
@@ -68,12 +71,26 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
         qWarning() << "Couldn't register object";
         return;
     }
+
+    m_idleTimer = new QTimer(this);
+    // Five minutes
+    m_idleTimer->start(IDLE_TIMEOUT);
 }
 
 WorkerDaemon::~WorkerDaemon()
 {
     m_workerThread->quit();
     m_workerThread->wait();
+}
+
+void WorkerDaemon::checkIdle()
+{
+    quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    if (!m_worker->currentTransaction() &&
+        currentTime - m_worker->lastActiveTimestamp() > IDLE_TIMEOUT &&
+        m_queue->isEmpty()) {
+        QCoreApplication::quit();
+    }
 }
 
 int WorkerDaemon::dbusSenderUid() const

@@ -46,7 +46,12 @@ Transaction *TransactionQueue::activeTransaction() const
     return m_activeTransaction;
 }
 
-Transaction *TransactionQueue::transactionById(const QString &id)
+bool TransactionQueue::isEmpty() const
+{
+    return (m_queue.isEmpty() && m_pending.isEmpty());
+}
+
+Transaction *TransactionQueue::transactionById(const QString &id) const
 {
     Transaction *transaction = nullptr;
 

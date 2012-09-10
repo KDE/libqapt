@@ -36,6 +36,7 @@ public:
 
     QList<Transaction *> transactions() const;
     Transaction *activeTransaction() const;
+    bool isEmpty() const;
 
 private:
     AptWorker *m_worker;
@@ -43,7 +44,7 @@ private:
     QList<Transaction *> m_pending;
     Transaction *m_activeTransaction;
 
-    Transaction *transactionById(const QString &id);
+    Transaction *transactionById(const QString &id) const;
     
 signals:
     void queueChanged(const QString &active,

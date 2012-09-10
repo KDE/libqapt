@@ -27,6 +27,7 @@
 #include "globals.h"
 
 class QThread;
+class QTimer;
 
 class AptWorker;
 class Transaction;
@@ -45,6 +46,7 @@ private:
     TransactionQueue *m_queue;
     AptWorker *m_worker;
     QThread *m_workerThread;
+    QTimer *m_idleTimer;
 
     int dbusSenderUid() const;
     Transaction *createTranscation(QApt::TransactionRole role,
@@ -64,6 +66,9 @@ public slots:
     // Synchronous methods
     bool writeFileToDisk(const QString &contents, const QString &path);
     bool copyArchiveToCache(const QString &archivePath);
+
+private slots:
+    void checkIdle();
 };
 
 #endif // WORKERDAEMON_H

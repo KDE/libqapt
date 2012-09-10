@@ -37,7 +37,8 @@ public:
     explicit AptWorker(QObject *parent = 0);
     ~AptWorker();
 
-    Transaction *currentTransaction();
+    Transaction *currentTransaction() const;
+    quint64 lastActiveTimestamp() const;
 
 private:
     pkgCacheFile *m_cache;
@@ -45,6 +46,7 @@ private:
     Transaction *m_trans;
     bool m_ready;
     QVector<AptLock *> m_locks;
+    quint64 m_lastActiveTimestamp;
 
     /**
      * If the locks on the package system cannot be immediately taken, this
@@ -67,8 +69,6 @@ private:
      * Checks for and downloads new package source lists.
      */
     void updateCache();
-
-signals:
     
 public slots:
     /**

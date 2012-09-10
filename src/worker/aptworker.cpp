@@ -21,6 +21,7 @@
 #include "aptworker.h"
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QStringList>
@@ -103,6 +104,7 @@ AptWorker::AptWorker(QObject *parent)
     , m_records(nullptr)
     , m_trans(nullptr)
     , m_ready(false)
+    , m_lastActiveTimestamp(QDateTime::currentMSecsSinceEpoch())
 {
 }
 
@@ -113,9 +115,14 @@ AptWorker::~AptWorker()
     qDeleteAll(m_locks);
 }
 
-Transaction *AptWorker::currentTransaction()
+Transaction *AptWorker::currentTransaction() const
 {
     return m_trans;
+}
+
+quint64 AptWorker::lastActiveTimestamp() const
+{
+    return m_lastActiveTimestamp;
 }
 
 void AptWorker::init()
@@ -150,6 +157,7 @@ void AptWorker::runTransaction(Transaction *trans)
     if (m_trans || !m_ready)
         return;
 
+    m_lastActiveTimestamp = QDateTime::currentMSecsSinceEpoch();
     m_trans = trans;
     trans->setStatus(QApt::RunningStatus);
     waitForLocks();
