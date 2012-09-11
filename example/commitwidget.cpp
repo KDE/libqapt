@@ -24,31 +24,32 @@
 #include <QLabel>
 #include <QProgressBar>
 
+//QApt
+#include <LibQApt/Transaction>
+
 CommitWidget::CommitWidget(QWidget *parent)
     : KVBox(parent)
+    , m_trans(0)
 {
     m_commitLabel = new QLabel(this);
     m_progressBar = new QProgressBar(this);
 }
 
-CommitWidget::~CommitWidget()
+void CommitWidget::setTransaction(QApt::Transaction *trans)
 {
-}
-
-void CommitWidget::setLabelText(const QString &text)
-{
-    m_commitLabel->setText(text);
-}
-
-void CommitWidget::setProgress(int percentage)
-{
-    m_progressBar->setValue(percentage);
+    m_trans = trans;
+    connect(m_trans, SIGNAL(statusDetailsChanged(QString)),
+            m_commitLabel, SLOT(setText(QString)));
+    connect(m_trans, SIGNAL(progressChanged(int)),
+            m_progressBar, SLOT(setValue(int)));
+    m_progressBar->setValue(trans->progress());
 }
 
 void CommitWidget::clear()
 {
     m_commitLabel->setText(QString());
     m_progressBar->setValue(0);
+    m_trans = 0;
 }
 
 #include "commitwidget.moc"

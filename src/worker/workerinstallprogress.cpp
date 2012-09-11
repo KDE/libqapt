@@ -113,7 +113,7 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
         // Format raw dpkg output, remove ansi escape sequences
         dpkgLine = QString(masterbuf);
         dpkgLine.remove(m_ansiRegex);
-        qDebug() << dpkgLine;
+        //qDebug() << dpkgLine;
 
         // Update high-level status info
         updateInterface(readFromChildFD[0], pty_master);

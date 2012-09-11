@@ -195,7 +195,7 @@ void QAptTest::updateLabels()
 
 void QAptTest::updateCache()
 {
-    if (m_trans) // Transaction running
+    if (m_trans) // Transaction running, you could queue these though
         return;
 
     m_trans = m_backend->updateCache();
@@ -223,6 +223,9 @@ void QAptTest::upgrade()
 
 void QAptTest::commitAction()
 {
+    if (m_trans) // Transaction running, you could queue these though
+        return;
+
     if (!m_package->isInstalled()) {
         m_package->setInstall();
     } else {
@@ -237,7 +240,22 @@ void QAptTest::commitAction()
     m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
     m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
 
-    m_backend->commitChanges();
+    m_trans = m_backend->commitChanges();
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Pass the new current transaction on to our child widgets
+    m_cacheUpdateWidget->setTransaction(m_trans);
+    m_commitWidget->setTransaction(m_trans);
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+
+    m_trans->run();
 }
 
 void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
@@ -331,13 +349,6 @@ void QAptTest::updateDownloadMessage(int flag, const QString &message)
           fullMessage = message;
     }
     m_cacheUpdateWidget->addItem(fullMessage);
-}
-
-void QAptTest::updateCommitProgress(const QString& message, int percentage)
-{
-    m_commitWidget->setLabelText(message);
-    m_commitWidget->setProgress(percentage);
-    qDebug() << message;
 }
 
 void QAptTest::updateStatusBar()

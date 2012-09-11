@@ -26,18 +26,22 @@
 class QLabel;
 class QProgressBar;
 
+namespace QApt {
+    class Transaction;
+}
+
 class CommitWidget : public KVBox
 {
     Q_OBJECT
 public:
     CommitWidget(QWidget *parent = 0);
-    ~CommitWidget();
 
-    void setLabelText(const QString &text);
-    void setProgress(int percentage);
+    void setTransaction(QApt::Transaction *trans);
     void clear();
 
 private:
+    QApt::Transaction *m_trans;
+
     QLabel *m_commitLabel;
     QProgressBar *m_progressBar;
 };

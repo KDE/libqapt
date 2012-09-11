@@ -90,7 +90,7 @@ void WorkerDaemon::checkIdle()
     if (!m_worker->currentTransaction() &&
         currentTime - m_worker->lastActiveTimestamp() > IDLE_TIMEOUT &&
         m_queue->isEmpty()) {
-        QCoreApplication::quit();
+        quit();
     }
 }
 

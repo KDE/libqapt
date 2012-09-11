@@ -304,6 +304,7 @@ void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
     QDBusPendingReply<> reply = *watcher;
 
     if (reply.isError()) {
+        qDebug() << reply.error();
         switch (reply.error().type())
         {
         case QDBusError::AccessDenied:
