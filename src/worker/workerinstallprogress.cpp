@@ -23,6 +23,7 @@
 
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
+#include <QDebug>
 
 #include <apt-pkg/error.h>
 
@@ -36,22 +37,34 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "../globals.h"
+#include "transaction.h"
 
 using namespace std;
 
-WorkerInstallProgress::WorkerInstallProgress(QObject* parent)
+WorkerInstallProgress::WorkerInstallProgress(QObject* parent, int begin, int end)
         : QObject(parent)
+        , m_trans(nullptr)
         , m_startCounting(false)
+        , m_progressBegin(begin)
+        , m_progressEnd(end)
 {
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
     setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
     setenv("APT_LISTBUGS_FRONTEND", "none", 1);
     setenv("APT_LISTCHANGES_FRONTEND", "debconf", 1);
+
+    m_ansiRegex = QRegExp(QChar(27) + QLatin1String("\[[;?0-9]*[A-Za-z]"));
+}
+
+void WorkerInstallProgress::setTransaction(Transaction *trans)
+{
+    m_trans = trans;
+    std::setlocale(LC_ALL, m_trans->locale().toAscii());
 }
 
 pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *pm)
 {
+    m_trans->setStatus(QApt::CommittingStatus);
     pkgPackageManager::OrderResult res;
 
     res = pm->DoInstallPreFork();
@@ -92,9 +105,17 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     // Update the interface until the child dies
     int ret;
     char masterbuf[1024];
+    QString dpkgLine;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
-        // TODO: This is dpkg's raw output. Let's see if we can't do something with it
+        // Read dpkg's raw output
         while(read(pty_master, masterbuf, sizeof(masterbuf)) > 0);
+
+        // Format raw dpkg output, remove ansi escape sequences
+        dpkgLine = QString(masterbuf);
+        dpkgLine.remove(m_ansiRegex);
+        qDebug() << dpkgLine;
+
+        // Update high-level status info
         updateInterface(readFromChildFD[0], pty_master);
     }
 
@@ -167,6 +188,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             }
 
             int percentage;
+            int progress;
             if (percent.contains(QLatin1Char('.'))) {
                 QStringList percentList = percent.split(QLatin1Char('.'));
                 percentage = percentList.at(0).toInt();
@@ -174,7 +196,10 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 percentage = percent.toInt();
             }
 
-            emit commitProgress(str, percentage);
+            progress = qRound(m_progressBegin + (percentage / 100) * (m_progressEnd - m_progressBegin));
+
+            m_trans->setProgress(progress);
+            m_trans->setStatusDetails(str);
             // clean-up
             line[0] = 0;
         } else {

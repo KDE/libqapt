@@ -69,6 +69,10 @@ private:
      * Checks for and downloads new package source lists.
      */
     void updateCache();
+
+    void commitChanges();
+
+    bool markChanges();
     
 public slots:
     /**

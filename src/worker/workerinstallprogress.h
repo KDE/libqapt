@@ -21,26 +21,34 @@
 #ifndef WORKERINSTALLPROGRESS_H
 #define WORKERINSTALLPROGRESS_H
 
+#include <QtCore/QRegExp>
 #include <QtCore/QVariantMap>
 
 #include <apt-pkg/packagemanager.h>
+
+class Transaction;
 
 class WorkerInstallProgress : public QObject
 {
     Q_OBJECT
 public:
-    WorkerInstallProgress(QObject *parent);
+    WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
 
+    void setTransaction(Transaction *trans);
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);
 
 private:
+    Transaction *m_trans;
+    QRegExp m_ansiRegex;
+
     pid_t m_child_id;
     bool m_startCounting;
+    int m_progressBegin;
+    int m_progressEnd;
 
     void updateInterface(int fd, int writeFd);
 
 signals:
-    void commitProgress(QString status, int percentage);
     void commitError(int code, const QVariantMap &details);
 };
 

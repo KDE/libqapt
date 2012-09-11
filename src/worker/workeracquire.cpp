@@ -49,6 +49,7 @@ WorkerAcquire::WorkerAcquire(QObject *parent, int begin, int end)
 void WorkerAcquire::setTransaction(Transaction *trans)
 {
     m_trans = trans;
+    setenv("http_proxy", m_trans->proxy().toAscii(), 1);
 }
 
 void WorkerAcquire::Start()

@@ -28,6 +28,7 @@
 #include <QtCore/QDebug>
 
 // Apt-pkg includes
+#include <apt-pkg/acquire-item.h>
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/cachefile.h>
 #include <apt-pkg/configuration.h>
@@ -40,8 +41,10 @@
 #include "aptlock.h"
 #include "cache.h"
 #include "config.h"
+#include "package.h"
 #include "transaction.h"
 #include "workeracquire.h"
+#include "workerinstallprogress.h"
 
 class CacheOpenProgress : public OpProgress
 {
@@ -276,4 +279,182 @@ void AptWorker::updateCache()
     delete acquire;
 
     openCache(91, 95);
+}
+
+bool AptWorker::markChanges()
+{
+    pkgDepCache::ActionGroup *actionGroup = new pkgDepCache::ActionGroup(*m_cache);
+
+    auto mapIter = m_trans->packages().constBegin();
+
+    QApt::Package::State operation = QApt::Package::ToKeep;
+    while (mapIter != m_trans->packages().constEnd()) {
+        QApt::Package::State operation = (QApt::Package::State)mapIter.value().toInt();
+
+        // Find package in cache
+        pkgCache::PkgIterator iter;
+        QString packageString = mapIter.key();
+        QString version;
+
+        // Check if a version is specified
+        if (packageString.contains(QLatin1Char(','))) {
+            QStringList split = packageString.split(QLatin1Char(','));
+            iter = (*m_cache)->FindPkg(split.at(0).toStdString());
+            version = split.at(1);
+        } else {
+            iter = (*m_cache)->FindPkg(packageString.toStdString());
+        }
+
+        // Check if the package was found
+        if (iter == 0) {
+            m_trans->setError(QApt::NotFoundError);
+            // FIXME: error details
+
+            delete actionGroup;
+            return false;
+        }
+
+        pkgDepCache::StateCache &State = (*m_cache)[iter];
+        pkgProblemResolver resolver(*m_cache);
+        bool toPurge = false;
+
+        // Then mark according to the instruction
+        switch (operation) {
+        case QApt::Package::ToUpgrade: {
+            bool fromUser = !(State.Flags & pkgCache::Flag::Auto);
+            (*m_cache)->MarkInstall(iter, true, 0, fromUser);
+
+            resolver.Clear(iter);
+            resolver.Protect(iter);
+            break;
+        }
+        case QApt::Package::ToInstall:
+            (*m_cache)->MarkInstall(iter, true);
+
+            resolver.Clear(iter);
+            resolver.Protect(iter);
+            break;
+        case QApt::Package::ToReInstall:
+            (*m_cache)->SetReInstall(iter, true);
+            break;
+        case QApt::Package::ToDowngrade: {
+            pkgVersionMatch Match(version.toStdString(), pkgVersionMatch::Version);
+            pkgCache::VerIterator Ver = Match.Find(iter);
+
+            (*m_cache)->SetCandidateVersion(Ver);
+
+            (*m_cache)->MarkInstall(iter, true);
+
+            resolver.Clear(iter);
+            resolver.Protect(iter);
+            break;
+        }
+        case QApt::Package::ToPurge:
+            toPurge = true;
+        case QApt::Package::ToRemove:
+            (*m_cache)->SetReInstall(iter, false);
+            (*m_cache)->MarkDelete(iter, toPurge);
+
+            resolver.Clear(iter);
+            resolver.Protect(iter);
+            resolver.Remove(iter);
+        default:
+            break;
+        }
+        mapIter++;
+    }
+
+    delete actionGroup;
+
+    if (_error->PendingError() && ((*m_cache)->BrokenCount() == 0))
+            _error->Discard(); // We had dep errors, but fixed them
+
+    if (_error->PendingError())
+    {
+        // We've failed to mark the packages
+        m_trans->setError(QApt::MarkingError);
+        // TODO error details
+
+        return false;
+    }
+
+    return true;
+}
+
+void AptWorker::commitChanges()
+{
+    if (!markChanges())
+        return;
+
+    // Initialize fetcher with our progress watcher
+    WorkerAcquire *acquire = new WorkerAcquire(this, 15, 50);
+    acquire->setTransaction(m_trans);
+
+    pkgAcquire fetcher;
+    fetcher.Setup(acquire);
+
+    pkgPackageManager *packageManager;
+    packageManager = _system->CreatePM(*m_cache);
+
+    // Populate the fetcher with the needed archives
+    if (!packageManager->GetArchives(&fetcher, m_cache->GetSourceList(), m_records) ||
+        _error->PendingError()) {
+        m_trans->setError(QApt::FetchError);
+        return;
+    }
+
+    // TODO: Size mismatch warning, disk space sanity check, untrusted check
+
+    // Fetch archives from the network
+    if (fetcher.Run() != pkgAcquire::Continue) {
+        // Our fetcher will report warnings for itself, but if it fails entirely
+        // we have to send the error and finished signals
+        if (!m_trans->isCancelled()) {
+            m_trans->setError(QApt::FetchError);
+        }
+
+        delete acquire;
+        return;
+    }
+
+    delete acquire;
+
+    // Check for cancellation during fetch, or fetch errors
+    if (m_trans->isCancelled())
+        return;
+
+    bool failed = false;
+    for (auto i = fetcher.ItemsBegin(); i != fetcher.ItemsEnd(); ++i) {
+        if((*i)->Status == pkgAcquire::Item::StatDone && (*i)->Complete)
+            continue;
+        if((*i)->Status == pkgAcquire::Item::StatIdle)
+            continue;
+
+        failed = true;
+        break;
+    }
+
+    if (failed && !packageManager->FixMissing()) {
+        m_trans->setError(QApt::FetchError);
+        return;
+    }
+
+    // Set up the install
+    WorkerInstallProgress *installProgress = new WorkerInstallProgress(this, 50, 90);
+    installProgress->setTransaction(m_trans);
+    setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
+
+    pkgPackageManager::OrderResult res = installProgress->start(packageManager);
+    bool success = (res == pkgPackageManager::Completed);
+
+    // See how the installation went
+    if (!success) {
+        m_trans->setError(QApt::CommitError);
+        // TODO: Error detail
+
+        delete installProgress;
+        return;
+    }
+
+    delete installProgress;
 }

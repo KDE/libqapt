@@ -117,33 +117,35 @@ namespace QApt
     */
     enum ErrorCode {
         /// An invalid/unknown value
-        UnknownError            = 0,
-        /// Emitted when the APT cache could not be initialized
-        InitError               = 1,
-        /// Emitted when the package cache could not be locked
-        LockError               = 2,
-        /// Emitted when there is not enough disk space for an install
-        DiskSpaceError          = 3,
-        /// Emitted when fetching packages failed
-        FetchError              = 4,
-        /// Emitted when dpkg encounters an error during commit
-        CommitError             = 5,
-        /// Emitted when the user has not given proper authentication
-        AuthError               = 6,
-        /// Emitted when the worker crashes or disappears
-        WorkerDisappeared       = 7,
-        /// Emitted when APT prevents the installation of untrusted packages
-        UntrustedError          = 8,
-        /// A pseudo-error emitted when the user cancels a download
-        UserCancelError         = 9,
-        /// Emitted when the APT configuration prevents downloads
-        DownloadDisallowedError = 10,
-        /// Emitted when the selected package does not exist
-        NotFoundError           = 11,
-        /// Emitted when a .deb package cannot be installed due to an arch mismatch
-        WrongArchError          = 12,
+        UnknownError = -1,
         /// An error code representing no error
-        Success
+        Success = 0,
+        /// Emitted when the APT cache could not be initialized
+        InitError,
+        /// Emitted when the package cache could not be locked
+        LockError,
+        /// Emitted when there is not enough disk space for an install
+        DiskSpaceError,
+        /// Emitted when fetching packages failed
+        FetchError,
+        /// Emitted when dpkg encounters an error during commit
+        CommitError,
+        /// Emitted when the user has not given proper authentication
+        AuthError,
+        /// Emitted when the worker crashes or disappears
+        WorkerDisappeared,
+        /// Emitted when APT prevents the installation of untrusted packages
+        UntrustedError,
+        /// A pseudo-error emitted when the user cancels a download
+        UserCancelError,
+        /// Emitted when the APT configuration prevents downloads
+        DownloadDisallowedError,
+        /// Emitted when the selected package does not exist
+        NotFoundError,
+        /// Emitted when a .deb package cannot be installed due to an arch mismatch
+        WrongArchError,
+        /// Emitted when the worker cannot mark packages without broken dependencies
+        MarkingError
     };
 
    /**
