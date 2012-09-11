@@ -50,5 +50,12 @@ install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
 
+find_package(KDE4)
+if (KDE4_FOUND)
+    include(KDE4Defaults)
+    kde4_install_auth_actions(org.kubuntu.qaptworker qaptworker.actions)
+else (KDE4_FOUND)
+    install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
+endif (KDE4_FOUND)
+
 install(FILES org.kubuntu.qaptworker.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d/)
-install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)

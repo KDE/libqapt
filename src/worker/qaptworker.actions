@@ -1,0 +1,28 @@
+[Domain]
+Name=Kubuntu
+Icon=package-x-generic
+URL=http://www.kubuntu.org
+
+[org.kubuntu.qaptworker.update-cache]
+Name=Update package information
+Description=To update the software catalog, you need to authenticate.
+Policy=yes
+Persistence=session
+
+[org.kubuntu.qaptworker.commit-changes]
+Name=Install or remove packages
+Description=To install or remove software, you need to authenticate.
+Policy=auth_admin
+Persistence=session
+
+[org.kubuntu.qaptworker.write-file-to-disk]
+Name=Change software configuration
+Description=To change software settings, you need to authenticate.
+Policy=auth_admin
+Persistence=session
+
+[org.kubuntu.qaptworker.cancel-foreign]
+Name=Cancel the task of another user
+Description=To cancel someone else's software changes, you need to authenticate.
+Policy=auth_admin
+Persistence=session

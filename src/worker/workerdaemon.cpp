@@ -72,8 +72,8 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
         return;
     }
 
+    // Quit if we've not run a job for a while
     m_idleTimer = new QTimer(this);
-    // Five minutes
     m_idleTimer->start(IDLE_TIMEOUT);
     connect(m_idleTimer, SIGNAL(timeout()), this, SLOT(checkIdle()), Qt::QueuedConnection);
 }
@@ -142,7 +142,7 @@ QString WorkerDaemon::updateXapianIndex()
 
 bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writeFileToDisk"), message().service())) {
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.write-file-to-disk"), message().service())) {
         return false;
     }
 
@@ -159,7 +159,7 @@ bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 
 bool WorkerDaemon::copyArchiveToCache(const QString &archivePath)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writeFileToDisk"), message().service())) {
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.write-file-to-disk"), message().service())) {
         return false;
     }
 
