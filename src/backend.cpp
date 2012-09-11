@@ -989,12 +989,11 @@ void Backend::setCompressEvents(bool enabled)
     }
 }
 
-void Backend::commitChanges()
+QApt::Transaction * Backend::commitChanges()
 {
     Q_D(Backend);
 
     QVariantMap packageList;
-
     for (const Package *package : d->packages) {
         int flags = package->state();
         std::string fullName = package->packageIterator()->FullName();
@@ -1006,11 +1005,6 @@ void Backend::commitChanges()
                               Package::ToDowngrade |
                               Package::ToRemove);
         switch (status) {
-           case Package::ToKeep:
-               if (flags & Package::Held) {
-                   packageList.insert(fullName.c_str(), Package::Held);
-               }
-               break;
            case Package::NewInstall:
                packageList.insert(fullName.c_str(), Package::ToInstall);
                break;
@@ -1033,7 +1027,10 @@ void Backend::commitChanges()
         }
     }
 
-    d->worker->commitChanges(packageList);
+    QDBusPendingReply<QString> rep = d->worker->commitChanges(packageList);
+    Transaction *trans = new Transaction(rep.value());
+
+    return trans;
 }
 
 void Backend::downloadArchives(const QString &listFile, const QString &destination)

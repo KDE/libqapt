@@ -619,7 +619,7 @@ public Q_SLOTS:
      * @see workerEvent()
      * @see commitProgress()
      */
-    void commitChanges();
+    QApt::Transaction *commitChanges();
 
    /**
     * Downloads the packages listed in the provided list file to the provided
