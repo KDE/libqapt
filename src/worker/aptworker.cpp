@@ -184,6 +184,9 @@ void AptWorker::runTransaction(Transaction *trans)
     case QApt::UpgradeSystemRole:
         //upgradeSystem();
         break;
+    case QApt::CommitChangesRole:
+        commitChanges();
+        break;
     // Other
     case QApt::EmptyRole:
     default:
