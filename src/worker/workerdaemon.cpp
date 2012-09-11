@@ -142,7 +142,7 @@ QString WorkerDaemon::updateXapianIndex()
 
 bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.write-file-to-disk"), message().service())) {
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writefiletodisk"), message().service())) {
         return false;
     }
 
@@ -159,7 +159,7 @@ bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 
 bool WorkerDaemon::copyArchiveToCache(const QString &archivePath)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.write-file-to-disk"), message().service())) {
+    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writefiletodisk"), message().service())) {
         return false;
     }
 
