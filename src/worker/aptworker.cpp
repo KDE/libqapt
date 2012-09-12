@@ -40,7 +40,6 @@
 // Own includes
 #include "aptlock.h"
 #include "cache.h"
-#include "config.h"
 #include "package.h"
 #include "transaction.h"
 #include "workeracquire.h"
@@ -118,13 +117,15 @@ AptWorker::~AptWorker()
     qDeleteAll(m_locks);
 }
 
-Transaction *AptWorker::currentTransaction() const
+Transaction *AptWorker::currentTransaction()
 {
+    QMutexLocker locker(&m_transMutex);
     return m_trans;
 }
 
-quint64 AptWorker::lastActiveTimestamp() const
+quint64 AptWorker::lastActiveTimestamp()
 {
+    QMutexLocker locker(&m_timestampMutex);
     return m_lastActiveTimestamp;
 }
 
@@ -138,12 +139,12 @@ void AptWorker::init()
     m_cache = new pkgCacheFile;
 
     // Prepare locks to be used later
-    QApt::Config *config = new QApt::Config(this);
     QStringList dirs;
-    dirs << config->findDirectory("Dir::Cache::Archives")
-         << config->findDirectory("Dir::State::lists");
 
-    QString statusFile = config->findDirectory("Dir::State::status");
+    dirs << QString::fromStdString(_config->FindDir("Dir::Cache::Archives"))
+         << QString::fromStdString(_config->FindDir("Dir::State::lists"));
+
+    QString statusFile = QString::fromStdString(_config->FindDir("Dir::State::status"));
     QFileInfo info(statusFile);
     dirs << info.dir().absolutePath();
 
@@ -160,7 +161,9 @@ void AptWorker::runTransaction(Transaction *trans)
     if (m_trans || !m_ready)
         return;
 
+    m_timestampMutex.lock();
     m_lastActiveTimestamp = QDateTime::currentMSecsSinceEpoch();
+    m_timestampMutex.unlock();
     m_trans = trans;
     trans->setStatus(QApt::RunningStatus);
     waitForLocks();
@@ -218,6 +221,8 @@ void AptWorker::cleanupCurrentTransaction()
         m_trans->setExitStatus(QApt::ExitSuccess);
 
     m_trans = nullptr;
+
+    QMutexLocker locker(&m_timestampMutex);
     m_lastActiveTimestamp = QDateTime::currentMSecsSinceEpoch();
 }
 
@@ -292,7 +297,7 @@ bool AptWorker::markChanges()
 
     QApt::Package::State operation = QApt::Package::ToKeep;
     while (mapIter != m_trans->packages().constEnd()) {
-        QApt::Package::State operation = (QApt::Package::State)mapIter.value().toInt();
+        operation = (QApt::Package::State)mapIter.value().toInt();
 
         // Find package in cache
         pkgCache::PkgIterator iter;
@@ -454,9 +459,6 @@ void AptWorker::commitChanges()
     if (!success) {
         m_trans->setError(QApt::CommitError);
         // TODO: Error detail
-
-        delete installProgress;
-        return;
     }
 
     delete installProgress;

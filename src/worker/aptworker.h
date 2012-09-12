@@ -21,6 +21,7 @@
 #ifndef APTWORKER_H
 #define APTWORKER_H
 
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
@@ -37,15 +38,17 @@ public:
     explicit AptWorker(QObject *parent = 0);
     ~AptWorker();
 
-    Transaction *currentTransaction() const;
-    quint64 lastActiveTimestamp() const;
+    Transaction *currentTransaction();
+    quint64 lastActiveTimestamp();
 
 private:
     pkgCacheFile *m_cache;
     pkgRecords *m_records;
+    QMutex m_transMutex;
     Transaction *m_trans;
     bool m_ready;
     QVector<AptLock *> m_locks;
+    QMutex m_timestampMutex;
     quint64 m_lastActiveTimestamp;
 
     /**
