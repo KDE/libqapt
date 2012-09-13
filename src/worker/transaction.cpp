@@ -49,6 +49,8 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_isCancellable(true)
     , m_isCancelled(false)
     , m_exitStatus(QApt::ExitUnfinished)
+    , m_isPaused(false)
+    , m_progress(0)
 {
     new TransactionAdaptor(this);
     QDBusConnection connection = QDBusConnection::systemBus();
