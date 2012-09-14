@@ -44,6 +44,7 @@ private:
     QList<Transaction *> m_pending;
     Transaction *m_activeTransaction;
 
+    Transaction *pendingTransactionById(const QString &id) const;
     Transaction *transactionById(const QString &id) const;
     
 signals:

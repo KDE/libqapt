@@ -51,6 +51,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_exitStatus(QApt::ExitUnfinished)
     , m_isPaused(false)
     , m_progress(0)
+    , m_dataMutex(QMutex::Recursive)
 {
     new TransactionAdaptor(this);
     QDBusConnection connection = QDBusConnection::systemBus();
@@ -92,13 +93,16 @@ int Transaction::userId() const
     return m_uid;
 }
 
-int Transaction::role() const
+int Transaction::role()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_role;
 }
 
 void Transaction::setRole(int role)
 {
+    QMutexLocker lock(&m_dataMutex);
     // Cannot change role for an already determined transaction
     if (m_role != QApt::EmptyRole) {
         sendErrorReply(QDBusError::Failed);
@@ -111,13 +115,16 @@ void Transaction::setRole(int role)
     emit propertyChanged(QApt::RoleProperty, QDBusVariant(role));
 }
 
-int Transaction::status() const
+int Transaction::status()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_status;
 }
 
 void Transaction::setStatus(QApt::TransactionStatus status)
 {
+    QMutexLocker lock(&m_dataMutex);
     m_status = status;
     emit propertyChanged(QApt::StatusProperty, QDBusVariant((int)status));
 
@@ -129,8 +136,10 @@ void Transaction::setStatus(QApt::TransactionStatus status)
     }
 }
 
-int Transaction::error() const
+int Transaction::error()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_error;
 }
 
@@ -140,13 +149,17 @@ void Transaction::setError(QApt::ErrorCode code)
     emit propertyChanged(QApt::ErrorProperty, QDBusVariant((int)code));
 }
 
-QString Transaction::locale() const
+QString Transaction::locale()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_locale;
 }
 
 void Transaction::setLocale(QString locale)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     if (m_status != QApt::SetupStatus) {
         sendErrorReply(QDBusError::Failed);
         return;
@@ -156,13 +169,17 @@ void Transaction::setLocale(QString locale)
     emit propertyChanged(QApt::LocaleProperty, QDBusVariant(locale));
 }
 
-QString Transaction::proxy() const
+QString Transaction::proxy()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_proxy;
 }
 
 void Transaction::setProxy(QString proxy)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     if (m_status != QApt::SetupStatus) {
         sendErrorReply(QDBusError::Failed);
         return;
@@ -172,13 +189,17 @@ void Transaction::setProxy(QString proxy)
     emit propertyChanged(QApt::ProxyProperty, QDBusVariant(proxy));
 }
 
-QString Transaction::debconfPipe() const
+QString Transaction::debconfPipe()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_debconfPipe;
 }
 
 void Transaction::setDebconfPipe(QString pipe)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     if (m_status != QApt::SetupStatus) {
         sendErrorReply(QDBusError::Failed);
         return;
@@ -195,13 +216,17 @@ void Transaction::setDebconfPipe(QString pipe)
     emit propertyChanged(QApt::DebconfPipeProperty, QDBusVariant(pipe));
 }
 
-QVariantMap Transaction::packages() const
+QVariantMap Transaction::packages()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_packages;
 }
 
 void Transaction::setPackages(QVariantMap packageList)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     if (m_status != QApt::SetupStatus) {
         sendErrorReply(QDBusError::Failed);
         return;
@@ -211,79 +236,103 @@ void Transaction::setPackages(QVariantMap packageList)
     emit propertyChanged(QApt::PackagesProperty, QDBusVariant(packageList));
 }
 
-bool Transaction::isCancellable() const
+bool Transaction::isCancellable()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_isCancellable;
 }
 
 void Transaction::setCancellable(bool cancellable)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     m_isCancellable = cancellable;
     emit propertyChanged(QApt::CancellableProperty, QDBusVariant(cancellable));
 }
 
-bool Transaction::isCancelled() const
+bool Transaction::isCancelled()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_isCancelled;
 }
 
-int Transaction::exitStatus() const
+int Transaction::exitStatus()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return (int)m_exitStatus;
 }
 
 void Transaction::setExitStatus(QApt::ExitStatus exitStatus)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     setStatus(QApt::FinishedStatus);
     m_exitStatus = exitStatus;
     emit propertyChanged(QApt::ExitStatusProperty, QDBusVariant(exitStatus));
     emit finished(exitStatus);
 }
 
-QString Transaction::medium() const
+QString Transaction::medium()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_medium;
 }
 
 void Transaction::setMediumRequired(const QString &label, const QString &medium)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     m_medium = medium;
     m_isPaused = true;
 
     emit mediumRequired(label, medium);
 }
 
-bool Transaction::isPaused() const
+bool Transaction::isPaused()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_isPaused;
 }
 
 void Transaction::setIsPaused(bool paused)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     m_isPaused = paused;
 }
 
-QString Transaction::statusDetails() const
+QString Transaction::statusDetails()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_statusDetails;
 }
 
 void Transaction::setStatusDetails(const QString &details)
 {
-    m_statusDetails = details;
+    QMutexLocker lock(&m_dataMutex);
 
+    m_statusDetails = details;
     emit propertyChanged(QApt::StatusDetailsProperty, QDBusVariant(details));
 }
 
-int Transaction::progress() const
+int Transaction::progress()
 {
+    QMutexLocker lock(&m_dataMutex);
+
     return m_progress;
 }
 
 void Transaction::setProgress(int progress)
 {
-    m_progress = progress;
+    QMutexLocker lock(&m_dataMutex);
 
+    m_progress = progress;
     emit propertyChanged(QApt::ProgressProperty, QDBusVariant(progress));
 }
 
@@ -306,6 +355,7 @@ void Transaction::run()
         return;
     }
 
+    QMutexLocker lock(&m_dataMutex);
     m_queue->enqueue(m_tid);
     setStatus(QApt::WaitingStatus);
 }
@@ -322,7 +372,9 @@ bool Transaction::isForeignUser() const
 
 bool Transaction::authorizeRun()
 {
+    m_dataMutex.lock();
     QString action = m_roleActionMap.value(m_role);
+    m_dataMutex.unlock();
 
     // Some actions don't need authorizing, and are run in the worker
     // for the sake of asynchronicity.
@@ -382,6 +434,7 @@ void Transaction::cancel()
         }
     }
 
+    QMutexLocker lock(&m_dataMutex);
     // We can only cancel cancellable transactions, obviously
     if (!m_isCancellable) {
         sendErrorReply(QDBusError::Failed);
@@ -395,6 +448,8 @@ void Transaction::cancel()
 
 void Transaction::provideMedium(const QString &medium)
 {
+    QMutexLocker lock(&m_dataMutex);
+
     if (isForeignUser()) {
         sendErrorReply(QDBusError::AccessDenied);
         return;

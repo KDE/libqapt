@@ -51,11 +51,25 @@ bool TransactionQueue::isEmpty() const
     return (m_queue.isEmpty() && m_pending.isEmpty());
 }
 
-Transaction *TransactionQueue::transactionById(const QString &id) const
+Transaction *TransactionQueue::pendingTransactionById(const QString &id) const
 {
     Transaction *transaction = nullptr;
 
     for (Transaction *trans : m_pending) {
+        if (trans->transactionId() == id) {
+            transaction = trans;
+            break;
+        }
+    }
+
+    return transaction;
+}
+
+Transaction *TransactionQueue::transactionById(const QString &id) const
+{
+    Transaction *transaction = nullptr;
+
+    for (Transaction *trans : m_queue) {
         if (trans->transactionId() == id) {
             transaction = trans;
             break;
@@ -81,12 +95,13 @@ void TransactionQueue::removePending(Transaction *trans)
 
 void TransactionQueue::enqueue(QString tid)
 {
-    Transaction *trans = transactionById(tid);
+    Transaction *trans = pendingTransactionById(tid);
 
     if (!trans)
         return;
 
     connect(trans, SIGNAL(finished(int)), this, SLOT(onTransactionFinished(int)));
+    m_pending.removeAll(trans);
     m_queue.enqueue(trans);
     emitQueueChanged();
 

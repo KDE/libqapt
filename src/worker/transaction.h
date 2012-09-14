@@ -23,6 +23,7 @@
 #define TRANSACTION_H
 
 // Qt includes
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtDBus/QDBusContext>
 #include <QtDBus/QDBusVariant>
@@ -38,7 +39,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_OBJECT
 
     Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker.transaction")
-    Q_PROPERTY(QString transactionId READ transactionId)
+    Q_PROPERTY(QString transactionId READ transactionId CONSTANT)
     Q_PROPERTY(int userId READ userId CONSTANT)
     Q_PROPERTY(int role READ role)
     Q_PROPERTY(int status READ status)
@@ -61,20 +62,20 @@ public:
 
     QString transactionId() const;
     int userId() const;
-    int role() const;
-    int status() const;
-    int error() const;
-    QString locale() const;
-    QString proxy() const;
-    QString debconfPipe() const;
-    QVariantMap packages() const;
-    bool isCancellable() const;
-    bool isCancelled() const;
-    int exitStatus() const;
-    QString medium() const;
-    bool isPaused() const;
-    QString statusDetails() const;
-    int progress() const;
+    int role();
+    int status();
+    int error();
+    QString locale();
+    QString proxy();
+    QString debconfPipe();
+    QVariantMap packages();
+    bool isCancellable();
+    bool isCancelled();
+    int exitStatus();
+    QString medium();
+    bool isPaused();
+    QString statusDetails();
+    int progress();
     QString service() const;
 
     void setStatus(QApt::TransactionStatus status);
@@ -113,6 +114,7 @@ private:
     // Other data
     QMap<int, QString> m_roleActionMap;
     QTimer *m_idleTimer;
+    QMutex m_dataMutex;
 
     // Private functions
     int dbusSenderUid() const;
