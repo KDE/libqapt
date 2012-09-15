@@ -59,9 +59,6 @@ private Q_SLOTS:
     void commitAction();
     void upgrade();
     void onTransactionStatusChanged(QApt::TransactionStatus status);
-    void workerEvent(QApt::WorkerEvent event);
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateDownloadMessage(int flag, const QString &name);
     void updateStatusBar();
 
 private:

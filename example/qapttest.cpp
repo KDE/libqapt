@@ -292,64 +292,25 @@ void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
     }
 }
 
-void QAptTest::workerEvent(QApt::WorkerEvent event)
-{
-    switch (event) {
-        case QApt::CacheUpdateStarted:
-            m_cacheUpdateWidget->clear();
-            m_cacheUpdateWidget->setHeaderText(i18n("<b>Updating software sources</b>"));
-            m_stack->setCurrentWidget(m_cacheUpdateWidget);
-            connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
-            break;
-        case QApt::CacheUpdateFinished:
-            updateStatusBar();
-            m_stack->setCurrentWidget(m_mainWidget);
-            break;
-        case QApt::PackageDownloadStarted:
-            m_cacheUpdateWidget->clear();
-            m_cacheUpdateWidget->setHeaderText(i18n("<b>Downloading Packages</b>"));
-            m_stack->setCurrentWidget(m_cacheUpdateWidget);
-            connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
-            break;
-        case QApt::PackageDownloadFinished:
-            updateStatusBar();
-            m_stack->setCurrentWidget(m_mainWidget);
-            break;
-        case QApt::CommitChangesStarted:
-            m_commitWidget->clear();
-            m_stack->setCurrentWidget(m_commitWidget);
-            break;
-        case QApt::CommitChangesFinished:
-            updateStatusBar();
-            m_stack->setCurrentWidget(m_mainWidget);
-            break;
-    }
-}
-
-void QAptTest::updateDownloadProgress(int percentage, int speed, int ETA)
-{
-    m_cacheUpdateWidget->setTotalProgress(percentage, speed, ETA);
-}
-
-void QAptTest::updateDownloadMessage(int flag, const QString &message)
-{
-    QString fullMessage;
-
-    switch (flag) {
-      case QApt::DownloadFetch:
-          fullMessage = i18n("Downloading: %1", message);
-          break;
-      case QApt::HitFetch:
-          fullMessage = i18n("Checking: %1", message);
-          break;
-      case QApt::IgnoredFetch:
-          fullMessage = i18n("Ignored: %1", message);
-          break;
-      default:
-          fullMessage = message;
-    }
-    m_cacheUpdateWidget->addItem(fullMessage);
-}
+// void QAptTest::updateDownloadMessage(int flag, const QString &message)
+// {
+//     QString fullMessage;
+// 
+//     switch (flag) {
+//       case QApt::DownloadFetch:
+//           fullMessage = i18n("Downloading: %1", message);
+//           break;
+//       case QApt::HitFetch:
+//           fullMessage = i18n("Checking: %1", message);
+//           break;
+//       case QApt::IgnoredFetch:
+//           fullMessage = i18n("Ignored: %1", message);
+//           break;
+//       default:
+//           fullMessage = message;
+//     }
+//     m_cacheUpdateWidget->addItem(fullMessage);
+// }
 
 void QAptTest::updateStatusBar()
 {
@@ -363,5 +324,3 @@ void QAptTest::updateStatusBar()
                                          m_backend->packageCount(QApt::Package::ToUpgrade),
                                          m_backend->packageCount(QApt::Package::ToRemove)));
 }
-
-#include "qapttest.moc"
