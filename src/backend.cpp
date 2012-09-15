@@ -130,8 +130,9 @@ bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const 
     return true;
 }
 
-Backend::Backend()
-        : d_ptr(new BackendPrivate)
+Backend::Backend(QObject *parent)
+        : QObject(parent)
+        , d_ptr(new BackendPrivate)
 {
     Q_D(Backend);
 

@@ -64,7 +64,7 @@ public:
      /**
       * Default constructor
       */
-    explicit Backend();
+    explicit Backend(QObject *parent = 0);
 
      /**
       * Default destructor
