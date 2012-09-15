@@ -122,13 +122,6 @@ QAptTest::QAptTest()
     updateLabels();
     updateStatusBar();
     setCentralWidget(m_stack);
-
-    // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
-//     m_group = m_backend->group("kde");
-//     QApt::PackageList packageList = m_group->packages();
-//     foreach (QApt::Package *package, packageList) {
-//             kDebug() << package->name();
-//     }
 }
 
 void QAptTest::updateLabels()
