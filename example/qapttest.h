@@ -51,8 +51,6 @@ class QAptTest : public KMainWindow
 public:
     QAptTest();
 
-    virtual ~QAptTest();
-
 private Q_SLOTS:
     void updateLabels();
     void updateCache();

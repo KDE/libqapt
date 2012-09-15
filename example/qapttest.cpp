@@ -51,7 +51,7 @@ QAptTest::QAptTest()
 {
     setWindowIcon(KIcon("application-x-deb"));
 
-    m_backend = new QApt::Backend();
+    m_backend = new QApt::Backend(this);
     m_backend->init();
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
@@ -129,10 +129,6 @@ QAptTest::QAptTest()
 //     foreach (QApt::Package *package, packageList) {
 //             kDebug() << package->name();
 //     }
-}
-
-QAptTest::~QAptTest()
-{
 }
 
 void QAptTest::updateLabels()
