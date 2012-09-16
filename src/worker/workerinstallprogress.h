@@ -47,9 +47,6 @@ private:
     int m_progressEnd;
 
     void updateInterface(int fd, int writeFd);
-
-signals:
-    void commitError(int code, const QVariantMap &details);
 };
 
 #endif

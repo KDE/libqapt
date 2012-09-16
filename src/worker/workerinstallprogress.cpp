@@ -156,10 +156,9 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             }
 
             if (status.contains(QLatin1String("pmerror"))) {
-                QVariantMap args;
-                args[QLatin1String("FailedItem")] = package;
-                args[QLatin1String("ErrorText")] = str;
-                emit commitError(QApt::CommitError, args);
+                // FIXME: Transactify errors
+//                args[QLatin1String("FailedItem")] = package;
+//                args[QLatin1String("ErrorText")] = str;
             } else if (status.contains(QLatin1String("pmconffile"))) {
                 // From what I understand, the original file starts after the ' character ('\'') and
                 // goes to a second ' character. The new conf file starts at the next ' and goes to
@@ -171,7 +170,6 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 QVariantMap args;
                 args[QLatin1String("OldConfFile")] = oldFile;
                 args[QLatin1String("NewConfFile")] = newFile;
-                //TODO: diff support
 
                 // FIXME: use transaction to query user, wait for resume
                 bool replaceFile;
