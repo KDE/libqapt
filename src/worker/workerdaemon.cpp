@@ -121,7 +121,7 @@ QString WorkerDaemon::updateCache()
 QString WorkerDaemon::installFile(const QString &file)
 {
     Transaction *trans = createTranscation(QApt::InstallFileRole);
-    // FIXME: Add a "filePath" property to Transaction, and set it here
+    trans->setFilePath(file);
 
     return trans->transactionId();
 }

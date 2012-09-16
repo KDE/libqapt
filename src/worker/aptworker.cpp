@@ -45,6 +45,7 @@
 // Own includes
 #include "aptlock.h"
 #include "cache.h"
+#include "debfile.h"
 #include "package.h"
 #include "transaction.h"
 #include "workeracquire.h"
@@ -194,6 +195,9 @@ void AptWorker::runTransaction(Transaction *trans)
         break;
     case QApt::CommitChangesRole:
         commitChanges();
+        break;
+    case QApt::InstallFileRole:
+        installFile();
         break;
     // Other
     case QApt::EmptyRole:
@@ -520,4 +524,9 @@ void AptWorker::commitChanges()
     }
 
     delete installProgress;
+}
+
+void AptWorker::installFile()
+{
+    QApt::DebFile file(m_trans->filePath());
 }

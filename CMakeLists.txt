@@ -179,8 +179,7 @@ add_subdirectory(includes)
 find_package(KDE4)
 if (KDE4_FOUND)
     include(KDE4Defaults)
-    # FIXME: Port to QApt2
-    #add_subdirectory(utils)
+    add_subdirectory(utils)
 
     #Do not remove or modify these.  The release script substitutes in for these
     #comments with appropriate doc and translation directories.

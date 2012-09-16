@@ -76,6 +76,8 @@ private:
     void commitChanges();
 
     bool markChanges();
+
+    void installFile();
     
 public slots:
     /**

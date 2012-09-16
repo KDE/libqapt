@@ -44,8 +44,8 @@
 
 DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     : KDialog(parent)
-    , m_backend(new QApt::Backend)
-    , m_commitWidget(0)
+    , m_trans(nullptr)
+    , m_commitWidget(nullptr)
 {
     m_backend->init();
     connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
@@ -103,114 +103,113 @@ void DebInstaller::initGUI()
     }
 }
 
-void DebInstaller::workerEvent(QApt::WorkerEvent event)
-{
-    switch (event) {
-    case QApt::PackageDownloadStarted:
-        if (m_commitWidget) {
-            m_stack->setCurrentWidget(m_commitWidget);
-            m_commitWidget->showProgress();
-            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are downloading",
-                                                "<title>Downloading Dependencies</title>"));
+//void DebInstaller::workerEvent(QApt::WorkerEvent event)
+//{
+//    switch (event) {
+//    case QApt::PackageDownloadStarted:
+//        if (m_commitWidget) {
+//            m_stack->setCurrentWidget(m_commitWidget);
+//            m_commitWidget->showProgress();
+//            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are downloading",
+//                                                "<title>Downloading Dependencies</title>"));
 
-            connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
-                m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
-        }
-        break;
-    case QApt::PackageDownloadFinished:
-        if (m_commitWidget) {
-            disconnect(m_backend, SIGNAL(downloadProgress(int,int,int)),
-                       m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
-        }
-        break;
-    case QApt::CommitChangesStarted:
-        if (m_commitWidget) {
-            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are installing",
-                                                "<title>Installing Dependencies</title>"));
+//            connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
+//                m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
+//        }
+//        break;
+//    case QApt::PackageDownloadFinished:
+//        if (m_commitWidget) {
+//            disconnect(m_backend, SIGNAL(downloadProgress(int,int,int)),
+//                       m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
+//        }
+//        break;
+//    case QApt::CommitChangesStarted:
+//        if (m_commitWidget) {
+//            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are installing",
+//                                                "<title>Installing Dependencies</title>"));
 
-            connect(m_backend, SIGNAL(commitProgress(QString,int)),
-                    m_commitWidget, SLOT(updateCommitProgress(QString,int)));
-        }
-        break;
-    case QApt::CommitChangesFinished:
-        if (m_commitWidget) {
-            m_commitWidget->hideProgress();
+//            connect(m_backend, SIGNAL(commitProgress(QString,int)),
+//                    m_commitWidget, SLOT(updateCommitProgress(QString,int)));
+//        }
+//        break;
+//    case QApt::CommitChangesFinished:
+//        if (m_commitWidget) {
+//            m_commitWidget->hideProgress();
 
-            disconnect(m_backend, SIGNAL(commitProgress(QString,int)),
-                       m_commitWidget, SLOT(updateCommitProgress(QString,int)));
+//            disconnect(m_backend, SIGNAL(commitProgress(QString,int)),
+//                       m_commitWidget, SLOT(updateCommitProgress(QString,int)));
 
-            m_backend->installDebFile(*m_debFile);
-        }
-        break;
-    case QApt::DebInstallStarted:
-        if (m_commitWidget) {
-            m_commitWidget->hideProgress();
-            m_stack->setCurrentWidget(m_commitWidget);
-        }
-        break;
-    case QApt::DebInstallFinished:
-        if (m_commitWidget) {
-            m_commitWidget->updateTerminal(i18nc("@label Message that the install is done",
-                                                "Done"));
-            m_commitWidget->setHeaderText(i18nc("@info Header label used when the install is done",
-                                                "<title>Done</title>"));
-        }
-        setButtons(KDialog::Close);
-        break;
-    case QApt::InvalidEvent:
-    default:
-        break;
-    }
-}
+//            m_backend->installFile(*m_debFile);
+//        }
+//        break;
+//    case QApt::DebInstallStarted:
+//        if (m_commitWidget) {
+//            m_commitWidget->hideProgress();
+//            m_stack->setCurrentWidget(m_commitWidget);
+//        }
+//        break;
+//    case QApt::DebInstallFinished:
+//        if (m_commitWidget) {
+//            m_commitWidget->updateTerminal(i18nc("@label Message that the install is done",
+//                                                "Done"));
+//            m_commitWidget->setHeaderText(i18nc("@info Header label used when the install is done",
+//                                                "<title>Done</title>"));
+//        }
+//        setButtons(KDialog::Close);
+//        break;
+//    case QApt::InvalidEvent:
+//    default:
+//        break;
+//    }
+//}
 
-void DebInstaller::errorOccurred(QApt::ErrorCode error, const QVariantMap &args)
-{
-    QString text;
-    QString title;
-    QString details;
+//void DebInstaller::errorOccurred(QApt::ErrorCode error, const QVariantMap &args)
+//{
+//    QString text;
+//    QString title;
+//    QString details;
 
-    switch (error) {
-        case QApt::InitError: {
-            text = i18nc("@label",
-                        "The package system could not be initialized, your "
-                        "configuration may be broken.");
-            title = i18nc("@title:window", "Initialization error");
-            details = args["ErrorText"].toString();
-            KMessageBox::detailedError(this, text, details, title);
-            KApplication::instance()->quit();
-            break;
-        }
-        case QApt::WrongArchError:
-            text = i18nc("@label",
-                         "This package is incompatible with your computer.");
-            title = i18nc("@title:window", "Incompatible Package");
-            details =  i18nc("@info", "Error: Wrong architecture '%1'.",
-                             args["RequestedArch"].toString());
-            KMessageBox::detailedError(this, text, details, title);
-            break;
-        case QApt::AuthError:
-            m_applyButton->setEnabled(true);
-            m_cancelButton->setEnabled(true);
-            break;
-        case QApt::UnknownError:
-        default:
-            break;
-    }
-}
+//    switch (error) {
+//        case QApt::InitError: {
+//            text = i18nc("@label",
+//                        "The package system could not be initialized, your "
+//                        "configuration may be broken.");
+//            title = i18nc("@title:window", "Initialization error");
+//            details = args["ErrorText"].toString();
+//            KMessageBox::detailedError(this, text, details, title);
+//            KApplication::instance()->quit();
+//            break;
+//        }
+//        case QApt::WrongArchError:
+//            text = i18nc("@label",
+//                         "This package is incompatible with your computer.");
+//            title = i18nc("@title:window", "Incompatible Package");
+//            details =  i18nc("@info", "Error: Wrong architecture '%1'.",
+//                             args["RequestedArch"].toString());
+//            KMessageBox::detailedError(this, text, details, title);
+//            break;
+//        case QApt::AuthError:
+//            m_applyButton->setEnabled(true);
+//            m_cancelButton->setEnabled(true);
+//            break;
+//        case QApt::UnknownError:
+//        default:
+//            break;
+//    }
+//}
 
 void DebInstaller::installDebFile()
 {
-    connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)),
-            this, SLOT(workerEvent(QApt::WorkerEvent)));
-
     m_applyButton->setEnabled(false);
     m_cancelButton->setEnabled(false);
+
+    m_trans = m_backend->installFile(*m_debFile);
 
     initCommitWidget();
     if (m_backend->markedPackages().size()) {
         m_backend->commitChanges();
     } else {
-        m_backend->installDebFile(*m_debFile);
+        m_backend->installFile(*m_debFile);
     }
 }
 
@@ -481,5 +480,3 @@ bool DebInstaller::satisfyDepends()
 
     return true;
 }
-
-#include "DebInstaller.moc"

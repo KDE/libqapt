@@ -32,6 +32,7 @@ class QStackedWidget;
 
 namespace QApt {
     class Backend;
+    class Transaction;
 }
 
 class DebCommitWidget;
@@ -48,6 +49,7 @@ private:
     // Backend stuff
     QApt::Backend *m_backend;
     QApt::DebFile *m_debFile;
+    QApt::Transaction *m_trans;
     QString m_foreignArch;
 
     // GUI
@@ -74,8 +76,8 @@ private:
 private Q_SLOTS:
     void initGUI();
 
-    void workerEvent(QApt::WorkerEvent event);
-    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
+    //void workerEvent(QApt::WorkerEvent event);
+    //void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
 
     void installDebFile();
     void initCommitWidget();
