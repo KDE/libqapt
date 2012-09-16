@@ -57,7 +57,6 @@ namespace QApt
     * InitError: <"ErrorText", QString> (APT's error description)
     *            <"FromWorker, bool> (Whether or not an init error comes from the worker.
     *                                 You want to quit your app if it doesn't)
-    * LockError: No fields
     * DiskSpaceError: <"DirectoryString", QString>
     * FetchError: No fields
     * CommitError: <"FailedItem, QString> (Package that failed to commit)
@@ -65,41 +64,11 @@ namespace QApt
     * AuthError: No fields
     * WorkerDisappeared: No fields
     * UntrustedError: <"UntrustedItems", QStringList> (List of untrusted packages)
-    * UserCancelError: No fields, pseudo-error
-    * DownloadDisallowedError: No fields
     * NotFoundError: <"NotFoundString", QString> (String of the nonexistent package)
     *                <"WarningText", QString> (APT's warning description)
     * WrongArchError: <"RequestedArch", QString> (String of the unsupported architecture)
     */
     typedef QVariantMap Error;
-
-   /**
-    * An enumerator listing all the events that the QApt Worker can emit
-    */
-    enum WorkerEvent {
-        /// An invalid event
-        InvalidEvent            = 0,
-        /// The worker has begun to check for updates
-        CacheUpdateStarted      = 1,
-        /// The worker has finished checking for updates
-        CacheUpdateFinished     = 2,
-        /// The worker has started downloading packages for an install
-        PackageDownloadStarted  = 3,
-        /// The worker has finished downloading packages
-        PackageDownloadFinished = 4,
-        /// The worker has begun committing changes to the package cache
-        CommitChangesStarted    = 5,
-        /// The worker has finished committing changes
-        CommitChangesFinished   = 6,
-        /// The worker has begun to update the xapian index
-        XapianUpdateStarted     = 7,
-        /// The worker has finished updating the xapian index
-        XapianUpdateFinished    = 8,
-        /// The worker has started installing a .deb with dpkg
-        DebInstallStarted       = 9,
-        /// The worker has finished installing a .deb with dpkg
-        DebInstallFinished      = 10
-    };
 
    /**
     * An enumerator listing all error types that the QApt Worker can throw

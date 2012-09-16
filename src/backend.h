@@ -447,13 +447,6 @@ Q_SIGNALS:
     void packageChanged();
 
     /**
-     * Emitted whenever a backend event occurs.
-     *
-     * @param event A @c WorkerEvent enum member indicating event type
-     */
-    void workerEvent(QApt::WorkerEvent event);
-
-    /**
      * Emits total progress information while the QApt Worker is downloading
      * packages.
      *
