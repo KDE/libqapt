@@ -441,16 +441,6 @@ Q_SIGNALS:
     void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
 
     /**
-     * Emitted whenever a backend warning occurs. You should listen to this
-     * signal and present the warning when your app receives it.
-     *
-     * @param error @c WarningCode enum member indicating error type
-     * @param details  A @c QVariantMap containing info about the warning, if
-     *                available
-     */
-    void warningOccurred(QApt::WarningCode warning, const QVariantMap &details);
-
-    /**
      * Emitted whenever a package changes state. Useful for knowning when to
      * react to state changes.
      */

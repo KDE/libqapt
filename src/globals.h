@@ -73,17 +73,6 @@ namespace QApt
     */
     typedef QVariantMap Error;
 
-    /**
-    * Defines the Warning type, a QVariantMap with info about warnings
-    *
-    * These are the fields that each WarningCode can have:
-    *                      <"Key", ValueType> (Description of value)
-    * SizeMismatchWarning: No fields
-    * FetchFailedWarning: <"FailedItem", QString> (Package that failed to download)
-    * 
-    */
-    typedef QVariantMap Warning;
-
    /**
     * An enumerator listing all the events that the QApt Worker can emit
     */
@@ -146,18 +135,6 @@ namespace QApt
         WrongArchError,
         /// Emitted when the worker cannot mark packages without broken dependencies
         MarkingError
-    };
-
-   /**
-    * An enumerator listing all warning types that the QApt Worker can throw
-    */
-    enum WarningCode {
-        /// An invalid/unknown warning
-        UnknownWarning        = 0,
-        /// Emitted when the downloaded size didn't match the expected size
-        SizeMismatchWarning   = 1,
-        /// Emitted for non-fatal fetch errors
-        FetchFailedWarning    = 2
     };
 
    /**
