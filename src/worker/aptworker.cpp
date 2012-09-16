@@ -411,7 +411,38 @@ void AptWorker::commitChanges()
         return;
     }
 
-    // TODO: Size mismatch warning, disk space sanity check, untrusted check
+    // TODO: disk space sanity check
+
+    // Check for untrusted packages
+    QStringList untrustedPackages;
+    for (auto it = fetcher.ItemsBegin(); it < fetcher.ItemsEnd(); ++it) {
+        if (!(*it)->IsTrusted())
+            untrustedPackages << QString::fromStdString((*it)->ShortDesc());
+    }
+
+    if (!untrustedPackages.isEmpty()) {
+        bool allowUntrusted = _config->FindB("APT::Get::AllowUnauthenticated", true);
+
+        m_trans->setUntrustedPackages(untrustedPackages, allowUntrusted);
+
+        if (!allowUntrusted) {
+            m_trans->setError(QApt::UntrustedError);
+
+            delete acquire;
+            return;
+        }
+
+        // Wait until the user approves, disapproves, or cancels the transaction
+        while (m_trans->isPaused())
+             usleep(200000);
+
+        if (!m_trans->allowUntrusted()) {
+            m_trans->setError(QApt::UntrustedError);
+
+            delete acquire;
+            return;
+        }
+    }
 
     // Fetch archives from the network
     if (fetcher.Run() != pkgAcquire::Continue) {

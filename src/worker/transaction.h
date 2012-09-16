@@ -55,6 +55,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(QString statusDetails READ statusDetails)
     Q_PROPERTY(int progress READ progress)
     Q_PROPERTY(QApt::DownloadProgress downloadProgress READ downloadProgress)
+    Q_PROPERTY(QStringList untrustedPackages READ untrustedPackages)
 public:
     Transaction(TransactionQueue *queue, int userId);
     Transaction(TransactionQueue *queue, int userId,
@@ -79,6 +80,8 @@ public:
     int progress();
     QString service() const;
     QApt::DownloadProgress downloadProgress();
+    QStringList untrustedPackages();
+    bool allowUntrusted();
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -90,6 +93,7 @@ public:
     void setProgress(int progress);
     void setService(const QString &service);
     void setDownloadProgress(const QApt::DownloadProgress &downloadProgress);
+    void setUntrustedPackages(const QStringList &untrusted, bool promptUser);
 
 private:
     // Pointers to external containers
@@ -113,6 +117,8 @@ private:
     QString m_statusDetails;
     int m_progress;
     QApt::DownloadProgress m_downloadProgress;
+    QStringList m_untrusted;
+    bool m_allowUntrusted;
 
     // Other data
     QMap<int, QString> m_roleActionMap;
@@ -134,6 +140,7 @@ Q_SIGNALS:
     Q_SCRIPTABLE void propertyChanged(int role, QDBusVariant newValue);
     Q_SCRIPTABLE void finished(int exitStatus);
     Q_SCRIPTABLE void mediumRequired(QString label, QString mountPoint);
+    Q_SCRIPTABLE void promptUntrusted(QStringList untrustedPackages);
     void idleTimeout(Transaction *trans);
     
 public Q_SLOTS:
@@ -141,6 +148,7 @@ public Q_SLOTS:
     void run();
     void cancel();
     void provideMedium(const QString &medium);
+    void replyUntrustedPrompt(bool approved);
 
 private Q_SLOTS:
     void emitIdleTimeout();

@@ -21,6 +21,7 @@
     <property name="downloadProgress" type="(sistts)" access="read">
       <annotation name="org.qtproject.QtDBus.QtTypeName" value="QApt::DownloadProgress"/>
     </property>
+    <property name="untrustedPackages" type="as" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
@@ -32,6 +33,9 @@
       <arg name="label" type="s" direction="out"/>
       <arg name="mountPoint" type="s" direction="out"/>
     </signal>
+    <signal name="promptUntrusted">
+      <arg name="untrustedPackages" type="as" direction="out"/>
+    </signal>
     <method name="setProperty">
       <arg name="property" type="i" direction="in"/>
       <arg name="value" type="v" direction="in"/>
@@ -42,6 +46,9 @@
     </method>
     <method name="provideMedium">
       <arg name="medium" type="s" direction="in"/>
+    </method>
+    <method name="replyUntrustedPrompt">
+      <arg name="approved" type="b" direction="in"/>
     </method>
   </interface>
 </node>

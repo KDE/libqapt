@@ -80,6 +80,7 @@ class TransactionPrivate
         QString statusDetails;
         int progress;
         DownloadProgress downloadProgress;
+        QStringList untrustedPackages;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -93,6 +94,8 @@ Transaction::Transaction(const QString &tid)
             this, SLOT(updateProperty(int,QDBusVariant)));
     connect(d->dbus, SIGNAL(mediumRequired(QString,QString)),
             this, SIGNAL(mediumRequired(QString,QString)));
+    connect(d->dbus, SIGNAL(promptUntrusted(QStringList)),
+            this, SIGNAL(promptUntrusted(QStringList)));
 }
 
 Transaction::Transaction(const Transaction *other)
@@ -103,6 +106,8 @@ Transaction::Transaction(const Transaction *other)
             this, SLOT(updateProperty(int,QDBusVariant)));
     connect(d->dbus, SIGNAL(mediumRequired(QString,QString)),
             this, SIGNAL(mediumRequired(QString,QString)));
+    connect(d->dbus, SIGNAL(promptUntrusted(QStringList)),
+            this, SIGNAL(promptUntrusted(QStringList)));
 }
 
 Transaction::~Transaction()
@@ -275,6 +280,16 @@ void Transaction::updateDownloadProgress(const DownloadProgress &downloadProgres
     d->downloadProgress = downloadProgress;
 }
 
+QStringList Transaction::untrustedPackages() const
+{
+    return d->untrustedPackages;
+}
+
+void Transaction::updateUntrustedPackages(const QStringList &untrusted)
+{
+    d->untrustedPackages = untrusted;
+}
+
 void Transaction::setLocale(const QString &locale)
 {
     QDBusPendingCall call = d->dbus->setProperty(QApt::LocaleProperty,
@@ -316,6 +331,15 @@ void Transaction::cancel()
 void Transaction::provideMedium(const QString &medium)
 {
     QDBusPendingCall call = d->dbus->provideMedium(medium);
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::replyUntrustedPrompt(bool approved)
+{
+    QDBusPendingCall call = d->dbus->replyUntrustedPrompt(approved);
 
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
@@ -447,6 +471,9 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         emit downloadProgressChanged(downloadProgress());
         break;
     }
+    case UntrustedPackagesProperty:
+        updateUntrustedPackages(variant.variant().toStringList());
+        break;
     default:
         break;
     }

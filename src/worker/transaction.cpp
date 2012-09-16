@@ -51,6 +51,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_exitStatus(QApt::ExitUnfinished)
     , m_isPaused(false)
     , m_progress(0)
+    , m_allowUntrusted(false)
     , m_dataMutex(QMutex::Recursive)
 {
     new TransactionAdaptor(this);
@@ -362,6 +363,31 @@ void Transaction::setService(const QString &service)
     m_service = service;
 }
 
+QStringList Transaction::untrustedPackages()
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    return m_untrusted;
+}
+
+void Transaction::setUntrustedPackages(const QStringList &untrusted, bool promptUser)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_untrusted = untrusted;
+    emit propertyChanged(QApt::UntrustedPackagesProperty, QDBusVariant(untrusted));
+
+    if (promptUser) {
+        m_isPaused = true;
+        emit promptUntrusted(untrusted);
+    }
+}
+
+bool Transaction::allowUntrusted()
+{
+    return m_allowUntrusted;
+}
+
 void Transaction::run()
 {
     setDelayedReply(true);
@@ -478,6 +504,19 @@ void Transaction::provideMedium(const QString &medium)
     }
 
     // The medium has now been provided, and the installation should be able to continue
+    m_isPaused = false;
+}
+
+void Transaction::replyUntrustedPrompt(bool approved)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    if (isForeignUser()) {
+        sendErrorReply(QDBusError::AccessDenied);
+        return;
+    }
+
+    m_allowUntrusted = approved;
     m_isPaused = false;
 }
 

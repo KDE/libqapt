@@ -292,7 +292,9 @@ namespace QApt
         /// int, progress as percent, 1-100, 101 if indeterminate
         ProgressProperty,
         /// DownloadProgress, progress for individual files
-        DownloadProgressProperty
+        DownloadProgressProperty,
+        /// QStringList, list of untrusted package names
+        UntrustedPackagesProperty
     };
 
     /**
