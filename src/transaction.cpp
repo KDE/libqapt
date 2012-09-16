@@ -85,6 +85,7 @@ class TransactionPrivate
         QStringList untrustedPackages;
         quint64 downloadSpeed;
         quint64 downloadETA;
+        QString filePath;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -314,6 +315,16 @@ void Transaction::updateDownloadETA(quint64 ETA)
     d->downloadETA = ETA;
 }
 
+QString Transaction::filePath() const
+{
+    return d->filePath;
+}
+
+void Transaction::updateFilePath(const QString &filePath)
+{
+    d->filePath = filePath;
+}
+
 void Transaction::setLocale(const QString &locale)
 {
     QDBusPendingCall call = d->dbus->setProperty(QApt::LocaleProperty,
@@ -506,6 +517,8 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         updateDownloadETA(variant.variant().toULongLong());
         emit downloadETAChanged(downloadETA());
         break;
+    case FilePathProperty:
+        updateFilePath(variant.variant().toString());
     default:
         break;
     }

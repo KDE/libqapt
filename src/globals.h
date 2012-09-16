@@ -267,7 +267,9 @@ namespace QApt
         /// quint64, download speed in bytes
         DownloadSpeedProperty,
         /// quint64, the estimated time until completion in seconds
-        DownloadETAProperty
+        DownloadETAProperty,
+        /// QString, the path of the .deb file to be installed
+        FilePathProperty
     };
 
     /**

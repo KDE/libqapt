@@ -1069,11 +1069,14 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
     //d->worker->downloadArchives(packages, destination);
 }
 
-void Backend::installDebFile(const DebFile &debFile)
+Transaction *Backend::installFile(const DebFile &debFile)
 {
     Q_D(Backend);
 
-    //d->worker->installDebFile(debFile.filePath());
+    QDBusPendingReply<QString> rep = d->worker->installFile(debFile.filePath());
+    Transaction *trans = new Transaction(rep.value());
+
+    return trans;
 }
 
 void Backend::emitPackageChanged()

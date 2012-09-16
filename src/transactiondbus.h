@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef TRANSACTIONDBUS_H_1347824719
-#define TRANSACTIONDBUS_H_1347824719
+#ifndef TRANSACTIONDBUS_H_1347827142
+#define TRANSACTIONDBUS_H_1347827142
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -59,6 +59,10 @@ public:
     Q_PROPERTY(int exitStatus READ exitStatus)
     inline int exitStatus() const
     { return qvariant_cast< int >(property("exitStatus")); }
+
+    Q_PROPERTY(QString filePath READ filePath)
+    inline QString filePath() const
+    { return qvariant_cast< QString >(property("filePath")); }
 
     Q_PROPERTY(bool isCancellable READ isCancellable)
     inline bool isCancellable() const

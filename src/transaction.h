@@ -71,6 +71,7 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_PROPERTY(QStringList untrustedPackages READ untrustedPackages WRITE updateUntrustedPackages)
     Q_PROPERTY(quint64 downloadSpeed READ downloadSpeed WRITE updateDownloadSpeed)
     Q_PROPERTY(quint64 downloadETA READ downloadETA WRITE updateDownloadETA)
+    Q_PROPERTY(QString filePath READ filePath WRITE updateFilePath)
 
     Q_ENUMS(TransactionRole)
     Q_ENUMS(TransactionStatus)
@@ -131,6 +132,7 @@ public:
     QStringList untrustedPackages() const;
     quint64 downloadSpeed() const;
     quint64 downloadETA() const;
+    QString filePath() const;
 
 private:
     QSharedPointer<TransactionPrivate> d;
@@ -154,6 +156,7 @@ private:
     void updateUntrustedPackages(const QStringList &untrusted);
     void updateDownloadSpeed(quint64 downloadSpeed);
     void updateDownloadETA(quint64 ETA);
+    void updateFilePath(const QString &filePath);
 
 Q_SIGNALS:
     void errorOccurred(QApt::ErrorCode error);

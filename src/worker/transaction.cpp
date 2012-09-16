@@ -419,6 +419,21 @@ void Transaction::setETA(quint64 ETA)
     emit propertyChanged(QApt::DownloadETAProperty, QDBusVariant(ETA));
 }
 
+QString Transaction::filePath()
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    return m_filePath;
+}
+
+void Transaction::setFilePath(const QString &filePath)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_filePath = filePath;
+    emit propertyChanged(QApt::FilePathProperty, QDBusVariant(filePath));
+}
+
 void Transaction::run()
 {
     setDelayedReply(true);

@@ -69,6 +69,12 @@ int TransactionAdaptor::exitStatus() const
     return qvariant_cast< int >(parent()->property("exitStatus"));
 }
 
+QString TransactionAdaptor::filePath() const
+{
+    // get the value of property filePath
+    return qvariant_cast< QString >(parent()->property("filePath"));
+}
+
 bool TransactionAdaptor::isCancellable() const
 {
     // get the value of property isCancellable

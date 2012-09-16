@@ -607,9 +607,9 @@ public Q_SLOTS:
     * @see workerEvent()
     * @see packageDownloadProgress()
     *
-    * @since 1.2
+    * @since 2.0
     */
-    void installDebFile(const DebFile &file);
+    Transaction *installFile(const DebFile &file);
 
     /**
      * Checks for and downloads new package source lists.

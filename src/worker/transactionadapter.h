@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef TRANSACTIONADAPTER_H_1347824746
-#define TRANSACTIONADAPTER_H_1347824746
+#ifndef TRANSACTIONADAPTER_H_1347827104
+#define TRANSACTIONADAPTER_H_1347827104
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -54,6 +54,7 @@ class TransactionAdaptor: public QDBusAbstractAdaptor
 "    <property access=\"read\" type=\"as\" name=\"untrustedPackages\"/>\n"
 "    <property access=\"read\" type=\"t\" name=\"downloadSpeed\"/>\n"
 "    <property access=\"read\" type=\"t\" name=\"downloadETA\"/>\n"
+"    <property access=\"read\" type=\"s\" name=\"filePath\"/>\n"
 "    <signal name=\"propertyChanged\">\n"
 "      <arg direction=\"out\" type=\"i\" name=\"role\"/>\n"
 "      <arg direction=\"out\" type=\"v\" name=\"newValue\"/>\n"
@@ -104,6 +105,9 @@ public: // PROPERTIES
 
     Q_PROPERTY(int exitStatus READ exitStatus)
     int exitStatus() const;
+
+    Q_PROPERTY(QString filePath READ filePath)
+    QString filePath() const;
 
     Q_PROPERTY(bool isCancellable READ isCancellable)
     bool isCancellable() const;
