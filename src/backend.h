@@ -447,31 +447,6 @@ Q_SIGNALS:
     void packageChanged();
 
     /**
-     * Emits total progress information while the QApt Worker is downloading
-     * packages.
-     *
-     * @param percentage Total percent complete
-     * @param speed Current download speed in bytes
-     * @param ETA Current estimated download time
-     */
-    void downloadProgress(int percentage, int speed, int ETA);
-
-    /**
-     * Emits per-package progress information while the QApt Worker is
-     * downloading packages.
-     *
-     * @param name Name of the package currently being downloaded
-     * @param percentage Percentage of the package downloaded
-     * @param URI The URI of the download location
-     * @param size The size of the download in bytes
-     * @param flag Fetch type (is a QApt::Global enum member)
-     *
-     * @since 1.1
-     */
-    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
-                                 double size, int flag);
-
-    /**
      * Emits the progress of a current package installation/removal/
      * operation.
      *
@@ -486,7 +461,7 @@ Q_SIGNALS:
     *
     * @param message A line of output from dpkg
     *
-    * @since 1.2
+    * @since 2.0
     *
     * @see installDebFile(const DebFile &debFile)
     */
