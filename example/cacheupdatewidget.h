@@ -37,6 +37,7 @@ class QPushButton;
 
 namespace QApt {
     class Transaction;
+    class DownloadProgress;
 }
 
 class CacheUpdateWidget : public KVBox
@@ -47,12 +48,11 @@ public:
 
     void clear();
     void setTransaction(QApt::Transaction *trans);
-    void addItem(const QString &message);
     void setTotalProgress(int percentage, int speed, int ETA);
-    void setHeaderText(const QString &text);
 
 private:
     QApt::Transaction *m_trans;
+    QStringList m_downloads;
     int m_lastRealProgress;
 
     QLabel *m_headerLabel;
@@ -65,6 +65,8 @@ private:
 private slots:
     void onTransactionStatusChanged(QApt::TransactionStatus status);
     void progressChanged(int progress);
+    void downloadProgressChanged(const QApt::DownloadProgress &progress);
+    void addItem(const QString &message);
 
 signals:
     void cancelCacheUpdate();

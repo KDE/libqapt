@@ -281,26 +281,6 @@ void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
     }
 }
 
-// void QAptTest::updateDownloadMessage(int flag, const QString &message)
-// {
-//     QString fullMessage;
-// 
-//     switch (flag) {
-//       case QApt::DownloadFetch:
-//           fullMessage = i18n("Downloading: %1", message);
-//           break;
-//       case QApt::HitFetch:
-//           fullMessage = i18n("Checking: %1", message);
-//           break;
-//       case QApt::IgnoredFetch:
-//           fullMessage = i18n("Ignored: %1", message);
-//           break;
-//       default:
-//           fullMessage = message;
-//     }
-//     m_cacheUpdateWidget->addItem(fullMessage);
-// }
-
 void QAptTest::updateStatusBar()
 {
     m_packageCountLabel->setText(i18n("%1 Installed, %2 upgradeable, %3 available",

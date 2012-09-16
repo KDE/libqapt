@@ -56,6 +56,7 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
 void CacheUpdateWidget::clear()
 {
     m_downloadModel->clear();
+    m_downloads.clear();
     m_totalProgress->setValue(0);
 }
 
@@ -74,11 +75,8 @@ void CacheUpdateWidget::setTransaction(QApt::Transaction *trans)
             this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
     connect(m_trans, SIGNAL(progressChanged(int)),
             this, SLOT(progressChanged(int)));
-}
-
-void CacheUpdateWidget::setHeaderText(const QString &text)
-{
-    m_headerLabel->setText(text);
+    connect(m_trans, SIGNAL(downloadProgressChanged(QApt::DownloadProgress)),
+            this, SLOT(downloadProgressChanged(QApt::DownloadProgress)));
 }
 
 void CacheUpdateWidget::addItem(const QString &message)
@@ -148,5 +146,13 @@ void CacheUpdateWidget::progressChanged(int progress)
         m_totalProgress->setMaximum(100);
         m_totalProgress->setValue(progress);
         m_lastRealProgress = progress;
+    }
+}
+
+void CacheUpdateWidget::downloadProgressChanged(const QApt::DownloadProgress &progress)
+{
+    if (!m_downloads.contains(progress.uri())) {
+        addItem(progress.uri());
+        m_downloads.append(progress.uri());
     }
 }

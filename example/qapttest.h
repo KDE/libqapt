@@ -39,6 +39,7 @@ namespace QApt {
     class Backend;
     class Package;
     class Transaction;
+    class DownloadProgress;
 }
 
 namespace DebconfKde {
