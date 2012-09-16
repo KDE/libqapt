@@ -154,22 +154,6 @@ namespace QApt
         VirtualPackage        = 4
     };
 
-   /**
-    * An enumerator listing all types of fetches the QApt Worker can do
-    */
-    enum FetchType {
-        /// An invalid enum value
-        InvalidFetch = 0,
-        /// A normal download fetch
-        DownloadFetch = 1,
-        /// A fetch that happens when the cached item equals the item on the sever
-        HitFetch = 2,
-        /// A fetch that happens when an item is ignored
-        IgnoredFetch = 3,
-        /// A fetch that really just queues an item for download
-        QueueFetch = 4
-    };
-
     // Not yet used
     enum UpdateImportance {
         UnknownImportance = 1,//
