@@ -91,6 +91,8 @@ Transaction::Transaction(const QString &tid)
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
+    connect(d->dbus, SIGNAL(mediumRequired(QString,QString)),
+            this, SIGNAL(mediumRequired(QString,QString)));
 }
 
 Transaction::Transaction(const Transaction *other)
@@ -99,6 +101,8 @@ Transaction::Transaction(const Transaction *other)
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
+    connect(d->dbus, SIGNAL(mediumRequired(QString,QString)),
+            this, SIGNAL(mediumRequired(QString,QString)));
 }
 
 Transaction::~Transaction()
@@ -309,6 +313,14 @@ void Transaction::cancel()
             this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
 }
 
+void Transaction::provideMedium(const QString &medium)
+{
+    QDBusPendingCall call = d->dbus->provideMedium(medium);
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
 
 void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
 {

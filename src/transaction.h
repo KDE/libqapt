@@ -156,12 +156,14 @@ Q_SIGNALS:
     void progressChanged(int progress);
     void downloadProgressChanged(QApt::DownloadProgress progress);
     void finished(QApt::ExitStatus exitStatus);
+    void mediumRequired(QString label, QString mountPoint);
 
 public Q_SLOTS:
     void setLocale(const QString &locale);
     void setProxy(const QString &proxy);
     void run();
     void cancel();
+    void provideMedium(const QString &medium);
 
 private Q_SLOTS:
     void sync();
