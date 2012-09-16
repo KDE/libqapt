@@ -52,6 +52,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_isPaused(false)
     , m_progress(0)
     , m_allowUntrusted(false)
+    , m_downloadSpeed(0)
     , m_dataMutex(QMutex::Recursive)
 {
     new TransactionAdaptor(this);
@@ -386,6 +387,21 @@ void Transaction::setUntrustedPackages(const QStringList &untrusted, bool prompt
 bool Transaction::allowUntrusted()
 {
     return m_allowUntrusted;
+}
+
+quint64 Transaction::downloadSpeed()
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    return m_downloadSpeed;
+}
+
+void Transaction::setDownloadSpeed(quint64 downloadSpeed)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_downloadSpeed = downloadSpeed;
+    emit propertyChanged(QApt::DownloadSpeedProperty, QDBusVariant(downloadSpeed));
 }
 
 void Transaction::run()

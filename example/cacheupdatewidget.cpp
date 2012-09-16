@@ -45,7 +45,8 @@ CacheUpdateWidget::CacheUpdateWidget(QWidget *parent)
     m_downloadModel = new QStandardItemModel(this);
     m_downloadView->setModel(m_downloadModel);
 
-    m_downloadLabel = new QLabel(this);
+    m_downloadSpeedLabel = new QLabel(this);
+    m_ETALabel = new QLabel(this);
     m_totalProgress = new QProgressBar(this);
 
     m_cancelButton = new QPushButton(this);
@@ -77,6 +78,8 @@ void CacheUpdateWidget::setTransaction(QApt::Transaction *trans)
             this, SLOT(progressChanged(int)));
     connect(m_trans, SIGNAL(downloadProgressChanged(QApt::DownloadProgress)),
             this, SLOT(downloadProgressChanged(QApt::DownloadProgress)));
+    connect(m_trans, SIGNAL(downloadSpeedChanged(quint64)),
+            this, SLOT(updateDownloadSpeed(quint64)));
 }
 
 void CacheUpdateWidget::addItem(const QString &message)
@@ -87,28 +90,26 @@ void CacheUpdateWidget::addItem(const QString &message)
     m_downloadView->scrollTo(m_downloadModel->indexFromItem(n));
 }
 
-void CacheUpdateWidget::setTotalProgress(int percentage, int speed, int ETA)
+void CacheUpdateWidget::updateDownloadSpeed(quint64 speed)
 {
-    m_totalProgress->setValue(percentage);
+    QString downloadSpeed = i18n("Download rate: %1/s",
+                                 KGlobal::locale()->formatByteSize(speed));
 
-    QString downloadSpeed;
-    if (speed < 0) {
-        downloadSpeed = i18n("Unknown speed");
-    } else {
-        downloadSpeed = i18n("Download rate: %1/s",
-                                     KGlobal::locale()->formatByteSize(speed));
-    }
+    m_downloadSpeedLabel->setText(downloadSpeed);
+}
 
+void CacheUpdateWidget::updateETA(quint64 ETA)
+{
     QString timeRemaining;
     int ETAMilliseconds = ETA * 1000;
 
-    if (ETAMilliseconds <= 0 || ETAMilliseconds > 14*24*60*60) {
+    if (ETAMilliseconds <= 0 || ETAMilliseconds > 14*24*60*60*1000) {
         // If ETA is less than zero or bigger than 2 weeks
-        timeRemaining = i18n(" - Unknown time remaining");
+        timeRemaining = i18n("Unknown time remaining");
     } else {
-        timeRemaining = i18n(" - %1/s", KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
+        timeRemaining = i18n("%1/s", KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
     }
-    m_downloadLabel->setText(downloadSpeed + timeRemaining);
+    m_ETALabel->setText(timeRemaining);
 }
 
 void CacheUpdateWidget::onTransactionStatusChanged(QApt::TransactionStatus status)

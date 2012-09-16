@@ -22,6 +22,7 @@
       <annotation name="org.qtproject.QtDBus.QtTypeName" value="QApt::DownloadProgress"/>
     </property>
     <property name="untrustedPackages" type="as" access="read"/>
+    <property name="downloadSpeed" type="t" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>

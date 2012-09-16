@@ -48,7 +48,6 @@ public:
 
     void clear();
     void setTransaction(QApt::Transaction *trans);
-    void setTotalProgress(int percentage, int speed, int ETA);
 
 private:
     QApt::Transaction *m_trans;
@@ -59,13 +58,16 @@ private:
     QListView *m_downloadView;
     QStandardItemModel *m_downloadModel;
     QProgressBar *m_totalProgress;
-    QLabel *m_downloadLabel;
+    QLabel *m_downloadSpeedLabel;
+    QLabel *m_ETALabel;
     QPushButton *m_cancelButton;
 
 private slots:
     void onTransactionStatusChanged(QApt::TransactionStatus status);
     void progressChanged(int progress);
     void downloadProgressChanged(const QApt::DownloadProgress &progress);
+    void updateDownloadSpeed(quint64 speed);
+    void updateETA(quint64 ETA);
     void addItem(const QString &message);
 
 signals:

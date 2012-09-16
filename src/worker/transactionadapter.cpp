@@ -45,6 +45,12 @@ QApt::DownloadProgress TransactionAdaptor::downloadProgress() const
     return qvariant_cast< QApt::DownloadProgress >(parent()->property("downloadProgress"));
 }
 
+qulonglong TransactionAdaptor::downloadSpeed() const
+{
+    // get the value of property downloadSpeed
+    return qvariant_cast< qulonglong >(parent()->property("downloadSpeed"));
+}
+
 int TransactionAdaptor::error() const
 {
     // get the value of property error

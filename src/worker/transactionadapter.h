@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef TRANSACTIONADAPTER_H_1347804362
-#define TRANSACTIONADAPTER_H_1347804362
+#ifndef TRANSACTIONADAPTER_H_1347823233
+#define TRANSACTIONADAPTER_H_1347823233
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -52,6 +52,7 @@ class TransactionAdaptor: public QDBusAbstractAdaptor
 "      <annotation value=\"QApt::DownloadProgress\" name=\"org.qtproject.QtDBus.QtTypeName\"/>\n"
 "    </property>\n"
 "    <property access=\"read\" type=\"as\" name=\"untrustedPackages\"/>\n"
+"    <property access=\"read\" type=\"t\" name=\"downloadSpeed\"/>\n"
 "    <signal name=\"propertyChanged\">\n"
 "      <arg direction=\"out\" type=\"i\" name=\"role\"/>\n"
 "      <arg direction=\"out\" type=\"v\" name=\"newValue\"/>\n"
@@ -90,6 +91,9 @@ public: // PROPERTIES
 
     Q_PROPERTY(QApt::DownloadProgress downloadProgress READ downloadProgress)
     QApt::DownloadProgress downloadProgress() const;
+
+    Q_PROPERTY(qulonglong downloadSpeed READ downloadSpeed)
+    qulonglong downloadSpeed() const;
 
     Q_PROPERTY(int error READ error)
     int error() const;

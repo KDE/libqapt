@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef TRANSACTIONDBUS_H_1347804096
-#define TRANSACTIONDBUS_H_1347804096
+#ifndef TRANSACTIONDBUS_H_1347823270
+#define TRANSACTIONDBUS_H_1347823270
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -43,6 +43,10 @@ public:
     Q_PROPERTY(QApt::DownloadProgress downloadProgress READ downloadProgress)
     inline QApt::DownloadProgress downloadProgress() const
     { return qvariant_cast< QApt::DownloadProgress >(property("downloadProgress")); }
+
+    Q_PROPERTY(qulonglong downloadSpeed READ downloadSpeed)
+    inline qulonglong downloadSpeed() const
+    { return qvariant_cast< qulonglong >(property("downloadSpeed")); }
 
     Q_PROPERTY(int error READ error)
     inline int error() const

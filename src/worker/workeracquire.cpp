@@ -148,12 +148,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         }
 
         packagePercentage = qRound(double(iter->CurrentSize * 100.0)/double(iter->TotalSize));
-
-        if (iter->TotalSize > 0) {
-            updateStatus(*iter->CurrentItem);
-        } else {
-            updateStatus(*iter->CurrentItem);
-        }
+        updateStatus(*iter->CurrentItem);
     }
 
     int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
@@ -173,31 +168,17 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         m_lastProgress = progress;
     }
 
-    int speed;
-    // m_calculatingSpeed is always set to true in the constructor since APT
-    // will always have a period of time where it has to initially calulate
-    // speed. Once speed > 0 for the first time, it'll be set to false, and
-    // all subsequent zero values will be legitimate. APT should really do
-    // this for us, but I guess stuff might depend on the old behavior...
-    // The fail stops here.
-    if (m_calculatingSpeed && CurrentCPS <= 0) {
-        speed = -1;
-    } else {
-        m_calculatingSpeed = false;
-        speed = CurrentCPS;
-    }
-
-   unsigned long long ETA = 0;
-   if(CurrentCPS > 0)
+    quint64 ETA = 0;
+    if(CurrentCPS > 0)
         ETA = (TotalBytes - CurrentBytes) / CurrentCPS;
 
-    // if the ETA is greater than two weeks, show unknown time
-    if (ETA > 14*24*60*60) {
+    // if the ETA is greater than two days, show unknown time
+    if (ETA > 2*24*60*60) {
         ETA = 0;
     }
 
-    // FIXME: Transactify
-    //emit downloadProgress(percentage, speed, ETA);
+    m_trans->setDownloadSpeed(CurrentCPS);
+    //emit downloadProgress(percentage, CurrentCPS, ETA);
 
     Update = false;
 

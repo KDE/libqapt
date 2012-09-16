@@ -263,7 +263,9 @@ namespace QApt
         /// DownloadProgress, progress for individual files
         DownloadProgressProperty,
         /// QStringList, list of untrusted package names
-        UntrustedPackagesProperty
+        UntrustedPackagesProperty,
+        /// quint64, download speed in bytes
+        DownloadSpeedProperty
     };
 
     /**
