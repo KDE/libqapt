@@ -26,7 +26,7 @@
 #include <QtCore/QVariantMap>
 #include <QtDBus/QDBusVariant>
 
-#include "globals.h"
+#include "downloadprogress.h"
 
 class QDBusPendingCallWatcher;
 
@@ -67,6 +67,7 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_PROPERTY(bool isPaused READ isPaused WRITE updatePaused)
     Q_PROPERTY(QString statusDetails READ statusDetails WRITE updateStatusDetails)
     Q_PROPERTY(int progress READ progress WRITE updateProgress)
+    Q_PROPERTY(DownloadProgress downloadProgress READ downloadProgress WRITE updateDownloadProgress)
 
     Q_ENUMS(TransactionRole)
     Q_ENUMS(TransactionStatus)
@@ -123,6 +124,7 @@ public:
     bool isPaused() const;
     QString statusDetails() const;
     int progress() const;
+    QApt::DownloadProgress downloadProgress() const;
 
 private:
     QSharedPointer<TransactionPrivate> d;
@@ -142,6 +144,7 @@ private:
     void updatePaused(bool paused);
     void updateStatusDetails(const QString &details);
     void updateProgress(int progress);
+    void updateDownloadProgress(const QApt::DownloadProgress &downloadProgress);
 
 Q_SIGNALS:
     void errorOccurred(QApt::ErrorCode error);
@@ -151,6 +154,7 @@ Q_SIGNALS:
     void resumed();
     void statusDetailsChanged(const QString &statusDetails);
     void progressChanged(int progress);
+    void downloadProgressChanged(QApt::DownloadProgress progress);
     void finished(QApt::ExitStatus exitStatus);
 
 public Q_SLOTS:

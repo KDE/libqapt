@@ -65,8 +65,7 @@ void WorkerAcquire::Start()
 
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
-    QString message = QString::fromUtf8(item.Description.c_str());
-    updateStatus(item, /*percentage*/ -1, QApt::HitFetch);
+    updateStatus(item);
 
     Update = true;
 }
@@ -78,15 +77,14 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
         return;
     }
 
-    QString message = QString::fromUtf8(item.Description.c_str());
-    updateStatus(item, /*percentage*/ -1, QApt::QueueFetch);
+    updateStatus(item);
 }
 
 void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
 {
    Update = true;
 
-   updateStatus(item, 100, QApt::DownloadFetch);
+   updateStatus(item);
 }
 
 void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
@@ -98,8 +96,7 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
 
     if (item.Owner->Status == pkgAcquire::Item::StatDone)
     {
-        QString message = QString::fromUtf8(item.Description.c_str());
-        updateStatus(item, /*percentage*/ -1, QApt::IgnoredFetch);
+        updateStatus(item);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
@@ -153,9 +150,9 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
         packagePercentage = qRound(double(iter->CurrentSize * 100.0)/double(iter->TotalSize));
 
         if (iter->TotalSize > 0) {
-            updateStatus(*iter->CurrentItem, packagePercentage, QApt::DownloadFetch);
+            updateStatus(*iter->CurrentItem);
         } else {
-            updateStatus(*iter->CurrentItem, 100, QApt::DownloadFetch);
+            updateStatus(*iter->CurrentItem);
         }
     }
 
@@ -207,14 +204,47 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     return true;
 }
 
-void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status)
+void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
 {
-    if (Itm.Owner->ID == 0) {
-          QString name = QLatin1String(Itm.ShortDesc.c_str());
-          QString URI = QLatin1String(Itm.Description.c_str());
-          qint64 size = Itm.Owner->FileSize;
+    QString URI = QString::fromStdString(Itm.Description);
+    int status = (int)Itm.Owner->Status;
+    QApt::DownloadStatus downloadStatus = QApt::IdleState;
+    QString shortDesc = QString::fromStdString(Itm.ShortDesc);
+    qint64 fileSize = Itm.Owner->FileSize;
+    quint64 partialSize = Itm.Owner->PartialSize;
+    QString errorMsg = QString::fromStdString(Itm.Owner->ErrorText);
+    QString message;
 
-          // FIXME: Transactify
-          //emit packageDownloadProgress(name, percentage, URI, size, status);
+    switch (status) {
+    case pkgAcquire::Item::StatIdle:
+        downloadStatus = QApt::IdleState;
+        break;
+    case pkgAcquire::Item::StatFetching:
+        downloadStatus = QApt::FetchingState;
+        break;
+    case pkgAcquire::Item::StatDone:
+        downloadStatus = QApt::DoneState;
+        break;
+    case pkgAcquire::Item::StatError:
+        downloadStatus = QApt::ErrorState;
+        break;
+    case pkgAcquire::Item::StatAuthError:
+        downloadStatus = QApt::AuthErrorState;
+        break;
+    case pkgAcquire::Item::StatTransientNetworkError:
+        downloadStatus = QApt::NetworkErrorState;
+        break;
+    default:
+        break;
     }
+
+    if (downloadStatus == QApt::DoneState && errorMsg.size())
+        message = errorMsg;
+    else if (Itm.Owner->Mode)
+        message = QString::fromUtf8(Itm.Owner->Mode);
+
+    QApt::DownloadProgress dp(URI, downloadStatus, shortDesc,
+                              fileSize, partialSize, message);
+
+    m_trans->setDownloadProgress(dp);
 }

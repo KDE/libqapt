@@ -274,6 +274,8 @@ namespace QApt
 
     /**
      * @brief TransactionRole enumerates the different types of worker transactions
+     *
+     * @since 2.0
      */
     enum TransactionRole {
         /// The transaction role has not yet been determined
@@ -294,6 +296,8 @@ namespace QApt
 
     /**
      * @brief Enumerates the data properties of worker transactions
+     *
+     * @since 2.0
      */
     enum TransactionProperty {
         /// QString, the dbus path of the transaction
@@ -325,11 +329,15 @@ namespace QApt
         /// QString, status details from APT
         StatusDetailsProperty,
         /// int, progress as percent, 1-100, 101 if indeterminate
-        ProgressProperty
+        ProgressProperty,
+        /// DownloadProgress, progress for individual files
+        DownloadProgressProperty
     };
 
     /**
      * @brief An enum for the statuses of ongoing transactions
+     *
+     * @since 2.0
      */
     enum TransactionStatus {
         /// The status when a client is still setting pre-run properties
@@ -356,6 +364,8 @@ namespace QApt
 
     /**
      * @brief An enumeration for transaction exit statuses
+     *
+     * @since 2.0
      */
     enum ExitStatus {
         ExitSuccess = 0,
@@ -363,6 +373,28 @@ namespace QApt
         ExitFailed,
         ExitPreviousFailed,
         ExitUnfinished
+    };
+
+    /**
+     * @brief An enumeration for download progress states
+     *
+     * @since 2.0
+     */
+    enum DownloadStatus {
+        /// The item is waiting to be downloaded.
+        IdleState = 0,
+        /// The item is currently being downloaded.
+        FetchingState,
+        /// The item has been successfully downloaded.
+        DoneState,
+        /// An error was encountered while downloading this item.
+        ErrorState,
+        /// The item was downloaded but its authenticity could not be verified.
+        AuthErrorState,
+        /** The item was could not be downloaded because of a transient network
+         * error (e.g. network down, HTTP 404/403 errors, etc)
+         */
+        NetworkErrorState
     };
 }
 

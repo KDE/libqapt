@@ -55,6 +55,7 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
             this, SIGNAL(transactionQueueChanged(QString,QStringList)),
             Qt::QueuedConnection);
     qRegisterMetaType<Transaction *>("Transaction *");
+    QApt::DownloadProgress::registerMetaTypes();
 
     // Start up D-Bus service
     new QaptworkerAdaptor(this);

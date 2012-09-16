@@ -8,6 +8,8 @@ set(qapt_SRCS
     dependencyinfo.cpp
     changelog.cpp
     transaction.cpp
+    transactiondbus.cpp
+    downloadprogress.cpp
     )
 
 include_directories(
@@ -23,6 +25,7 @@ set(qapt_MOC_HDRS
     config.h
     history.h
     transaction.h
+    transactiondbus.h
    )
 
 set(qapt_HDRS
@@ -31,6 +34,7 @@ set(qapt_HDRS
     dependencyinfo.h
     changelog.h
     globals.h
+    downloadprogress.h
     )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
@@ -38,10 +42,6 @@ qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
 qt4_add_dbus_interface(qapt_SRCS
                        worker/org.kubuntu.qaptworker.xml
                        workerdbus)
-
-qt4_add_dbus_interface(qapt_SRCS
-                       worker/org.kubuntu.qaptworker.transaction.xml
-                       transactiondbus)
 
 add_library(qapt SHARED ${qapt_SRCS})
 set_target_properties(qapt PROPERTIES
@@ -70,6 +70,7 @@ install(FILES
     package.h
     globals.h
     transaction.h
+    downloadprogress.h
 
     DESTINATION
     include/libqapt COMPONENT Devel)

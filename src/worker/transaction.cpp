@@ -28,7 +28,7 @@
 
 // Own includes
 #include "qaptauthorization.h"
-#include "transactionadaptor.h"
+#include "transactionadapter.h"
 #include "transactionqueue.h"
 
 Transaction::Transaction(TransactionQueue *queue, int userId)
@@ -339,6 +339,22 @@ void Transaction::setProgress(int progress)
 QString Transaction::service() const
 {
     return m_service;
+}
+
+QApt::DownloadProgress Transaction::downloadProgress()
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    return m_downloadProgress;
+}
+
+void Transaction::setDownloadProgress(const QApt::DownloadProgress &downloadProgress)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_downloadProgress = downloadProgress;
+    emit propertyChanged(QApt::DownloadProgressProperty,
+                         QDBusVariant(QVariant::fromValue((downloadProgress))));
 }
 
 void Transaction::setService(const QString &service)

@@ -29,7 +29,7 @@
 #include <QtDBus/QDBusVariant>
 
 // Own includes
-#include "globals.h"
+#include "downloadprogress.h"
 
 class QTimer;
 class TransactionQueue;
@@ -54,6 +54,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(bool isPaused READ isPaused)
     Q_PROPERTY(QString statusDetails READ statusDetails)
     Q_PROPERTY(int progress READ progress)
+    Q_PROPERTY(QApt::DownloadProgress downloadProgress READ downloadProgress)
 public:
     Transaction(TransactionQueue *queue, int userId);
     Transaction(TransactionQueue *queue, int userId,
@@ -77,6 +78,7 @@ public:
     QString statusDetails();
     int progress();
     QString service() const;
+    QApt::DownloadProgress downloadProgress();
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -87,6 +89,7 @@ public:
     void setStatusDetails(const QString &details);
     void setProgress(int progress);
     void setService(const QString &service);
+    void setDownloadProgress(const QApt::DownloadProgress &downloadProgress);
 
 private:
     // Pointers to external containers
@@ -109,12 +112,13 @@ private:
     bool m_isPaused;
     QString m_statusDetails;
     int m_progress;
-    QString m_service;
+    QApt::DownloadProgress m_downloadProgress;
 
     // Other data
     QMap<int, QString> m_roleActionMap;
     QTimer *m_idleTimer;
     QMutex m_dataMutex;
+    QString m_service;
 
     // Private functions
     int dbusSenderUid() const;

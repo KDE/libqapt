@@ -18,6 +18,9 @@
     <property name="isPaused" type="b" access="read"/>
     <property name="statusDetails" type="s" access="read"/>
     <property name="progress" type="i" access="read"/>
+    <property name="downloadProgress" type="(sistts)" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QApt::DownloadProgress"/>
+    </property>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>

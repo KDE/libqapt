@@ -79,6 +79,7 @@ class TransactionPrivate
         bool isPaused;
         QString statusDetails;
         int progress;
+        DownloadProgress downloadProgress;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -259,6 +260,17 @@ void Transaction::updateProgress(int progress)
     d->progress = progress;
 }
 
+DownloadProgress Transaction::downloadProgress() const
+{
+    return d->downloadProgress;
+}
+
+void Transaction::updateDownloadProgress(const DownloadProgress &downloadProgress)
+{
+
+    d->downloadProgress = downloadProgress;
+}
+
 void Transaction::setLocale(const QString &locale)
 {
     QDBusPendingCall call = d->dbus->setProperty(QApt::LocaleProperty,
@@ -347,6 +359,11 @@ void Transaction::sync()
                 // iter.value() for the QVariantMap is QDBusArgument, so we have to
                 // set this manually
                 setProperty(iter.key().toLatin1(), d->dbus->property(iter.key().toLatin1()));
+            else if (iter.key() == "downloadProgress") {
+                QVariant v = d->dbus->property(iter.key().toLatin1());
+                qDebug() << v.value<QApt::DownloadProgress>().uri();
+                //setProperty(iter.key().toLatin1(), d->dbus->property(iter.key().toLatin1()));
+            }
             else
                 qDebug() << "failed to set:" << iter.key();
         }
@@ -410,6 +427,16 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         updateProgress(variant.variant().toInt());
         emit progressChanged(progress());
         break;
+    case DownloadProgressProperty: {
+        QApt::DownloadProgress prog;
+        QDBusArgument arg = variant.variant().value<QDBusArgument>();
+        arg >> prog;
+
+        updateDownloadProgress(prog);
+        emit downloadProgressChanged(downloadProgress());
+        qDebug() << "uri after update" << downloadProgress().uri();
+        break;
+    }
     default:
         break;
     }

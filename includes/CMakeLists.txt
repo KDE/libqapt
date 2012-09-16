@@ -9,4 +9,5 @@ install( FILES
     DependencyInfo
     Changelog
     Transaction
+    DownloadProgress
 DESTINATION include/LibQApt COMPONENT Devel)

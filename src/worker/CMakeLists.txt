@@ -15,6 +15,7 @@ set(qapt_worker_SRCS
     aptlock.cpp
     aptworker.cpp
     transaction.cpp
+    transactionadapter.cpp
     transactionqueue.cpp
     workeracquire.cpp
     workerdaemon.cpp
@@ -25,12 +26,6 @@ qt4_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker.xml
     workerdaemon.h
     WorkerDaemon
-)
-
-qt4_add_dbus_adaptor(qapt_worker_SRCS
-    org.kubuntu.qaptworker.transaction.xml
-    src/worker/transaction.h
-    Transaction
 )
 
 automoc4_add_executable(qaptworker
