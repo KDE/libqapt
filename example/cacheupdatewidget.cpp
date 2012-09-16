@@ -80,6 +80,8 @@ void CacheUpdateWidget::setTransaction(QApt::Transaction *trans)
             this, SLOT(downloadProgressChanged(QApt::DownloadProgress)));
     connect(m_trans, SIGNAL(downloadSpeedChanged(quint64)),
             this, SLOT(updateDownloadSpeed(quint64)));
+    connect(m_trans, SIGNAL(downloadETAChanged(quint64)),
+            this, SLOT(updateETA(quint64)));
 }
 
 void CacheUpdateWidget::addItem(const QString &message)
@@ -107,7 +109,7 @@ void CacheUpdateWidget::updateETA(quint64 ETA)
         // If ETA is less than zero or bigger than 2 weeks
         timeRemaining = i18n("Unknown time remaining");
     } else {
-        timeRemaining = i18n("%1/s", KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
+        timeRemaining = i18n("%1 remaining", KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
     }
     m_ETALabel->setText(timeRemaining);
 }

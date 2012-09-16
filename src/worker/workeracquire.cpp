@@ -178,10 +178,9 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     }
 
     m_trans->setDownloadSpeed(CurrentCPS);
-    //emit downloadProgress(percentage, CurrentCPS, ETA);
+    m_trans->setETA(ETA);
 
     Update = false;
-
     return true;
 }
 

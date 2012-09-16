@@ -53,6 +53,7 @@ class TransactionPrivate
             , isPaused(false)
             , progress(0)
             , downloadSpeed(0)
+            , downloadETA(0)
         {
         }
 
@@ -83,6 +84,7 @@ class TransactionPrivate
         DownloadProgress downloadProgress;
         QStringList untrustedPackages;
         quint64 downloadSpeed;
+        quint64 downloadETA;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -302,6 +304,16 @@ void Transaction::updateDownloadSpeed(quint64 downloadSpeed)
     d->downloadSpeed = downloadSpeed;
 }
 
+quint64 Transaction::downloadETA() const
+{
+    return d->downloadETA;
+}
+
+void Transaction::updateDownloadETA(quint64 ETA)
+{
+    d->downloadETA = ETA;
+}
+
 void Transaction::setLocale(const QString &locale)
 {
     QDBusPendingCall call = d->dbus->setProperty(QApt::LocaleProperty,
@@ -489,6 +501,10 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
     case DownloadSpeedProperty:
         updateDownloadSpeed(variant.variant().toULongLong());
         emit downloadSpeedChanged(downloadSpeed());
+        break;
+    case DownloadETAProperty:
+        updateDownloadETA(variant.variant().toULongLong());
+        emit downloadETAChanged(downloadETA());
         break;
     default:
         break;

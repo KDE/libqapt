@@ -70,6 +70,7 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_PROPERTY(DownloadProgress downloadProgress READ downloadProgress WRITE updateDownloadProgress)
     Q_PROPERTY(QStringList untrustedPackages READ untrustedPackages WRITE updateUntrustedPackages)
     Q_PROPERTY(quint64 downloadSpeed READ downloadSpeed WRITE updateDownloadSpeed)
+    Q_PROPERTY(quint64 downloadETA READ downloadETA WRITE updateDownloadETA)
 
     Q_ENUMS(TransactionRole)
     Q_ENUMS(TransactionStatus)
@@ -129,6 +130,7 @@ public:
     QApt::DownloadProgress downloadProgress() const;
     QStringList untrustedPackages() const;
     quint64 downloadSpeed() const;
+    quint64 downloadETA() const;
 
 private:
     QSharedPointer<TransactionPrivate> d;
@@ -151,6 +153,7 @@ private:
     void updateDownloadProgress(const QApt::DownloadProgress &downloadProgress);
     void updateUntrustedPackages(const QStringList &untrusted);
     void updateDownloadSpeed(quint64 downloadSpeed);
+    void updateDownloadETA(quint64 ETA);
 
 Q_SIGNALS:
     void errorOccurred(QApt::ErrorCode error);
@@ -165,6 +168,7 @@ Q_SIGNALS:
     void mediumRequired(QString label, QString mountPoint);
     void promptUntrusted(QStringList untrustedPackages);
     void downloadSpeedChanged(quint64 downloadSpeed);
+    void downloadETAChanged(quint64 ETA);
 
 public Q_SLOTS:
     void setLocale(const QString &locale);

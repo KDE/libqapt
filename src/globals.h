@@ -265,7 +265,9 @@ namespace QApt
         /// QStringList, list of untrusted package names
         UntrustedPackagesProperty,
         /// quint64, download speed in bytes
-        DownloadSpeedProperty
+        DownloadSpeedProperty,
+        /// quint64, the estimated time until completion in seconds
+        DownloadETAProperty
     };
 
     /**

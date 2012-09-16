@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef TRANSACTIONDBUS_H_1347823270
-#define TRANSACTIONDBUS_H_1347823270
+#ifndef TRANSACTIONDBUS_H_1347824719
+#define TRANSACTIONDBUS_H_1347824719
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -39,6 +39,10 @@ public:
     Q_PROPERTY(QString debconfPipe READ debconfPipe)
     inline QString debconfPipe() const
     { return qvariant_cast< QString >(property("debconfPipe")); }
+
+    Q_PROPERTY(qulonglong downloadETA READ downloadETA)
+    inline qulonglong downloadETA() const
+    { return qvariant_cast< qulonglong >(property("downloadETA")); }
 
     Q_PROPERTY(QApt::DownloadProgress downloadProgress READ downloadProgress)
     inline QApt::DownloadProgress downloadProgress() const

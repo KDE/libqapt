@@ -39,6 +39,12 @@ QString TransactionAdaptor::debconfPipe() const
     return qvariant_cast< QString >(parent()->property("debconfPipe"));
 }
 
+qulonglong TransactionAdaptor::downloadETA() const
+{
+    // get the value of property downloadETA
+    return qvariant_cast< qulonglong >(parent()->property("downloadETA"));
+}
+
 QApt::DownloadProgress TransactionAdaptor::downloadProgress() const
 {
     // get the value of property downloadProgress

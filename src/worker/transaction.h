@@ -57,6 +57,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(QApt::DownloadProgress downloadProgress READ downloadProgress)
     Q_PROPERTY(QStringList untrustedPackages READ untrustedPackages)
     Q_PROPERTY(quint64 downloadSpeed READ downloadSpeed)
+    Q_PROPERTY(quint64 downloadETA READ downloadETA)
 public:
     Transaction(TransactionQueue *queue, int userId);
     Transaction(TransactionQueue *queue, int userId,
@@ -84,6 +85,7 @@ public:
     QStringList untrustedPackages();
     bool allowUntrusted();
     quint64 downloadSpeed();
+    quint64 downloadETA();
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -97,6 +99,7 @@ public:
     void setDownloadProgress(const QApt::DownloadProgress &downloadProgress);
     void setUntrustedPackages(const QStringList &untrusted, bool promptUser);
     void setDownloadSpeed(quint64 downloadSpeed);
+    void setETA(quint64 ETA);
 
 private:
     // Pointers to external containers
@@ -123,6 +126,7 @@ private:
     QStringList m_untrusted;
     bool m_allowUntrusted;
     quint64 m_downloadSpeed;
+    quint64 m_ETA;
 
     // Other data
     QMap<int, QString> m_roleActionMap;

@@ -404,6 +404,21 @@ void Transaction::setDownloadSpeed(quint64 downloadSpeed)
     emit propertyChanged(QApt::DownloadSpeedProperty, QDBusVariant(downloadSpeed));
 }
 
+quint64 Transaction::downloadETA()
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    return m_ETA;
+}
+
+void Transaction::setETA(quint64 ETA)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_ETA = ETA;
+    emit propertyChanged(QApt::DownloadETAProperty, QDBusVariant(ETA));
+}
+
 void Transaction::run()
 {
     setDelayedReply(true);
