@@ -37,6 +37,11 @@
 #include <apt-pkg/pkgsystem.h>
 #include <string>
 
+// System includes
+#include <sys/statvfs.h>
+#include <sys/statfs.h>
+#define RAMFS_MAGIC     0x858458f6
+
 // Own includes
 #include "aptlock.h"
 #include "cache.h"
@@ -408,10 +413,32 @@ void AptWorker::commitChanges()
     if (!packageManager->GetArchives(&fetcher, m_cache->GetSourceList(), m_records) ||
         _error->PendingError()) {
         m_trans->setError(QApt::FetchError);
+        delete acquire;
         return;
     }
 
-    // TODO: disk space sanity check
+    // Check for enough free space
+    double FetchBytes = fetcher.FetchNeeded();
+    double FetchPBytes = fetcher.PartialPresent();
+
+    struct statvfs Buf;
+    string OutputDir = _config->FindDir("Dir::Cache::Archives");
+    if (statvfs(OutputDir.c_str(),&Buf) != 0) {
+        m_trans->setError(QApt::DiskSpaceError);
+        delete acquire;
+        return;
+    }
+
+    if (unsigned(Buf.f_bfree) < (FetchBytes - FetchPBytes)/Buf.f_bsize) {
+        struct statfs Stat;
+        if (statfs(OutputDir.c_str(), &Stat) != 0 ||
+            unsigned(Stat.f_type)            != RAMFS_MAGIC)
+        {
+            m_trans->setError(QApt::DiskSpaceError);
+            delete acquire;
+            return;
+        }
+    }
 
     // Check for untrusted packages
     QStringList untrustedPackages;
