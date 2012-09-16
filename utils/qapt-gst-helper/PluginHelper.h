@@ -59,8 +59,6 @@ private:
     QStringList m_details;
     QList<PluginInfo *> m_searchList;
     QList<QApt::Package *> m_foundCodecs;
-    QList<QVariantMap> m_warningStack;
-    QList<QVariantMap> m_errorStack;
 
     QThread *m_finderThread;
     PluginFinder *m_finder;
@@ -68,13 +66,7 @@ private:
 private Q_SLOTS:
     void canSearch();
     void offerInstallPackages();
-    void errorOccurred(QApt::ErrorCode code, const QVariantMap &args);
-    void warningOccurred(QApt::WarningCode code, const QVariantMap &args);
-    void questionOccurred(QApt::WorkerQuestion question, const QVariantMap &args);
-    void showQueuedWarnings();
-    void showQueuedErrors();
     void raiseErrorMessage(const QString &text, const QString &title);
-    void workerEvent(QApt::WorkerEvent event);
     void foundCodec(QApt::Package *);
     void notFound();
     void notFoundError();
