@@ -382,17 +382,20 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
         setButtons(KDialog::Cancel);
         break;
     case QApt::FinishedStatus:
-        setWindowTitle(i18nc("@title:window", "Installation Complete"));
-
         if (m_trans->error() != QApt::Success) {
             setLabelText(i18nc("@label", "Package installation finished with errors."));
+            setWindowTitle(i18nc("@title:window", "Installation Failed"));
         } else {
             setLabelText(i18nc("@label", "Codecs successfully installed"));
+            setWindowTitle(i18nc("@title:window", "Installation Complete"));
         }
 
         progressBar()->setValue(100);
         // Really a close button, but KProgressDialog uses ButtonCode Cancel
         setButtonFocus(KDialog::Cancel);
+
+        m_trans->deleteLater();
+        m_trans = 0;
     }
 }
 
