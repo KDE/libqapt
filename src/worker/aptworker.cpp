@@ -25,6 +25,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QStringList>
+#include <QtCore/QThread>
 #include <QtCore/QDebug>
 
 // Apt-pkg includes
@@ -121,6 +122,11 @@ AptWorker::~AptWorker()
     delete m_cache;
     delete m_records;
     qDeleteAll(m_locks);
+}
+
+void AptWorker::quit()
+{
+    thread()->quit();
 }
 
 Transaction *AptWorker::currentTransaction()

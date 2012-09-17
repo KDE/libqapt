@@ -31,6 +31,8 @@
 #include "transactionadapter.h"
 #include "transactionqueue.h"
 
+#define IDLE_TIMEOUT 30000 // 30 seconds
+
 Transaction::Transaction(TransactionQueue *queue, int userId)
     : Transaction(queue, userId, QApt::EmptyRole, QVariantMap())
 {
@@ -76,6 +78,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
 
     m_queue->addPending(this);
     m_idleTimer = new QTimer(this);
+    m_idleTimer->setInterval(IDLE_TIMEOUT);
     connect(m_idleTimer, SIGNAL(timeout()),
             this, SLOT(emitIdleTimeout()));
 }

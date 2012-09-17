@@ -40,7 +40,6 @@ class WorkerDaemon : public QCoreApplication, protected QDBusContext
     Q_CLASSINFO("D-Bus Interface", "org.kubuntu.qaptworker")
 public:
     WorkerDaemon(int &argc, char **argv);
-    ~WorkerDaemon();
 
 private:
     TransactionQueue *m_queue;

@@ -34,7 +34,7 @@
 #include "transaction.h"
 #include "transactionqueue.h"
 
-#define IDLE_TIMEOUT 300000 // 300 seconds
+#define IDLE_TIMEOUT 30000 // 30 seconds
 
 WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     : QCoreApplication(argc, argv)
@@ -48,6 +48,7 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     m_workerThread = new QThread(this);
     m_worker->moveToThread(m_workerThread);
     m_workerThread->start();
+    connect(m_workerThread, SIGNAL(finished()), this, SLOT(quit()));
 
     // Invoke with Qt::QueuedConnection since the Qt event loop isn't up yet
     QMetaObject::invokeMethod(m_worker, "init", Qt::QueuedConnection);
@@ -79,19 +80,13 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     connect(m_idleTimer, SIGNAL(timeout()), this, SLOT(checkIdle()), Qt::QueuedConnection);
 }
 
-WorkerDaemon::~WorkerDaemon()
-{
-    m_workerThread->quit();
-    m_workerThread->wait();
-}
-
 void WorkerDaemon::checkIdle()
 {
     quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     if (!m_worker->currentTransaction() &&
         currentTime - m_worker->lastActiveTimestamp() > IDLE_TIMEOUT &&
         m_queue->isEmpty()) {
-        quit();
+        m_worker->quit();
     }
 }
 

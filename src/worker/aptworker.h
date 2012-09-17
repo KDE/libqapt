@@ -95,6 +95,8 @@ public slots:
      * @param trans
      */
     void runTransaction(Transaction *trans);
+
+    void quit();
 };
 
 #endif // APTWORKER_H
