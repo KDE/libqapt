@@ -388,6 +388,7 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
         } else {
             setLabelText(i18nc("@label", "Codecs successfully installed"));
             setWindowTitle(i18nc("@title:window", "Installation Complete"));
+            m_done = true;
         }
 
         progressBar()->setValue(100);
