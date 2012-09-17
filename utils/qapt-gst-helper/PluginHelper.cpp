@@ -384,7 +384,7 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
     case QApt::FinishedStatus:
         setWindowTitle(i18nc("@title:window", "Installation Complete"));
 
-        if (m_trans->error()) {
+        if (m_trans->error() != QApt::Success) {
             setLabelText(i18nc("@label", "Package installation finished with errors."));
         } else {
             setLabelText(i18nc("@label", "Codecs successfully installed"));
