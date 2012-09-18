@@ -1094,6 +1094,17 @@ Transaction *Backend::updateCache()
     return trans;
 }
 
+Transaction *Backend::upgradeSystem(UpgradeType upgradeType)
+{
+    Q_D(Backend);
+
+    bool safeUpgrade = (upgradeType == QApt::SafeUpgrade);
+    QDBusPendingReply<QString> rep = d->worker->upgradeSystem(safeUpgrade);
+    Transaction *trans = new Transaction(rep.value());
+
+    return trans;
+}
+
 bool Backend::saveInstalledPackagesList(const QString &path) const
 {
     Q_D(const Backend);

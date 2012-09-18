@@ -621,8 +621,26 @@ public Q_SLOTS:
      * signal, and per-package download progress can be tracked by the
      * packageDownloadProgress() signal.
      *
+     * @return A pointer to a @c Transaction object tracking the cache update.
+     *
+     * @since 2.0
      */
     Transaction *updateCache();
+
+    /**
+     * Starts a transaction which will upgrade as many of the packages as it can.
+     * If the upgrade type is a "safe" upgrade, only packages that can be upgraded
+     * without installing or removing new packages will be upgraded. If a "full"
+     * upgrade is chosen, the transaction will upgrade all packages, and can
+     * install or remove packages to do so.
+     *
+     * @param upgradeType The type of upgrade to be performed. (safe vs. full)
+     *
+     * @return A pointer to a @c Transaction object tracking the upgrade
+     *
+     * @since 2.0
+     */
+    Transaction *upgradeSystem(QApt::UpgradeType upgradeType);
 
     /**
      * Exports a list of all packages currently installed on the system. This

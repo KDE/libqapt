@@ -336,6 +336,15 @@ namespace QApt
          */
         NetworkErrorState
     };
+
+    enum UpgradeType {
+        /// An invalid default type
+        InvalidUpgrade = 0,
+        /// An upgrade that will not install or remove new packages
+        SafeUpgrade,
+        /// An upgrade that may install or remove packages to accomplish the upgrade
+        FullUpgrade
+    };
 }
 
 #endif
