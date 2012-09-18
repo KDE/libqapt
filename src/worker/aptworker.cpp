@@ -189,6 +189,12 @@ void AptWorker::runTransaction(Transaction *trans)
         break;
     }
 
+    // Check for init error
+    if (m_trans->error() != QApt::Success) {
+        cleanupCurrentTransaction();
+        return;
+    }
+
     // Process transactions requiring a cache
     switch (trans->role()) {
     // Transactions that can use a broken cache
@@ -272,6 +278,9 @@ void AptWorker::openCache(int begin, int end)
         bool isError = _error->PopMessage(message);
         if (isError)
             qWarning() << QString::fromStdString(message);
+
+        m_trans->setError(QApt::InitError);
+        m_trans->setErrorDetails(QString::fromStdString(message));
 
         delete progress;
         return;
