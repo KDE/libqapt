@@ -240,13 +240,16 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             raiseErrorMessage(text, title);
             break;
         case QApt::FetchError:
-            text = i18nc("@label",
-                         "Could not download packages");
+            text = i18nc("@label", "Could not download packages");
             title = i18nc("@title:window", "Download failed");
-            raiseErrorMessage(text, title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            tExit(ERR_RANDOM_ERR);
             break;
         case QApt::CommitError:
-            // FIXME: QApt2 porting
+            text = i18nc("@label", "An error occurred while applying changes:");
+            title = i18nc("@title:window", "Commit Error");
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            tExit(ERR_RANDOM_ERR);
             break;
         case QApt::AuthError:
             text = i18nc("@label",
@@ -399,22 +402,6 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
         m_trans = 0;
     }
 }
-
-//void PluginHelper::showQueuedErrors()
-//{
-//    QString details;
-//    QString text = i18ncp("@label", "An error occurred while applying changes:",
-//                                    "The following errors occurred while applying changes:",
-//                                    m_warningStack.size());
-//    foreach (const QVariantMap &args, m_errorStack) {
-//        QString failedItem = i18nc("@label Shows which package failed", "Package: %1", args["FailedItem"].toString());
-//        QString errorText = i18nc("@label Shows the error", "Error: %1", args["ErrorText"].toString());
-//        details.append(failedItem % '\n' % errorText % "\n\n");
-//    }
-
-//    QString title = i18nc("@title:window", "Commit error");
-//    KMessageBox::detailedError(this, text, details, title);
-//}
 
 void PluginHelper::raiseErrorMessage(const QString &text, const QString &title)
 {
