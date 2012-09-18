@@ -77,7 +77,7 @@ public:
     void Update() {
         int progress;
         if (Percent < 101) {
-            progress = qRound(m_begin + (Percent / 100) * (m_end - m_begin));
+            progress = qRound(m_begin + qreal(Percent / 100.0) * (m_end - m_begin));
             if (m_lastProgress == progress)
                         return;
         } else {

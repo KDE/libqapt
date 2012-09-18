@@ -193,7 +193,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 percentage = percent.toInt();
             }
 
-            progress = qRound(m_progressBegin + (percentage / 100) * (m_progressEnd - m_progressBegin));
+            progress = qRound(qreal(m_progressBegin + qreal(percentage / 100.0) * (m_progressEnd - m_progressBegin)));
 
             m_trans->setProgress(progress);
             m_trans->setStatusDetails(str);

@@ -159,7 +159,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
     }
 
     // Calculate global progress, adjusted for given beginning and ending points
-    progress = qRound(m_progressBegin + (percentage / 100) * (m_progressEnd - m_progressBegin));
+    progress = qRound(m_progressBegin + qreal(percentage / 100.0) * (m_progressEnd - m_progressBegin));
 
     if (m_lastProgress > progress)
         m_trans->setProgress(101);
@@ -192,7 +192,6 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
     QString shortDesc = QString::fromStdString(Itm.ShortDesc);
     quint64 fileSize = Itm.Owner->FileSize;
     quint64 fetchedSize = Itm.Owner->PartialSize;
-    qDebug() << fetchedSize << "fetched size";
     QString errorMsg = QString::fromStdString(Itm.Owner->ErrorText);
     QString message;
 
