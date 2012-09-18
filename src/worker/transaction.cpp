@@ -55,6 +55,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_progress(0)
     , m_allowUntrusted(false)
     , m_downloadSpeed(0)
+    , m_safeUpgrade(true)
     , m_dataMutex(QMutex::Recursive)
 {
     new TransactionAdaptor(this);
@@ -450,6 +451,16 @@ void Transaction::setErrorDetails(const QString &errorDetails)
 
     m_errorDetails = errorDetails;
     emit propertyChanged(QApt::ErrorDetailsProperty, QDBusVariant(errorDetails));
+}
+
+bool Transaction::safeUpgrade() const
+{
+    return m_safeUpgrade;
+}
+
+void Transaction::setSafeUpgrade(bool safeUpgrade)
+{
+    m_safeUpgrade = safeUpgrade;
 }
 
 void Transaction::run()

@@ -17,6 +17,10 @@
       <arg name="instructionsList" type="a{sv}" direction="in"/>
       <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </method>
+    <method name="upgradeSystem">
+      <arg type="s" direction="out"/>
+      <arg name="safeUpgrade" type="b" direction="in"/>
+    </method>
     <method name="updateXapianIndex">
       <arg type="s" direction="out"/>
     </method>

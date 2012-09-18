@@ -73,9 +73,11 @@ private:
      */
     void updateCache();
 
+    bool markChanges();
+
     void commitChanges();
 
-    bool markChanges();
+    void upgradeSystem();
 
     void installFile();
     

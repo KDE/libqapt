@@ -129,6 +129,14 @@ QString WorkerDaemon::commitChanges(QVariantMap instructionsList)
     return trans->transactionId();
 }
 
+QString WorkerDaemon::upgradeSystem(bool safeUpgrade)
+{
+    Transaction *trans = createTranscation(QApt::UpgradeSystemRole);
+    trans->setSafeUpgrade(safeUpgrade);
+
+    return trans->transactionId();
+}
+
 QString WorkerDaemon::updateXapianIndex()
 {
     Transaction *trans = createTranscation(QApt::UpdateXapianRole);

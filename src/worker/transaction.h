@@ -90,6 +90,7 @@ public:
     quint64 downloadETA();
     QString filePath();
     QString errorDetails();
+    bool safeUpgrade() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -106,6 +107,7 @@ public:
     void setETA(quint64 ETA);
     void setFilePath(const QString &filePath);
     void setErrorDetails(const QString &errorDetails);
+    void setSafeUpgrade(bool safeUpgrade);
 
 private:
     // Pointers to external containers
@@ -135,6 +137,7 @@ private:
     quint64 m_ETA;
     QString m_filePath;
     QString m_errorDetails;
+    bool m_safeUpgrade;
 
     // Other data
     QMap<int, QString> m_roleActionMap;

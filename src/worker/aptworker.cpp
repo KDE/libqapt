@@ -203,10 +203,11 @@ void AptWorker::runTransaction(Transaction *trans)
         break;
     // Transactions that need a consistent cache
     case QApt::UpgradeSystemRole:
-        //upgradeSystem();
+        upgradeSystem();
         break;
     case QApt::CommitChangesRole:
-        commitChanges();
+        if (markChanges())
+            commitChanges();
         break;
     case QApt::InstallFileRole:
         installFile();
@@ -413,11 +414,18 @@ bool AptWorker::markChanges()
     return true;
 }
 
+void AptWorker::upgradeSystem()
+{
+    if (m_trans->safeUpgrade())
+        pkgAllUpgrade(*m_cache);
+    else
+        pkgDistUpgrade(*m_cache);
+
+    commitChanges();
+}
+
 void AptWorker::commitChanges()
 {
-    if (!markChanges())
-        return;
-
     // Initialize fetcher with our progress watcher
     WorkerAcquire *acquire = new WorkerAcquire(this, 15, 50);
     acquire->setTransaction(m_trans);
