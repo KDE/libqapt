@@ -141,14 +141,13 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 
     pkgAcquireStatus::Pulse(Owner);
 
-    // FIXME: Use in DownloadProgress
-    int packagePercentage = 0;
     for (pkgAcquire::Worker *iter = Owner->WorkersBegin(); iter != 0; iter = Owner->WorkerStep(iter)) {
         if (!iter->CurrentItem) {
             continue;
         }
 
-        packagePercentage = qRound(double(iter->CurrentSize * 100.0)/double(iter->TotalSize));
+        (*iter->CurrentItem).Owner->PartialSize = iter->CurrentSize;
+
         updateStatus(*iter->CurrentItem);
     }
 
@@ -191,11 +190,13 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
     int status = (int)Itm.Owner->Status;
     QApt::DownloadStatus downloadStatus = QApt::IdleState;
     QString shortDesc = QString::fromStdString(Itm.ShortDesc);
-    qint64 fileSize = Itm.Owner->FileSize;
-    quint64 partialSize = Itm.Owner->PartialSize;
+    quint64 fileSize = Itm.Owner->FileSize;
+    quint64 fetchedSize = Itm.Owner->PartialSize;
+    qDebug() << fetchedSize << "fetched size";
     QString errorMsg = QString::fromStdString(Itm.Owner->ErrorText);
     QString message;
 
+    // Status mapping
     switch (status) {
     case pkgAcquire::Item::StatIdle:
         downloadStatus = QApt::IdleState;
@@ -225,7 +226,7 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
         message = QString::fromUtf8(Itm.Owner->Mode);
 
     QApt::DownloadProgress dp(URI, downloadStatus, shortDesc,
-                              fileSize, partialSize, message);
+                              fileSize, fetchedSize, message);
 
     m_trans->setDownloadProgress(dp);
 }

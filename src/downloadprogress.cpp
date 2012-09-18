@@ -34,7 +34,7 @@ public:
         : QSharedData()
         , status(QApt::IdleState)
         , fileSize(0)
-        , partialSize(0)
+        , fetchedSize(0)
     {
     }
 
@@ -46,7 +46,7 @@ public:
         , status(dStatus)
         , shortDesc(sDesc)
         , fileSize(fSize)
-        , partialSize(pSize)
+        , fetchedSize(pSize)
         , statusMessage(sMessage)
     {
     }
@@ -58,7 +58,7 @@ public:
         status = other.status;
         shortDesc = other.shortDesc;
         fileSize = other.fileSize;
-        partialSize = other.partialSize;
+        fetchedSize = other.fetchedSize;
         statusMessage = other.statusMessage;
     }
 
@@ -68,7 +68,7 @@ public:
     QApt::DownloadStatus status;
     QString shortDesc;
     quint64 fileSize;
-    quint64 partialSize;
+    quint64 fetchedSize;
     QString statusMessage;
 };
 
@@ -143,14 +143,14 @@ void DownloadProgress::setFileSize(quint64 fileSize)
     d->fileSize = fileSize;
 }
 
-quint64 DownloadProgress::partialSize() const
+quint64 DownloadProgress::fetchedSize() const
 {
-    return d->partialSize;
+    return d->fetchedSize;
 }
 
-void DownloadProgress::setPartialSize(quint64 partialSize)
+void DownloadProgress::setFetchedSize(quint64 partialSize)
 {
-    d->partialSize = partialSize;
+    d->fetchedSize = partialSize;
 }
 
 QString DownloadProgress::statusMessage() const
@@ -161,6 +161,11 @@ QString DownloadProgress::statusMessage() const
 void DownloadProgress::setStatusMessage(const QString &message)
 {
     d->statusMessage = message;
+}
+
+int DownloadProgress::progress() const
+{
+    return (d->fileSize) ? qRound(double(d->fetchedSize * 100.0)/double(d->fileSize)) : 0;
 }
 
 void DownloadProgress::registerMetaTypes()
@@ -189,9 +194,9 @@ const QDBusArgument &operator>>(const QDBusArgument &argument,
     argument >> fileSize;
     progress.setFileSize(fileSize);
 
-    quint64 partialSize;
-    argument >> partialSize;
-    progress.setPartialSize(partialSize);
+    quint64 fetchedSize;
+    argument >> fetchedSize;
+    progress.setFetchedSize(fetchedSize);
 
     QString statusMessage;
     argument >> statusMessage;
@@ -207,7 +212,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const DownloadProgress &progr
     argument.beginStructure();
     argument << progress.uri() << (int)progress.status()
              << progress.shortDescription() << progress.fileSize()
-             << progress.partialSize() << progress.statusMessage();
+             << progress.fetchedSize() << progress.statusMessage();
     argument.endStructure();
 
     return argument;

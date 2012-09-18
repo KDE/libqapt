@@ -72,6 +72,7 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_PROPERTY(quint64 downloadSpeed READ downloadSpeed WRITE updateDownloadSpeed)
     Q_PROPERTY(quint64 downloadETA READ downloadETA WRITE updateDownloadETA)
     Q_PROPERTY(QString filePath READ filePath WRITE updateFilePath)
+    Q_PROPERTY(QString errorDetails READ errorDetails WRITE updateErrorDetails)
 
     Q_ENUMS(TransactionRole)
     Q_ENUMS(TransactionStatus)

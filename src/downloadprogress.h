@@ -48,7 +48,7 @@ public:
      */
     DownloadProgress(const QString &uri, QApt::DownloadStatus status,
                      const QString &shortDesc, quint64 fileSize,
-                     quint64 partialSize, const QString &statusMessage);
+                     quint64 fetchedSize, const QString &statusMessage);
 
     /**
      * Constructs a copy of the @a other download progress.
@@ -85,7 +85,7 @@ public:
     QString shortDescription() const;
 
     /**
-     * Returns the full size of the file being downloaded
+     * Returns the full size of the file being downloaded.
      *
      * @sa partialSize()
      */
@@ -95,12 +95,17 @@ public:
      * Returns the size of the data that has already been downloaded for
      * the file.
      */
-    quint64 partialSize() const;
+    quint64 fetchedSize() const;
 
     /**
      * Returns the current status message for the download.
      */
     QString statusMessage() const;
+
+    /**
+     * Returns the download progress of the URI, described in percentage.
+     */
+    int progress() const;
 
     /**
      * Convenience function to register DownloadProgress with the Qt
@@ -120,7 +125,7 @@ private:
     void setStatus(QApt::DownloadStatus status);
     void setShortDescription(const QString &shortDescription);
     void setFileSize(quint64 fileSize);
-    void setPartialSize(quint64 partialSize);
+    void setFetchedSize(quint64 fetchedSize);
     void setStatusMessage(const QString &message);
 };
 
