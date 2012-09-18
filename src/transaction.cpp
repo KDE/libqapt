@@ -282,7 +282,6 @@ DownloadProgress Transaction::downloadProgress() const
 
 void Transaction::updateDownloadProgress(const DownloadProgress &downloadProgress)
 {
-    qDebug() << downloadProgress.progress();
     d->downloadProgress = downloadProgress;
 }
 
