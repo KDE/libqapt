@@ -285,17 +285,16 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             break;
         }
         case QApt::NotFoundError: {
-            QString notFoundString;
-            // FIXME: Get from trans error details
             text = i18nc("@label",
                         "The package \"%1\" has not been found among your software sources. "
                         "Therefore, it cannot be installed. ",
-                        notFoundString);
+                        m_trans->errorDetails());
             title = i18nc("@title:window", "Package Not Found");
             KMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
             break;
         }
+        // FIXME: does not exist, handle cancel via signal/slot
         case QApt::UserCancelError:
             tExit(ERR_CANCEL);
             break;

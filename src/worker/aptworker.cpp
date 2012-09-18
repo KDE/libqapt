@@ -331,7 +331,7 @@ bool AptWorker::markChanges()
         // Check if the package was found
         if (iter == 0) {
             m_trans->setError(QApt::NotFoundError);
-            // FIXME: error details
+            m_trans->setErrorDetails(packageString);
 
             delete actionGroup;
             return false;
@@ -526,7 +526,7 @@ void AptWorker::commitChanges()
     // See how the installation went
     if (!success) {
         m_trans->setError(QApt::CommitError);
-        // TODO: Error detail
+        // Error details set by WorkerInstallProgress
     }
 
     delete installProgress;
