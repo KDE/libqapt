@@ -52,5 +52,6 @@ void AptLock::release()
         return;
 
     m_lock.Close();
+    ::close(m_fd);
     m_fd = -1;
 }
