@@ -437,6 +437,21 @@ void Transaction::setFilePath(const QString &filePath)
     emit propertyChanged(QApt::FilePathProperty, QDBusVariant(filePath));
 }
 
+QString Transaction::errorDetails()
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    return m_errorDetails;
+}
+
+void Transaction::setErrorDetails(const QString &errorDetails)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_errorDetails = errorDetails;
+    emit propertyChanged(QApt::ErrorDetailsProperty, QDBusVariant(errorDetails));
+}
+
 void Transaction::run()
 {
     setDelayedReply(true);

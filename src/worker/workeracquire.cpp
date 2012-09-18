@@ -24,6 +24,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QEventLoop>
+#include <QtCore/QStringBuilder>
 
 // Apt-pkg includes
 #include <apt-pkg/error.h>
@@ -94,17 +95,16 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         return;
     }
 
-    if (item.Owner->Status == pkgAcquire::Item::StatDone)
-    {
+    if (item.Owner->Status == pkgAcquire::Item::StatDone) {
         updateStatus(item);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
-        QVariantMap args;
-        args[QLatin1String("FailedItem")] = QString::fromUtf8(item.URI.c_str());
-        args[QLatin1String("WarningText")] = QString::fromUtf8(item.Owner->ErrorText.c_str());
-        // FIXME: Transactify
-        //emit fetchWarning(QApt::FetchFailedWarning, args);
+        QString failedItem = QString::fromStdString(item.URI);
+        QString errorText = QString::fromStdString(item.Owner->ErrorText);
+
+        m_trans->setErrorDetails(m_trans->errorDetails() % failedItem %
+                                 '\n' % errorText % "\n\n");
     }
 
     Update = true;
@@ -141,6 +141,7 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 
     pkgAcquireStatus::Pulse(Owner);
 
+    // FIXME: Use in DownloadProgress
     int packagePercentage = 0;
     for (pkgAcquire::Worker *iter = Owner->WorkersBegin(); iter != 0; iter = Owner->WorkerStep(iter)) {
         if (!iter->CurrentItem) {

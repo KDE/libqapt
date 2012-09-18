@@ -133,6 +133,7 @@ public:
     quint64 downloadSpeed() const;
     quint64 downloadETA() const;
     QString filePath() const;
+    QString errorDetails() const;
 
 private:
     QSharedPointer<TransactionPrivate> d;
@@ -157,6 +158,7 @@ private:
     void updateDownloadSpeed(quint64 downloadSpeed);
     void updateDownloadETA(quint64 ETA);
     void updateFilePath(const QString &filePath);
+    void updateErrorDetails(const QString &errorDetails);
 
 Q_SIGNALS:
     void errorOccurred(QApt::ErrorCode error);

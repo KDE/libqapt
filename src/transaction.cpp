@@ -86,6 +86,7 @@ class TransactionPrivate
         quint64 downloadSpeed;
         quint64 downloadETA;
         QString filePath;
+        QString errorDetails;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -325,6 +326,16 @@ void Transaction::updateFilePath(const QString &filePath)
     d->filePath = filePath;
 }
 
+QString Transaction::errorDetails() const
+{
+    return d->errorDetails;
+}
+
+void Transaction::updateErrorDetails(const QString &errorDetails)
+{
+    d->errorDetails = errorDetails;
+}
+
 void Transaction::setLocale(const QString &locale)
 {
     QDBusPendingCall call = d->dbus->setProperty(QApt::LocaleProperty,
@@ -519,6 +530,10 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         break;
     case FilePathProperty:
         updateFilePath(variant.variant().toString());
+        break;
+    case ErrorDetailsProperty:
+        updateErrorDetails(variant.variant().toString());
+        break;
     default:
         break;
     }

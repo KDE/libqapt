@@ -148,7 +148,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             // If str legitimately had a ':' in it (such as a package version)
             // we need to retrieve the next string in the list.
             if (list.count() == 5) {
-                str += QString(QLatin1Char(':') % list.at(4));
+                str += QString(':' % list.at(4));
             }
 
             if (package.isEmpty() || status.isEmpty()) {
@@ -156,9 +156,8 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             }
 
             if (status.contains(QLatin1String("pmerror"))) {
-                // FIXME: Transactify errors
-//                args[QLatin1String("FailedItem")] = package;
-//                args[QLatin1String("ErrorText")] = str;
+                // Append error string to existing error details
+                m_trans->setErrorDetails(m_trans->errorDetails() % package % '\n' % str % "\n\n");
             } else if (status.contains(QLatin1String("pmconffile"))) {
                 // From what I understand, the original file starts after the ' character ('\'') and
                 // goes to a second ' character. The new conf file starts at the next ' and goes to

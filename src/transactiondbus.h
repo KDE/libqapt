@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef TRANSACTIONDBUS_H_1347827142
-#define TRANSACTIONDBUS_H_1347827142
+#ifndef TRANSACTIONDBUS_H_1347973411
+#define TRANSACTIONDBUS_H_1347973411
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -55,6 +55,10 @@ public:
     Q_PROPERTY(int error READ error)
     inline int error() const
     { return qvariant_cast< int >(property("error")); }
+
+    Q_PROPERTY(QString errorDetails READ errorDetails)
+    inline QString errorDetails() const
+    { return qvariant_cast< QString >(property("errorDetails")); }
 
     Q_PROPERTY(int exitStatus READ exitStatus)
     inline int exitStatus() const

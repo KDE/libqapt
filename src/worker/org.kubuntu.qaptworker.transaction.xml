@@ -25,6 +25,7 @@
     <property name="downloadSpeed" type="t" access="read"/>
     <property name="downloadETA" type="t" access="read"/>
     <property name="filePath" type="s" access="read"/>
+    <property name="errorDetails" type="s" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>

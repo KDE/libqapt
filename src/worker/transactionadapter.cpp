@@ -63,6 +63,12 @@ int TransactionAdaptor::error() const
     return qvariant_cast< int >(parent()->property("error"));
 }
 
+QString TransactionAdaptor::errorDetails() const
+{
+    // get the value of property errorDetails
+    return qvariant_cast< QString >(parent()->property("errorDetails"));
+}
+
 int TransactionAdaptor::exitStatus() const
 {
     // get the value of property exitStatus
