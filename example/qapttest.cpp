@@ -206,8 +206,29 @@ void QAptTest::updateCache()
 
 void QAptTest::upgrade()
 {
-    m_backend->markPackagesForDistUpgrade();
-    m_backend->commitChanges();
+    if (m_trans) // Transaction running, you could queue these though
+        return;
+
+    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock");
+    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
+
+    m_trans = m_backend->upgradeSystem(QApt::FullUpgrade);
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Pass the new current transaction on to our child widgets
+    m_cacheUpdateWidget->setTransaction(m_trans);
+    m_commitWidget->setTransaction(m_trans);
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+
+    m_trans->run();
 }
 
 void QAptTest::commitAction()
@@ -275,6 +296,8 @@ void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
         // Clean up transaction object
         m_trans->deleteLater();
         m_trans = 0;
+        delete m_debconfGui;
+        m_debconfGui = 0;
         break;
     default:
         break;
