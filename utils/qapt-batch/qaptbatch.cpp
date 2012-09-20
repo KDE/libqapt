@@ -20,86 +20,60 @@
 
 #include "qaptbatch.h"
 
-// Qt includes
-#include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusServiceWatcher>
-
 // KDE includes
 #include <KApplication>
 #include <KDebug>
 #include <KIcon>
 #include <KLocale>
 #include <KMessageBox>
+#include <KProtocolManager>
 #include <KWindowSystem>
 
+#include "../../src/backend.h"
+#include "../../src/transaction.h"
 #include "detailswidget.h"
-#include "../../src/globals.h"
-#include "../../src/package.h"
-#include "workerdbus.h"
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     : KProgressDialog()
-    , m_worker(0)
-    , m_watcher(0)
+    , m_backend(new QApt::Backend(this))
+    , m_winId(winId)
+    , m_lastRealProgress(0)
     , m_mode(mode)
     , m_packages(packages)
-    , m_detailsWidget(0)
     , m_done(false)
 {
-    m_worker = new OrgKubuntuQaptworkerInterface("org.kubuntu.qaptworker",
-                                                  "/", QDBusConnection::systemBus(),
-                                                  this);
-    connect(m_worker, SIGNAL(errorOccurred(int,QVariantMap)),
-            this, SLOT(errorOccurred(int,QVariantMap)));
-    connect(m_worker, SIGNAL(warningOccurred(int,QVariantMap)),
-            this, SLOT(warningOccurred(int,QVariantMap)));
-    connect(m_worker, SIGNAL(workerStarted()), this, SLOT(workerStarted()));
-    connect(m_worker, SIGNAL(workerEvent(int)), this, SLOT(workerEvent(int)));
-    connect(m_worker, SIGNAL(workerFinished(bool)), this, SLOT(workerFinished(bool)));
+    m_backend->init();
 
-    m_watcher = new QDBusServiceWatcher(this);
-    m_watcher->setConnection(QDBusConnection::systemBus());
-    m_watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
-    m_watcher->addWatchedService("org.kubuntu.qaptworker");
-
-    // Delay auto-show to 10 seconds. We can't disable it entirely, and after
-    // 10 seconds people may need a reminder, or something to say we haven't died
-    // If auth happens before this, we will manually show when progress happens
-    setMinimumDuration(10000);
     // Set this in case we auto-show before auth
     setLabelText(i18nc("@label", "Waiting for authorization"));
     progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
 
-    m_detailsWidget = new DetailsWidget(this);
-    setDetailsWidget(m_detailsWidget);
+    DetailsWidget *detailsWidget = new DetailsWidget(this);
+    setDetailsWidget(detailsWidget);
 
-    m_worker->setLocale(setlocale(LC_ALL, 0));
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall);
     } else if (m_mode == "uninstall") {
         commitChanges(QApt::Package::ToRemove);
     } else if (m_mode == "update") {
-        m_worker->updateCache();
+        m_trans = m_backend->updateCache();
     }
 
-    if (winId != 0) {
+    detailsWidget->setTransaction(m_trans);
+    setTransaction(m_trans);
+
+    if (winId)
         KWindowSystem::setMainWindow(this, winId);
-    }
 
     setAutoClose(false);
 }
 
-QAptBatch::~QAptBatch()
-{
-}
-
 void QAptBatch::reject()
 {
-    if (m_done) {
+    if (m_done)
         accept();
-    } else {
+    else
         KProgressDialog::reject();
-    }
 }
 
 void QAptBatch::commitChanges(int mode)
@@ -110,23 +84,39 @@ void QAptBatch::commitChanges(int mode)
         instructionList.insert(package, mode);
     }
 
-    m_worker->commitChanges(instructionList);
+    // FIXME
+    //m_trans = m_backend->commitChanges(instructionList);
 }
 
-void QAptBatch::workerStarted()
+void QAptBatch::setTransaction(QApt::Transaction *trans)
 {
-    // Reset the progresbar's maximum to default
-    progressBar()->setMaximum(100);
-    connect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-            this, SLOT(serviceOwnerChanged(QString,QString,QString)));
+    m_trans = trans;
 
-    connect(m_worker, SIGNAL(questionOccurred(int,QVariantMap)),
-            this, SLOT(questionOccurred(int,QVariantMap)));
-    connect(m_worker, SIGNAL(downloadProgress(int,int,int)),
-            this, SLOT(updateDownloadProgress(int,int,int)));
-    connect(m_worker, SIGNAL(commitProgress(QString,int)),
-            this, SLOT(updateCommitProgress(QString,int)));
+    m_trans->setLocale(setlocale(LC_ALL, 0));
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(cancellableChanged(bool)),
+            this, SLOT(cancellableChanged(bool)));
+    connect(m_trans, SIGNAL(mediumRequired(QString,QString)),
+            this, SLOT(provideMedium(QString,QString)));
+    connect(m_trans, SIGNAL(promptUntrusted(QStringList)),
+            this, SLOT(untrustedPrompt(QStringList)));
+    connect(m_trans, SIGNAL(progressChanged(int)),
+            this, SLOT(updateProgress(int)));
+    connect(m_trans, SIGNAL(statusDetailsChanged(QString)),
+            this, SLOT(updateCommitMessage(QString)));
+
+    connect(this, SIGNAL(cancelClicked()), m_trans, SLOT(cancel()));
+
+    m_trans->run();
 }
+
 void QAptBatch::errorOccurred(int code, const QVariantMap &args)
 {
     QString text;
@@ -170,7 +160,10 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             raiseErrorMessage(text, title);
             break;
         case QApt::CommitError:
-            m_errorStack.append(args);
+            text = i18nc("@label", "An error occurred while applying changes:");
+            title = i18nc("@title:window", "Commit error");
+
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             break;
         case QApt::AuthError:
             text = i18nc("@label",
@@ -223,268 +216,165 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
     }
 }
 
-void QAptBatch::warningOccurred(int warning, const QVariantMap &args)
+void QAptBatch::provideMedium(const QString &label, const QString &mountPoint)
 {
-    switch (warning) {
-        case QApt::SizeMismatchWarning: {
-            QString text = i18nc("@label",
-                                 "The size of the downloaded items did not "
-                                 "equal the expected size.");
-            QString title = i18nc("@title:window", "Size Mismatch");
-            KMessageBox::sorry(this, text, title);
-            break;
-        }
-        case QApt::FetchFailedWarning: {
-            m_warningStack.append(args);
-            break;
-        }
-        case QApt::UnknownWarning:
-        default:
-            break;
-    }
+    QString title = i18nc("@title:window", "Media Change Required");
+    QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
+                         label, mountPoint);
 
+    KMessageBox::informationWId(m_winId, text, title);
+    m_trans->provideMedium(mountPoint);
 }
 
-void QAptBatch::questionOccurred(int code, const QVariantMap &args)
+void QAptBatch::untrustedPrompt(const QStringList &untrustedPackages)
 {
-    // show() so that closing our question dialog doesn't quit the program
-    show();
-    QVariantMap response;
+    QString title = i18nc("@title:window", "Warning - Unverified Software");
+    QString text = i18ncp("@label",
+                          "The following piece of software cannot be verified. "
+                          "<warning>Installing unverified software represents a "
+                          "security risk, as the presence of unverifiable software "
+                          "can be a sign of tampering.</warning> Do you wish to continue?",
+                          "The following pieces of software cannot be authenticated. "
+                          "<warning>Installing unverified software represents a "
+                          "security risk, as the presence of unverifiable software "
+                          "can be a sign of tampering.</warning> Do you wish to continue?",
+                          untrustedPackages.size());
+    int result = KMessageBox::Cancel;
 
-    switch (code) {
-        case QApt::MediaChange: {
-            QString media = args["Media"].toString();
-            QString drive = args["Drive"].toString();
+    result = KMessageBox::warningContinueCancelListWId(m_winId, text,
+                                                       untrustedPackages, title);
 
-            QString title = i18nc("@title:window", "Media Change Required");
-            QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>", media, drive);
+    bool installUntrusted = (result == KMessageBox::Continue);
+    m_trans->replyUntrustedPrompt(installUntrusted);
 
-            KMessageBox::information(this, text, title);
-            response["MediaChanged"] = true;
-            m_worker->answerWorkerQuestion(response);
-        }   break;
-        case QApt::InstallUntrusted: {
-            QStringList untrustedItems = args["UntrustedItems"].toStringList();
-
-            QString title = i18nc("@title:window", "Warning - Unverified Software");
-            QString text = i18ncp("@label",
-                        "The following piece of software cannot be verified. "
-                        "<warning>Installing unverified software represents a "
-                        "security risk, as the presence of unverifiable software "
-                        "can be a sign of tampering.</warning> Do you wish to continue?",
-                        "The following pieces of software cannot be authenticated. "
-                        "<warning>Installing unverified software represents a "
-                        "security risk, as the presence of unverifiable software "
-                        "can be a sign of tampering.</warning> Do you wish to continue?",
-                        untrustedItems.size());
-            int result = KMessageBox::warningContinueCancelList(this, text,
-                                                            untrustedItems, title);
-            bool installUntrusted = result==KMessageBox::Continue;
-
-            response["InstallUntrusted"] = installUntrusted;
-            m_worker->answerWorkerQuestion(response);
-
-            if (!installUntrusted) {
-                close();
-            }
-        }
+    if (!installUntrusted) {
+        close();
     }
 }
 
 void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 {
     KMessageBox::error(0, text, title);
-    workerFinished(false);
     close();
 }
 
-void QAptBatch::workerEvent(int code)
+void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
 {
-    switch (code) {
-        case QApt::CacheUpdateStarted:
-            connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
+    switch (status) {
+    case QApt::SetupStatus:
+    case QApt::WaitingStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Progress bar label when waiting to start",
+                           "Waiting to start."));
+        break;
+    case QApt::AuthenticationStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Status label when waiting for a password",
+                           "Waiting for authentication."));
+        break;
+    case QApt::WaitingMediumStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Status label when waiting for a CD-ROM",
+                           "Waiting for required media."));
+        break;
+    case QApt::WaitingLockStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Status label",
+                           "Waiting for other package managers to quit."));
+        break;
+    case QApt::RunningStatus:
+        // We're ready for "real" progress now
+        progressBar()->setMaximum(100);
+        break;
+    case QApt::LoadingCacheStatus:
+        setLabelText(i18nc("@label Status label",
+                           "Loading package cache."));
+        break;
+    case QApt::DownloadingStatus:
+        if (m_trans->role() == QApt::UpdateCacheRole) {
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
             setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
-            setButtons(KDialog::Cancel | KDialog::Details);
-            setButtonFocus(KDialog::Details);
-            show();
-            break;
-        case QApt::CacheUpdateFinished:
-            setWindowTitle(i18nc("@title:window", "Refresh Complete"));
-            if (!m_warningStack.isEmpty()) {
-                showQueuedWarnings();
-            }
-            if (!m_errorStack.isEmpty()) {
-                showQueuedErrors();
-            }
-
-            if (!m_errorStack.isEmpty()) {
-                setLabelText(i18nc("@info:status", "Refresh completed with errors"));
-            } else {
-                setLabelText(i18nc("@label", "Package information successfully refreshed"));
-            }
-            disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
-            progressBar()->setValue(100);
-            m_detailsWidget->hide();
-            setButtons(KDialog::Close);
-            setButtonFocus(KDialog::Close);
-            break;
-        case QApt::PackageDownloadStarted:
-            connect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
+        } else {
             setWindowTitle(i18nc("@title:window", "Downloading"));
             setLabelText(i18ncp("@info:status",
                                 "Downloading package file",
                                 "Downloading package files",
                                 m_packages.count()));
-            setButtons(KDialog::Cancel | KDialog::Details);
-            setButtonFocus(KDialog::Details);
-            show();
-            break;
-        case QApt::PackageDownloadFinished:
-            setAllowCancel(false);
-            disconnect(this, SIGNAL(cancelClicked()), m_worker, SLOT(cancelDownload()));
-            break;
-        case QApt::CommitChangesStarted:
-            setWindowTitle(i18nc("@title:window", "Installing Packages"));
-            m_detailsWidget->hide();
-            setButtons(KDialog::Cancel);
-            setAllowCancel(false); //Committing changes is uninterruptable (safely, that is)
-            show(); // In case no download was necessary
-            break;
-        case QApt::CommitChangesFinished:
-            if (!m_warningStack.isEmpty()) {
-                showQueuedWarnings();
+        }
+
+        setButtons(KDialog::Cancel | KDialog::Details);
+        setButtonFocus(KDialog::Details);
+        break;
+    case QApt::CommittingStatus:
+        setWindowTitle(i18nc("@title:window", "Installing Packages"));
+        setButtons(KDialog::Cancel);
+        break;
+    case QApt::FinishedStatus:
+        if (m_mode == "install") {
+            setWindowTitle(i18nc("@title:window", "Installation Complete"));
+
+            if (m_trans->error() != QApt::Success) {
+                setLabelText(i18nc("@label",
+                                   "Package installation failed."));
+            } else {
+                setLabelText(i18ncp("@label",
+                                    "Package successfully installed.",
+                                    "Packages successfully installed.", m_packages.size()));
             }
-            if (!m_errorStack.isEmpty()) {
-                showQueuedErrors();
+        } else if (m_mode == "uninstall") {
+            setWindowTitle(i18nc("@title:window", "Removal Complete"));
+
+            if (m_trans->error() != QApt::Success) {
+                setLabelText(i18nc("@label",
+                                   "Package removal failed."));
+            } else {
+                setLabelText(i18ncp("@label",
+                                    "Package successfully uninstalled.",
+                                    "Packages successfully uninstalled.", m_packages.size()));
             }
-            if (m_mode == "install") {
-                setWindowTitle(i18nc("@title:window", "Installation Complete"));
+        } else if (m_mode == "update") {
+            setWindowTitle(i18nc("@title:window", "Refresh Complete"));
 
-                if (!m_errorStack.isEmpty()) {
-                    setLabelText(i18nc("@label",
-                                       "Package installation finished with errors."));
-                } else {
-                    setLabelText(i18ncp("@label",
-                                        "Package successfully installed",
-                                        "Packages successfully installed", m_packages.size()));
-                }
-            } else if (m_mode == "uninstall") {
-                setWindowTitle(i18nc("@title:window", "Removal Complete"));
-
-                if (!m_errorStack.isEmpty()) {
-                    setLabelText(i18nc("@label",
-                                       "Package removal finished with errors."));
-                } else {
-                    setLabelText(i18ncp("@label",
-                                        "Package successfully uninstalled",
-                                        "Packages successfully uninstalled", m_packages.size()));
-                }
+            if (m_trans->error() != QApt::Success) {
+                setLabelText(i18nc("@info:status", "Refresh failed."));
+            } else {
+                setLabelText(i18nc("@label", "Package information successfully refreshed."));
             }
-            progressBar()->setValue(100);
-            m_done = true;
-            // Really a close button, but KProgressDialog use ButtonCode Cancel
-            setButtonFocus(KDialog::Cancel);
-            break;
+        }
+
+        progressBar()->setValue(100);
+        m_done = true;
+
+        m_trans->deleteLater();
+        m_trans = 0;
+
+        // Really a close button, but KProgressDialog use ButtonCode Cancel
+        setButtonFocus(KDialog::Cancel);
+        break;
     }
 }
 
-void QAptBatch::workerFinished(bool success)
+void QAptBatch::cancellableChanged(bool cancellable)
 {
-    Q_UNUSED(success);
-    disconnect(m_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
-               this, SLOT(serviceOwnerChanged(QString,QString,QString)));
-
-    disconnect(m_worker, SIGNAL(downloadProgress(int,int,int)),
-               this, SLOT(updateDownloadProgress(int,int,int)));
-    disconnect(m_worker, SIGNAL(commitProgress(QString,int)),
-               this, SLOT(updateCommitProgress(QString,int)));
+    setAllowCancel(cancellable);
 }
 
-void QAptBatch::serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
+void QAptBatch::updateProgress(int progress)
 {
-    Q_UNUSED(name);
-    if (oldOwner.isEmpty()) {
-        return; // Don't care, just appearing
+    if (progress == 100) {
+        --progress;
     }
 
-    if (newOwner.isEmpty()) {
-        // Normally we'd handle this in errorOccurred, but if the worker dies it
-        // can't really tell us, can it?
-        QString text = i18nc("@label", "It appears that the QApt worker has either crashed "
-                            "or disappeared. Please report a bug to the QApt maintainers");
-        QString title = i18nc("@title:window", "Unexpected Error");
-
-        raiseErrorMessage(text, title);
+    if (progress > 100) {
+        progressBar()->setMaximum(0);
+    } else if (progress > m_lastRealProgress) {
+        progressBar()->setMaximum(100);
+        progressBar()->setValue(progress);
+        m_lastRealProgress = progress;
     }
 }
 
-void QAptBatch::updateDownloadProgress(int percentage, int speed, int ETA)
+void QAptBatch::updateCommitMessage(const QString& message)
 {
-    QString timeRemaining;
-    int ETAMilliseconds = ETA * 1000;
-
-    // Greater than zero and less than 2 weeks
-    if (ETAMilliseconds > 0 && ETAMilliseconds < 14*24*60*60) {
-        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
-    } else {
-        timeRemaining = i18nc("@info:progress Remaining time", "Unknown");
-    }
-
-    QString downloadSpeed;
-    if (speed == -1) {
-        downloadSpeed = i18nc("@info:progress Download rate", "Unknown");
-    } else {
-        downloadSpeed = i18nc("@info:progress Download rate",
-                              "%1/s", KGlobal::locale()->formatByteSize(speed));
-    }
-
-    if (percentage == 100) {
-        --percentage;
-    }
-    progressBar()->setValue(percentage);
-    m_detailsWidget->setTimeText(timeRemaining);
-    m_detailsWidget->setSpeedText(downloadSpeed);
-}
-
-void QAptBatch::updateCommitProgress(const QString& message, int percentage)
-{
-    if (percentage == 100) {
-        --percentage;
-    }
-    progressBar()->setValue(percentage);
     setLabelText(message);
 }
-
-void QAptBatch::showQueuedWarnings()
-{
-    QString details;
-    QString text = i18nc("@label", "Unable to download the following packages:");
-    foreach (const QVariantMap &args, m_warningStack) {
-        QString failedItem = args["FailedItem"].toString();
-        QString warningText = args["WarningText"].toString();
-        details.append(i18nc("@label",
-                             "Failed to download %1\n"
-                             "%2\n\n", failedItem, warningText));
-    }
-    QString title = i18nc("@title:window", "Some Packages Could not be Downloaded");
-    KMessageBox::detailedError(this, text, details, title);
-}
-
-void QAptBatch::showQueuedErrors()
-{
-    QString details;
-    QString text = i18ncp("@label", "An error occurred while applying changes:",
-                                    "The following errors occurred while applying changes:",
-                                    m_warningStack.size());
-    foreach (const QVariantMap &args, m_errorStack) {
-        QString failedItem = i18nc("@label Shows which package failed", "Package: %1", args["FailedItem"].toString());
-        QString errorText = i18nc("@label Shows the error", "Error: %1", args["ErrorText"].toString());
-        details.append(failedItem % '\n' % errorText % "\n\n");
-    }
-
-    QString title = i18nc("@title:window", "Commit error");
-    KMessageBox::detailedError(this, text, details, title);
-}
-
-#include "qaptbatch.moc"

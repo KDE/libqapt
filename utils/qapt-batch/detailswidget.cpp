@@ -23,13 +23,19 @@
 // Qt includes
 #include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
+#include <QDebug>
 
 // KDE includes
-#include <KVBox>
+#include <KGlobal>
 #include <KLocale>
+#include <KVBox>
+
+// LibQApt includes
+#include "../../src/transaction.h"
 
 DetailsWidget::DetailsWidget(QWidget *parent)
     : QWidget(parent)
+    , m_trans(nullptr)
 {
     QGridLayout *layout = new QGridLayout(this);
 
@@ -52,19 +58,52 @@ DetailsWidget::DetailsWidget(QWidget *parent)
     m_speedLabel = new QLabel(columnTwo);
 }
 
-DetailsWidget::~DetailsWidget()
+void DetailsWidget::setTransaction(QApt::Transaction *trans)
 {
+    m_trans = trans;
+
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(downloadETAChanged(quint64)),
+            this, SLOT(updateTimeText(quint64)));
+    connect(m_trans, SIGNAL(downloadSpeedChanged(quint64)),
+            this, SLOT(updateSpeedText(quint64)));
 }
 
-void DetailsWidget::setTimeText(const QString &text)
+void DetailsWidget::transactionStatusChanged(QApt::TransactionStatus status)
 {
-    m_timeLabel->setText(text);
+    // Limit visibility of details to when details exist
+    switch (status) {
+    case QApt::DownloadingStatus:
+        show();
+        break;
+    case QApt::CommittingStatus:
+    case QApt::FinishedStatus:
+        hide();
+        break;
+    default:
+        break;
+    }
 }
 
-
-void DetailsWidget::setSpeedText(const QString &text)
+void DetailsWidget::updateTimeText(quint64 eta)
 {
-    m_speedLabel->setText(text);
+    QString timeRemaining;
+    quint64 ETAMilliseconds = eta * 1000;
+
+    // Greater than zero and less than 2 days
+    if (ETAMilliseconds > 0 && ETAMilliseconds < 2*24*60*60) {
+        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
+    } else {
+        timeRemaining = i18nc("@info:progress Remaining time", "Unknown");
+    }
+
+    m_timeLabel->setText(timeRemaining);
 }
 
-#include "detailswidget.moc"
+void DetailsWidget::updateSpeedText(quint64 speed)
+{
+    QString downloadSpeed = i18nc("@info:progress Download rate",
+                                  "%1/s", KGlobal::locale()->formatByteSize(speed));
+    m_speedLabel->setText(downloadSpeed);
+}

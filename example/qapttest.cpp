@@ -122,6 +122,10 @@ QAptTest::QAptTest()
     updateLabels();
     updateStatusBar();
     setCentralWidget(m_stack);
+
+    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock");
+    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
 }
 
 void QAptTest::updateLabels()
@@ -245,10 +249,6 @@ void QAptTest::commitAction()
     if (m_package->state() & QApt::Package::Upgradeable) {
         m_package->setInstall();
     }
-
-    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock");
-    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
-    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
 
     m_trans = m_backend->commitChanges();
 

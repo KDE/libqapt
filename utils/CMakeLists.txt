@@ -9,8 +9,7 @@ include(FindPkgConfig REQUIRED)
 
 find_package(DebconfKDE REQUIRED)
 
-# FIXME: Port to QApt2
-#add_subdirectory(qapt-batch)
+add_subdirectory(qapt-batch)
 add_subdirectory(qapt-deb-installer)
 add_subdirectory(qapt-deb-thumbnailer)
 add_subdirectory(plasma-runner-installer)
