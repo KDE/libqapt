@@ -107,6 +107,8 @@ void QAptBatch::setTransaction(QApt::Transaction *trans)
 
     connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
             this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
+            this, SLOT(errorOccurred(int,QVariantMap)));
     connect(m_trans, SIGNAL(cancellableChanged(bool)),
             this, SLOT(cancellableChanged(bool)));
     connect(m_trans, SIGNAL(mediumRequired(QString,QString)),
@@ -123,12 +125,10 @@ void QAptBatch::setTransaction(QApt::Transaction *trans)
     m_trans->run();
 }
 
-void QAptBatch::errorOccurred(int code, const QVariantMap &args)
+void QAptBatch::errorOccurred(QApt::ErrorCode code)
 {
     QString text;
     QString title;
-    QString failedItem;
-    QString errorText;
     QString drive;
 
     switch(code) {
@@ -137,7 +137,8 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            QString details = args["ErrorText"].toString();
+            // FIXME: details = transaction error details
+            QString details;
             KMessageBox::detailedError(this, text, details, title);
             KApplication::instance()->quit();
             break;
@@ -152,7 +153,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             raiseErrorMessage(text, title);
             break;
         case QApt::DiskSpaceError:
-            drive = args["DirectoryString"].toString();
+            // FIXME: drive = transaction error details
             text = i18nc("@label",
                          "You do not have enough disk space in the directory "
                          "at %1 to continue with this operation.", drive);
@@ -186,7 +187,7 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             close();
             break;
         case QApt::UntrustedError: {
-            QStringList untrustedItems = args["UntrustedItems"].toStringList();
+            QStringList untrustedItems = m_trans->untrustedPackages();
             if (untrustedItems.size() == 1) {
                 text = i18ncp("@label",
                              "The following package has not been verified by its author. "
@@ -204,18 +205,15 @@ void QAptBatch::errorOccurred(int code, const QVariantMap &args)
             break;
         }
         case QApt::NotFoundError: {
-            QString notFoundString = args["NotFoundString"].toString();
             text = i18nc("@label",
                         "The package \"%1\" has not been found among your software sources. "
                         "Therefore, it cannot be installed. ",
-                        notFoundString);
+                        m_trans->errorDetails());
             title = i18nc("@title:window", "Package Not Found");
             KMessageBox::error(this, text, title);
             close();
             break;
         }
-        case QApt::UserCancelError:
-            // KProgressDialog handles cancel, nothing to do
         case QApt::UnknownError:
         default:
             break;

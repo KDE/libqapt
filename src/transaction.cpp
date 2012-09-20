@@ -402,6 +402,7 @@ void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
         {
         case QDBusError::AccessDenied:
             emit errorOccurred(QApt::AuthError);
+            qDebug() << "auth error reply!";
             break;
         default:
             emit errorOccurred(QApt::UnknownError);

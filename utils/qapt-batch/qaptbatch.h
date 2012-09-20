@@ -54,7 +54,7 @@ private:
 
 private Q_SLOTS:
     void commitChanges(int mode);
-    void errorOccurred(int code, const QVariantMap &args);
+    void errorOccurred(QApt::ErrorCode code);
     void provideMedium(const QString &label, const QString &mountPoint);
     void untrustedPrompt(const QStringList &untrustedPackages);
     void raiseErrorMessage(const QString &text, const QString &title);
