@@ -122,17 +122,10 @@ void CacheUpdateWidget::onTransactionStatusChanged(QApt::TransactionStatus statu
 
     switch (status) {
     case QApt::DownloadingStatus:
-        switch (m_trans->role()) {
-        case QApt::UpdateCacheRole:
+        if (m_trans->role == QApt::UpdateCacheRole)
             headerText = i18n("<b>Updating software sources</b>");
-            break;
-        case QApt::DownloadArchivesRole:
-        case QApt::CommitChangesRole:
+        else
             headerText = i18n("<b>Downloading Packages</b>");
-            break;
-        default:
-            break;
-        }
 
         m_headerLabel->setText(headerText);
         break;
