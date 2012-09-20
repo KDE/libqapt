@@ -566,18 +566,44 @@ public Q_SLOTS:
     void setCompressEvents(bool enabled);
 
     /**
-     * Commits all pending package state changes that have been made.
+     * Starts a transaction which will commit all pending package state
+     * changes that have been made to the backend
      *
-     * This function is asynchronous. Events from the worker that
-     * occur while committing changes can be tracked with the workerEvent()
-     * signal.
+     * @return A pointer to a @c Transaction object tracking the commit
      *
-     * Commit progress can be tracked with the commitProgress() signal
-     *
-     * @see workerEvent()
-     * @see commitProgress()
+     * @since 2.0
      */
     QApt::Transaction *commitChanges();
+
+    /**
+     * Starts a transaction which will install the list of provided packages.
+     * This function is useful when you only need a few packages installed and
+     * don't need to commit a complex set of changes with commitChanges().
+     *
+     * @param packages The packages to be installed
+     *
+     * @return A pointer to a @c Transaction object tracking the install
+     *
+     * @since 2.0
+     * @see removePackages
+     * @see commitChanges
+     */
+    QApt::Transaction *installPackages(QApt::PackageList packages);
+
+    /**
+     * Starts a transaction which will remove the list of provided packages.
+     * This function is useful when you only need a few packages removed and
+     * don't need to commit a complex set of changes with commitChanges().
+     *
+     * @param packages The packages to be removed
+     *
+     * @return A pointer to a @c Transaction object tracking the removal
+     *
+     * @since 2.0
+     * @see installPackages
+     * @see commitChanges
+     */
+    QApt::Transaction *removePackages(QApt::PackageList packages);
 
    /**
     * Downloads the packages listed in the provided list file to the provided
@@ -612,14 +638,8 @@ public Q_SLOTS:
     Transaction *installFile(const DebFile &file);
 
     /**
-     * Checks for and downloads new package source lists.
-     *
-     * This function is asynchronous. Worker events that occur while
-     * donwloading cache files can be tracked with the workerEvent() signal.
-     *
-     * Overall download progress can be tracked by the downloadProgress()
-     * signal, and per-package download progress can be tracked by the
-     * packageDownloadProgress() signal.
+     * Starts a transaction that will check for and downloads new package
+     * source lists. (Essentially, checking for updates.)
      *
      * @return A pointer to a @c Transaction object tracking the cache update.
      *

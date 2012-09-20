@@ -1035,6 +1035,40 @@ QApt::Transaction * Backend::commitChanges()
     return trans;
 }
 
+QApt::Transaction * Backend::installPackages(PackageList packages)
+{
+    Q_D(Backend);
+
+    QVariantMap packageList;
+
+    for (const Package *package : packages) {
+        std::string fullName = package->packageIterator()->FullName();
+        packageList.insert(QString::fromStdString(fullName), Package::ToInstall);
+    }
+
+    QDBusPendingReply<QString> rep = d->worker->commitChanges(packageList);
+    Transaction *trans = new Transaction(rep.value());
+
+    return trans;
+}
+
+QApt::Transaction * Backend::removePackages(PackageList packages)
+{
+    Q_D(Backend);
+
+    QVariantMap packageList;
+
+    for (const Package *package : packages) {
+        std::string fullName = package->packageIterator()->FullName();
+        packageList.insert(QString::fromStdString(fullName), Package::ToRemove);
+    }
+
+    QDBusPendingReply<QString> rep = d->worker->commitChanges(packageList);
+    Transaction *trans = new Transaction(rep.value());
+
+    return trans;
+}
+
 void Backend::downloadArchives(const QString &listFile, const QString &destination)
 {
     Q_D(Backend);

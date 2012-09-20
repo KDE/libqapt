@@ -78,14 +78,20 @@ void QAptBatch::reject()
 
 void QAptBatch::commitChanges(int mode)
 {
-    QMap<QString, QVariant> instructionList;
+    QStringList packageStrs;
+    QApt::PackageList packages;
 
-    foreach (const QString &package, m_packages) {
-        instructionList.insert(package, mode);
+    QApt::Package *pkg;
+    for (const QString &packageStr : packageStrs) {
+        pkg = m_backend->package(packageStr);
+
+        if (pkg)
+            packages.append(pkg);
     }
 
-    // FIXME
-    //m_trans = m_backend->commitChanges(instructionList);
+    m_trans = (mode == QApt::Package::ToInstall) ?
+               m_backend->installPackages(packages) :
+               m_backend->removePackages(packages);
 }
 
 void QAptBatch::setTransaction(QApt::Transaction *trans)
@@ -260,6 +266,7 @@ void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 
 void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
 {
+    qDebug() << "new status" << status;
     switch (status) {
     case QApt::SetupStatus:
     case QApt::WaitingStatus:
@@ -327,6 +334,7 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
             if (m_trans->error() != QApt::Success) {
                 setLabelText(i18nc("@label",
                                    "Package removal failed."));
+                qDebug() << m_trans->error();
             } else {
                 setLabelText(i18ncp("@label",
                                     "Package successfully uninstalled.",
