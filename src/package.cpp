@@ -425,7 +425,7 @@ QString Package::priority() const
 {
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(*d->packageIter);
     if (!ver.end()) {
-        QLatin1String(ver.PriorityType());
+        return QLatin1String(ver.PriorityType());
     }
 
     return QString();
