@@ -207,7 +207,6 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
 {
     QString text;
     QString title;
-    QString drive;
 
     switch(code) {
         case QApt::InitError: {
@@ -235,7 +234,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             // FIXME: drive = transaction error details
             text = i18nc("@label",
                          "You do not have enough disk space in the directory "
-                         "at %1 to continue with this operation.", drive);
+                         "at %1 to continue with this operation.", m_trans->errorDetails());
             title = i18nc("@title:window", "Low disk space");
             raiseErrorMessage(text, title);
             break;
@@ -266,8 +265,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::UntrustedError: {
-            QStringList untrustedItems;
-            // FIXME: untrustedItems = m_trans->untrusted
+            QStringList untrustedItems = m_trans->untrustedPackages();
             if (untrustedItems.size()) {
                 text = i18ncp("@label",
                              "The following package has not been verified by its author. "
@@ -284,7 +282,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             tExit(ERR_RANDOM_ERR);
             break;
         }
-        case QApt::NotFoundError: {
+        case QApt::NotFoundError:
             text = i18nc("@label",
                         "The package \"%1\" has not been found among your software sources. "
                         "Therefore, it cannot be installed. ",
@@ -293,7 +291,6 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             KMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
             break;
-        }
         case QApt::UnknownError:
             tExit(ERR_RANDOM_ERR);
             break;
