@@ -94,8 +94,6 @@ namespace QApt
         WorkerDisappeared,
         /// Emitted when APT prevents the installation of untrusted packages
         UntrustedError,
-        /// A pseudo-error emitted when the user cancels a download
-        UserCancelError,
         /// Emitted when the APT configuration prevents downloads
         DownloadDisallowedError,
         /// Emitted when the selected package does not exist

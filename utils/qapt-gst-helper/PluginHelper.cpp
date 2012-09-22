@@ -294,10 +294,6 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             tExit(ERR_RANDOM_ERR);
             break;
         }
-        // FIXME: does not exist, handle cancel via signal/slot
-        case QApt::UserCancelError:
-            tExit(ERR_CANCEL);
-            break;
         case QApt::UnknownError:
             tExit(ERR_RANDOM_ERR);
             break;
@@ -384,7 +380,9 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
         setButtons(KDialog::Cancel);
         break;
     case QApt::FinishedStatus:
-        if (m_trans->error() != QApt::Success) {
+        if (m_trans->exitStatus() == QApt::ExitCancelled) {
+            tExit(ERR_CANCEL);
+        } else if (m_trans->exitStatus() != QApt::ExitSuccess) {
             setLabelText(i18nc("@label", "Package installation finished with errors."));
             setWindowTitle(i18nc("@title:window", "Installation Failed"));
         } else {
