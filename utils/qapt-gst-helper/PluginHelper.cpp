@@ -214,10 +214,8 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            // FIXME: Get error details from the transaction once we can
-            QString details;
-            KMessageBox::detailedErrorWId(m_winId, text, details, title);
-            // TODO: Report some sort of init error
+            KMessageBox::detailedErrorWId(m_winId, text, m_trans->errorDetails(), title);
+            // TODO: Report some sort of init error with the exit value
             tExit(ERR_RANDOM_ERR);
             break;
         }
