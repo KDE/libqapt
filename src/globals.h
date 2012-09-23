@@ -279,16 +279,16 @@ namespace QApt
     enum MultiArchType {
         /// Junk type
         InvalidMultiArchType = 0,
-        /* This package is co-installable with itself, but it must not be used to
+        /** This package is co-installable with itself, but it must not be used to
          * satisfy the dependency of any package of a different architecture from itself.
          * (Basically, not a multi-arch package)
          */
         MultiArchSame,
-        /* The package is @b not co-installable with itself, but should be allowed to
+        /** The package is @b not co-installable with itself, but should be allowed to
          * satisfy the dependencies of a package of a different arch from itself.
          */
         MultiArchForeign,
-        /* This permits the reverse-dependencies of the package to annotate their Depends:
+        /** This permits the reverse-dependencies of the package to annotate their Depends:
          * field to indicate that a foreign architecture version of the package satisfies
          * the dependencies, but does not change the resolution of any existing dependencies.
          */
