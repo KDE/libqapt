@@ -708,6 +708,7 @@ bool Backend::openXapianIndex()
     }
     try {
         d->xapianDatabase = new Xapian::Database("/var/lib/apt-xapian-index/index");
+        d->xapianIndexExists = true;
     } catch (Xapian::DatabaseOpeningError) {
         d->xapianIndexExists = false;
         return false;
