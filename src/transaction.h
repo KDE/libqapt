@@ -179,6 +179,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void setLocale(const QString &locale);
     void setProxy(const QString &proxy);
+    void setDebconfPipe(const QString &pipe);
     void run();
     void cancel();
     void provideMedium(const QString &medium);

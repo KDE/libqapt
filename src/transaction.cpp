@@ -355,6 +355,16 @@ void Transaction::setProxy(const QString &proxy)
             this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
 }
 
+void Transaction::setDebconfPipe(const QString &pipe)
+{
+    QDBusPendingCall call = d->dbus->setProperty(QApt::DebconfPipeProperty,
+                                                 QDBusVariant(pipe));
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
 void Transaction::run()
 {
     QDBusPendingCall call = d->dbus->run();
@@ -405,7 +415,6 @@ void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
             qDebug() << "auth error reply!";
             break;
         default:
-            emit errorOccurred(QApt::UnknownError);
             break;
         }
     }

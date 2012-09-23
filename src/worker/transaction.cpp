@@ -42,7 +42,6 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
                          QApt::TransactionRole role, QVariantMap packagesList)
     : QObject(queue)
     , m_queue(queue)
-    , m_tid(QUuid::createUuid().toString())
     , m_uid(userId)
     , m_role(role)
     , m_status(QApt::SetupStatus)
