@@ -52,6 +52,11 @@ class Q_DECL_EXPORT Transaction : public QObject
 {
     Q_OBJECT
 
+    Q_ENUMS(TransactionRole)
+    Q_ENUMS(TransactionStatus)
+    Q_ENUMS(ErrorCode)
+    Q_ENUMS(ExitStatus)
+
     Q_PROPERTY(QString transactionId READ transactionId WRITE updateTransactionId)
     Q_PROPERTY(int userId READ userId WRITE updateUserId)
     Q_PROPERTY(TransactionRole role READ role WRITE updateRole)
@@ -74,10 +79,6 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_PROPERTY(QString filePath READ filePath WRITE updateFilePath)
     Q_PROPERTY(QString errorDetails READ errorDetails WRITE updateErrorDetails)
 
-    Q_ENUMS(TransactionRole)
-    Q_ENUMS(TransactionStatus)
-    Q_ENUMS(ErrorCode)
-    Q_ENUMS(ExitStatus)
 public:
     /**
      * Constructor
@@ -86,16 +87,6 @@ public:
      * @param tid The D-Bus path (transaction id) of the transaction
      */
     Transaction(const QString &tid);
-
-    /**
-     * The copy constructor.
-     *
-     * This will create a new transaction instance representing the same worker
-     * transaction as the one being copied. Delete it when you are done with it.
-     *
-     * @param other The transaction to be copied
-     */
-    Transaction(const Transaction *other);
 
     /**
      * Destructor
@@ -189,6 +180,7 @@ private Q_SLOTS:
     void sync();
     void updateProperty(int type, const QDBusVariant &variant);
     void onCallFinished(QDBusPendingCallWatcher *watcher);
+    void serviceOwnerChanged(QString name, QString oldOwner, QString newOwner);
     void emitFinished(int exitStatus);
 };
 

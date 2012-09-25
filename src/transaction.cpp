@@ -34,15 +34,6 @@ class TransactionPrivate
     public:
         TransactionPrivate(const QString &id)
             : tid(id)
-        {
-            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
-                                                                       tid, QDBusConnection::systemBus(),
-                                                                       0);
-        }
-
-        TransactionPrivate(const TransactionPrivate &other)
-            : dbus(other.dbus)
-            , tid(other.tid)
             , uid(0)
             , role(EmptyRole)
             , status(QApt::SetupStatus)
@@ -55,6 +46,9 @@ class TransactionPrivate
             , downloadSpeed(0)
             , downloadETA(0)
         {
+            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
+                                                                       tid, QDBusConnection::systemBus(),
+                                                                       0);
         }
 
         ~TransactionPrivate()
@@ -64,6 +58,7 @@ class TransactionPrivate
 
         // DBus
         OrgKubuntuQaptworkerTransactionInterface *dbus;
+        QDBusServiceWatcher *watcher;
 
         // Data
         QString tid;
@@ -96,17 +91,10 @@ Transaction::Transaction(const QString &tid)
     // Fetch property data from D-Bus
     sync();
 
-    connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
-            this, SLOT(updateProperty(int,QDBusVariant)));
-    connect(d->dbus, SIGNAL(mediumRequired(QString,QString)),
-            this, SIGNAL(mediumRequired(QString,QString)));
-    connect(d->dbus, SIGNAL(promptUntrusted(QStringList)),
-            this, SIGNAL(promptUntrusted(QStringList)));
-}
-
-Transaction::Transaction(const Transaction *other)
-{
-    d = other->d;
+    d->watcher = new QDBusServiceWatcher(this);
+    d->watcher->setConnection(QDBusConnection::systemBus());
+    d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
+    d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker"));
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
@@ -114,6 +102,8 @@ Transaction::Transaction(const Transaction *other)
             this, SIGNAL(mediumRequired(QString,QString)));
     connect(d->dbus, SIGNAL(promptUntrusted(QStringList)),
             this, SIGNAL(promptUntrusted(QStringList)));
+    connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
+            this, SLOT(serviceOwnerChanged(QString,QString,QString)));
 }
 
 Transaction::~Transaction()
@@ -411,6 +401,7 @@ void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
         switch (reply.error().type())
         {
         case QDBusError::AccessDenied:
+            updateError(QApt::AuthError);
             emit errorOccurred(QApt::AuthError);
             qDebug() << "auth error reply!";
             break;
@@ -420,6 +411,26 @@ void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
     }
 
     watcher->deleteLater();
+}
+
+void Transaction::serviceOwnerChanged(QString name, QString oldOwner, QString newOwner)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(oldOwner)
+
+    if (newOwner.isEmpty() && d->exitStatus == QApt::ExitUnfinished) {
+        updateError(QApt::WorkerDisappeared);
+        emit errorOccurred(QApt::WorkerDisappeared);
+
+        updateCancellable(false);
+        emit cancellableChanged(false);
+
+        updateStatus(QApt::FinishedStatus);
+        emit statusChanged(QApt::FinishedStatus);
+
+        updateExitStatus(QApt::ExitFailed);
+        emit finished(exitStatus());
+    }
 }
 
 void Transaction::sync()
