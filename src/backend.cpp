@@ -1012,8 +1012,9 @@ QApt::Transaction * Backend::commitChanges()
             packageList.insert(fullName.c_str(), Package::Held);
             break;
         case Package::NewInstall:
-
-            packageList.insert(fullName.c_str(), Package::ToInstall);
+            if (!(flags & Package::IsAuto)) {
+                packageList.insert(fullName.c_str(), Package::ToInstall);
+            }
             break;
         case Package::ToReInstall:
             packageList.insert(fullName.c_str(), Package::ToReInstall);
