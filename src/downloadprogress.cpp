@@ -165,7 +165,7 @@ void DownloadProgress::setStatusMessage(const QString &message)
 
 int DownloadProgress::progress() const
 {
-    return (d->fileSize) ? qRound(double(d->fetchedSize * 100.0)/double(d->fileSize)) : 0;
+    return (d->fileSize) ? qRound(double(d->fetchedSize * 100.0)/double(d->fileSize)) : 100;
 }
 
 void DownloadProgress::registerMetaTypes()

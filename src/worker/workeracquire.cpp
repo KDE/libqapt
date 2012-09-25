@@ -205,6 +205,7 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
         break;
     case pkgAcquire::Item::StatDone:
         downloadStatus = QApt::DoneState;
+        fetchedSize = fileSize;
         break;
     case pkgAcquire::Item::StatError:
         downloadStatus = QApt::ErrorState;
