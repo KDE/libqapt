@@ -274,6 +274,9 @@ void AptWorker::openCache(int begin, int end)
 {
     m_trans->setStatus(QApt::LoadingCacheStatus);
     CacheOpenProgress *progress = new CacheOpenProgress(m_trans, begin, end);
+
+    // Close in case it's already open
+    m_cache->Close();
     if (!m_cache->ReadOnlyOpen(progress)) {
         std::string message;
         bool isError = _error->PopMessage(message);
@@ -552,6 +555,8 @@ void AptWorker::commitChanges()
     }
 
     delete installProgress;
+
+    openCache(91, 95);
 }
 
 void AptWorker::installFile()
