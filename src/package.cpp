@@ -176,10 +176,6 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
         packageState |= QApt::Package::NotDownloadable;
     }
 
-    if (stateCache.Flags & pkgCache::Flag::Auto) {
-        packageState |= QApt::Package::IsAuto;
-    }
-
     if (stateCache.Garbage) {
         packageState |= QApt::Package::IsGarbage;
     }
@@ -723,6 +719,10 @@ int Package::state() const
 
     if (stateCache.Install()) {
         packageState |= ToInstall;
+    }
+
+    if (stateCache.Flags & pkgCache::Flag::Auto) {
+        packageState |= QApt::Package::IsAuto;
     }
 
     if (stateCache.iFlags & pkgDepCache::ReInstall) {
