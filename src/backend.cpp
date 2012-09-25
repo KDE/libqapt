@@ -1001,7 +1001,7 @@ QApt::Transaction * Backend::commitChanges()
         int flags = package->state();
         std::string fullName = package->packageIterator()->FullName();
         // Cannot have any of these flags simultaneously
-        int status = flags & (Package::ToKeep |
+        int status = flags & (Package::Held |
                               Package::NewInstall |
                               Package::ToReInstall |
                               Package::ToUpgrade |
