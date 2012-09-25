@@ -277,6 +277,7 @@ void AptWorker::openCache(int begin, int end)
 
     // Close in case it's already open
     m_cache->Close();
+    _error->Discard();
     if (!m_cache->ReadOnlyOpen(progress)) {
         std::string message;
         bool isError = _error->PopMessage(message);
