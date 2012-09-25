@@ -1008,28 +1008,29 @@ QApt::Transaction * Backend::commitChanges()
                               Package::ToDowngrade |
                               Package::ToRemove);
         switch (status) {
-           case Package::IsManuallyHeld:
-               packageList.insert(fullName.c_str(), Package::Held);
-               break;
-           case Package::NewInstall:
-               packageList.insert(fullName.c_str(), Package::ToInstall);
-               break;
-           case Package::ToReInstall:
-               packageList.insert(fullName.c_str(), Package::ToReInstall);
-               break;
-           case Package::ToUpgrade:
-               packageList.insert(fullName.c_str(), Package::ToUpgrade);
-               break;
-           case Package::ToDowngrade:
-               packageList.insert(QString(fullName.c_str()) % ',' % package->availableVersion(), Package::ToDowngrade);
-               break;
-           case Package::ToRemove:
-               if(flags & Package::ToPurge) {
-                   packageList.insert(fullName.c_str(), Package::ToPurge);
-               } else {
-                   packageList.insert(fullName.c_str(), Package::ToRemove);
-               }
-               break;
+        case Package::IsManuallyHeld:
+            packageList.insert(fullName.c_str(), Package::Held);
+            break;
+        case Package::NewInstall:
+
+            packageList.insert(fullName.c_str(), Package::ToInstall);
+            break;
+        case Package::ToReInstall:
+            packageList.insert(fullName.c_str(), Package::ToReInstall);
+            break;
+        case Package::ToUpgrade:
+            packageList.insert(fullName.c_str(), Package::ToUpgrade);
+            break;
+        case Package::ToDowngrade:
+            packageList.insert(QString(fullName.c_str()) % ',' % package->availableVersion(), Package::ToDowngrade);
+            break;
+        case Package::ToRemove:
+            if(flags & Package::ToPurge) {
+                packageList.insert(fullName.c_str(), Package::ToPurge);
+            } else {
+                packageList.insert(fullName.c_str(), Package::ToRemove);
+            }
+            break;
         }
     }
 
