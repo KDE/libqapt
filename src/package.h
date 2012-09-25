@@ -67,13 +67,6 @@ public:
     ~Package();
 
    /**
-    * Returns the internal APT representation of the package
-    *
-    * \return The interal APT package pointer
-    */
-    pkgCache::PkgIterator *packageIterator() const;
-
-   /**
     * Returns the name of the package
     *
     * \return The name of the package
@@ -623,6 +616,15 @@ public:
 
 private:
     PackagePrivate *const d;
+
+    /**
+     * Returns the internal APT representation of the package
+     *
+     * \return The interal APT package pointer
+     */
+     const pkgCache::PkgIterator &packageIterator() const;
+
+     friend class Backend;
 };
 
 /**

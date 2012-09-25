@@ -794,17 +794,17 @@ void Backend::restoreCacheState(const CacheState &state)
 
         if (oldflags != flags) {
             if (oldflags & Package::ToReInstall) {
-                deps->MarkInstall(*(pkg->packageIterator()), true);
-                deps->SetReInstall(*(pkg->packageIterator()), false);
+                deps->MarkInstall(pkg->packageIterator(), true);
+                deps->SetReInstall(pkg->packageIterator(), false);
             } else if (oldflags & Package::ToInstall) {
-                deps->MarkInstall(*(pkg->packageIterator()), true);
+                deps->MarkInstall(pkg->packageIterator(), true);
             } else if (oldflags & Package::ToRemove) {
-                deps->MarkDelete(*(pkg->packageIterator()), (bool)(oldflags & Package::ToPurge));
+                deps->MarkDelete(pkg->packageIterator(), (bool)(oldflags & Package::ToPurge));
             } else if (oldflags & Package::ToKeep) {
-                deps->MarkKeep(*(pkg->packageIterator()), false);
+                deps->MarkKeep(pkg->packageIterator(), false);
             }
             // fix the auto flag
-            deps->MarkAuto(*pkg->packageIterator(), (oldflags & Package::IsAuto));
+            deps->MarkAuto(pkg->packageIterator(), (oldflags & Package::IsAuto));
         }
     }
     emit packageChanged();
@@ -927,7 +927,7 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
     setCompressEvents(true);
 
     foreach (Package *package, packages) {
-        pkgCache::PkgIterator *iter = package->packageIterator();
+        const pkgCache::PkgIterator &iter = package->packageIterator();
         switch (action) {
         case Package::ToInstall: {
             int state = package->state();
@@ -944,7 +944,7 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
             break;
         case Package::ToUpgrade: {
             bool fromUser = !(package->state() & Package::IsAuto);
-            deps->MarkInstall(*iter, true, 0, fromUser);
+            deps->MarkInstall(iter, true, 0, fromUser);
             break;
         }
         case Package::ToReInstall: {
@@ -999,7 +999,7 @@ QApt::Transaction * Backend::commitChanges()
     QVariantMap packageList;
     for (const Package *package : d->packages) {
         int flags = package->state();
-        std::string fullName = package->packageIterator()->FullName();
+        std::string fullName = package->packageIterator().FullName();
         // Cannot have any of these flags simultaneously
         int status = flags & (Package::IsManuallyHeld |
                               Package::NewInstall |
@@ -1048,7 +1048,7 @@ QApt::Transaction * Backend::installPackages(PackageList packages)
     QVariantMap packageList;
 
     for (const Package *package : packages) {
-        std::string fullName = package->packageIterator()->FullName();
+        std::string fullName = package->packageIterator().FullName();
         packageList.insert(QString::fromStdString(fullName), Package::ToInstall);
     }
 
@@ -1065,7 +1065,7 @@ QApt::Transaction * Backend::removePackages(PackageList packages)
     QVariantMap packageList;
 
     for (const Package *package : packages) {
-        std::string fullName = package->packageIterator()->FullName();
+        std::string fullName = package->packageIterator().FullName();
         packageList.insert(QString::fromStdString(fullName), Package::ToRemove);
     }
 
