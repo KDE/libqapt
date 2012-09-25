@@ -52,18 +52,21 @@ namespace QApt {
 class PackagePrivate
 {
     public:
-        PackagePrivate()
-            : state(0)
+        PackagePrivate(pkgCache::PkgIterator iter, Backend *back)
+            : packageIter(new pkgCache::PkgIterator(iter))
+            , backend(back)
+            , state(0)
             , staticStateCalculated(false)
             , foreignArchCalculated(false)
         {
         }
+
         ~PackagePrivate()
         {
             delete packageIter;
         }
-        QApt::Backend *backend;
         pkgCache::PkgIterator *packageIter;
+        QApt::Backend *backend;
         int state;
         bool staticStateCalculated;
         bool isForeignArch;
@@ -194,13 +197,8 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
 }
 
 Package::Package(QApt::Backend* backend, pkgCache::PkgIterator &packageIter)
-        : d(new PackagePrivate())
+        : d(new PackagePrivate(packageIter, backend))
 {
-    // We have to make our own pkgIterator, since the one passed here will
-    // keep on iterating while all the packages are being built
-    d->packageIter = new pkgCache::PkgIterator(packageIter);
-    d->backend = backend;
-    d->state = 0;
 }
 
 Package::~Package()
