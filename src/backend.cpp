@@ -1001,13 +1001,16 @@ QApt::Transaction * Backend::commitChanges()
         int flags = package->state();
         std::string fullName = package->packageIterator()->FullName();
         // Cannot have any of these flags simultaneously
-        int status = flags & (Package::Held |
+        int status = flags & (Package::IsManuallyHeld |
                               Package::NewInstall |
                               Package::ToReInstall |
                               Package::ToUpgrade |
                               Package::ToDowngrade |
                               Package::ToRemove);
         switch (status) {
+           case Package::IsManuallyHeld:
+               packageList.insert(fullName.c_str(), Package::Held);
+               break;
            case Package::NewInstall:
                packageList.insert(fullName.c_str(), Package::ToInstall);
                break;

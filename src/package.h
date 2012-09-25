@@ -578,7 +578,7 @@ public:
         ToDowngrade         = 1 << 5,
         /// The package has been marked for removal
         ToRemove            = 1 << 6,
-        /// The package has been held from beinig upgraded
+        /// The package has been held from being upgraded
         Held                = 1 << 7,
         /// The package is currently installed
         Installed           = 1 << 8,
@@ -615,7 +615,9 @@ public:
         /// The package is not installed
         NotInstalled        = 1 << 24,
         /// The package has been pinned
-        IsPinned            = 1 << 25
+        IsPinned            = 1 << 25,
+        /// The package was auto-marked as a recommend, but then manually held
+        IsManuallyHeld      = 1 << 26
     };
     Q_DECLARE_FLAGS(States, State)
 

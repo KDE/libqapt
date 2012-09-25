@@ -1219,6 +1219,8 @@ void Package::setKeep()
         Fix.ResolveByKeep();
     }
 
+    d->state |= IsManuallyHeld;
+
     if (!d->backend->areEventsCompressed()) {
         d->backend->emitPackageChanged();
     }
@@ -1227,6 +1229,7 @@ void Package::setKeep()
 void Package::setInstall()
 {
     d->backend->cache()->depCache()->MarkInstall(*d->packageIter, true);
+    d->state &= ~IsManuallyHeld;
 
     // FIXME: can't we get rid of it here?
     // if there is something wrong, try to fix it
@@ -1245,6 +1248,7 @@ void Package::setInstall()
 void Package::setReInstall()
 {
     d->backend->cache()->depCache()->SetReInstall(*d->packageIter, true);
+    d->state &= ~IsManuallyHeld;
 
     if (!d->backend->areEventsCompressed()) {
         d->backend->emitPackageChanged();
@@ -1265,6 +1269,7 @@ void Package::setRemove()
 
     d->backend->cache()->depCache()->SetReInstall(*d->packageIter, false);
     d->backend->cache()->depCache()->MarkDelete(*d->packageIter, false);
+    d->state &= ~IsManuallyHeld;
 
     if (!d->backend->areEventsCompressed()) {
         d->backend->emitPackageChanged();
@@ -1284,6 +1289,7 @@ void Package::setPurge()
 
     d->backend->cache()->depCache()->SetReInstall(*d->packageIter, false);
     d->backend->cache()->depCache()->MarkDelete(*d->packageIter, true);
+    d->state &= ~IsManuallyHeld;
 
     if (!d->backend->areEventsCompressed()) {
         d->backend->emitPackageChanged();

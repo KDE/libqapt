@@ -354,8 +354,10 @@ bool AptWorker::markChanges()
         // Then mark according to the instruction
         switch (operation) {
         case QApt::Package::Held:
+            qDebug() << "holding" << packageString;
             (*m_cache)->MarkKeep(iter, false);
             (*m_cache)->SetReInstall(iter, false);
+            resolver.Protect(iter);
             break;
         case QApt::Package::ToUpgrade: {
             bool fromUser = !(State.Flags & pkgCache::Flag::Auto);
@@ -366,6 +368,7 @@ bool AptWorker::markChanges()
             break;
         }
         case QApt::Package::ToInstall:
+            qDebug() << "installing" << packageString;
             (*m_cache)->MarkInstall(iter, true);
 
             resolver.Clear(iter);
