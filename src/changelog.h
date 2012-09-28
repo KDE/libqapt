@@ -53,9 +53,7 @@ public:
     QStringList CVEUrls() const;
 
 private:
-    QT_END_NAMESPACE
     QSharedDataPointer<ChangelogEntryPrivate> d;
-    QT_BEGIN_NAMESPACE
 };
 
 typedef QList<ChangelogEntry> ChangelogEntryList;
@@ -84,9 +82,7 @@ public:
     ChangelogEntryList newEntriesSince(const QString &version) const;
 
 private:
-    QT_END_NAMESPACE
     QSharedDataPointer<ChangelogPrivate> d;
-    QT_BEGIN_NAMESPACE
 };
 
 }
