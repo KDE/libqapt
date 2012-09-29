@@ -462,8 +462,7 @@ void Transaction::sync()
                 // set this manually
                 setProperty(iter.key().toLatin1(), d->dbus->property(iter.key().toLatin1()));
             else if (iter.key() == "downloadProgress") {
-                QVariant v = d->dbus->property(iter.key().toLatin1());
-                updateDownloadProgress(v.value<QApt::DownloadProgress>());
+                updateDownloadProgress(iter.value().value<QApt::DownloadProgress>());
             }
             else
                 qDebug() << "failed to set:" << iter.key();
