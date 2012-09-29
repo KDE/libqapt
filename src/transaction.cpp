@@ -450,13 +450,13 @@ void Transaction::sync()
             // Qt won't support arbitrary enums over dbus until "maybe Qt 6 or 7"
             // when c++11 is prevalent, so do some ugly hacks here...
             if (iter.key() == QLatin1String("role"))
-                setProperty(iter.key().toLatin1(), (TransactionRole)iter.value().toInt());
+                updateRole((TransactionRole)iter.value().toInt());
             else if (iter.key() == QLatin1String("status"))
-                setProperty(iter.key().toLatin1(), (TransactionStatus)iter.value().toInt());
+                updateStatus((TransactionStatus)iter.value().toInt());
             else if (iter.key() == QLatin1String("error"))
-                setProperty(iter.key().toLatin1(), (ErrorCode)iter.value().toInt());
+                updateError((ErrorCode)iter.value().toInt());
             else if (iter.key() == QLatin1String("exitStatus"))
-                setProperty(iter.key().toLatin1(), (ExitStatus)iter.value().toInt());
+                updateExitStatus((ExitStatus)iter.value().toInt());
             else if (iter.key() == QLatin1String("packages"))
                 // iter.value() for the QVariantMap is QDBusArgument, so we have to
                 // set this manually
