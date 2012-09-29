@@ -1,3 +1,13 @@
+1.4.1:
+======
+- Bugfixes:
+  * Fixed a small memory leak where invalid QApt::HistoryItems would never be deleted.
+  * Fixed a bug where apt-listchanges and apt-listbugs would freeze the QApt Worker.
+  * Fixed Package::priority() returning an empty QString
+  * Fixed Backend::xapianIndexNeedsUpdate() always returning true, even if an
+    update wasn't needed.
+  * Fixed API documentation formatting for QApt::MultiArchType
+
 1.4.0
 ======
 - Features:
