@@ -142,7 +142,7 @@ void BackendPrivate::setWorkerLocale()
 
 void BackendPrivate::setWorkerProxy()
 {
-    QString proxy = customProxy.isEmpty() ? qgetenv("http_proxy") : proxy = customProxy;
+    QString proxy = customProxy.isEmpty() ? qgetenv("http_proxy") : customProxy;
     worker->setProxy(proxy);
 }
 
