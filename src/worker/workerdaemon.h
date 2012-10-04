@@ -48,7 +48,7 @@ private:
     QTimer *m_idleTimer;
 
     int dbusSenderUid() const;
-    Transaction *createTranscation(QApt::TransactionRole role,
+    Transaction *createTransaction(QApt::TransactionRole role,
                                    QVariantMap instructionsList = QVariantMap());
 
 signals:

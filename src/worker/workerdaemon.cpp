@@ -95,7 +95,7 @@ int WorkerDaemon::dbusSenderUid() const
     return connection().interface()->serviceUid(message().service()).value();
 }
 
-Transaction *WorkerDaemon::createTranscation(QApt::TransactionRole role, QVariantMap instructionsList)
+Transaction *WorkerDaemon::createTransaction(QApt::TransactionRole role, QVariantMap instructionsList)
 {
     int uid = dbusSenderUid();
 
@@ -108,14 +108,14 @@ Transaction *WorkerDaemon::createTranscation(QApt::TransactionRole role, QVarian
 
 QString WorkerDaemon::updateCache()
 {
-    Transaction *trans = createTranscation(QApt::UpdateCacheRole);
+    Transaction *trans = createTransaction(QApt::UpdateCacheRole);
 
     return trans->transactionId();
 }
 
 QString WorkerDaemon::installFile(const QString &file)
 {
-    Transaction *trans = createTranscation(QApt::InstallFileRole);
+    Transaction *trans = createTransaction(QApt::InstallFileRole);
     trans->setFilePath(file);
 
     return trans->transactionId();
@@ -123,7 +123,7 @@ QString WorkerDaemon::installFile(const QString &file)
 
 QString WorkerDaemon::commitChanges(QVariantMap instructionsList)
 {
-    Transaction *trans = createTranscation(QApt::CommitChangesRole,
+    Transaction *trans = createTransaction(QApt::CommitChangesRole,
                                            instructionsList);
 
     return trans->transactionId();
@@ -131,7 +131,7 @@ QString WorkerDaemon::commitChanges(QVariantMap instructionsList)
 
 QString WorkerDaemon::upgradeSystem(bool safeUpgrade)
 {
-    Transaction *trans = createTranscation(QApt::UpgradeSystemRole);
+    Transaction *trans = createTransaction(QApt::UpgradeSystemRole);
     trans->setSafeUpgrade(safeUpgrade);
 
     return trans->transactionId();
@@ -145,7 +145,7 @@ QString WorkerDaemon::downloadArchives(const QStringList &packageNames, const QS
         packages.insert(pkg, 0);
     }
 
-    Transaction *trans = createTranscation(QApt::DownloadArchivesRole, packages);
+    Transaction *trans = createTransaction(QApt::DownloadArchivesRole, packages);
     trans->setFilePath(dest);
 
     return trans->transactionId();
@@ -153,7 +153,7 @@ QString WorkerDaemon::downloadArchives(const QStringList &packageNames, const QS
 
 QString WorkerDaemon::updateXapianIndex()
 {
-    Transaction *trans = createTranscation(QApt::UpdateXapianRole);
+    Transaction *trans = createTransaction(QApt::UpdateXapianRole);
 
     return trans->transactionId();
 }
