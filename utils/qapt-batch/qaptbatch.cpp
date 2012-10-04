@@ -108,7 +108,7 @@ void QAptBatch::setTransaction(QApt::Transaction *trans)
     connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
             this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
     connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
-            this, SLOT(errorOccurred(int,QVariantMap)));
+            this, SLOT(errorOccurred(QApt::ErrorCode)));
     connect(m_trans, SIGNAL(cancellableChanged(bool)),
             this, SLOT(cancellableChanged(bool)));
     connect(m_trans, SIGNAL(mediumRequired(QString,QString)),
@@ -129,7 +129,6 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
 {
     QString text;
     QString title;
-    QString drive;
 
     switch(code) {
         case QApt::InitError: {
