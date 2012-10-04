@@ -80,6 +80,11 @@ private:
     void upgradeSystem();
 
     void installFile();
+
+    /**
+     * Special function to download archives for DownloadArchivesRole transactions.
+     */
+    void downloadArchives();
     
 public slots:
     /**

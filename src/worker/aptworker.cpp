@@ -564,3 +564,64 @@ void AptWorker::installFile()
 {
     QApt::DebFile file(m_trans->filePath());
 }
+
+void AptWorker::downloadArchives()
+{
+    // Initialize fetcher with our progress watcher
+    WorkerAcquire *acquire = new WorkerAcquire(this, 15, 100);
+    acquire->setTransaction(m_trans);
+
+    pkgAcquire fetcher;
+    fetcher.Setup(acquire);
+
+    pkgIndexFile *index;
+
+    for (const QString &packageString : m_trans->packages().keys()) {
+        pkgCache::PkgIterator iter = (*m_cache)->FindPkg(packageString.toStdString());
+
+        if (!iter)
+            continue; // Package not found
+
+        pkgCache::VerIterator ver = (*m_cache)->GetCandidateVer(iter);
+
+        if (!ver || !ver.Downloadable() || !ver.Arch())
+            continue; // Virtual package or not downloadable or broken
+
+        // Obtain package info
+        pkgCache::VerFileIterator vf = ver.FileList();
+        pkgRecords::Parser &rec = m_records->Lookup(ver.FileList());
+
+        // Try to cross match against the source list
+        if (!m_cache->GetSourceList()->FindIndex(vf.File(), index))
+            continue;
+
+        string fileName = rec.FileName();
+        string MD5sum = rec.MD5Hash();
+
+        if (fileName.empty()) {
+            m_trans->setError(QApt::NotFoundError);
+            m_trans->setErrorDetails(packageString);
+            delete acquire;
+            return;
+        }
+
+        new pkgAcqFile(&fetcher,
+                       index->ArchiveURI(fileName),
+                       MD5sum,
+                       ver->Size,
+                       index->ArchiveInfo(ver),
+                       ver.ParentPkg().Name(),
+                       m_trans->filePath().toStdString(), "");
+    }
+
+    if (fetcher.Run() != pkgAcquire::Continue) {
+        // Our fetcher will report warnings for itself, but if it fails entirely
+        // we have to send the error and finished signals
+        if (!m_trans->isCancelled()) {
+            m_trans->setError(QApt::FetchError);
+        }
+    }
+
+    delete acquire;
+    return;
+}

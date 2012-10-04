@@ -607,15 +607,18 @@ public Q_SLOTS:
 
    /**
     * Downloads the packages listed in the provided list file to the provided
-    * destination directory. The worker sends normal download event signals
-    * as usual, and this can be handled exactly like any other package download
+    * destination directory.
+    *
+    * If the list file provided cannot be opened, a null pointer will be returned.
+    *
+    * @return A pointer to a @c Transaction object tracking the download
     *
     * @param listFile The path to the package list file
     * @param destination The path of the directory to download the packages to
     *
-    * @since 1.2
+    * @since 2.0
     */
-    void downloadArchives(const QString &listFile, const QString &destination);
+    Transaction *downloadArchives(const QString &listFile, const QString &destination);
 
    /**
     * Installs a .deb package archive file.

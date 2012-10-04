@@ -21,6 +21,11 @@
       <arg type="s" direction="out"/>
       <arg name="safeUpgrade" type="b" direction="in"/>
     </method>
+    <method name="downloadArchives">
+      <arg type="s" direction="out"/>
+      <arg name="packageNames" type="as" direction="in"/>
+      <arg name="dest" type="s" direction="in"/>
+    </method>
     <method name="updateXapianIndex">
       <arg type="s" direction="out"/>
     </method>

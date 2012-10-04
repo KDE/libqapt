@@ -137,6 +137,20 @@ QString WorkerDaemon::upgradeSystem(bool safeUpgrade)
     return trans->transactionId();
 }
 
+QString WorkerDaemon::downloadArchives(const QStringList &packageNames, const QString &dest)
+{
+    QVariantMap packages;
+
+    for (const QString &pkg : packageNames) {
+        packages.insert(pkg, 0);
+    }
+
+    Transaction *trans = createTranscation(QApt::DownloadArchivesRole, packages);
+    trans->setFilePath(dest);
+
+    return trans->transactionId();
+}
+
 QString WorkerDaemon::updateXapianIndex()
 {
     Transaction *trans = createTranscation(QApt::UpdateXapianRole);

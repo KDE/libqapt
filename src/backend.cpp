@@ -1075,15 +1075,14 @@ QApt::Transaction * Backend::removePackages(PackageList packages)
     return trans;
 }
 
-void Backend::downloadArchives(const QString &listFile, const QString &destination)
+Transaction *Backend::downloadArchives(const QString &listFile, const QString &destination)
 {
     Q_D(Backend);
 
     QFile file(listFile);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // TODO: error
-        return;
+        return nullptr;
     }
 
     QByteArray buffer = file.readAll();
@@ -1091,7 +1090,7 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
     QList<QByteArray> lines = buffer.split('\n');
 
     if (lines.isEmpty() || lines.first() != QByteArray("[Download List]")) {
-        return;
+        return nullptr;
     }
 
     lines.removeAt(0);
@@ -1106,7 +1105,10 @@ void Backend::downloadArchives(const QString &listFile, const QString &destinati
     QDir dir(dirName);
     dir.mkdir(QLatin1String("packages"));
 
-    //d->worker->downloadArchives(packages, destination);
+    QDBusPendingReply<QString> rep = d->worker->downloadArchives(packages, destination);
+    Transaction *trans = new Transaction(rep.value());
+
+    return trans;
 }
 
 Transaction *Backend::installFile(const DebFile &debFile)
