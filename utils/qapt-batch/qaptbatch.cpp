@@ -262,7 +262,6 @@ void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 
 void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
 {
-    qDebug() << "new status" << status;
     switch (status) {
     case QApt::SetupStatus:
     case QApt::WaitingStatus:
