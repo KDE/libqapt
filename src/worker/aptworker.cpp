@@ -212,6 +212,9 @@ void AptWorker::runTransaction(Transaction *trans)
     case QApt::InstallFileRole:
         installFile();
         break;
+    case QApt::DownloadArchivesRole:
+        downloadArchives();
+        break;
     // Other
     case QApt::EmptyRole:
     default:
