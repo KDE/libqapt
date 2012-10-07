@@ -103,13 +103,14 @@ void TransactionQueue::enqueue(QString tid)
     connect(trans, SIGNAL(finished(int)), this, SLOT(onTransactionFinished(int)));
     m_pending.removeAll(trans);
     m_queue.enqueue(trans);
-    emitQueueChanged();
 
     if (!m_worker->currentTransaction())
         runNextTransaction();
     else {
         trans->setStatus(QApt::WaitingStatus);
     }
+
+    emitQueueChanged();
 }
 
 void TransactionQueue::remove(QString tid)
