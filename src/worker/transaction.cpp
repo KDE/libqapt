@@ -213,7 +213,7 @@ void Transaction::setDebconfPipe(QString pipe)
     QFileInfo pipeInfo(pipe);
 
     if (!pipeInfo.exists() || (int)pipeInfo.ownerId() != m_uid) {
-        sendErrorReply(QDBusError::InvalidArgs);
+        sendErrorReply(QDBusError::InvalidArgs, pipe);
         return;
     }
 
