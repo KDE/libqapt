@@ -100,7 +100,7 @@ void TransactionQueue::enqueue(QString tid)
     if (!trans)
         return;
 
-    connect(trans, SIGNAL(finished(int)), this, SLOT(onTransactionFinished(int)));
+    connect(trans, SIGNAL(finished(int)), this, SLOT(onTransactionFinished()));
     m_pending.removeAll(trans);
     m_queue.enqueue(trans);
 
@@ -131,10 +131,8 @@ void TransactionQueue::remove(QString tid)
     QTimer::singleShot(5000, trans, SLOT(deleteLater()));
 }
 
-void TransactionQueue::onTransactionFinished(int exitCode)
+void TransactionQueue::onTransactionFinished()
 {
-    Q_UNUSED(exitCode);
-
     Transaction *trans = qobject_cast<Transaction *>(sender());
 
     if (!trans) // Don't want no trouble...

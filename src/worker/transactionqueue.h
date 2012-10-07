@@ -58,7 +58,7 @@ public slots:
     void remove(QString tid);
 
 private slots:
-    void onTransactionFinished(int exitCode);
+    void onTransactionFinished();
     void runNextTransaction();
     void emitQueueChanged();
 };
