@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef TRANSACTIONDBUS_H_1347973411
-#define TRANSACTIONDBUS_H_1347973411
+#ifndef TRANSACTIONDBUS_H_1349745943
+#define TRANSACTIONDBUS_H_1349745943
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -141,6 +141,13 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("replyUntrustedPrompt"), argumentList);
     }
 
+    inline QDBusPendingReply<> resolveConfigFileConflict(const QString &currentPath, bool replace)
+    {
+        QList<QVariant> argumentList;
+        argumentList << QVariant::fromValue(currentPath) << QVariant::fromValue(replace);
+        return asyncCallWithArgumentList(QLatin1String("resolveConfigFileConflict"), argumentList);
+    }
+
     inline QDBusPendingReply<> run()
     {
         QList<QVariant> argumentList;
@@ -155,6 +162,7 @@ public Q_SLOTS: // METHODS
     }
 
 Q_SIGNALS: // SIGNALS
+    void configFileConflict(const QString &currentPath, const QString &newPath);
     void finished(int exitStatus);
     void mediumRequired(const QString &label, const QString &mountPoint);
     void promptUntrusted(const QStringList &untrustedPackages);

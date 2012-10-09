@@ -37,6 +37,10 @@
       <arg name="label" type="s" direction="out"/>
       <arg name="mountPoint" type="s" direction="out"/>
     </signal>
+    <signal name="configFileConflict">
+      <arg name="currentPath" type="s" direction="out"/>
+      <arg name="newPath" type="s" direction="out"/>
+    </signal>
     <signal name="promptUntrusted">
       <arg name="untrustedPackages" type="as" direction="out"/>
     </signal>
@@ -53,6 +57,10 @@
     </method>
     <method name="replyUntrustedPrompt">
       <arg name="approved" type="b" direction="in"/>
+    </method>
+    <method name="resolveConfigFileConflict">
+      <arg name="currentPath" type="s" direction="in"/>
+      <arg name="replace" type="b" direction="in"/>
     </method>
   </interface>
 </node>

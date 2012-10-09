@@ -162,18 +162,19 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 // From what I understand, the original file starts after the ' character ('\'') and
                 // goes to a second ' character. The new conf file starts at the next ' and goes to
                 // the next '.
-                QStringList strList = str.split(QLatin1Char('\''));
+                QStringList strList = str.split('\'');
                 QString oldFile = strList.at(1);
                 QString newFile = strList.at(2);
 
-                QVariantMap args;
-                args[QLatin1String("OldConfFile")] = oldFile;
-                args[QLatin1String("NewConfFile")] = newFile;
+                m_trans->setConfFileConflict(oldFile, newFile);
+                m_trans->setStatus(QApt::WaitingConfigFilePromptStatus);
 
-                // FIXME: use transaction to query user, wait for resume
-                bool replaceFile;
+                while (m_trans->isPaused())
+                    usleep(200000);
 
-                if (replaceFile) {
+                m_trans->setStatus(QApt::CommittingStatus);
+
+                if (m_trans->replaceConfFile()) {
                     ssize_t reply = write(writeFd, "Y\n", 2);
                     Q_UNUSED(reply);
                 } else {

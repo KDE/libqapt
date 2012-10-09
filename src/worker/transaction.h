@@ -91,6 +91,7 @@ public:
     QString filePath();
     QString errorDetails();
     bool safeUpgrade() const;
+    bool replaceConfFile() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -108,6 +109,7 @@ public:
     void setFilePath(const QString &filePath);
     void setErrorDetails(const QString &errorDetails);
     void setSafeUpgrade(bool safeUpgrade);
+    void setConfFileConflict(const QString &currentPath, const QString &newPath);
 
 private:
     // Pointers to external containers
@@ -138,6 +140,8 @@ private:
     QString m_filePath;
     QString m_errorDetails;
     bool m_safeUpgrade;
+    QString m_currentConfPath;
+    bool m_replaceConfFile;
 
     // Other data
     QMap<int, QString> m_roleActionMap;
@@ -160,6 +164,7 @@ Q_SIGNALS:
     Q_SCRIPTABLE void finished(int exitStatus);
     Q_SCRIPTABLE void mediumRequired(QString label, QString mountPoint);
     Q_SCRIPTABLE void promptUntrusted(QStringList untrustedPackages);
+    Q_SCRIPTABLE void configFileConflict(QString currentPath, QString newPath);
     void idleTimeout(Transaction *trans);
     
 public Q_SLOTS:
@@ -168,6 +173,7 @@ public Q_SLOTS:
     void cancel();
     void provideMedium(const QString &medium);
     void replyUntrustedPrompt(bool approved);
+    void resolveConfigFileConflict(const QString &currentPath, bool replaceFile);
 
 private Q_SLOTS:
     void emitIdleTimeout();

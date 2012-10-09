@@ -286,6 +286,8 @@ namespace QApt
         WaitingStatus,
         /// The status when a transaction is waiting for a media change prompt
         WaitingMediumStatus,
+        /// The status when waiting for the resolution of a config file conflict
+        WaitingConfigFilePromptStatus,
         /// The status when the transaction is waiting for the APT lock
         WaitingLockStatus,
         /// The status when a transaction first starts running

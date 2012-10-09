@@ -55,6 +55,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_allowUntrusted(false)
     , m_downloadSpeed(0)
     , m_safeUpgrade(true)
+    , m_replaceConfFile(false)
     , m_dataMutex(QMutex::Recursive)
 {
     new TransactionAdaptor(this);
@@ -297,6 +298,16 @@ void Transaction::setMediumRequired(const QString &label, const QString &medium)
     emit mediumRequired(label, medium);
 }
 
+void Transaction::setConfFileConflict(const QString &currentPath, const QString &newPath)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_isPaused = true;
+    m_currentConfPath = currentPath;
+
+    emit configFileConflict(currentPath, newPath);
+}
+
 bool Transaction::isPaused()
 {
     QMutexLocker lock(&m_dataMutex);
@@ -462,6 +473,11 @@ void Transaction::setSafeUpgrade(bool safeUpgrade)
     m_safeUpgrade = safeUpgrade;
 }
 
+bool Transaction::replaceConfFile() const
+{
+    return m_replaceConfFile;
+}
+
 void Transaction::run()
 {
     setDelayedReply(true);
@@ -592,6 +608,16 @@ void Transaction::replyUntrustedPrompt(bool approved)
 
     m_allowUntrusted = approved;
     m_isPaused = false;
+}
+
+void Transaction::resolveConfigFileConflict(const QString &currentPath, bool replaceFile)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    if (currentPath != m_currentConfPath)
+        replaceFile = false; // Client is buggy, assume keep to be safe
+
+    m_replaceConfFile = replaceFile;
 }
 
 void Transaction::emitIdleTimeout()

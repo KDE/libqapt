@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef TRANSACTIONADAPTER_H_1347973428
-#define TRANSACTIONADAPTER_H_1347973428
+#ifndef TRANSACTIONADAPTER_H_1349745701
+#define TRANSACTIONADAPTER_H_1349745701
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -67,6 +67,10 @@ class TransactionAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"s\" name=\"label\"/>\n"
 "      <arg direction=\"out\" type=\"s\" name=\"mountPoint\"/>\n"
 "    </signal>\n"
+"    <signal name=\"configFileConflict\">\n"
+"      <arg direction=\"out\" type=\"s\" name=\"currentPath\"/>\n"
+"      <arg direction=\"out\" type=\"s\" name=\"newPath\"/>\n"
+"    </signal>\n"
 "    <signal name=\"promptUntrusted\">\n"
 "      <arg direction=\"out\" type=\"as\" name=\"untrustedPackages\"/>\n"
 "    </signal>\n"
@@ -81,6 +85,10 @@ class TransactionAdaptor: public QDBusAbstractAdaptor
 "    </method>\n"
 "    <method name=\"replyUntrustedPrompt\">\n"
 "      <arg direction=\"in\" type=\"b\" name=\"approved\"/>\n"
+"    </method>\n"
+"    <method name=\"resolveConfigFileConflict\">\n"
+"      <arg direction=\"in\" type=\"s\" name=\"currentPath\"/>\n"
+"      <arg direction=\"in\" type=\"b\" name=\"replace\"/>\n"
 "    </method>\n"
 "  </interface>\n"
         "")
@@ -156,9 +164,11 @@ public Q_SLOTS: // METHODS
     void cancel();
     void provideMedium(const QString &medium);
     void replyUntrustedPrompt(bool approved);
+    void resolveConfigFileConflict(const QString &currentPath, bool replace);
     void run();
     void setProperty(int property, const QDBusVariant &value);
 Q_SIGNALS: // SIGNALS
+    void configFileConflict(const QString &currentPath, const QString &newPath);
     void finished(int exitStatus);
     void mediumRequired(const QString &label, const QString &mountPoint);
     void promptUntrusted(const QStringList &untrustedPackages);

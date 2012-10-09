@@ -164,6 +164,7 @@ Q_SIGNALS:
     void finished(QApt::ExitStatus exitStatus);
     void mediumRequired(QString label, QString mountPoint);
     void promptUntrusted(QStringList untrustedPackages);
+    void configFileConflict(QString currentPath, QString newPath);
     void downloadSpeedChanged(quint64 downloadSpeed);
     void downloadETAChanged(quint64 ETA);
 
@@ -175,6 +176,7 @@ public Q_SLOTS:
     void cancel();
     void provideMedium(const QString &medium);
     void replyUntrustedPrompt(bool approved);
+    void resolveConfigFileConflict(const QString &currentPath, bool replace);
 
 private Q_SLOTS:
     void sync();

@@ -102,6 +102,8 @@ Transaction::Transaction(const QString &tid)
             this, SIGNAL(mediumRequired(QString,QString)));
     connect(d->dbus, SIGNAL(promptUntrusted(QStringList)),
             this, SIGNAL(promptUntrusted(QStringList)));
+    connect(d->dbus, SIGNAL(configFileConflict(QString,QString)),
+            this, SIGNAL(configFileConflict(QString,QString)));
     connect(d->watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)),
             this, SLOT(serviceOwnerChanged(QString,QString,QString)));
 }
@@ -385,6 +387,15 @@ void Transaction::provideMedium(const QString &medium)
 void Transaction::replyUntrustedPrompt(bool approved)
 {
     QDBusPendingCall call = d->dbus->replyUntrustedPrompt(approved);
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::resolveConfigFileConflict(const QString &currentPath, bool replace)
+{
+    QDBusPendingCall call = d->dbus->resolveConfigFileConflict(currentPath, replace);
 
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),

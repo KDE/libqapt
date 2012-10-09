@@ -177,6 +177,12 @@ void TransactionAdaptor::replyUntrustedPrompt(bool approved)
     QMetaObject::invokeMethod(parent(), "replyUntrustedPrompt", Q_ARG(bool, approved));
 }
 
+void TransactionAdaptor::resolveConfigFileConflict(const QString &currentPath, bool replace)
+{
+    // handle method call org.kubuntu.qaptworker.transaction.resolveConfigFileConflict
+    QMetaObject::invokeMethod(parent(), "resolveConfigFileConflict", Q_ARG(QString, currentPath), Q_ARG(bool, replace));
+}
+
 void TransactionAdaptor::run()
 {
     // handle method call org.kubuntu.qaptworker.transaction.run
