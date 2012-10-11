@@ -44,10 +44,13 @@
 
 DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     : KDialog(parent)
+    , m_backend(new QApt::Backend(this))
     , m_trans(nullptr)
     , m_commitWidget(nullptr)
 {
-    m_backend->init();
+    if (!m_backend->init())
+        initError();
+
     connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
             this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
 
@@ -57,9 +60,17 @@ DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
     initGUI();
 }
 
-DebInstaller::~DebInstaller()
+void DebInstaller::initError()
 {
-    delete m_backend;
+    QString details = m_backend->initErrorMessage();
+
+    QString text = i18nc("@label",
+                         "The package system could not be initialized, your "
+                         "configuration may be broken.");
+    QString title = i18nc("@title:window", "Initialization error");
+
+    KMessageBox::detailedError(this, text, details, title);
+    exit(-1);
 }
 
 void DebInstaller::initGUI()

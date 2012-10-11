@@ -42,7 +42,8 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     , m_packages(packages)
     , m_done(false)
 {
-    m_backend->init();
+    if (!m_backend->init())
+        initError();
 
     // Set this in case we auto-show before auth
     setLabelText(i18nc("@label", "Waiting for authorization"));
@@ -66,6 +67,19 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
         KWindowSystem::setMainWindow(this, winId);
 
     setAutoClose(false);
+}
+
+void QAptBatch::initError()
+{
+    QString details = m_backend->initErrorMessage();
+
+    QString text = i18nc("@label",
+                         "The package system could not be initialized, your "
+                         "configuration may be broken.");
+    QString title = i18nc("@title:window", "Initialization error");
+
+    KMessageBox::detailedError(this, text, details, title);
+    exit(-1);
 }
 
 void QAptBatch::reject()
@@ -136,9 +150,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            // FIXME: details = transaction error details
-            QString details;
-            KMessageBox::detailedError(this, text, details, title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             KApplication::instance()->quit();
             break;
         }

@@ -53,6 +53,7 @@ private:
     void setTransaction(QApt::Transaction *trans);
 
 private Q_SLOTS:
+    void initError();
     void commitChanges(int mode);
     void errorOccurred(QApt::ErrorCode code);
     void provideMedium(const QString &label, const QString &mountPoint);

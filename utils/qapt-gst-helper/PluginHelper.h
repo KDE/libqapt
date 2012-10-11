@@ -65,6 +65,7 @@ private:
     PluginFinder *m_finder;
 
 private Q_SLOTS:
+    void initError();
     void canSearch();
     void offerInstallPackages();
     void cancellableChanged(bool cancellable);

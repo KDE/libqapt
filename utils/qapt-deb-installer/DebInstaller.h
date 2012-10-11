@@ -43,7 +43,6 @@ class DebInstaller : public KDialog
     Q_OBJECT
 public:
     explicit DebInstaller(QWidget *parent, const QString &debFile);
-    ~DebInstaller();
 
 private:
     // Backend stuff
@@ -66,6 +65,7 @@ private:
     QString m_versionInfo;
 
     // Functions
+    void initError();
     bool checkDeb();
     void compareDebWithCache();
     QString maybeAppendArchSuffix(const QString& pkgName, bool checkingConflicts = false);

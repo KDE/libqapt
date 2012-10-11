@@ -88,10 +88,8 @@ void PluginHelper::run()
     incrementProgress();
     show();
 
-    if (!m_backend->init()) {
-        // TODO: Report some sort of init error
-        exit(ERR_RANDOM_ERR);
-    }
+    if (!m_backend->init())
+        initError();
 
     m_finder = new PluginFinder(0, m_backend);
     connect(m_finder, SIGNAL(foundCodec(QApt::Package*)),
@@ -105,6 +103,19 @@ void PluginHelper::run()
     m_finder->moveToThread(m_finderThread);
     m_finder->setSearchList(m_searchList);
     m_finderThread->start();
+}
+
+void PluginHelper::initError()
+{
+    QString details = m_backend->initErrorMessage();
+
+    QString text = i18nc("@label",
+                         "The package system could not be initialized, your "
+                         "configuration may be broken.");
+    QString title = i18nc("@title:window", "Initialization error");
+
+    KMessageBox::detailedError(this, text, details, title);
+    exit(ERR_RANDOM_ERR);
 }
 
 void PluginHelper::canSearch()
