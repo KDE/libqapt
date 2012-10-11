@@ -474,6 +474,16 @@ Q_SIGNALS:
     */
     void xapianUpdateProgress(int percentage);
 
+    /**
+     * Emitted whenever the QApt Worker's transaction queue has
+     * changed.
+     *
+     * @param active The transaction ID of the active transaction
+     * @param queue A list of transaction IDs of all transactions
+     * currently in the queue, including the active one.
+     *
+     * @since 2.0
+     */
     void transactionQueueChanged(QString active, QStringList queue);
 
 public Q_SLOTS:
