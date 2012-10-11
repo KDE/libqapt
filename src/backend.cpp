@@ -115,6 +115,7 @@ public:
     // Other
     bool writeSelectionFile(const QString &file, const QString &path) const;
     QString customProxy;
+    QString initErrorMessage;
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -153,7 +154,7 @@ bool Backend::init()
 {
     Q_D(Backend);
     if (!pkgInitConfig(*_config) || !pkgInitSystem(*_config, _system)) {
-        throwInitError();
+        setInitError();
         return false;
     }
 
@@ -161,19 +162,18 @@ bool Backend::init()
     d->config = new Config(this);
     d->nativeArch = config()->readEntry(QLatin1String("APT::Architecture"),
                                         QLatin1String(""));
-    reloadCache();
     openXapianIndex();
 
-    return true;
+    return reloadCache();
 }
 
-void Backend::reloadCache()
+bool Backend::reloadCache()
 {
     Q_D(Backend);
 
     if (!d->cache->open()) {
-        throwInitError();
-        return;
+        setInitError();
+        return false;
     }
 
     pkgDepCache *depCache = d->cache->depCache();
@@ -274,18 +274,21 @@ void Backend::reloadCache()
     }
 }
 
-void Backend::throwInitError()
+void Backend::setInitError()
 {
-    QVariantMap details;
+    Q_D(Backend);
+
     string message;
     bool isError = _error->PopMessage(message);
-    if (isError) {
-        details[QLatin1String("FromWorker")] = false;
-        details[QLatin1String("ErrorText")] = QString::fromStdString(message);
-    }
+    if (isError)
+        d->initErrorMessage = QString::fromStdString(message);
+}
 
-    // FIXME
-    //emitErrorOccurred(QApt::InitError, details);
+QString Backend::initErrorMessage() const
+{
+    Q_D(const Backend);
+
+    return d->initErrorMessage;
 }
 
 pkgSourceList *Backend::packageSourceList() const

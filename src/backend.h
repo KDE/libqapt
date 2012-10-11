@@ -78,9 +78,21 @@ public:
      * risk encountering undefined behavior.
      *
      * @return @c true if initialization was successful
-     * @return @c false if there was a problem initializing
+     * @return @c false if there was a problem initializing. If this is the case,
+     * calling Backend methods other than initErrorMessage() will result in
+     * undefined behavior, and will likely cause a crash.
      */
     bool init();
+
+    /**
+     * In the event that the init() or reloadCache() methods have returned false,
+     * this method provides access to the error message from APT explaining why
+     * opening the cache failed. This is the only safe method to call after
+     * encountering a return false of @c false from init() or reloadCache()
+     *
+     * @since 2.0
+     */
+    QString initErrorMessage() const;
 
    /**
     * Returns whether or not APT is configured for installing packages for
@@ -123,8 +135,12 @@ public:
      * Repopulates the internal package cache, package list, and group list.
      * Mostly used internally, like after an update or a package installation
      * or removal.
+     *
+     * @return @c true when the cache reloads successfully. If it returns false,
+     * assume that you cannot call any methods other than initErrorMessage()
+     * safely.
      */
-    void reloadCache();
+    bool reloadCache();
 
     /**
      * Takes a snapshot of the current state of the package cache. (E.g.
@@ -427,7 +443,7 @@ private:
 
     Package *package(pkgCache::PkgIterator &iter) const;
 
-    void throwInitError();
+    void setInitError();
 
 Q_SIGNALS:
     /**
@@ -759,7 +775,6 @@ public Q_SLOTS:
     * events using the workerEvent() signal. Progress is reported by the
     * xapianUpdateProgress() signal.
     *
-    * @see workerEvent()
     * @see xapianUpdateProgress()
     * @see xapianIndexNeedsUpdate()
     */
