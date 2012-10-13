@@ -49,7 +49,6 @@ WorkerInstallProgress::WorkerInstallProgress(QObject* parent, int begin, int end
         , m_progressEnd(end)
 {
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
-    setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
     setenv("APT_LISTBUGS_FRONTEND", "none", 1);
     setenv("APT_LISTCHANGES_FRONTEND", "debconf", 1);
 
@@ -60,6 +59,7 @@ void WorkerInstallProgress::setTransaction(Transaction *trans)
 {
     m_trans = trans;
     std::setlocale(LC_ALL, m_trans->locale().toAscii());
+    setenv("DEBCONF_PIPE", trans->debconfPipe().toAscii(), 1);
 }
 
 pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *pm)
