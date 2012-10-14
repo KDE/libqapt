@@ -38,6 +38,7 @@
 #include "../../src/backend.h"
 #include "../../src/config.h"
 #include "../../src/dependencyinfo.h"
+#include "../../src/transaction.h"
 
 #include "DebCommitWidget.h"
 #include "DebViewer.h"
@@ -50,9 +51,6 @@ DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
 {
     if (!m_backend->init())
         initError();
-
-    connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
-            this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
 
     QFileInfo fi(debFile);
     m_debFile = new QApt::DebFile(fi.absoluteFilePath());
@@ -85,6 +83,9 @@ void DebInstaller::initGUI()
     m_stack = new QStackedWidget(this);
     setMainWidget(m_stack);
 
+    m_commitWidget = new DebCommitWidget(this);
+    m_stack->addWidget(m_commitWidget);
+
     m_debViewer = new DebViewer(m_stack);
     m_debViewer->setBackend(m_backend);
     m_stack->addWidget(m_debViewer);
@@ -111,6 +112,26 @@ void DebInstaller::initGUI()
         m_debViewer->setVersionInfo(m_versionInfo);
     } else {
         m_debViewer->hideVersionInfo();
+    }
+}
+
+void DebInstaller::transactionStatusChanged(QApt::TransactionStatus status)
+{
+    switch (status) {
+    case QApt::DownloadingStatus:
+    case QApt::CommitChangesRole:
+        m_stack->setCurrentWidget(m_commitWidget);
+        break;
+    case QApt::FinishedStatus:
+        if (m_trans->role() == QApt::CommitChangesRole) {
+            // Dependencies installed, now go for the deb file
+            m_trans = m_backend->installFile(*m_debFile);
+            setupTransaction(m_trans);
+            m_trans->run();
+        } else
+            setButtons(KDialog::Close);
+    default:
+        break;
     }
 }
 
@@ -174,63 +195,37 @@ void DebInstaller::initGUI()
 //    }
 //}
 
-//void DebInstaller::errorOccurred(QApt::ErrorCode error, const QVariantMap &args)
-//{
-//    QString text;
-//    QString title;
-//    QString details;
-
-//    switch (error) {
-//        case QApt::InitError: {
-//            text = i18nc("@label",
-//                        "The package system could not be initialized, your "
-//                        "configuration may be broken.");
-//            title = i18nc("@title:window", "Initialization error");
-//            details = args["ErrorText"].toString();
-//            KMessageBox::detailedError(this, text, details, title);
-//            KApplication::instance()->quit();
-//            break;
-//        }
-//        case QApt::WrongArchError:
-//            text = i18nc("@label",
-//                         "This package is incompatible with your computer.");
-//            title = i18nc("@title:window", "Incompatible Package");
-//            details =  i18nc("@info", "Error: Wrong architecture '%1'.",
-//                             args["RequestedArch"].toString());
-//            KMessageBox::detailedError(this, text, details, title);
-//            break;
-//        case QApt::AuthError:
-//            m_applyButton->setEnabled(true);
-//            m_cancelButton->setEnabled(true);
-//            break;
-//        case QApt::UnknownError:
-//        default:
-//            break;
-//    }
-//}
+void DebInstaller::errorOccurred(QApt::ErrorCode error)
+{
+    switch (error) {
+    case QApt::AuthError:
+    case QApt::LockError:
+        m_applyButton->setEnabled(true);
+        m_cancelButton->setEnabled(true);
+        break;
+    default:
+        break;
+    }
+}
 
 void DebInstaller::installDebFile()
 {
     m_applyButton->setEnabled(false);
     m_cancelButton->setEnabled(false);
 
-    m_trans = m_backend->installFile(*m_debFile);
-
-    initCommitWidget();
     if (m_backend->markedPackages().size()) {
-        m_backend->commitChanges();
+        m_trans = m_backend->commitChanges();
     } else {
-        m_backend->installFile(*m_debFile);
+        m_trans = m_backend->installFile(*m_debFile);
     }
+
+    setupTransaction(m_trans);
+    m_trans->run();
 }
 
-void DebInstaller::initCommitWidget()
+void DebInstaller::setupTransaction(QApt::Transaction *trans)
 {
-    m_commitWidget = new DebCommitWidget(this);
-    m_stack->addWidget(m_commitWidget);
 
-    connect(m_backend, SIGNAL(debInstallMessage(QString)),
-            m_commitWidget, SLOT(updateTerminal(QString)));
 }
 
 bool DebInstaller::checkDeb()

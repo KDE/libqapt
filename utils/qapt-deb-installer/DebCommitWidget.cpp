@@ -26,7 +26,12 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 
+// KDE includes
+#include <KMessageBox>
+
+// LibQApt/DebconfKDE includes
 #include <DebconfGui.h>
+#include <LibQApt/Transaction>
 
 // KDE includes
 #include <KLocale>
@@ -66,21 +71,55 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     layout->addWidget(m_progressBar);
 }
 
-DebCommitWidget::~DebCommitWidget()
+void DebCommitWidget::setTransaction(QApt::Transaction *trans)
+{
+    m_trans = trans;
+
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(statusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
+            this, SLOT(transactionErrorOccurred(QApt::ErrorCode)));
+}
+
+void DebCommitWidget::statusChanged(QApt::TransactionStatus status)
 {
 }
 
-void DebCommitWidget::updateDownloadProgress(int progress, int speed, int ETA)
+void DebCommitWidget::errorOccurred(QApt::ErrorCode error)
 {
-    Q_UNUSED(speed);
-    Q_UNUSED(ETA);
+    QString text;
+    QString title;
+    QString details;
 
-    m_progressBar->setValue(progress);
+    switch (error) {
+        case QApt::InitError: {
+            text = i18nc("@label",
+                        "The package system could not be initialized, your "
+                        "configuration may be broken.");
+            title = i18nc("@title:window", "Initialization error");
+            details = m_trans->errorDetails();
+            KMessageBox::detailedError(this, text, details, title);
+            break;
+        }
+        case QApt::WrongArchError:
+            text = i18nc("@label",
+                         "This package is incompatible with your computer.");
+            title = i18nc("@title:window", "Incompatible Package");
+            details =  m_trans->errorDetails();
+            KMessageBox::detailedError(this, text, details, title);
+            break;
+        default:
+            break;
+    }
 }
 
-void DebCommitWidget::updateCommitProgress(const QString &message, int progress)
+void DebCommitWidget::updateProgress(int progress)
 {
-    Q_UNUSED(message);
+    if (progress > 100) {
+        m_progressBar->setMaximum(0);
+        return;
+    } else
+        m_progressBar->setMaximum(100);
 
     m_progressBar->setValue(progress);
 }
@@ -88,11 +127,6 @@ void DebCommitWidget::updateCommitProgress(const QString &message, int progress)
 void DebCommitWidget::updateTerminal(const QString &message)
 {
     m_terminal->insertPlainText(message);
-}
-
-void DebCommitWidget::setHeaderText(const QString &text)
-{
-    m_headerLabel->setText(text);
 }
 
 void DebCommitWidget::showDebconf()

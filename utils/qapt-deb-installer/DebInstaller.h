@@ -76,11 +76,11 @@ private:
 private Q_SLOTS:
     void initGUI();
 
-    //void workerEvent(QApt::WorkerEvent event);
-    //void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
+    void transactionStatusChanged(QApt::TransactionStatus status);
+    void errorOccurred(QApt::ErrorCode error);
 
+    void setupTransaction(QApt::Transaction *trans);
     void installDebFile();
-    void initCommitWidget();
 };
 
 #endif
