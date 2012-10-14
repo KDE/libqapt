@@ -22,8 +22,10 @@
 #define APTWORKER_H
 
 #include <QtCore/QMutex>
-#include <QtCore/QObject>
+#include <QtCore/QProcess>
 #include <QtCore/QVector>
+
+class QProcess;
 
 class pkgCacheFile;
 class pkgRecords;
@@ -50,6 +52,7 @@ private:
     QVector<AptLock *> m_locks;
     QMutex m_timestampMutex;
     quint64 m_lastActiveTimestamp;
+    QProcess *m_dpkgProcess;
 
     /**
      * If the locks on the package system cannot be immediately taken, this
@@ -73,12 +76,24 @@ private:
      */
     void updateCache();
 
+    /**
+     * Marks changes as definied by the current transaction
+     */
     bool markChanges();
 
+    /**
+     * Runs an APT commit
+     */
     void commitChanges();
 
+    /**
+     * Upgrades packages
+     */
     void upgradeSystem();
 
+    /**
+     * Installs a Debian package file by calling dpkg
+     */
     void installFile();
 
     /**
@@ -103,7 +118,16 @@ public slots:
      */
     void runTransaction(Transaction *trans);
 
+    /**
+     * Stops the separate thread that AptWorker lives in. Call this before
+     * exit to prevent the thread from whining that it was destroyed on shutdown.
+     */
     void quit();
+
+private slots:
+    void dpkgStarted();
+    void updateDpkgProgress();
+    void dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus);
 };
 
 #endif // APTWORKER_H

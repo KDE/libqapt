@@ -24,6 +24,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
 #include <QtCore/QThread>
 #include <QtCore/QDebug>
@@ -563,11 +564,6 @@ void AptWorker::commitChanges()
     openCache(91, 95);
 }
 
-void AptWorker::installFile()
-{
-    QApt::DebFile file(m_trans->filePath());
-}
-
 void AptWorker::downloadArchives()
 {
     // Initialize fetcher with our progress watcher
@@ -627,4 +623,62 @@ void AptWorker::downloadArchives()
 
     delete acquire;
     return;
+}
+
+void AptWorker::installFile()
+{
+    m_trans->setStatus(QApt::RunningStatus);
+    QApt::DebFile deb(m_trans->filePath());
+
+    QString debArch = deb.architecture();
+
+    QStringList archList;
+    archList.append(QLatin1String("all"));
+    std::vector<std::string> archs = APT::Configuration::getArchitectures(false);
+
+    for (std::string &arch : archs)
+         archList.append(QString::fromStdString(arch));
+
+    if (!archList.contains(debArch)) {
+        m_trans->setError(QApt::WrongArchError);
+        m_trans->setErrorDetails(debArch);
+        return;
+    }
+
+    m_dpkgProcess = new QProcess(this);
+    QString program = QLatin1String("dpkg") %
+            QLatin1String(" -i ") % '"' % m_trans->filePath() % '"';
+    setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
+    setenv("DEBIAN_FRONTEND", "passthrough", 1);
+    setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
+    m_dpkgProcess->start(program);
+    connect(m_dpkgProcess, SIGNAL(started()), this, SLOT(dpkgStarted()));
+    connect(m_dpkgProcess, SIGNAL(readyRead()), this, SLOT(updateDpkgProgress()));
+    connect(m_dpkgProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
+            this, SLOT(dpkgFinished(int,QProcess::ExitStatus)));
+}
+
+void AptWorker::dpkgStarted()
+{
+    m_trans->setStatus(QApt::CommittingStatus);
+}
+
+void AptWorker::updateDpkgProgress()
+{
+    QString str = m_dpkgProcess->readLine();
+
+    m_trans->setStatusDetails(str);
+}
+
+void AptWorker::dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitCode);
+
+    if (exitStatus) {
+        m_trans->setError(QApt::CommitError);
+        m_trans->setErrorDetails(m_dpkgProcess->readAllStandardError());
+    }
+
+    m_dpkgProcess->deleteLater();
+    m_dpkgProcess = nullptr;
 }
