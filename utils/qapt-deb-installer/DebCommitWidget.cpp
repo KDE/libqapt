@@ -21,6 +21,8 @@
 #include "DebCommitWidget.h"
 
 // Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QStringBuilder>
 #include <QtCore/QUuid>
 #include <QtGui/QLabel>
 #include <QtGui/QProgressBar>
@@ -60,7 +62,7 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
 
     QString uuid = QUuid::createUuid().toString();
     uuid.remove('{').remove('}').remove('-');
-    m_pipe = QLatin1String("/tmp/qapt-sock-") + uuid;
+    m_pipe = QDir::tempPath() % QLatin1String("/qapt-sock-") % uuid;
 
     m_debconfGui = new DebconfKde::DebconfGui(m_pipe, this);
     m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
