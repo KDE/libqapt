@@ -27,6 +27,7 @@
 #include <KApplication>
 #include <KIcon>
 #include <KLocale>
+#include <KProtocolManager>
 #include <KPushButton>
 #include <KMessageBox>
 #include <KDebug>
@@ -83,12 +84,12 @@ void DebInstaller::initGUI()
     m_stack = new QStackedWidget(this);
     setMainWidget(m_stack);
 
-    m_commitWidget = new DebCommitWidget(this);
-    m_stack->addWidget(m_commitWidget);
-
     m_debViewer = new DebViewer(m_stack);
     m_debViewer->setBackend(m_backend);
     m_stack->addWidget(m_debViewer);
+
+    m_commitWidget = new DebCommitWidget(this);
+    m_stack->addWidget(m_commitWidget);
 
     if (!m_debFile->isValid()) {
         QString text = i18nc("@label",
@@ -118,12 +119,14 @@ void DebInstaller::initGUI()
 void DebInstaller::transactionStatusChanged(QApt::TransactionStatus status)
 {
     switch (status) {
+    case QApt::RunningStatus:
     case QApt::DownloadingStatus:
     case QApt::CommitChangesRole:
         m_stack->setCurrentWidget(m_commitWidget);
         break;
     case QApt::FinishedStatus:
         if (m_trans->role() == QApt::CommitChangesRole) {
+            delete m_trans;
             // Dependencies installed, now go for the deb file
             m_trans = m_backend->installFile(*m_debFile);
             setupTransaction(m_trans);
@@ -134,66 +137,6 @@ void DebInstaller::transactionStatusChanged(QApt::TransactionStatus status)
         break;
     }
 }
-
-//void DebInstaller::workerEvent(QApt::WorkerEvent event)
-//{
-//    switch (event) {
-//    case QApt::PackageDownloadStarted:
-//        if (m_commitWidget) {
-//            m_stack->setCurrentWidget(m_commitWidget);
-//            m_commitWidget->showProgress();
-//            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are downloading",
-//                                                "<title>Downloading Dependencies</title>"));
-
-//            connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
-//                m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
-//        }
-//        break;
-//    case QApt::PackageDownloadFinished:
-//        if (m_commitWidget) {
-//            disconnect(m_backend, SIGNAL(downloadProgress(int,int,int)),
-//                       m_commitWidget, SLOT(updateDownloadProgress(int,int,int)));
-//        }
-//        break;
-//    case QApt::CommitChangesStarted:
-//        if (m_commitWidget) {
-//            m_commitWidget->setHeaderText(i18nc("@info Header label used when packages are installing",
-//                                                "<title>Installing Dependencies</title>"));
-
-//            connect(m_backend, SIGNAL(commitProgress(QString,int)),
-//                    m_commitWidget, SLOT(updateCommitProgress(QString,int)));
-//        }
-//        break;
-//    case QApt::CommitChangesFinished:
-//        if (m_commitWidget) {
-//            m_commitWidget->hideProgress();
-
-//            disconnect(m_backend, SIGNAL(commitProgress(QString,int)),
-//                       m_commitWidget, SLOT(updateCommitProgress(QString,int)));
-
-//            m_backend->installFile(*m_debFile);
-//        }
-//        break;
-//    case QApt::DebInstallStarted:
-//        if (m_commitWidget) {
-//            m_commitWidget->hideProgress();
-//            m_stack->setCurrentWidget(m_commitWidget);
-//        }
-//        break;
-//    case QApt::DebInstallFinished:
-//        if (m_commitWidget) {
-//            m_commitWidget->updateTerminal(i18nc("@label Message that the install is done",
-//                                                "Done"));
-//            m_commitWidget->setHeaderText(i18nc("@info Header label used when the install is done",
-//                                                "<title>Done</title>"));
-//        }
-//        setButtons(KDialog::Close);
-//        break;
-//    case QApt::InvalidEvent:
-//    default:
-//        break;
-//    }
-//}
 
 void DebInstaller::errorOccurred(QApt::ErrorCode error)
 {
@@ -225,7 +168,20 @@ void DebInstaller::installDebFile()
 
 void DebInstaller::setupTransaction(QApt::Transaction *trans)
 {
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
 
+    trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    trans->setDebconfPipe(m_commitWidget->pipe());
+    m_commitWidget->setTransaction(m_trans);
+
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
+            this, SLOT(errorOccurred(QApt::ErrorCode)));
 }
 
 bool DebInstaller::checkDeb()

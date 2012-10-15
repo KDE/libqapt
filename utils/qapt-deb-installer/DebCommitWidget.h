@@ -43,10 +43,12 @@ class DebCommitWidget : public QWidget
 public:
     explicit DebCommitWidget(QWidget *parent = 0);
 
+    QString pipe() const;
     void setTransaction(QApt::Transaction *trans);
 
 private:
     QApt::Transaction *m_trans;
+    QString m_pipe;
     QLabel *m_headerLabel;
     QTextEdit *m_terminal;
     DebconfKde::DebconfGui *m_debconfGui;

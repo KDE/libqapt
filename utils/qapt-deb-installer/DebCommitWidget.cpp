@@ -21,6 +21,7 @@
 #include "DebCommitWidget.h"
 
 // Qt includes
+#include <QtCore/QUuid>
 #include <QtGui/QLabel>
 #include <QtGui/QProgressBar>
 #include <QtGui/QTextEdit>
@@ -57,7 +58,11 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     m_terminal->setPalette(p);
     m_terminal->setFrameShape(QFrame::NoFrame);
 
-    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock", this);
+    QString uuid = QUuid::createUuid().toString();
+    uuid.remove('{').remove('}').remove('-');
+    m_pipe = QLatin1String("/tmp/qapt-sock-") + uuid;
+
+    m_debconfGui = new DebconfKde::DebconfGui(m_pipe, this);
     m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
     m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
     m_debconfGui->hide();
@@ -71,6 +76,11 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     layout->addWidget(m_progressBar);
 }
 
+QString DebCommitWidget::pipe() const
+{
+    return m_pipe;
+}
+
 void DebCommitWidget::setTransaction(QApt::Transaction *trans)
 {
     m_trans = trans;
@@ -78,11 +88,56 @@ void DebCommitWidget::setTransaction(QApt::Transaction *trans)
     connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
             this, SLOT(statusChanged(QApt::TransactionStatus)));
     connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
-            this, SLOT(transactionErrorOccurred(QApt::ErrorCode)));
+            this, SLOT(errorOccurred(QApt::ErrorCode)));
 }
 
 void DebCommitWidget::statusChanged(QApt::TransactionStatus status)
 {
+    switch (status) {
+    case QApt::SetupStatus:
+    case QApt::WaitingStatus:
+    case QApt::AuthenticationStatus:
+        m_progressBar->setMaximum(0);
+        m_headerLabel->setText(i18nc("@info Status information, widget title",
+                                     "<title>Starting</title>"));
+        break;
+    case QApt::WaitingMediumStatus:
+    case QApt::WaitingLockStatus:
+    case QApt::WaitingConfigFilePromptStatus:
+        m_progressBar->setMaximum(0);
+        m_headerLabel->setText(i18nc("@info Status information, widget title",
+                                     "<title>Waiting</title>"));
+        break;
+    case QApt::RunningStatus:
+        // We're ready for "real" progress now
+        m_progressBar->setMaximum(100);
+        break;
+    case QApt::LoadingCacheStatus:
+        m_headerLabel->setText(i18nc("@info Status info",
+                                     "<title>Loading Software List</title>"));
+        break;
+    case QApt::DownloadingStatus:
+        m_progressBar->setMaximum(100);
+        m_headerLabel->setText(i18nc("@info Status information, widget title",
+                                     "<title>Downloading Packages</title>"));
+        showProgress();
+        break;
+    case QApt::CommittingStatus:
+        m_headerLabel->setText(i18nc("@info Status information, widget title",
+                                     "<title>Committing Changes</title>"));
+        hideProgress();
+        break;
+    case QApt::FinishedStatus:
+        if (m_trans->role() == QApt::InstallFileRole) {
+            updateTerminal(i18nc("@label Message that the install is done",
+                                 "Done"));
+            m_headerLabel->setText(i18nc("@info Header label used when the install is done",
+                                         "<title>Done</title>"));
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void DebCommitWidget::errorOccurred(QApt::ErrorCode error)

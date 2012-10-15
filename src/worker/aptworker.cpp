@@ -212,6 +212,7 @@ void AptWorker::runTransaction(Transaction *trans)
         break;
     case QApt::InstallFileRole:
         installFile();
+        m_dpkgProcess->waitForFinished();
         break;
     case QApt::DownloadArchivesRole:
         downloadArchives();
