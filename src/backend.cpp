@@ -732,42 +732,44 @@ QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, Pa
 
         int status = pkg->state();
 
-        if (oldState.at(i) != status) {
-            // These flags will never be set together.
-            status &= (Package::Held |
-                       Package::NewInstall |
-                       Package::ToReInstall |
-                       Package::ToUpgrade |
-                       Package::ToDowngrade |
-                       Package::ToRemove);
+        if (oldState.at(i) == status)
+            continue;
 
-            PackageList list;
-            if (status & Package::ToUpgrade) {
-                list = changes.value(Package::ToUpgrade);
-                list.append(pkg);
-                changes[Package::ToUpgrade]= list;
-            } else if (status & Package::NewInstall) {
-                list = changes.value(Package::NewInstall);
-                list.append(pkg);
-                changes[Package::NewInstall]= list;
-            } else if (status & Package::ToReInstall) {
-                list = changes.value(Package::ToReInstall);
-                list.append(pkg);
-                changes[Package::ToReInstall]= list;
-            } else if (status & Package::ToDowngrade) {
-                list = changes.value(Package::ToDowngrade);
-                list.append(pkg);
-                changes[Package::ToDowngrade]= list;
-            } else if (status & Package::ToRemove) {
-                list = changes.value(Package::ToRemove);
-                list.append(pkg);
-                changes[Package::ToRemove]= list;
-            } else if (status & Package::ToKeep) {
-                list = changes.value(Package::ToKeep);
-                list.append(pkg);
-                changes[Package::ToKeep]= list;
-            }
+        // These flags will never be set together.
+        status &= (Package::Held |
+                   Package::NewInstall |
+                   Package::ToReInstall |
+                   Package::ToUpgrade |
+                   Package::ToDowngrade |
+                   Package::ToRemove);
+
+        PackageList list;
+        if (status & Package::ToUpgrade) {
+            list = changes.value(Package::ToUpgrade);
+            list.append(pkg);
+            changes[Package::ToUpgrade]= list;
+        } else if (status & Package::NewInstall) {
+            list = changes.value(Package::NewInstall);
+            list.append(pkg);
+            changes[Package::NewInstall]= list;
+        } else if (status & Package::ToReInstall) {
+            list = changes.value(Package::ToReInstall);
+            list.append(pkg);
+            changes[Package::ToReInstall]= list;
+        } else if (status & Package::ToDowngrade) {
+            list = changes.value(Package::ToDowngrade);
+            list.append(pkg);
+            changes[Package::ToDowngrade]= list;
+        } else if (status & Package::ToRemove) {
+            list = changes.value(Package::ToRemove);
+            list.append(pkg);
+            changes[Package::ToRemove]= list;
+        } else if (status & Package::ToKeep) {
+            list = changes.value(Package::ToKeep);
+            list.append(pkg);
+            changes[Package::ToKeep]= list;
         }
+
     }
 
     return changes;
