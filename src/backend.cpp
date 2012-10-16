@@ -726,19 +726,20 @@ QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, Pa
 
     for (int i = 0; i < d->packages.size(); ++i) {
         Package *pkg = d->packages.at(i);
-        int flags = pkg->state();
 
-        if (oldState.at(i) != flags) {
+        if (excluded.contains(pkg))
+            continue;
+
+        int status = pkg->state();
+
+        if (oldState.at(i) != status) {
             // These flags will never be set together.
-            int status = flags & (Package::Held |
-                                  Package::NewInstall |
-                                  Package::ToReInstall |
-                                  Package::ToUpgrade |
-                                  Package::ToDowngrade |
-                                  Package::ToRemove);
-
-            if (excluded.contains(pkg))
-                continue;
+            status &= (Package::Held |
+                       Package::NewInstall |
+                       Package::ToReInstall |
+                       Package::ToUpgrade |
+                       Package::ToDowngrade |
+                       Package::ToRemove);
 
             PackageList list;
             if (status & Package::ToUpgrade) {
