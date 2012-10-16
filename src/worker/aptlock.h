@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,35 +18,26 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef WORKERINSTALLPROGRESS_H
-#define WORKERINSTALLPROGRESS_H
+#ifndef APTLOCK_H
+#define APTLOCK_H
 
-#include <QtCore/QRegExp>
-#include <QtCore/QVariantMap>
+#include <QtCore/QString>
 
-#include <apt-pkg/packagemanager.h>
+#include <apt-pkg/fileutl.h>
 
-class Transaction;
-
-class WorkerInstallProgress : public QObject
+class AptLock
 {
-    Q_OBJECT
 public:
-    WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
+    AptLock(const QString &path);
 
-    void setTransaction(Transaction *trans);
-    pkgPackageManager::OrderResult start(pkgPackageManager *pm);
+    bool isLocked() const;
+    bool acquire();
+    void release();
 
 private:
-    Transaction *m_trans;
-    QRegExp m_ansiRegex;
-
-    pid_t m_child_id;
-    bool m_startCounting;
-    int m_progressBegin;
-    int m_progressEnd;
-
-    void updateInterface(int fd, int writeFd);
+    QByteArray m_path;
+    int m_fd;
+    FileFd m_lock;
 };
 
-#endif
+#endif // APTLOCK_H

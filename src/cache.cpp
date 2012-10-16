@@ -29,9 +29,7 @@ namespace QApt {
 class CacheBuildProgress : public OpProgress
 {
 public:
-    CacheBuildProgress(){}
-
-    virtual void Update() {
+    void Update() {
         // Evil but Necessary, libapt-pkg not thread safe, afaict
         QCoreApplication::processEvents();
     }
@@ -41,12 +39,12 @@ class CachePrivate
 {
 public:
     CachePrivate()
-        : cache(0)
+        : cache(new pkgCacheFile())
         , trustCache(new QHash<pkgCache::PkgFileIterator, pkgIndexFile*>)
     {
     }
 
-    virtual ~CachePrivate()
+    ~CachePrivate()
     {
         delete cache;
         delete trustCache;
@@ -73,22 +71,12 @@ bool Cache::open()
 {
     Q_D(Cache);
 
-    // delete any old structures
-    delete d->cache;
-    d->cache = 0;
-
-    bool shouldLock = false;//(geteuid() == 0);
-
-    d->cache = new pkgCacheFile();
-
-    // Build the cache
-    if (!d->cache->Open(&d->progressMeter, shouldLock)) {
-        return false;
-    }
-
+    // Close cache in case it's been opened
+    d->cache->Close();
     d->trustCache->clear();
 
-    return true;
+    // Build the cache, return whether it opened
+    return d->cache->ReadOnlyOpen(&d->progressMeter);
 }
 
 pkgDepCache *Cache::depCache() const

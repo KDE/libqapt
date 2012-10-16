@@ -23,7 +23,7 @@
 
 #include <KMainWindow>
 
-#include <../src/backend.h>
+#include <../src/globals.h>
 
 class QLabel;
 class QPushButton;
@@ -35,6 +35,13 @@ class KLineEdit;
 class CacheUpdateWidget;
 class CommitWidget;
 
+namespace QApt {
+    class Backend;
+    class Package;
+    class Transaction;
+    class DownloadProgress;
+}
+
 namespace DebconfKde {
     class DebconfGui;
 }
@@ -45,23 +52,19 @@ class QAptTest : public KMainWindow
 public:
     QAptTest();
 
-    virtual ~QAptTest();
-
 private Q_SLOTS:
     void updateLabels();
     void updateCache();
     void commitAction();
     void upgrade();
-    void workerEvent(QApt::WorkerEvent event);
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateDownloadMessage(int flag, const QString &name);
-    void updateCommitProgress(const QString& message, int percentage);
+    void onTransactionStatusChanged(QApt::TransactionStatus status);
     void updateStatusBar();
 
 private:
     QApt::Backend *m_backend;
     QApt::Package *m_package;
     QApt::Group *m_group;
+    QApt::Transaction *m_trans;
 
     QStackedWidget *m_stack;
     QWidget *m_mainWidget;

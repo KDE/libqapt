@@ -49,15 +49,14 @@ class Q_DECL_EXPORT Cache : public QObject
     Q_OBJECT
 public:
      /**
-      * Default constructor
+      * Constructor
       */
     explicit Cache(QObject* parent);
 
      /**
-      * Default destructor
+      * Destructor
       */
-     // TODO: QApt2: Nah
-    virtual ~Cache();
+    ~Cache();
 
     /**
      * Returns a pointer to the interal dependency cache, which keeps track of
@@ -98,7 +97,7 @@ protected:
     CachePrivate *const d_ptr;
 
 private:
-    Q_DECLARE_PRIVATE(Cache);
+    Q_DECLARE_PRIVATE(Cache)
 };
 
 }

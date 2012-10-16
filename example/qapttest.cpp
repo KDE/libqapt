@@ -32,10 +32,12 @@
 #include <KGlobal>
 #include <KLocale>
 #include <KLineEdit>
+#include <KProtocolManager>
 #include <KStatusBar>
 #include <KVBox>
 
-#include <libqapt/debfile.h>
+#include <LibQApt/Backend>
+#include <LibQApt/Transaction>
 
 #include <DebconfGui.h>
 
@@ -44,20 +46,15 @@
 
 QAptTest::QAptTest()
     : KMainWindow()
+    , m_trans(0)
     , m_stack(0)
 {
     setWindowIcon(KIcon("application-x-deb"));
 
-    m_backend = new QApt::Backend();
+    m_backend = new QApt::Backend(this);
     m_backend->init();
 
     connect(m_backend, SIGNAL(packageChanged()), this, SLOT(updateStatusBar()));
-    connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)), this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_backend, SIGNAL(downloadProgress(int,int,int)), this, SLOT(updateDownloadProgress(int,int,int)));
-    connect(m_backend, SIGNAL(downloadMessage(int,QString)),
-            this, SLOT(updateDownloadMessage(int,QString)));
-    connect(m_backend, SIGNAL(commitProgress(QString,int)),
-            this, SLOT(updateCommitProgress(QString,int)));
 
     m_stack = new QStackedWidget(this);
 
@@ -76,7 +73,7 @@ QAptTest::QAptTest()
     layout->addWidget(topHBox);
 
     m_lineEdit = new KLineEdit(topHBox);
-    m_lineEdit->setText("kdelibs5");
+    m_lineEdit->setText("muon");
     m_lineEdit->setClearButtonShown(true);
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(updateLabels()));
 
@@ -126,16 +123,9 @@ QAptTest::QAptTest()
     updateStatusBar();
     setCentralWidget(m_stack);
 
-    // Lists all packages in the KDE section via kDebug(), uncomment to see in Konsole
-//     m_group = m_backend->group("kde");
-//     QApt::PackageList packageList = m_group->packages();
-//     foreach (QApt::Package *package, packageList) {
-//             kDebug() << package->name();
-//     }
-}
-
-QAptTest::~QAptTest()
-{
+    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock");
+    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
 }
 
 void QAptTest::updateLabels()
@@ -198,17 +188,58 @@ void QAptTest::updateLabels()
 
 void QAptTest::updateCache()
 {
-    m_backend->updateCache();
+    if (m_trans) // Transaction running, you could queue these though
+        return;
+
+    m_trans = m_backend->updateCache();
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Pass the new current transaction on to our child widgets
+    m_cacheUpdateWidget->setTransaction(m_trans);
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+
+    m_trans->run();
 }
 
 void QAptTest::upgrade()
 {
-    m_backend->markPackagesForDistUpgrade();
-    m_backend->commitChanges();
+    if (m_trans) // Transaction running, you could queue these though
+        return;
+
+    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock");
+    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
+
+    m_trans = m_backend->upgradeSystem(QApt::FullUpgrade);
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Pass the new current transaction on to our child widgets
+    m_cacheUpdateWidget->setTransaction(m_trans);
+    m_commitWidget->setTransaction(m_trans);
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+
+    m_trans->run();
 }
 
 void QAptTest::commitAction()
 {
+    if (m_trans) // Transaction running, you could queue these though
+        return;
+
     if (!m_package->isInstalled()) {
         m_package->setInstall();
     } else {
@@ -219,77 +250,58 @@ void QAptTest::commitAction()
         m_package->setInstall();
     }
 
-    m_debconfGui = new DebconfKde::DebconfGui("/tmp/qapt-sock");
-    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), m_debconfGui, SLOT(show()));
-    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), m_debconfGui, SLOT(hide()));
+    m_trans = m_backend->commitChanges();
 
-    m_backend->commitChanges();
-}
-
-void QAptTest::workerEvent(QApt::WorkerEvent event)
-{
-    switch (event) {
-        case QApt::CacheUpdateStarted:
-            m_cacheUpdateWidget->clear();
-            m_cacheUpdateWidget->setHeaderText(i18n("<b>Updating software sources</b>"));
-            m_stack->setCurrentWidget(m_cacheUpdateWidget);
-            connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
-            break;
-        case QApt::CacheUpdateFinished:
-            updateStatusBar();
-            m_stack->setCurrentWidget(m_mainWidget);
-            break;
-        case QApt::PackageDownloadStarted:
-            m_cacheUpdateWidget->clear();
-            m_cacheUpdateWidget->setHeaderText(i18n("<b>Downloading Packages</b>"));
-            m_stack->setCurrentWidget(m_cacheUpdateWidget);
-            connect(m_cacheUpdateWidget, SIGNAL(cancelCacheUpdate()), m_backend, SLOT(cancelDownload()));
-            break;
-        case QApt::PackageDownloadFinished:
-            updateStatusBar();
-            m_stack->setCurrentWidget(m_mainWidget);
-            break;
-        case QApt::CommitChangesStarted:
-            m_commitWidget->clear();
-            m_stack->setCurrentWidget(m_commitWidget);
-            break;
-        case QApt::CommitChangesFinished:
-            updateStatusBar();
-            m_stack->setCurrentWidget(m_mainWidget);
-            break;
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
     }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Pass the new current transaction on to our child widgets
+    m_cacheUpdateWidget->setTransaction(m_trans);
+    m_commitWidget->setTransaction(m_trans);
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(onTransactionStatusChanged(QApt::TransactionStatus)));
+
+    m_trans->run();
 }
 
-void QAptTest::updateDownloadProgress(int percentage, int speed, int ETA)
+void QAptTest::onTransactionStatusChanged(QApt::TransactionStatus status)
 {
-    m_cacheUpdateWidget->setTotalProgress(percentage, speed, ETA);
-}
+    QString headerText;
 
-void QAptTest::updateDownloadMessage(int flag, const QString &message)
-{
-    QString fullMessage;
+    switch (status) {
+    case QApt::RunningStatus:
+        // For roles that start by downloading something, switch to download view
+        if (m_trans->role() == (QApt::UpdateCacheRole || QApt::UpgradeSystemRole ||
+                                QApt::CommitChangesRole || QApt::DownloadArchivesRole ||
+                                QApt::InstallFileRole)) {
+            m_stack->setCurrentWidget(m_cacheUpdateWidget);
+        }
+        break;
+    case QApt::DownloadingStatus:
+        m_stack->setCurrentWidget(m_cacheUpdateWidget);
+        break;
+    case QApt::CommittingStatus:
+        m_stack->setCurrentWidget(m_commitWidget);
+        break;
+    case QApt::FinishedStatus:
+        // FIXME: Determine which transactions need to reload cache on completion
+        m_backend->reloadCache();
+        m_stack->setCurrentWidget(m_mainWidget);
+        updateStatusBar();
 
-    switch (flag) {
-      case QApt::DownloadFetch:
-          fullMessage = i18n("Downloading: %1", message);
-          break;
-      case QApt::HitFetch:
-          fullMessage = i18n("Checking: %1", message);
-          break;
-      case QApt::IgnoredFetch:
-          fullMessage = i18n("Ignored: %1", message);
-          break;
-      default:
-          fullMessage = message;
+        // Clean up transaction object
+        m_trans->deleteLater();
+        m_trans = 0;
+        delete m_debconfGui;
+        m_debconfGui = 0;
+        break;
+    default:
+        break;
     }
-    m_cacheUpdateWidget->addItem(fullMessage);
-}
-
-void QAptTest::updateCommitProgress(const QString& message, int percentage)
-{
-    m_commitWidget->setLabelText(message);
-    m_commitWidget->setProgress(percentage);
-    qDebug() << message;
 }
 
 void QAptTest::updateStatusBar()
@@ -304,5 +316,3 @@ void QAptTest::updateStatusBar()
                                          m_backend->packageCount(QApt::Package::ToUpgrade),
                                          m_backend->packageCount(QApt::Package::ToRemove)));
 }
-
-#include "qapttest.moc"

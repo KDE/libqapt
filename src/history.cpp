@@ -24,18 +24,35 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
+#include <QtCore/QSharedData>
+#include <QtCore/QStringBuilder>
 
 // APT includes
 #include <apt-pkg/configuration.h>
 
 namespace QApt {
 
-class HistoryItemPrivate
+class HistoryItemPrivate : public QSharedData
 {
     public:
-        HistoryItemPrivate(const QString &data) : isValid(true)
+        HistoryItemPrivate(const QString &data)
+            : QSharedData()
+            , isValid(true)
         {
             parseData(data);
+        }
+
+         HistoryItemPrivate(const HistoryItemPrivate &other)
+            : QSharedData(other)
+            , startDate(other.startDate)
+            , installedPackages(other.installedPackages)
+            , upgradedPackages(other.upgradedPackages)
+            , downgradedPackages(other.downgradedPackages)
+            , removedPackages(other.removedPackages)
+            , purgedPackages(other.purgedPackages)
+            , error(other.error)
+            , isValid(other.isValid)
+        {
         }
 
         // Data
@@ -109,9 +126,9 @@ void HistoryItemPrivate::parseData(const QString &data)
 
             QString actionPackages = keyValue.value(1);
             // Remove arch info
-            actionPackages.remove(QRegExp(":\\w+"));
+            actionPackages.remove(QRegExp(QLatin1String(":\\w+")));
 
-            Q_FOREACH (QString package, actionPackages.split("), ")) {
+            for (QString package : actionPackages.split(QLatin1String("), "))) {
                 if (!package.endsWith(QLatin1Char(')'))) {
                     package.append(QLatin1Char(')'));
                 }
@@ -145,68 +162,56 @@ void HistoryItemPrivate::parseData(const QString &data)
 }
 
 HistoryItem::HistoryItem(const QString &data)
-       : d_ptr(new HistoryItemPrivate(data))
+       : d(new HistoryItemPrivate(data))
 {
+}
+
+HistoryItem::HistoryItem(const HistoryItem &other)
+{
+    d = other.d;
 }
 
 HistoryItem::~HistoryItem()
 {
-    delete d_ptr;
 }
 
 QDateTime HistoryItem::startDate() const
 {
-    Q_D(const HistoryItem);
-
     return d->startDate;
 }
 
 QStringList HistoryItem::installedPackages() const
 {
-    Q_D(const HistoryItem);
-
     return d->installedPackages;
 }
 
 QStringList HistoryItem::upgradedPackages() const
 {
-    Q_D(const HistoryItem);
-
     return d->upgradedPackages;
 }
 
 QStringList HistoryItem::downgradedPackages() const
 {
-    Q_D(const HistoryItem);
-
     return d->downgradedPackages;
 }
 
 QStringList HistoryItem::removedPackages() const
 {
-    Q_D(const HistoryItem);
-
     return d->removedPackages;
 }
 
 QStringList HistoryItem::purgedPackages() const
 {
-    Q_D(const HistoryItem);
-
     return d->purgedPackages;
 }
 
 QString HistoryItem::errorString() const
 {
-    Q_D(const HistoryItem);
-
     return d->error;
 }
 
 bool HistoryItem::isValid() const
 {
-    Q_D(const HistoryItem);
-
     return d->isValid;
 }
 
@@ -218,11 +223,6 @@ class HistoryPrivate
         HistoryPrivate(const QString &fileName) : historyFilePath(fileName)
         {
             init();
-        }
-
-        ~HistoryPrivate()
-        {
-            qDeleteAll(historyItemList);
         }
 
         // Data
@@ -241,17 +241,19 @@ void HistoryPrivate::init()
     QDir logDirectory(directoryPath);
     QStringList logFiles = logDirectory.entryList(QDir::Files, QDir::Name);
 
-    Q_FOREACH (QString file, logFiles) {
-        file.prepend(directoryPath + QLatin1Char('/'));
-        if (file.contains(QLatin1String("history"))) {
-            if (file.endsWith(QLatin1String(".gz"))) {
+    QString fullPath;
+
+    for (const QString &file : logFiles) {
+        fullPath = directoryPath % '/' % file;
+        if (fullPath.contains(QLatin1String("history"))) {
+            if (fullPath.endsWith(QLatin1String(".gz"))) {
                 QProcess gunzip;
-                gunzip.start(QLatin1String("gunzip"), QStringList() << QLatin1String("-c") << file);
+                gunzip.start(QLatin1String("gunzip"), QStringList() << QLatin1String("-c") << fullPath);
                 gunzip.waitForFinished();
 
                 data.append(gunzip.readAll());
             } else {
-                QFile historyFile(file);
+                QFile historyFile(fullPath);
 
                 if (historyFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
                     data.append(historyFile.readAll());
@@ -262,9 +264,9 @@ void HistoryPrivate::init()
 
     data = data.trimmed();
     QStringList stanzas = data.split(QLatin1String("\n\n"));
-    Q_FOREACH(const QString &stanza, stanzas) {
-        HistoryItem *historyItem = new HistoryItem(stanza);
-        if (historyItem->isValid()) {
+    for (const QString &stanza : stanzas) {
+        const HistoryItem historyItem(stanza);
+        if (historyItem.isValid()) {
             historyItemList << historyItem;
         } else {
             delete historyItem;
@@ -273,8 +275,8 @@ void HistoryPrivate::init()
 }
 
 History::History(QObject *parent)
-       : QObject(parent)
-       , d_ptr(new HistoryPrivate(QLatin1String(_config->FindFile("Dir::Log::History").c_str())))
+        : QObject(parent)
+        , d_ptr(new HistoryPrivate(QLatin1String(_config->FindFile("Dir::Log::History").c_str())))
 {
 }
 
@@ -294,9 +296,7 @@ void History::reload()
 {
     Q_D(History);
 
-    qDeleteAll(d->historyItemList);
     d->historyItemList.clear();
-
     d->init();
 }
  

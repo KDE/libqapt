@@ -21,59 +21,41 @@
 #ifndef WORKERACQUIRE_H
 #define WORKERACQUIRE_H
 
-#include <QtCore/QVariantMap>
+// Qt includes
+#include <QtCore/QObject>
 
+// Apt-pkg includes
 #include <apt-pkg/acquire.h>
 
-#include "globals.h"
-
-class QEventLoop;
-class QAptWorker;
+class Transaction;
 
 class WorkerAcquire : public QObject, public pkgAcquireStatus
 {
     Q_OBJECT
-    Q_ENUMS(FetchType)
 public:
-    explicit WorkerAcquire(QAptWorker *parent);
-    virtual ~WorkerAcquire();
+    explicit WorkerAcquire(QObject *parent, int begin = 0, int end = 100);
 
-    virtual void Start();
-    virtual void IMSHit(pkgAcquire::ItemDesc &Itm);
-    virtual void Fetch(pkgAcquire::ItemDesc &Itm);
-    virtual void Done(pkgAcquire::ItemDesc &Itm);
-    virtual void Fail(pkgAcquire::ItemDesc &Itm);
-    virtual void Stop();
-    virtual bool MediaChange(string Media, string Drive);
+    void Start();
+    void IMSHit(pkgAcquire::ItemDesc &Itm);
+    void Fetch(pkgAcquire::ItemDesc &Itm);
+    void Done(pkgAcquire::ItemDesc &Itm);
+    void Fail(pkgAcquire::ItemDesc &Itm);
+    void Stop();
+    bool MediaChange(string Media, string Drive);
 
     bool Pulse(pkgAcquire *Owner);
 
-    bool wasCancelled() const;
+    void setTransaction(Transaction *trans);
 
 private:
-    QVariantMap askQuestion(int questionCode, const QVariantMap &args);
-
-    QAptWorker *m_worker;
-    QEventLoop *m_mediaBlock;
-    QVariantMap m_questionResponse;
+    Transaction *m_trans;
     bool m_calculatingSpeed;
-    bool m_cancelled;
-
-public Q_SLOTS:
-    void requestCancel();
+    int m_progressBegin;
+    int m_progressEnd;
+    int m_lastProgress;
 
 private Q_SLOTS:
-    void setAnswer(const QVariantMap &response);
-    void updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status);
-
-signals:
-    void fetchError(int errorCode, const QVariantMap &details);
-    void fetchWarning(int warningCode, const QVariantMap &details);
-    void workerQuestion(int questionCode, const QVariantMap &args);
-    void downloadProgress(int percentage, int speed, int ETA);
-    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
-                                 double size, int flag);
-    void downloadMessage(int flag, const QString &message);
+    void updateStatus(const pkgAcquire::ItemDesc &Itm);
 };
 
 #endif

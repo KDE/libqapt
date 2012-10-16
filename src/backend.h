@@ -22,6 +22,7 @@
 #define QAPT_BACKEND_H
 
 #include <QtCore/QHash>
+#include <QtCore/QStringList>
 #include <QtCore/QVariantMap>
 
 #include "globals.h"
@@ -34,6 +35,7 @@ namespace QApt {
     class Cache;
     class Config;
     class DebFile;
+    class Transaction;
 }
 
 /**
@@ -62,13 +64,12 @@ public:
      /**
       * Default constructor
       */
-    explicit Backend();
+    explicit Backend(QObject *parent = 0);
 
      /**
       * Default destructor
       */
-    // TODO: QApt2: Heck no
-    virtual ~Backend();
+    ~Backend();
 
     /**
      * Initializes the Apt database for usage. It sets up everything the backend
@@ -77,9 +78,21 @@ public:
      * risk encountering undefined behavior.
      *
      * @return @c true if initialization was successful
-     * @return @c false if there was a problem initializing
+     * @return @c false if there was a problem initializing. If this is the case,
+     * calling Backend methods other than initErrorMessage() will result in
+     * undefined behavior, and will likely cause a crash.
      */
     bool init();
+
+    /**
+     * In the event that the init() or reloadCache() methods have returned false,
+     * this method provides access to the error message from APT explaining why
+     * opening the cache failed. This is the only safe method to call after
+     * encountering a return false of @c false from init() or reloadCache()
+     *
+     * @since 2.0
+     */
+    QString initErrorMessage() const;
 
    /**
     * Returns whether or not APT is configured for installing packages for
@@ -122,8 +135,12 @@ public:
      * Repopulates the internal package cache, package list, and group list.
      * Mostly used internally, like after an update or a package installation
      * or removal.
+     *
+     * @return @c true when the cache reloads successfully. If it returns false,
+     * assume that you cannot call any methods other than initErrorMessage()
+     * safely.
      */
-    void reloadCache();
+    bool reloadCache();
 
     /**
      * Takes a snapshot of the current state of the package cache. (E.g.
@@ -144,16 +161,6 @@ public:
      * @since 1.3
      */
     QHash<Package::State, PackageList> stateChanges(CacheState oldState, PackageList excluded) const;
-
-   /**
-     * Returns the last event that the worker reported. When the worker is not
-     * running, this returns InvalidEvent
-     *
-     * \return The last reported @c WorkerEvent of the worker
-     *
-     * @since 1.1
-     */
-    WorkerEvent workerState() const;
 
     /**
      * Pointer to the QApt Backend's config object.
@@ -177,7 +184,7 @@ public:
     Package *package(const QString &name) const;
 
     /** Overload for package(const QString &name) **/
-    Package *package(const QLatin1String &name) const;
+    Package *package(QLatin1String name) const;
 
     /**
      * Queries the backend for a Package object that installs the specified
@@ -218,21 +225,19 @@ public:
      */
     QString originLabel(const QString &origin) const;
 
-    // TODO: QApt2: const QString &originLabel
     /**
      * Returns the machine-readable name for the origin repository of the given
      * the human-readable name.
      *
      * @return The machine-readable origin label
      */
-    QString origin(QString originLabel) const;
+    QString origin(const QString &originLabel) const;
 
     /** 
      * @returns the origins for a given @p host
      */
     QStringList originsForHost(const QString& host) const;
 
-    // TODO: QApt2: Around that time it might be wise to use qint64 for count()'s
     /**
      * Queries the backend for the total number of packages in the APT
      * database, discarding no-longer-existing packages that linger on in the
@@ -438,112 +443,14 @@ private:
 
     Package *package(pkgCache::PkgIterator &iter) const;
 
-    void throwInitError();
+    void setInitError();
 
 Q_SIGNALS:
-    /**
-     * Emitted whenever a backend error occurs. You should listen to this
-     * signal and present the error/clean up when your app receives it.
-     *
-     * @param error @c ErrorCode enum member indicating error type
-     * @param details  A @c QVariantMap containing containing info about the error, if
-     *                available
-     */
-    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
-
-    /**
-     * Emitted whenever a backend warning occurs. You should listen to this
-     * signal and present the warning when your app receives it.
-     *
-     * @param error @c WarningCode enum member indicating error type
-     * @param details  A @c QVariantMap containing info about the warning, if
-     *                available
-     */
-    void warningOccurred(QApt::WarningCode warning, const QVariantMap &details);
-
-    /**
-     * Emitted whenever the worker asks a question. You should listen to this
-     * signal and present the question to the user when your app receives it.
-     *
-     * You should send the response back to the worker as a QVariantMap
-     * using the Backend's answerWorkerQuestion() function.
-     *
-     * @param question A @c QApt::WorkerQuestion enum member indicating question type
-     * @param details A @c QVariantMap containing info about the question, if available
-     *
-     * @see answerWorkerQuestion()
-     */
-    void questionOccurred(QApt::WorkerQuestion question, const QVariantMap &details);
-
     /**
      * Emitted whenever a package changes state. Useful for knowning when to
      * react to state changes.
      */
     void packageChanged();
-
-    /**
-     * Emitted whenever a backend event occurs.
-     *
-     * @param event A @c WorkerEvent enum member indicating event type
-     */
-    void workerEvent(QApt::WorkerEvent event);
-
-    /**
-     * Emits total progress information while the QApt Worker is downloading
-     * packages.
-     *
-     * @param percentage Total percent complete
-     * @param speed Current download speed in bytes
-     * @param ETA Current estimated download time
-     */
-    void downloadProgress(int percentage, int speed, int ETA);
-
-    /**
-     * Emits per-package progress information while the QApt Worker is
-     * downloading packages.
-     *
-     * @param name Name of the package currently being downloaded
-     * @param percentage Percentage of the package downloaded
-     * @param URI The URI of the download location
-     * @param size The size of the download in bytes
-     * @param flag Fetch type (is a QApt::Global enum member)
-     *
-     * @since 1.1
-     */
-    void packageDownloadProgress(const QString &name, int percentage, const QString &URI,
-                                 double size, int flag);
-
-    /**
-     * Emitted whenever an item has been downloaded.
-     *
-     * This signal is deprecated. You should connect to packageDownloadProgress
-     * which provides a lot more information about the fetch.
-     *
-     * @param flag Fetch type (is a QApt::Global enum member)
-     * @param message Usually the URI of the item that's being downloaded
-     */
-    QT_DEPRECATED void downloadMessage(int flag, const QString &message);
-
-    /**
-     * Emits the progress of a current package installation/removal/
-     * operation.
-     *
-     * @param status Current status retrieved from dpkg
-     * @param percentage Total percent complete
-     */
-    void commitProgress(const QString &status, int percentage);
-
-   /**
-    * Emitted during the install of a .deb file, giving the output
-    * of the dpkg process installing the .deb
-    *
-    * @param message A line of output from dpkg
-    *
-    * @since 1.2
-    *
-    * @see installDebFile(const DebFile &debFile)
-    */
-    void debInstallMessage(const QString &message);
 
    /**
     * Emits the progress of the Apt Xapian Indexer
@@ -551,6 +458,18 @@ Q_SIGNALS:
     * @param progress The progress percentage of the indexer
     */
     void xapianUpdateProgress(int percentage);
+
+    /**
+     * Emitted whenever the QApt Worker's transaction queue has
+     * changed.
+     *
+     * @param active The transaction ID of the active transaction
+     * @param queue A list of transaction IDs of all transactions
+     * currently in the queue, including the active one.
+     *
+     * @since 2.0
+     */
+    void transactionQueueChanged(QString active, QStringList queue);
 
 public Q_SLOTS:
    /**
@@ -642,30 +561,59 @@ public Q_SLOTS:
     void setCompressEvents(bool enabled);
 
     /**
-     * Commits all pending package state changes that have been made.
+     * Starts a transaction which will commit all pending package state
+     * changes that have been made to the backend
      *
-     * This function is asynchronous. Events from the worker that
-     * occur while committing changes can be tracked with the workerEvent()
-     * signal.
+     * @return A pointer to a @c Transaction object tracking the commit
      *
-     * Commit progress can be tracked with the commitProgress() signal
-     *
-     * @see workerEvent()
-     * @see commitProgress()
+     * @since 2.0
      */
-    void commitChanges();
+    QApt::Transaction *commitChanges();
+
+    /**
+     * Starts a transaction which will install the list of provided packages.
+     * This function is useful when you only need a few packages installed and
+     * don't need to commit a complex set of changes with commitChanges().
+     *
+     * @param packages The packages to be installed
+     *
+     * @return A pointer to a @c Transaction object tracking the install
+     *
+     * @since 2.0
+     * @see removePackages
+     * @see commitChanges
+     */
+    QApt::Transaction *installPackages(QApt::PackageList packages);
+
+    /**
+     * Starts a transaction which will remove the list of provided packages.
+     * This function is useful when you only need a few packages removed and
+     * don't need to commit a complex set of changes with commitChanges().
+     *
+     * @param packages The packages to be removed
+     *
+     * @return A pointer to a @c Transaction object tracking the removal
+     *
+     * @since 2.0
+     * @see installPackages
+     * @see commitChanges
+     */
+    QApt::Transaction *removePackages(QApt::PackageList packages);
 
    /**
     * Downloads the packages listed in the provided list file to the provided
-    * destination directory. The worker sends normal download event signals
-    * as usual, and this can be handled exactly like any other package download
+    * destination directory.
+    *
+    * If the list file provided cannot be opened, a null pointer will be returned.
+    *
+    * @return A pointer to a @c Transaction object tracking the download
     *
     * @param listFile The path to the package list file
     * @param destination The path of the directory to download the packages to
     *
-    * @since 1.2
+    * @since 2.0
     */
-    void downloadArchives(const QString &listFile, const QString &destination);
+    Transaction *downloadArchives(const QString &listFile, const QString &destination);
 
    /**
     * Installs a .deb package archive file.
@@ -683,55 +631,34 @@ public Q_SLOTS:
     * @see workerEvent()
     * @see packageDownloadProgress()
     *
-    * @since 1.2
+    * @since 2.0
     */
-    void installDebFile(const DebFile &file);
+    Transaction *installFile(const DebFile &file);
 
     /**
-     * A slot that Packages use to tell the backend they've changed.
-     * (Used internally by QApt::Package. You likely will never use this)
+     * Starts a transaction that will check for and downloads new package
+     * source lists. (Essentially, checking for updates.)
      *
-     * @param package the package which has changed
+     * @return A pointer to a @c Transaction object tracking the cache update.
+     *
+     * @since 2.0
      */
-    // TODO: QApt2: Make this a private slot.
-    void packageChanged(Package *package);
+    Transaction *updateCache();
 
     /**
-     * Checks for and downloads new package source lists.
+     * Starts a transaction which will upgrade as many of the packages as it can.
+     * If the upgrade type is a "safe" upgrade, only packages that can be upgraded
+     * without installing or removing new packages will be upgraded. If a "full"
+     * upgrade is chosen, the transaction will upgrade all packages, and can
+     * install or remove packages to do so.
      *
-     * This function is asynchronous. Worker events that occur while
-     * donwloading cache files can be tracked with the workerEvent() signal.
+     * @param upgradeType The type of upgrade to be performed. (safe vs. full)
      *
-     * Overall download progress can be tracked by the downloadProgress()
-     * signal, and per-package download progress can be tracked by the
-     * packageDownloadProgress() signal.
+     * @return A pointer to a @c Transaction object tracking the upgrade
      *
-     * @see workerEvent()
-     * @see downloadProgress()
-     * @see packageDownloadProgress()
+     * @since 2.0
      */
-    void updateCache();
-
-    /**
-     * Cancels download operations in the worker initialized by the
-     * updateCache() or commitChanges() functions. This function
-     * will only have an effect if a download operation is in progress.
-     * The actual committing of changes cannot be canceled once in progress.
-     *
-     * This function is asynchronous. The backend will report a
-     * \c UserCancelError using the errorOccurred() signal
-     *
-     * @see errorOccurred()
-     */
-    void cancelDownload();
-
-    /**
-     * This function should be used to return the answer the user has given
-     * to a worker question delivered by the questionOccurred() signal
-     *
-     * @see questionOccurred()
-     */
-    void answerWorkerQuestion(const QVariantMap &response);
+    Transaction *upgradeSystem(QApt::UpgradeType upgradeType);
 
     /**
      * Exports a list of all packages currently installed on the system. This
@@ -817,7 +744,6 @@ public Q_SLOTS:
     * events using the workerEvent() signal. Progress is reported by the
     * xapianUpdateProgress() signal.
     *
-    * @see workerEvent()
     * @see xapianUpdateProgress()
     * @see xapianIndexNeedsUpdate()
     */
@@ -841,31 +767,8 @@ public Q_SLOTS:
     */
     bool addArchiveToCache(const DebFile &archive);
 
-   /**
-    * Sets the proxy to be used by the QApt Worker
-    *
-    * This function is used to aid in integration with environments that do not
-    * primarily use the proxy set by either APT or their shell environment's
-    * http_proxy environment variable. (Such as KDE)
-    *
-    * Once you call this function, the QApt Worker will use the custom proxy for
-    * the life of the QApt::Backend object.
-    *
-    * @param proxy the proxy to be used by the QApt Worker
-    *
-    * @since 1.4
-    */
-    void setWorkerProxy(const QString &proxy);
-
 private Q_SLOTS:
-    void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
-    void workerStarted();
-    void workerFinished(bool result);
-
-    void emitErrorOccurred(int errorCode, const QVariantMap &details);
-    void emitWarningOccurred(int warningCode, const QVariantMap &details);
-    void emitWorkerEvent(int event);
-    void emitWorkerQuestionOccurred(int question, const QVariantMap &details);
+    void emitPackageChanged();
 };
 
 }

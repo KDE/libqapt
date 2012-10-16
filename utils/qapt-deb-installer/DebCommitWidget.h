@@ -23,13 +23,18 @@
 
 #include <QtGui/QWidget>
 
+#include <LibQApt/Globals>
+
 class QLabel;
 class QProgressBar;
 class QTextEdit;
 
-namespace DebconfKde
-{
+namespace DebconfKde {
     class DebconfGui;
+}
+
+namespace QApt {
+    class Transaction;
 }
 
 class DebCommitWidget : public QWidget
@@ -37,23 +42,25 @@ class DebCommitWidget : public QWidget
     Q_OBJECT
 public:
     explicit DebCommitWidget(QWidget *parent = 0);
-    ~DebCommitWidget();
+
+    QString pipe() const;
+    void setTransaction(QApt::Transaction *trans);
 
 private:
+    QApt::Transaction *m_trans;
+    QString m_pipe;
     QLabel *m_headerLabel;
     QTextEdit *m_terminal;
     DebconfKde::DebconfGui *m_debconfGui;
     QProgressBar *m_progressBar;
 
-public Q_SLOTS:
-    void updateDownloadProgress(int progress, int speed, int ETA);
-    void updateCommitProgress(const QString &message, int progress);
+private Q_SLOTS:
+    void statusChanged(QApt::TransactionStatus status);
+    void errorOccurred(QApt::ErrorCode error);
+    void updateProgress(int progress);
     void updateTerminal(const QString &message);
-    void setHeaderText(const QString &text);
     void showProgress();
     void hideProgress();
-
-private Q_SLOTS:
     void showDebconf();
     void hideDebconf();
 };

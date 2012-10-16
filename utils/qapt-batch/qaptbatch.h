@@ -21,50 +21,49 @@
 #ifndef QAPTBATCH_H
 #define QAPTBATCH_H
 
-// Qt includes
-#include <QVariantMap>
-
 // KDE includes
 #include <KProgressDialog>
 
-class QDBusServiceWatcher;
+// LibQApt includes
+#include "../../src/globals.h"
 
-class OrgKubuntuQaptworkerInterface;
-class DetailsWidget;
+namespace QApt {
+    class Backend;
+    class Transaction;
+}
 
 class QAptBatch : public KProgressDialog
 {
     Q_OBJECT
 public:
     explicit QAptBatch(QString mode, QStringList packages, int winId);
-    virtual ~QAptBatch();
-    virtual void reject();
+
+    void reject();
 
 private:
-    OrgKubuntuQaptworkerInterface *m_worker;
-    QDBusServiceWatcher *m_watcher;
+    QApt::Backend *m_backend;
+    QApt::Transaction *m_trans;
+
+    int m_winId;
+    int m_lastRealProgress;
     QString m_mode;
     QStringList m_packages;
-    QList<QVariantMap> m_warningStack;
-    QList<QVariantMap> m_errorStack;
-    DetailsWidget *m_detailsWidget;
     bool m_done;
 
-private Q_SLOTS:
-    void commitChanges(int mode);
-    void workerStarted();
-    void errorOccurred(int code, const QVariantMap &args);
-    void warningOccurred(int code, const QVariantMap &args);
-    void questionOccurred(int question, const QVariantMap &args);
-    void showQueuedWarnings();
-    void showQueuedErrors();
-    void raiseErrorMessage(const QString &text, const QString &title);
-    void workerEvent(int event);
-    void workerFinished(bool result);
-    void serviceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    void setTransaction(QApt::Transaction *trans);
 
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateCommitProgress(const QString& message, int percentage);
+private Q_SLOTS:
+    void initError();
+    void commitChanges(int mode);
+    void errorOccurred(QApt::ErrorCode code);
+    void provideMedium(const QString &label, const QString &mountPoint);
+    void untrustedPrompt(const QStringList &untrustedPackages);
+    void raiseErrorMessage(const QString &text, const QString &title);
+    void transactionStatusChanged(QApt::TransactionStatus status);
+    void cancellableChanged(bool cancellable);
+
+    void updateProgress(int progress);
+    void updateCommitMessage(const QString& message);
 };
 
 #endif

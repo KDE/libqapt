@@ -20,20 +20,27 @@
 
 #include "PluginHelper.h"
 
+// Qt includes
 #include <QCoreApplication>
 #include <QtCore/QStringBuilder>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 
+// KDE includes
 #include <KApplication>
 #include <KIcon>
 #include <KLocale>
 #include <KMessageBox>
+#include <KProtocolManager>
 #include <KWindowSystem>
 #include <QDebug>
 
+// LibQApt includes
 #include "../../src/backend.h"
+#include "../../src/config.h"
+#include "../../src/transaction.h"
 
+// Own includes
 #include "PluginFinder.h"
 #include "PluginInfo.h"
 
@@ -45,25 +52,13 @@
 
 PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int winId)
     : KProgressDialog(parent)
-    , m_backend(new QApt::Backend())
+    , m_backend(new QApt::Backend(this))
+    , m_trans(nullptr)
     , m_winId(winId)
     , m_partialFound(false)
     , m_done(false)
     , m_details(gstDetails)
 {
-    connect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)),
-            this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
-            this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
-    connect(m_backend, SIGNAL(warningOccurred(QApt::WarningCode,QVariantMap)),
-            this, SLOT(warningOccurred(QApt::WarningCode,QVariantMap)));
-    connect(m_backend, SIGNAL(questionOccurred(QApt::WorkerQuestion,QVariantMap)),
-            this, SLOT(questionOccurred(QApt::WorkerQuestion,QVariantMap)));
-    connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
-            this, SLOT(updateDownloadProgress(int,int,int)));
-    connect(m_backend, SIGNAL(commitProgress(QString,int)),
-            this, SLOT(updateCommitProgress(QString,int)));
-
     foreach (const QString &plugin, gstDetails) {
         PluginInfo *pluginInfo = new PluginInfo(plugin);
         if (pluginInfo->isValid()) {
@@ -93,10 +88,8 @@ void PluginHelper::run()
     incrementProgress();
     show();
 
-    if (!m_backend->init()) {
-        // TODO: Report some sort of init error
-        exit(ERR_RANDOM_ERR);
-    }
+    if (!m_backend->init())
+        initError();
 
     m_finder = new PluginFinder(0, m_backend);
     connect(m_finder, SIGNAL(foundCodec(QApt::Package*)),
@@ -112,9 +105,17 @@ void PluginHelper::run()
     m_finderThread->start();
 }
 
-PluginHelper::~PluginHelper()
+void PluginHelper::initError()
 {
-    delete m_backend;
+    QString details = m_backend->initErrorMessage();
+
+    QString text = i18nc("@label",
+                         "The package system could not be initialized, your "
+                         "configuration may be broken.");
+    QString title = i18nc("@title:window", "Initialization error");
+
+    KMessageBox::detailedError(this, text, details, title);
+    exit(ERR_RANDOM_ERR);
 }
 
 void PluginHelper::canSearch()
@@ -136,13 +137,10 @@ void PluginHelper::canSearch()
     // Dunno if it's possible to have both an encoder and a decoder in the same list
     int type = m_searchList.at(0)->pluginType();
     // Or if a list can have multiple requesting apps
-    QString appName;
     QString requestedBy = m_searchList.at(0)->requestedBy();
-    if (requestedBy.isEmpty()) {
-        appName = i18nc("A program for which we have no name", "A program");
-    } else {
-        appName = requestedBy;
-    }
+    QString appName = (requestedBy.isEmpty()) ?
+                      i18nc("A program for which we have no name", "A program") :
+                      requestedBy;
 
     QString title;
 
@@ -179,7 +177,7 @@ void PluginHelper::offerInstallPackages()
 {
     int ret = KMessageBox::No;
 
-    foreach (QApt::Package *package, m_foundCodecs) {
+    for (QApt::Package *package : m_foundCodecs) {
         package->setInstall();
     }
 
@@ -188,7 +186,7 @@ void PluginHelper::offerInstallPackages()
 
     QStringList nameList;
 
-    foreach (QApt::Package *package, m_backend->markedPackages()) {
+    for (QApt::Package *package : m_backend->markedPackages()) {
         nameList << package->name();
     }
 
@@ -211,13 +209,15 @@ void PluginHelper::offerInstallPackages()
     }
 }
 
-void PluginHelper::errorOccurred(QApt::ErrorCode code, const QVariantMap &args)
+void PluginHelper::cancellableChanged(bool cancellable)
+{
+    setAllowCancel(cancellable);
+}
+
+void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
 {
     QString text;
     QString title;
-    QString failedItem;
-    QString errorText;
-    QString drive;
 
     switch(code) {
         case QApt::InitError: {
@@ -225,9 +225,8 @@ void PluginHelper::errorOccurred(QApt::ErrorCode code, const QVariantMap &args)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            QString details = args["ErrorText"].toString();
-            KMessageBox::detailedErrorWId(m_winId, text, details, title);
-            // TODO: Report some sort of init error
+            KMessageBox::detailedErrorWId(m_winId, text, m_trans->errorDetails(), title);
+            // TODO: Report some sort of init error with the exit value
             tExit(ERR_RANDOM_ERR);
             break;
         }
@@ -241,21 +240,24 @@ void PluginHelper::errorOccurred(QApt::ErrorCode code, const QVariantMap &args)
             raiseErrorMessage(text, title);
             break;
         case QApt::DiskSpaceError:
-            drive = args["DirectoryString"].toString();
+            // FIXME: drive = transaction error details
             text = i18nc("@label",
                          "You do not have enough disk space in the directory "
-                         "at %1 to continue with this operation.", drive);
+                         "at %1 to continue with this operation.", m_trans->errorDetails());
             title = i18nc("@title:window", "Low disk space");
             raiseErrorMessage(text, title);
             break;
         case QApt::FetchError:
-            text = i18nc("@label",
-                         "Could not download packages");
+            text = i18nc("@label", "Could not download packages");
             title = i18nc("@title:window", "Download failed");
-            raiseErrorMessage(text, title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            tExit(ERR_RANDOM_ERR);
             break;
         case QApt::CommitError:
-            m_errorStack.append(args);
+            text = i18nc("@label", "An error occurred while applying changes:");
+            title = i18nc("@title:window", "Commit Error");
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            tExit(ERR_RANDOM_ERR);
             break;
         case QApt::AuthError:
             text = i18nc("@label",
@@ -272,8 +274,8 @@ void PluginHelper::errorOccurred(QApt::ErrorCode code, const QVariantMap &args)
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::UntrustedError: {
-            QStringList untrustedItems = args["UntrustedItems"].toStringList();
-            if (untrustedItems.size() == 1) {
+            QStringList untrustedItems = m_trans->untrustedPackages();
+            if (untrustedItems.size()) {
                 text = i18ncp("@label",
                              "The following package has not been verified by its author. "
                              "Downloading untrusted packages has been disallowed "
@@ -289,19 +291,14 @@ void PluginHelper::errorOccurred(QApt::ErrorCode code, const QVariantMap &args)
             tExit(ERR_RANDOM_ERR);
             break;
         }
-        case QApt::NotFoundError: {
-            QString notFoundString = args["NotFoundString"].toString();
+        case QApt::NotFoundError:
             text = i18nc("@label",
                         "The package \"%1\" has not been found among your software sources. "
                         "Therefore, it cannot be installed. ",
-                        notFoundString);
+                        m_trans->errorDetails());
             title = i18nc("@title:window", "Package Not Found");
             KMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
-            break;
-        }
-        case QApt::UserCancelError:
-            tExit(ERR_CANCEL);
             break;
         case QApt::UnknownError:
             tExit(ERR_RANDOM_ERR);
@@ -311,157 +308,102 @@ void PluginHelper::errorOccurred(QApt::ErrorCode code, const QVariantMap &args)
     }
 }
 
-void PluginHelper::warningOccurred(QApt::WarningCode warning, const QVariantMap &args)
+void PluginHelper::provideMedium(const QString &label, const QString &mountPoint)
 {
-    switch (warning) {
-        case QApt::SizeMismatchWarning: {
-            QString text = i18nc("@label",
-                                 "The size of the downloaded items did not "
-                                 "equal the expected size.");
-            QString title = i18nc("@title:window", "Size Mismatch");
-            KMessageBox::sorryWId(m_winId, text, title);
-            break;
-        }
-        case QApt::FetchFailedWarning: {
-            m_warningStack.append(args);
-            break;
-        }
-        case QApt::UnknownWarning:
-        default:
-            break;
-    }
+    QString title = i18nc("@title:window", "Media Change Required");
+    QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
+                         label, mountPoint);
 
+    KMessageBox::informationWId(m_winId, text, title);
+    m_trans->provideMedium(mountPoint);
 }
 
-void PluginHelper::questionOccurred(QApt::WorkerQuestion code, const QVariantMap &args)
+void PluginHelper::untrustedPrompt(const QStringList &untrustedPackages)
 {
-    QVariantMap response;
+    QString title = i18nc("@title:window", "Warning - Unverified Software");
+    QString text = i18ncp("@label",
+                          "The following piece of software cannot be verified. "
+                          "<warning>Installing unverified software represents a "
+                          "security risk, as the presence of unverifiable software "
+                          "can be a sign of tampering.</warning> Do you wish to continue?",
+                          "The following pieces of software cannot be authenticated. "
+                          "<warning>Installing unverified software represents a "
+                          "security risk, as the presence of unverifiable software "
+                          "can be a sign of tampering.</warning> Do you wish to continue?",
+                          untrustedPackages.size());
+    int result = KMessageBox::Cancel;
 
-    switch (code) {
-        case QApt::MediaChange: {
-            QString media = args["Media"].toString();
-            QString drive = args["Drive"].toString();
+    result = KMessageBox::warningContinueCancelListWId(m_winId, text,
+                                                       untrustedPackages, title);
 
-            QString title = i18nc("@title:window", "Media Change Required");
-            QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>", media, drive);
+    bool installUntrusted = (result == KMessageBox::Continue);
+    m_trans->replyUntrustedPrompt(installUntrusted);
 
-            KMessageBox::informationWId(m_winId, text, title);
-            response["MediaChanged"] = true;
-            m_backend->answerWorkerQuestion(response);
-        }
-        case QApt::InstallUntrusted: {
-            QStringList untrustedItems = args["UntrustedItems"].toStringList();
-
-            QString title = i18nc("@title:window", "Warning - Unverified Software");
-            QString text = i18ncp("@label",
-                        "The following piece of software cannot be verified. "
-                        "<warning>Installing unverified software represents a "
-                        "security risk, as the presence of unverifiable software "
-                        "can be a sign of tampering.</warning> Do you wish to continue?",
-                        "The following pieces of software cannot be authenticated. "
-                        "<warning>Installing unverified software represents a "
-                        "security risk, as the presence of unverifiable software "
-                        "can be a sign of tampering.</warning> Do you wish to continue?",
-                        untrustedItems.size());
-            int result = KMessageBox::Cancel;
-            bool installUntrusted = false;
-
-            result = KMessageBox::warningContinueCancelListWId(m_winId, text,
-                                                               untrustedItems, title);
-            switch (result) {
-                case KMessageBox::Continue:
-                    installUntrusted = true;
-                    break;
-                case KMessageBox::Cancel:
-                    installUntrusted = false;
-                    break;
-            }
-
-            response["InstallUntrusted"] = installUntrusted;
-            m_backend->answerWorkerQuestion(response);
-
-            if (!installUntrusted) {
-                tExit(ERR_CANCEL);
-            }
-        }
-        default:
-            break;
+    if (!installUntrusted) {
+        tExit(ERR_CANCEL);
     }
 }
 
-void PluginHelper::workerEvent(QApt::WorkerEvent code)
+void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
 {
-    switch (code) {
-        case QApt::PackageDownloadStarted:
-            progressBar()->setMaximum(100);
-            connect(this, SIGNAL(cancelClicked()), m_backend, SLOT(cancelDownload()));
-            setWindowTitle(i18nc("@title:window", "Downloading"));
-            setLabelText(i18nc("@info:status", "Downloading codecs"));
-            break;
-        case QApt::PackageDownloadFinished:
-            setAllowCancel(false);
-            disconnect(this, SIGNAL(cancelClicked()), m_backend, SLOT(cancelDownload()));
-            break;
-        case QApt::CommitChangesStarted:
-            setWindowTitle(i18nc("@title:window", "Installing Codecs"));
-            setButtons(KDialog::Cancel);
-            setAllowCancel(false); //Committing changes is uninterruptable (safely, that is)
-            break;
-        case QApt::CommitChangesFinished:
-            if (m_warningStack.size() > 0) {
-                showQueuedWarnings();
-            }
-            if (m_errorStack.size() > 0) {
-                showQueuedErrors();
-            }
-
+    switch (status) {
+    case QApt::SetupStatus:
+    case QApt::WaitingStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Progress bar label when waiting to start",
+                           "Waiting to start."));
+        break;
+    case QApt::AuthenticationStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Status label when waiting for a password",
+                           "Waiting for authentication."));
+        break;
+    case QApt::WaitingMediumStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Status label when waiting for a CD-ROM",
+                           "Waiting for required media."));
+        break;
+    case QApt::WaitingLockStatus:
+        progressBar()->setMaximum(0);
+        setLabelText(i18nc("@label Status label",
+                           "Waiting for other package managers to quit."));
+        break;
+    case QApt::RunningStatus:
+        // We're ready for "real" progress now
+        progressBar()->setMaximum(100);
+        break;
+    case QApt::LoadingCacheStatus:
+        setLabelText(i18nc("@label Status label",
+                           "Loading package cache."));
+        break;
+    case QApt::DownloadingStatus:
+        setWindowTitle(i18nc("@title:window", "Downloading"));
+        setLabelText(i18nc("@info:status", "Downloading codecs"));
+        break;
+    case QApt::CommittingStatus:
+        setWindowTitle(i18nc("@title:window", "Installing"));
+        setLabelText(i18nc("@info:status", "Installing codecs"));
+        setButtons(KDialog::Cancel);
+        break;
+    case QApt::FinishedStatus:
+        if (m_trans->exitStatus() == QApt::ExitCancelled) {
+            tExit(ERR_CANCEL);
+        } else if (m_trans->exitStatus() != QApt::ExitSuccess) {
+            setLabelText(i18nc("@label", "Package installation finished with errors."));
+            setWindowTitle(i18nc("@title:window", "Installation Failed"));
+        } else {
+            setLabelText(i18nc("@label", "Codecs successfully installed"));
             setWindowTitle(i18nc("@title:window", "Installation Complete"));
+            m_done = true;
+        }
 
-            if (m_errorStack.size() > 0) {
-                setLabelText(i18nc("@label",
-                                   "Package installation finished with errors."));
-            } else {
-                setLabelText(i18nc("@label",
-                                    "Codecs successfully installed"));
-            }
-            progressBar()->setValue(100);
-            // Really a close button, but KProgressDialog uses ButtonCode Cancel
-            setButtonFocus(KDialog::Cancel);
-            break;
-        default:
-            break;
+        progressBar()->setValue(100);
+        // Really a close button, but KProgressDialog uses ButtonCode Cancel
+        setButtonFocus(KDialog::Cancel);
+
+        m_trans->deleteLater();
+        m_trans = 0;
     }
-}
-
-void PluginHelper::showQueuedWarnings()
-{
-    QString details;
-    QString text = i18nc("@label", "Unable to download the following packages:");
-    foreach (const QVariantMap &args, m_warningStack) {
-        QString failedItem = args["FailedItem"].toString();
-        QString warningText = args["WarningText"].toString();
-        details.append(i18nc("@label",
-                             "Failed to download %1\n"
-                             "%2\n\n", failedItem, warningText));
-    }
-    QString title = i18nc("@title:window", "Some Packages Could not be Downloaded");
-    KMessageBox::detailedError(this, text, details, title);
-}
-
-void PluginHelper::showQueuedErrors()
-{
-    QString details;
-    QString text = i18ncp("@label", "An error occurred while applying changes:",
-                                    "The following errors occurred while applying changes:",
-                                    m_warningStack.size());
-    foreach (const QVariantMap &args, m_errorStack) {
-        QString failedItem = i18nc("@label Shows which package failed", "Package: %1", args["FailedItem"].toString());
-        QString errorText = i18nc("@label Shows the error", "Error: %1", args["ErrorText"].toString());
-        details.append(failedItem % '\n' % errorText % "\n\n");
-    }
-
-    QString title = i18nc("@title:window", "Commit error");
-    KMessageBox::detailedError(this, text, details, title);
 }
 
 void PluginHelper::raiseErrorMessage(const QString &text, const QString &title)
@@ -516,7 +458,35 @@ void PluginHelper::reject()
 
 void PluginHelper::install()
 {
-    m_backend->commitChanges();
+    m_trans = m_backend->commitChanges();
+
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        m_trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    m_trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    // Connect the transaction all up to our slots
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
+            this, SLOT(transactionErrorOccurred(QApt::ErrorCode)));
+    connect(m_trans, SIGNAL(cancellableChanged(bool)),
+            this, SLOT(cancellableChanged(bool)));
+    connect(m_trans, SIGNAL(mediumRequired(QString,QString)),
+            this, SLOT(provideMedium(QString,QString)));
+    connect(m_trans, SIGNAL(promptUntrusted(QStringList)),
+            this, SLOT(untrustedPrompt(QStringList)));
+    connect(m_trans, SIGNAL(progressChanged(int)),
+            this, SLOT(updateProgress(int)));
+    connect(m_trans, SIGNAL(statusDetailsChanged(QString)),
+            this, SLOT(updateCommitStatus(QString)));
+
+    // Connect us to the transaction
+    connect(this, SIGNAL(cancelClicked()), m_trans, SLOT(cancel()));
+
+    m_trans->run();
 
     setLabelText(i18nc("@label Progress bar label when waiting to start", "Waiting"));
     progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
@@ -524,11 +494,8 @@ void PluginHelper::install()
     show();
 }
 
-void PluginHelper::updateDownloadProgress(int percentage, int speed, int ETA)
+void PluginHelper::updateProgress(int percentage)
 {
-    Q_UNUSED(speed);
-    Q_UNUSED(ETA);
-
     if (percentage == 100) {
         --percentage;
     }
@@ -536,13 +503,7 @@ void PluginHelper::updateDownloadProgress(int percentage, int speed, int ETA)
     progressBar()->setValue(percentage);
 }
 
-void PluginHelper::updateCommitProgress(const QString& message, int percentage)
+void PluginHelper::updateCommitStatus(const QString& message)
 {
-    if (percentage == 100) {
-        --percentage;
-    }
-    progressBar()->setValue(percentage);
     setLabelText(message);
 }
-
-#include "PluginHelper.moc"

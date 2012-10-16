@@ -20,46 +20,54 @@
 
 #include "workeracquire.h"
 
+// Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QEventLoop>
+#include <QtCore/QStringBuilder>
 
+// Apt-pkg includes
 #include <apt-pkg/error.h>
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/acquire-worker.h>
 
-#include "worker.h"
+// Own includes
+#include "aptworker.h"
+#include "transaction.h"
 
 using namespace std;
 
-WorkerAcquire::WorkerAcquire(QAptWorker *parent)
+WorkerAcquire::WorkerAcquire(QObject *parent, int begin, int end)
         : QObject(parent)
-        , m_worker(parent)
-        , m_cancelled(false)
         , m_calculatingSpeed(true)
-        , m_questionResponse(QVariantMap())
+        , m_progressBegin(begin)
+        , m_progressEnd(end)
+        , m_lastProgress(0)
 {
     MorePulses = true;
 }
 
-WorkerAcquire::~WorkerAcquire()
+void WorkerAcquire::setTransaction(Transaction *trans)
 {
+    m_trans = trans;
+    if (!trans->proxy().isEmpty())
+        setenv("http_proxy", m_trans->proxy().toAscii(), 1);
 }
 
 void WorkerAcquire::Start()
 {
     // Cleanup from old fetches
-    m_cancelled = false;
     m_calculatingSpeed = true;
+
+    m_trans->setCancellable(true);
+    m_trans->setStatus(QApt::DownloadingStatus);
 
     pkgAcquireStatus::Start();
 }
 
 void WorkerAcquire::IMSHit(pkgAcquire::ItemDesc &item)
 {
-    QString message = QString::fromUtf8(item.Description.c_str());
-    emit downloadMessage(QApt::HitFetch, message);
-    updateStatus(item, /*percentage*/ -1, QApt::HitFetch);
+    updateStatus(item);
 
     Update = true;
 }
@@ -71,16 +79,14 @@ void WorkerAcquire::Fetch(pkgAcquire::ItemDesc &item)
         return;
     }
 
-    QString message = QString::fromUtf8(item.Description.c_str());
-    emit downloadMessage(QApt::DownloadFetch, message);
-    updateStatus(item, /*percentage*/ -1, QApt::QueueFetch);
+    updateStatus(item);
 }
 
 void WorkerAcquire::Done(pkgAcquire::ItemDesc &item)
 {
    Update = true;
 
-   updateStatus(item, 100, QApt::DownloadFetch);
+   updateStatus(item);
 }
 
 void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
@@ -90,18 +96,16 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
         return;
     }
 
-    if (item.Owner->Status == pkgAcquire::Item::StatDone)
-    {
-        QString message = QString::fromUtf8(item.Description.c_str());
-        emit downloadMessage(QApt::IgnoredFetch, message);
-        updateStatus(item, /*percentage*/ -1, QApt::IgnoredFetch);
+    if (item.Owner->Status == pkgAcquire::Item::StatDone) {
+        updateStatus(item);
     } else {
         // an error was found (maybe 404, 403...)
         // the item that got the error and the error text
-        QVariantMap args;
-        args[QLatin1String("FailedItem")] = QString::fromUtf8(item.URI.c_str());
-        args[QLatin1String("WarningText")] = QString::fromUtf8(item.Owner->ErrorText.c_str());
-        emit fetchWarning(QApt::FetchFailedWarning, args);
+        QString failedItem = QString::fromStdString(item.URI);
+        QString errorText = QString::fromStdString(item.Owner->ErrorText);
+
+        m_trans->setErrorDetails(m_trans->errorDetails() % failedItem %
+                                 '\n' % errorText % "\n\n");
     }
 
     Update = true;
@@ -109,117 +113,121 @@ void WorkerAcquire::Fail(pkgAcquire::ItemDesc &item)
 
 void WorkerAcquire::Stop()
 {
-   pkgAcquireStatus::Stop();
+    m_trans->setProgress(m_progressEnd);
+    m_trans->setCancellable(false);
+    pkgAcquireStatus::Stop();
 }
 
 bool WorkerAcquire::MediaChange(string Media, string Drive)
 {
-    QVariantMap args;
-    args[QLatin1String("Media")] = QString::fromUtf8(Media.c_str());
-    args[QLatin1String("Drive")] = QString::fromUtf8(Drive.c_str());
+    // Notify listeners to the transaction
+    m_trans->setMediumRequired(QString::fromUtf8(Media.c_str()),
+                               QString::fromUtf8(Drive.c_str()));
+    m_trans->setStatus(QApt::WaitingMediumStatus);
 
-    QVariantMap result = askQuestion(QApt::MediaChange, args);
+    // Wait until the media is provided or the user cancels
+    while (m_trans->isPaused())
+        usleep(200000);
 
-    bool mediaChanged = result[QLatin1String("MediaChanged")].toBool();
+    m_trans->setStatus(QApt::DownloadingStatus);
 
-    return mediaChanged;
+    // As long as the user didn't cancel, we're ok to proceed
+    return (!m_trans->isCancelled());
 }
 
 bool WorkerAcquire::Pulse(pkgAcquire *Owner)
 {
-    // FIXME: processEvents() is dangerous. Proper threading is needed
-    QCoreApplication::processEvents();
+    if (m_trans->isCancelled())
+        return false;
+
     pkgAcquireStatus::Pulse(Owner);
 
-    int packagePercentage = 0;
     for (pkgAcquire::Worker *iter = Owner->WorkersBegin(); iter != 0; iter = Owner->WorkerStep(iter)) {
         if (!iter->CurrentItem) {
             continue;
         }
 
-        packagePercentage = qRound(double(iter->CurrentSize * 100.0)/double(iter->TotalSize));
+        (*iter->CurrentItem).Owner->PartialSize = iter->CurrentSize;
 
-        if (iter->TotalSize > 0) {
-            updateStatus(*iter->CurrentItem, packagePercentage, QApt::DownloadFetch);
-        } else {
-            updateStatus(*iter->CurrentItem, 100, QApt::DownloadFetch);
-        }
+        updateStatus(*iter->CurrentItem);
     }
 
     int percentage = qRound(double((CurrentBytes + CurrentItems) * 100.0)/double (TotalBytes + TotalItems));
+    int progress = 0;
     // work-around a stupid problem with libapt-pkg
     if(CurrentItems == TotalItems) {
         percentage = 100;
     }
 
-    int speed;
-    // m_calculatingSpeed is always set to true in the constructor since APT
-    // will always have a period of time where it has to initially calulate
-    // speed. Once speed > 0 for the first time, it'll be set to false, and
-    // all subsequent zero values will be legitimate. APT should really do
-    // this for us, but I guess stuff might depend on the old behavior...
-    // The fail stops here.
-    if (m_calculatingSpeed && CurrentCPS <= 0) {
-        speed = -1;
-    } else {
-        m_calculatingSpeed = false;
-        speed = CurrentCPS;
+    // Calculate global progress, adjusted for given beginning and ending points
+    progress = qRound(m_progressBegin + qreal(percentage / 100.0) * (m_progressEnd - m_progressBegin));
+
+    if (m_lastProgress > progress)
+        m_trans->setProgress(101);
+    else {
+        m_trans->setProgress(progress);
+        m_lastProgress = progress;
     }
 
-   unsigned long long ETA = 0;
-   if(CurrentCPS > 0)
+    quint64 ETA = 0;
+    if(CurrentCPS > 0)
         ETA = (TotalBytes - CurrentBytes) / CurrentCPS;
 
-    // if the ETA is greater than two weeks, show unknown time
-    if (ETA > 14*24*60*60) {
+    // if the ETA is greater than two days, show unknown time
+    if (ETA > 2*24*60*60) {
         ETA = 0;
     }
 
-    emit downloadProgress(percentage, speed, ETA);
+    m_trans->setDownloadSpeed(CurrentCPS);
+    m_trans->setETA(ETA);
 
     Update = false;
-
-    return !m_cancelled;
+    return true;
 }
 
-void WorkerAcquire::requestCancel()
+void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
 {
-    m_cancelled = true;
-    emit fetchError(QApt::UserCancelError, QVariantMap());
-}
+    QString URI = QString::fromStdString(Itm.Description);
+    int status = (int)Itm.Owner->Status;
+    QApt::DownloadStatus downloadStatus = QApt::IdleState;
+    QString shortDesc = QString::fromStdString(Itm.ShortDesc);
+    quint64 fileSize = Itm.Owner->FileSize;
+    quint64 fetchedSize = Itm.Owner->PartialSize;
+    QString errorMsg = QString::fromStdString(Itm.Owner->ErrorText);
+    QString message;
 
-QVariantMap WorkerAcquire::askQuestion(int questionCode, const QVariantMap &args)
-{
-    m_mediaBlock = new QEventLoop;
-    connect(m_worker, SIGNAL(answerReady(QVariantMap)),
-            this, SLOT(setAnswer(QVariantMap)));
-
-    emit workerQuestion(questionCode, args);
-    m_mediaBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
-
-    return m_questionResponse;
-}
-
-void WorkerAcquire::setAnswer(const QVariantMap &answer)
-{
-    disconnect(m_worker, SIGNAL(answerReady(QVariantMap)),
-               this, SLOT(setAnswer(QVariantMap)));
-    m_questionResponse = answer;
-    m_mediaBlock->quit();
-}
-
-void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm, int percentage, int status)
-{
-    if (Itm.Owner->ID == 0) {
-          QString name = QLatin1String(Itm.ShortDesc.c_str());
-          QString URI = QLatin1String(Itm.Description.c_str());
-          qint64 size = Itm.Owner->FileSize;
-
-          emit packageDownloadProgress(name, percentage, URI, size, status);
+    // Status mapping
+    switch (status) {
+    case pkgAcquire::Item::StatIdle:
+        downloadStatus = QApt::IdleState;
+        break;
+    case pkgAcquire::Item::StatFetching:
+        downloadStatus = QApt::FetchingState;
+        break;
+    case pkgAcquire::Item::StatDone:
+        downloadStatus = QApt::DoneState;
+        fetchedSize = fileSize;
+        break;
+    case pkgAcquire::Item::StatError:
+        downloadStatus = QApt::ErrorState;
+        break;
+    case pkgAcquire::Item::StatAuthError:
+        downloadStatus = QApt::AuthErrorState;
+        break;
+    case pkgAcquire::Item::StatTransientNetworkError:
+        downloadStatus = QApt::NetworkErrorState;
+        break;
+    default:
+        break;
     }
-}
 
-bool WorkerAcquire::wasCancelled() const
-{
-    return m_cancelled;
+    if (downloadStatus == QApt::DoneState && errorMsg.size())
+        message = errorMsg;
+    else if (Itm.Owner->Mode)
+        message = QString::fromUtf8(Itm.Owner->Mode);
+
+    QApt::DownloadProgress dp(URI, downloadStatus, shortDesc,
+                              fileSize, fetchedSize, message);
+
+    m_trans->setDownloadProgress(dp);
 }

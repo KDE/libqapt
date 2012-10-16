@@ -23,6 +23,7 @@
 
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
+#include <QDebug>
 
 #include <apt-pkg/error.h>
 
@@ -36,16 +37,16 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "../globals.h"
-#include "worker.h"
+#include "transaction.h"
 
 using namespace std;
 
-WorkerInstallProgress::WorkerInstallProgress(QAptWorker* parent)
+WorkerInstallProgress::WorkerInstallProgress(QObject* parent, int begin, int end)
         : QObject(parent)
-        , m_worker(parent)
-        , m_questionResponse(QVariantMap())
+        , m_trans(nullptr)
         , m_startCounting(false)
+        , m_progressBegin(begin)
+        , m_progressEnd(end)
 {
     setenv("DEBIAN_FRONTEND", "passthrough", 1);
     setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
@@ -53,12 +54,22 @@ WorkerInstallProgress::WorkerInstallProgress(QAptWorker* parent)
     setenv("APT_LISTCHANGES_FRONTEND", "debconf", 1);
 }
 
-WorkerInstallProgress::~WorkerInstallProgress()
+void WorkerInstallProgress::setTransaction(Transaction *trans)
 {
+    m_trans = trans;
+    std::setlocale(LC_ALL, m_trans->locale().toAscii());
+
+    if (!trans->debconfPipe().isEmpty()) {
+        setenv("DEBIAN_FRONTEND", "passthrough", 1);
+        setenv("DEBCONF_PIPE", trans->debconfPipe().toAscii(), 1);
+    } else {
+        setenv("DEBIAN_FRONTEND", "noninteractive", 1);
+    }
 }
 
 pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *pm)
 {
+    m_trans->setStatus(QApt::CommittingStatus);
     pkgPackageManager::OrderResult res;
 
     res = pm->DoInstallPreFork();
@@ -99,9 +110,17 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     // Update the interface until the child dies
     int ret;
     char masterbuf[1024];
+    QString dpkgLine;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
-        // TODO: This is dpkg's raw output. Let's see if we can't do something with it
+        // Read dpkg's raw output
         while(read(pty_master, masterbuf, sizeof(masterbuf)) > 0);
+
+        // Format raw dpkg output, remove ansi escape sequences
+        dpkgLine = QString(masterbuf);
+        dpkgLine.remove(m_ansiRegex);
+        //qDebug() << dpkgLine;
+
+        // Update high-level status info
         updateInterface(readFromChildFD[0], pty_master);
     }
 
@@ -134,7 +153,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             // If str legitimately had a ':' in it (such as a package version)
             // we need to retrieve the next string in the list.
             if (list.count() == 5) {
-                str += QString(QLatin1Char(':') % list.at(4));
+                str += QString(':' % list.at(4));
             }
 
             if (package.isEmpty() || status.isEmpty()) {
@@ -142,28 +161,25 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             }
 
             if (status.contains(QLatin1String("pmerror"))) {
-                QVariantMap args;
-                args[QLatin1String("FailedItem")] = package;
-                args[QLatin1String("ErrorText")] = str;
-                emit commitError(QApt::CommitError, args);
+                // Append error string to existing error details
+                m_trans->setErrorDetails(m_trans->errorDetails() % package % '\n' % str % "\n\n");
             } else if (status.contains(QLatin1String("pmconffile"))) {
                 // From what I understand, the original file starts after the ' character ('\'') and
                 // goes to a second ' character. The new conf file starts at the next ' and goes to
                 // the next '.
-                QStringList strList = str.split(QLatin1Char('\''));
+                QStringList strList = str.split('\'');
                 QString oldFile = strList.at(1);
                 QString newFile = strList.at(2);
 
-                QVariantMap args;
-                args[QLatin1String("OldConfFile")] = oldFile;
-                args[QLatin1String("NewConfFile")] = newFile;
-                //TODO: diff support
+                m_trans->setConfFileConflict(oldFile, newFile);
+                m_trans->setStatus(QApt::WaitingConfigFilePromptStatus);
 
-                QVariantMap result = askQuestion(QApt::ConfFilePrompt, args);
+                while (m_trans->isPaused())
+                    usleep(200000);
 
-                bool replaceFile = result[QLatin1String("ReplaceFile")].toBool();
+                m_trans->setStatus(QApt::CommittingStatus);
 
-                if (replaceFile) {
+                if (m_trans->replaceConfFile()) {
                     ssize_t reply = write(writeFd, "Y\n", 2);
                     Q_UNUSED(reply);
                 } else {
@@ -175,6 +191,7 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
             }
 
             int percentage;
+            int progress;
             if (percent.contains(QLatin1Char('.'))) {
                 QStringList percentList = percent.split(QLatin1Char('.'));
                 percentage = percentList.at(0).toInt();
@@ -182,7 +199,10 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 percentage = percent.toInt();
             }
 
-            emit commitProgress(str, percentage);
+            progress = qRound(qreal(m_progressBegin + qreal(percentage / 100.0) * (m_progressEnd - m_progressBegin)));
+
+            m_trans->setProgress(progress);
+            m_trans->setStatusDetails(str);
             // clean-up
             line[0] = 0;
         } else {
@@ -192,24 +212,4 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
     }
     // 30 frames per second
     usleep(1000000/30);
-}
-
-QVariantMap WorkerInstallProgress::askQuestion(int questionCode, const QVariantMap &args)
-{
-    m_questionBlock = new QEventLoop;
-    connect(m_worker, SIGNAL(answerReady(QVariantMap)),
-            this, SLOT(setAnswer(QVariantMap)));
-
-    emit workerQuestion(questionCode, args);
-    m_questionBlock->exec(); // Process blocked, waiting for answerReady signal over dbus
-
-    return m_questionResponse;
-}
-
-void WorkerInstallProgress::setAnswer(const QVariantMap &answer)
-{
-    disconnect(m_worker, SIGNAL(answerReady(QVariantMap)),
-               this, SLOT(setAnswer(QVariantMap)));
-    m_questionResponse = answer;
-    m_questionBlock->quit();
 }

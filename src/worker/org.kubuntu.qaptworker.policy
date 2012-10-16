@@ -30,5 +30,14 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
+  <action id="org.kubuntu.qaptworker.cancelForeign">
+    <description>Cancel the task of another user</description>
+    <message> To cancel someone else's software changes, you need to authenticate.</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+  </action>
 
 </policyconfig>

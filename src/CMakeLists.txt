@@ -7,6 +7,9 @@ set(qapt_SRCS
     debfile.cpp
     dependencyinfo.cpp
     changelog.cpp
+    transaction.cpp
+    transactiondbus.cpp
+    downloadprogress.cpp
     )
 
 include_directories(
@@ -21,6 +24,8 @@ set(qapt_MOC_HDRS
     cache.h
     config.h
     history.h
+    transaction.h
+    transactiondbus.h
    )
 
 set(qapt_HDRS
@@ -29,6 +34,7 @@ set(qapt_HDRS
     dependencyinfo.h
     changelog.h
     globals.h
+    downloadprogress.h
     )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
@@ -63,6 +69,8 @@ install(FILES
     history.h
     package.h
     globals.h
+    transaction.h
+    downloadprogress.h
 
     DESTINATION
     include/libqapt COMPONENT Devel)

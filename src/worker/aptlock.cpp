@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,35 +18,40 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef WORKERINSTALLPROGRESS_H
-#define WORKERINSTALLPROGRESS_H
+#include "aptlock.h"
 
-#include <QtCore/QRegExp>
-#include <QtCore/QVariantMap>
+#include <apt-pkg/error.h>
+#include <QDebug>
 
-#include <apt-pkg/packagemanager.h>
-
-class Transaction;
-
-class WorkerInstallProgress : public QObject
+AptLock::AptLock(const QString &path)
+    : m_path(path.toUtf8())
+    , m_fd(-1)
 {
-    Q_OBJECT
-public:
-    WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
+}
 
-    void setTransaction(Transaction *trans);
-    pkgPackageManager::OrderResult start(pkgPackageManager *pm);
+bool AptLock::isLocked() const
+{
+    return m_fd != -1;
+}
 
-private:
-    Transaction *m_trans;
-    QRegExp m_ansiRegex;
+bool AptLock::acquire()
+{
+    if (isLocked())
+        return true;
 
-    pid_t m_child_id;
-    bool m_startCounting;
-    int m_progressBegin;
-    int m_progressEnd;
+    std::string str = m_path.data();
+    m_fd = GetLock(str + "lock");
+    m_lock.Fd(m_fd);
 
-    void updateInterface(int fd, int writeFd);
-};
+    return isLocked();
+}
 
-#endif
+void AptLock::release()
+{
+    if (!isLocked())
+        return;
+
+    m_lock.Close();
+    ::close(m_fd);
+    m_fd = -1;
+}

@@ -32,6 +32,7 @@ class QStackedWidget;
 
 namespace QApt {
     class Backend;
+    class Transaction;
 }
 
 class DebCommitWidget;
@@ -42,12 +43,12 @@ class DebInstaller : public KDialog
     Q_OBJECT
 public:
     explicit DebInstaller(QWidget *parent, const QString &debFile);
-    ~DebInstaller();
 
 private:
     // Backend stuff
     QApt::Backend *m_backend;
     QApt::DebFile *m_debFile;
+    QApt::Transaction *m_trans;
     QString m_foreignArch;
 
     // GUI
@@ -64,6 +65,7 @@ private:
     QString m_versionInfo;
 
     // Functions
+    void initError();
     bool checkDeb();
     void compareDebWithCache();
     QString maybeAppendArchSuffix(const QString& pkgName, bool checkingConflicts = false);
@@ -74,11 +76,11 @@ private:
 private Q_SLOTS:
     void initGUI();
 
-    void workerEvent(QApt::WorkerEvent event);
-    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
+    void transactionStatusChanged(QApt::TransactionStatus status);
+    void errorOccurred(QApt::ErrorCode error);
 
+    void setupTransaction(QApt::Transaction *trans);
     void installDebFile();
-    void initCommitWidget();
 };
 
 #endif

@@ -73,7 +73,7 @@ void ChangelogEntryPrivate::parseData(const QString &sourcePackage)
 
     QString versionLine = lines.first();
     lines.removeFirst();
-    int pos = rxInfo.indexIn(versionLine);
+    rxInfo.indexIn(versionLine);
 
     QStringList list = rxInfo.capturedTexts();
     if (list.count() > 1) {
@@ -84,26 +84,32 @@ void ChangelogEntryPrivate::parseData(const QString &sourcePackage)
         // Populate description
         if (line.startsWith(QLatin1String("  "))) {
             description.append(line % '\n');
+
+            // Grab CVEs
+            QRegExp rxCVE("CVE-\\d{4}-\\d{4}");
+            rxCVE.indexIn(line);
+            QStringList cveMatches = rxCVE.capturedTexts();
+
+            for (const QString &match : cveMatches)
+            {
+                if (!match.isEmpty())
+                    CVEUrls += QString("http://web.nvd.nist.gov/view/vuln/detail?vulnId=%1;%1").arg(match);
+            }
+
             continue;
         }
 
-        // NBC Dateline, to catch a QDateTime
-        // Spacing matters here
-        QRegExp rxDate("^ -- (.+) (<.+>)  (.+)$"); // Chris Hansen
-        int pos = rxDate.indexIn(line);
+        QRegExp rxDate("^ -- (.+) (<.+>)  (.+)$");
+        rxDate.indexIn(line);
         list = rxDate.capturedTexts();
 
         if (list.count() > 1) {
-            // Why don't you have a seat over there...
             time_t issueTime = -1;
             if (RFC1123StrToTime(list.at(3).toUtf8().data(), issueTime)) {
                 issueDate = QDateTime::fromTime_t(issueTime);
                 break;
             }
         }
-
-
-        QRegExp rxCVE("CVE-\\d{4}-\\d{4}");
     }
 }
 
@@ -149,6 +155,11 @@ QDateTime ChangelogEntry::issueDateTime() const
 QString ChangelogEntry::description() const
 {
     return d->description;
+}
+
+QStringList ChangelogEntry::CVEUrls() const
+{
+    return d->CVEUrls;
 }
 
 
@@ -224,7 +235,7 @@ ChangelogEntryList Changelog::entries() const
         entryTexts[curIndex] = curEntry;
     }
 
-    foreach (const QString &stanza, entryTexts) {
+    for (const QString &stanza : entryTexts) {
         ChangelogEntry entry(stanza, d->sourcePackage);
 
         entries << entry;
@@ -237,8 +248,7 @@ ChangelogEntryList Changelog::newEntriesSince(const QString &version) const
 {
     ChangelogEntryList newEntries;
 
-    foreach (const ChangelogEntry &entry, entries()) {
-
+    for (const ChangelogEntry &entry : entries()) {
         int res = Package::compareVersion(entry.version(), version);
 
         // Add entries newer than the given version

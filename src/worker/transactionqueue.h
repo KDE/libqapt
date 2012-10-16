@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2012 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2008-2009 Sebastian Heinlein <devel@glatzor.de>           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,35 +19,48 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef WORKERINSTALLPROGRESS_H
-#define WORKERINSTALLPROGRESS_H
+#ifndef TRANSACTIONQUEUE_H
+#define TRANSACTIONQUEUE_H
 
-#include <QtCore/QRegExp>
-#include <QtCore/QVariantMap>
+#include <QtCore/QObject>
+#include <QtCore/QQueue>
 
-#include <apt-pkg/packagemanager.h>
-
+class AptWorker;
 class Transaction;
 
-class WorkerInstallProgress : public QObject
+class TransactionQueue : public QObject
 {
     Q_OBJECT
 public:
-    WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
+    TransactionQueue(QObject *parent, AptWorker *worker);
 
-    void setTransaction(Transaction *trans);
-    pkgPackageManager::OrderResult start(pkgPackageManager *pm);
+    QList<Transaction *> transactions() const;
+    Transaction *activeTransaction() const;
+    bool isEmpty() const;
 
 private:
-    Transaction *m_trans;
-    QRegExp m_ansiRegex;
+    AptWorker *m_worker;
+    QQueue<Transaction *> m_queue;
+    QList<Transaction *> m_pending;
+    Transaction *m_activeTransaction;
 
-    pid_t m_child_id;
-    bool m_startCounting;
-    int m_progressBegin;
-    int m_progressEnd;
+    Transaction *pendingTransactionById(const QString &id) const;
+    Transaction *transactionById(const QString &id) const;
+    
+signals:
+    void queueChanged(const QString &active,
+                      const QStringList &queued);
 
-    void updateInterface(int fd, int writeFd);
+public slots:
+    void addPending(Transaction *trans);
+    void removePending(Transaction *trans);
+    void enqueue(QString tid);
+    void remove(QString tid);
+
+private slots:
+    void onTransactionFinished();
+    void runNextTransaction();
+    void emitQueueChanged();
 };
 
-#endif
+#endif // TRANSACTIONQUEUE_H

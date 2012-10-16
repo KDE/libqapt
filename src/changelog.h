@@ -41,7 +41,7 @@ class ChangelogPrivate;
 class Q_DECL_EXPORT ChangelogEntry
 {
 public:
-    explicit ChangelogEntry(const QString &entryData, const QString &sourcePackage);
+    ChangelogEntry(const QString &entryData, const QString &sourcePackage);
     ChangelogEntry(const ChangelogEntry &other);
     ~ChangelogEntry();
     ChangelogEntry &operator=(const ChangelogEntry &rhs);
@@ -50,11 +50,10 @@ public:
     QString version() const;
     QDateTime issueDateTime() const;
     QString description() const;
+    QStringList CVEUrls() const;
 
 private:
-    QT_END_NAMESPACE
     QSharedDataPointer<ChangelogEntryPrivate> d;
-    QT_BEGIN_NAMESPACE
 };
 
 typedef QList<ChangelogEntry> ChangelogEntryList;
@@ -73,7 +72,7 @@ public:
      /**
       * Default constructor
       */
-    explicit Changelog(const QString &data, const QString &sourcePackage);
+    Changelog(const QString &data, const QString &sourcePackage);
     Changelog(const Changelog &other);
     ~Changelog();
     Changelog &operator=(const Changelog &rhs);
@@ -83,9 +82,7 @@ public:
     ChangelogEntryList newEntriesSince(const QString &version) const;
 
 private:
-    QT_END_NAMESPACE
     QSharedDataPointer<ChangelogPrivate> d;
-    QT_BEGIN_NAMESPACE
 };
 
 }

@@ -59,8 +59,7 @@ public:
      /**
       * Default destructor
       */
-    // TODO: QApt2: no virtual destructor
-    virtual ~Config();
+    ~Config();
 
     /**
      * Reads the value of an entry specified by @p key

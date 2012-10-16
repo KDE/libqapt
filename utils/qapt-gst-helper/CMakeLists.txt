@@ -13,6 +13,7 @@ kde4_add_executable(qapt-gst-helper ${qapt-gst-helper_SRCS})
 
 target_link_libraries(qapt-gst-helper
                       ${KDE4_KDEUI_LIBS}
+                      ${KDE4_KIO_LIBS}
                       ${QTGSTREAMER_LIBRARY}
                       qapt)
 
