@@ -279,8 +279,7 @@ void Backend::setInitError()
     Q_D(Backend);
 
     string message;
-    bool isError = _error->PopMessage(message);
-    if (isError)
+    if (_error->PopMessage(message))
         d->initErrorMessage = QString::fromStdString(message);
 }
 
