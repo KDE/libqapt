@@ -736,6 +736,7 @@ QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, Pa
             continue;
 
         // These flags will never be set together.
+        // We can use this to filter status down to a single flag.
         status &= (Package::Held |
                    Package::NewInstall |
                    Package::ToReInstall |
@@ -743,33 +744,10 @@ QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, Pa
                    Package::ToDowngrade |
                    Package::ToRemove);
 
-        PackageList list;
-        if (status & Package::ToUpgrade) {
-            list = changes.value(Package::ToUpgrade);
-            list.append(pkg);
-            changes[Package::ToUpgrade]= list;
-        } else if (status & Package::NewInstall) {
-            list = changes.value(Package::NewInstall);
-            list.append(pkg);
-            changes[Package::NewInstall]= list;
-        } else if (status & Package::ToReInstall) {
-            list = changes.value(Package::ToReInstall);
-            list.append(pkg);
-            changes[Package::ToReInstall]= list;
-        } else if (status & Package::ToDowngrade) {
-            list = changes.value(Package::ToDowngrade);
-            list.append(pkg);
-            changes[Package::ToDowngrade]= list;
-        } else if (status & Package::ToRemove) {
-            list = changes.value(Package::ToRemove);
-            list.append(pkg);
-            changes[Package::ToRemove]= list;
-        } else if (status & Package::ToKeep) {
-            list = changes.value(Package::ToKeep);
-            list.append(pkg);
-            changes[Package::ToKeep]= list;
-        }
-
+        // Add this package/status pair to the changes hash
+        PackageList list = changes.value((Package::State)status);
+        list.append(pkg);
+        changes[(Package::State)status]= list;
     }
 
     return changes;
