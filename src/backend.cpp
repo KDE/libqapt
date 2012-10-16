@@ -777,21 +777,23 @@ void Backend::restoreCacheState(const CacheState &state)
         int flags = pkg->state();
         int oldflags = state[i];
 
-        if (oldflags != flags) {
-            if (oldflags & Package::ToReInstall) {
-                deps->MarkInstall(pkg->packageIterator(), true);
-                deps->SetReInstall(pkg->packageIterator(), false);
-            } else if (oldflags & Package::ToInstall) {
-                deps->MarkInstall(pkg->packageIterator(), true);
-            } else if (oldflags & Package::ToRemove) {
-                deps->MarkDelete(pkg->packageIterator(), (bool)(oldflags & Package::ToPurge));
-            } else if (oldflags & Package::ToKeep) {
-                deps->MarkKeep(pkg->packageIterator(), false);
-            }
-            // fix the auto flag
-            deps->MarkAuto(pkg->packageIterator(), (oldflags & Package::IsAuto));
+        if (oldflags == flags)
+            continue;
+
+        if (oldflags & Package::ToReInstall) {
+            deps->MarkInstall(pkg->packageIterator(), true);
+            deps->SetReInstall(pkg->packageIterator(), false);
+        } else if (oldflags & Package::ToInstall) {
+            deps->MarkInstall(pkg->packageIterator(), true);
+        } else if (oldflags & Package::ToRemove) {
+            deps->MarkDelete(pkg->packageIterator(), (bool)(oldflags & Package::ToPurge));
+        } else if (oldflags & Package::ToKeep) {
+            deps->MarkKeep(pkg->packageIterator(), false);
         }
+        // fix the auto flag
+        deps->MarkAuto(pkg->packageIterator(), (oldflags & Package::IsAuto));
     }
+
     emit packageChanged();
 }
 
