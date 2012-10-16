@@ -266,11 +266,8 @@ void HistoryPrivate::init()
     QStringList stanzas = data.split(QLatin1String("\n\n"));
     for (const QString &stanza : stanzas) {
         const HistoryItem historyItem(stanza);
-        if (historyItem.isValid()) {
+        if (historyItem.isValid())
             historyItemList << historyItem;
-        } else {
-            delete historyItem;
-        }
     }
 }
 
