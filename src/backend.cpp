@@ -663,8 +663,8 @@ bool Backend::xapianIndexNeedsUpdate() const
     Q_D(const Backend);
 
     // If the cache has been modified after the xapian timestamp, we need to rebuild
-    QDateTime aptCacheTime = QFileInfo(QLatin1String(_config->FindFile("Dir::Cache::pkgcache").c_str())).lastModified();
-    QDateTime dpkgStatusTime = QFileInfo(QLatin1String("/var/lib/dpkg/status")).lastModified();
+    QDateTime aptCacheTime = QFileInfo(d->config->findFile("Dir::Cache::pkgcache")).lastModified();
+    QDateTime dpkgStatusTime = QFileInfo(d->config->findFile("Dir::State::status")).lastModified();
 
     bool outdated = false;
     if (d->xapianTimeStamp < aptCacheTime.toTime_t() ||
