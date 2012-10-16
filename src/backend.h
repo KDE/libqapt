@@ -447,41 +447,10 @@ private:
 
 Q_SIGNALS:
     /**
-     * Emitted whenever a backend error occurs. You should listen to this
-     * signal and present the error/clean up when your app receives it.
-     *
-     * @param error @c ErrorCode enum member indicating error type
-     * @param details  A @c QVariantMap containing containing info about the error, if
-     *                available
-     */
-    void errorOccurred(QApt::ErrorCode error, const QVariantMap &details);
-
-    /**
      * Emitted whenever a package changes state. Useful for knowning when to
      * react to state changes.
      */
     void packageChanged();
-
-    /**
-     * Emits the progress of a current package installation/removal/
-     * operation.
-     *
-     * @param status Current status retrieved from dpkg
-     * @param percentage Total percent complete
-     */
-    void commitProgress(const QString &status, int percentage);
-
-   /**
-    * Emitted during the install of a .deb file, giving the output
-    * of the dpkg process installing the .deb
-    *
-    * @param message A line of output from dpkg
-    *
-    * @since 2.0
-    *
-    * @see installDebFile(const DebFile &debFile)
-    */
-    void debInstallMessage(const QString &message);
 
    /**
     * Emits the progress of the Apt Xapian Indexer
