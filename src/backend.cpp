@@ -319,7 +319,8 @@ Package *Backend::package(pkgCache::PkgIterator &iter) const
     if (index != -1 && index < d->packages.size()) {
         return d->packages.at(index);
     }
-    return 0;
+
+    return nullptr;
 }
 
 Package *Backend::package(const QString &name) const
@@ -335,7 +336,7 @@ Package *Backend::package(QLatin1String name) const
     if (!pkg.end()) {
         return package(pkg);
     }
-    return 0;
+    return nullptr;
 }
 
 Package *Backend::packageForFile(const QString &file) const
@@ -343,7 +344,7 @@ Package *Backend::packageForFile(const QString &file) const
     Q_D(const Backend);
 
     if (file.isEmpty()) {
-        return 0;
+        return nullptr;
     }
 
     for (Package *package : d->packages) {
@@ -351,7 +352,8 @@ Package *Backend::packageForFile(const QString &file) const
             return package;
         }
     }
-    return 0;
+
+    return nullptr;
 }
 
 QStringList Backend::origins() const
