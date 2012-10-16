@@ -876,15 +876,17 @@ void Backend::markPackagesForAutoRemove()
     Q_D(Backend);
 
     pkgDepCache &cache = *d->cache->depCache();
+    bool isResidual;
 
     for (pkgCache::PkgIterator pkgIter = cache.PkgBegin(); !pkgIter.end(); ++pkgIter) {
-        if (cache[pkgIter].Garbage) {
-            if(pkgIter.CurrentVer() &&
-               pkgIter->CurrentState != pkgCache::State::ConfigFiles) {
-                cache.MarkDelete(pkgIter, false);
-            }
-        }
+        // Auto-removable packages are marked as garbage in the cache
+        if (!cache[pkgIter].Garbage)
+            continue;
 
+        isResidual = pkgIter->CurrentState == pkgCache::State::ConfigFiles;
+        // Delete auto-removable packages, but we can't delete residual packages
+        if (pkgIter.CurrentVer() && !isResidual)
+            cache.MarkDelete(pkgIter, false);
     }
 
     emit packageChanged();
