@@ -1,28 +1,55 @@
 [Domain]
 Name=Kubuntu
+Name[pt]=Kubuntu
+Name[uk]=Kubuntu
+Name[x-test]=xxKubuntuxx
 Icon=package-x-generic
 URL=http://www.kubuntu.org
 
 [org.kubuntu.qaptworker.updatecache]
 Name=Update package information
+Name[pt]=Actualizar a informação dos pacotes
+Name[uk]=Оновлення даних щодо пакунків
+Name[x-test]=xxUpdate package informationxx
 Description=To update the software catalog you need to authenticate.
+Description[pt]=Para actualizar o catálogo de aplicações, tem de se autenticar.
+Description[uk]=Для оновлення каталогу програмного забезпечення вам слід пройти розпізнавання.
+Description[x-test]=xxTo update the software catalog you need to authenticate.xx
 Policy=yes
 Persistence=session
 
 [org.kubuntu.qaptworker.commitchanges]
 Name=Install or remove packages
+Name[pt]=Instalar ou remover pacotes
+Name[uk]=Встановлення або вилучення пакунків
+Name[x-test]=xxInstall or remove packagesxx
 Description=To install or remove software you need to authenticate.
+Description[pt]=Para instalar ou remover aplicações, tem de se autenticar.
+Description[uk]=Для встановлення або вилучення програмного забезпечення вам слід пройти розпізнавання.
+Description[x-test]=xxTo install or remove software you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
 
 [org.kubuntu.qaptworker.writefiletodisk]
 Name=Change software configuration
+Name[pt]=Mudar a configuração das aplicações
+Name[uk]=Зміна налаштувань програмного забезпечення
+Name[x-test]=xxChange software configurationxx
 Description=To change software settings you need to authenticate.
+Description[pt]=Para modificar a configuração das aplicações, tem de se autenticar.
+Description[uk]=Для внесення змін до параметрів програмного забезпечення вам слід пройти розпізнавання.
+Description[x-test]=xxTo change software settings you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
 
 [org.kubuntu.qaptworker.cancelforeign]
 Name=Cancel the task of another user
+Name[pt]=Cancelar a tarefa de outro utilizador
+Name[uk]=Скасування дій, визначених іншим користувачем
+Name[x-test]=xxCancel the task of another userxx
 Description=To cancel someone else's software changes you need to authenticate.
+Description[pt]=Para cancelar as modificações de outra pessoa, terá de se autenticar.
+Description[uk]=Для скасування внесення змін до програмного забезпечення, визначеного кимось іншим, вам слід пройти розпізнавання.
+Description[x-test]=xxTo cancel someone else's software changes you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
