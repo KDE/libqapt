@@ -141,7 +141,7 @@ Backend::Backend(QObject *parent)
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
     connect(d->worker, SIGNAL(transactionQueueChanged(QString,QStringList)),
-            this, SIGNAL(transactionQueueChanged(QString, QStringList)));
+            this, SIGNAL(transactionQueueChanged(QString,QStringList)));
     DownloadProgress::registerMetaTypes();
 }
 

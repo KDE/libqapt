@@ -128,7 +128,7 @@ public:
     QString errorDetails() const;
 
 private:
-    QSharedPointer<TransactionPrivate> d;
+    const QSharedPointer<TransactionPrivate> d;
 
     void updateTransactionId(const QString &tid);
     void updateUserId(int id);
