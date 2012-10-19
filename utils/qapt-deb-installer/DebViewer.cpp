@@ -46,11 +46,13 @@ DebViewer::DebViewer(QWidget *parent)
     , m_debFile(nullptr)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setMargin(0);
     setLayout(mainLayout);
 
     // Header
     QWidget *headerWidget = new QWidget(this);
     QHBoxLayout *headerLayout = new QHBoxLayout(headerWidget);
+    headerLayout->setMargin(0);
     headerWidget->setLayout(headerLayout);
 
     m_iconLabel = new QLabel(headerWidget);

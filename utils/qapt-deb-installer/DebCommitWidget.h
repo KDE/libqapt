@@ -27,7 +27,7 @@
 
 class QLabel;
 class QProgressBar;
-class QTextEdit;
+class KTextEdit;
 
 namespace DebconfKde {
     class DebconfGui;
@@ -50,7 +50,7 @@ private:
     QApt::Transaction *m_trans;
     QString m_pipe;
     QLabel *m_headerLabel;
-    QTextEdit *m_terminal;
+    KTextEdit *m_terminal;
     DebconfKde::DebconfGui *m_debconfGui;
     QProgressBar *m_progressBar;
 

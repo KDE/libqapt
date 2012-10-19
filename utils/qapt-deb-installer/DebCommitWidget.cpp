@@ -26,11 +26,11 @@
 #include <QtCore/QUuid>
 #include <QtGui/QLabel>
 #include <QtGui/QProgressBar>
-#include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 
 // KDE includes
 #include <KMessageBox>
+#include <KTextEdit>
 
 // LibQApt/DebconfKDE includes
 #include <DebconfGui.h>
@@ -43,13 +43,14 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setMargin(0);
     setLayout(layout);
 
     m_headerLabel = new QLabel(this);
     m_headerLabel->setText(i18nc("@info The widget's header label",
                                  "<title>Installing</title>"));
 
-    m_terminal = new QTextEdit(this);
+    m_terminal = new KTextEdit(this);
     m_terminal->setReadOnly(true);
     m_terminal->setFontFamily(QLatin1String("Monospace"));
     m_terminal->setWordWrapMode(QTextOption::NoWrap);
