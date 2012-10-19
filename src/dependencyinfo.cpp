@@ -27,23 +27,62 @@
 
 namespace QApt {
 
+class DependencyInfoPrivate : public QSharedData {
+public:
+    DependencyInfoPrivate()
+        : QSharedData()
+        , relationType(NoOperand)
+        , dependencyType(InvalidType) {}
+
+    DependencyInfoPrivate(const QString &package, const QString &version,
+                          RelationType rType, DependencyType dType)
+        : QSharedData()
+        , packageName(package)
+        , packageVersion(version)
+        , relationType(rType)
+        , dependencyType(dType) {}
+
+    DependencyInfoPrivate(const DependencyInfoPrivate &other)
+        : QSharedData(other)
+        , packageName(other.packageName)
+        , packageVersion(other.packageVersion)
+        , relationType(other.relationType)
+        , dependencyType(other.dependencyType) {}
+
+    QString packageName;
+    QString packageVersion;
+    RelationType relationType;
+    DependencyType dependencyType;
+};
+
 DependencyInfo::DependencyInfo()
-    : m_relationType(NoOperand)
-    , m_dependencyType(InvalidType)
+    : d(new DependencyInfoPrivate())
 {
 }
 
 DependencyInfo::DependencyInfo(const QString &package, const QString &version,
                                RelationType rType, DependencyType dType)
-    : m_packageName(package)
-    , m_packageVersion(version)
-    , m_relationType(rType)
-    , m_dependencyType(dType)
+    : d(new DependencyInfoPrivate(package, version, rType, dType))
 {
+}
+
+DependencyInfo::DependencyInfo(const DependencyInfo &other)
+{
+    d = other.d;
 }
 
 DependencyInfo::~DependencyInfo()
 {
+}
+
+DependencyInfo &DependencyInfo::operator=(const DependencyInfo &rhs)
+{
+    // Protect against self-assignment
+    if (this == &rhs) {
+        return *this;
+    }
+    d = rhs.d;
+    return *this;
 }
 
 QList<DependencyItem> DependencyInfo::parseDepends(const QString &field, DependencyType type)
@@ -97,22 +136,22 @@ QList<DependencyItem> DependencyInfo::parseDepends(const QString &field, Depende
 
 QString DependencyInfo::packageName() const
 {
-    return m_packageName;
+    return d->packageName;
 }
 
 QString DependencyInfo::packageVersion() const
 {
-    return m_packageVersion;
+    return d->packageVersion;
 }
 
 RelationType DependencyInfo::relationType() const
 {
-    return m_relationType;
+    return d->relationType;
 }
 
 DependencyType DependencyInfo::dependencyType() const
 {
-    return m_dependencyType;
+    return d->dependencyType;
 }
 
 }

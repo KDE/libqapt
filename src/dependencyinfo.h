@@ -21,11 +21,14 @@
 #ifndef QAPT_DEPENDENCYINFO_H
 #define QAPT_DEPENDENCYINFO_H
 
+#include <QtCore/QSharedDataPointer>
 #include <QtCore/QString>
 
 #include "globals.h"
 
 namespace QApt {
+
+class DependencyInfoPrivate;
 
 /**
  * The DependencyInfo object describes a single dependency that a package can
@@ -52,11 +55,21 @@ public:
     DependencyInfo();
 
    /**
+    * Copy constructor. Creates a shallow copy.
+    */
+    DependencyInfo(const DependencyInfo &other);
+
+   /**
     * Default destructor.
     */
     ~DependencyInfo();
 
-    static QList<QList<DependencyInfo > > parseDepends(const QString &field, DependencyType type);
+   /**
+    * Assignment operator.
+    */
+    DependencyInfo &operator=(const DependencyInfo &rhs);
+
+    static QList<QList<DependencyInfo> > parseDepends(const QString &field, DependencyType type);
 
    /**
     * The name of the package that the dependency describes.
@@ -97,10 +110,7 @@ private:
     DependencyInfo(const QString &package, const QString &version,
                    RelationType rType, DependencyType dType);
 
-    QString m_packageName;
-    QString m_packageVersion;
-    RelationType m_relationType;
-    DependencyType m_dependencyType;
+    QSharedDataPointer<DependencyInfoPrivate> d;
 };
 
 /**
