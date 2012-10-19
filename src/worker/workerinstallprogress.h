@@ -32,7 +32,7 @@ class WorkerInstallProgress : public QObject
 {
     Q_OBJECT
 public:
-    WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
+    explicit WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
 
     void setTransaction(Transaction *trans);
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);

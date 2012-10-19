@@ -112,7 +112,7 @@ Transaction::~Transaction()
 {
 }
 
-bool Transaction::operator==(const Transaction* rhs)
+bool Transaction::operator==(const Transaction* rhs) const
 {
     return d->tid == rhs->d->tid;
 }

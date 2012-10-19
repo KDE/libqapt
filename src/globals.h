@@ -296,7 +296,7 @@ namespace QApt
         LoadingCacheStatus,
         /// The status when a transaction is downloading archives
         DownloadingStatus,
-        /// The status when a transation is committing changes to the APT cache
+        /// The status when a transaction is committing changes to the APT cache
         CommittingStatus,
         /// The status when a transaction is complete
         FinishedStatus

@@ -69,12 +69,12 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     if (!connection.registerObject(m_tid, this))
         qWarning() << "Unable to register transaction on DBus";
 
-    m_roleActionMap[QApt::EmptyRole] = QString();
+    m_roleActionMap[QApt::EmptyRole] = QString("");
     m_roleActionMap[QApt::UpdateCacheRole] = QLatin1String("org.kubuntu.qaptworker.updatecache");
     m_roleActionMap[QApt::UpgradeSystemRole] = QLatin1String("org.kubuntu.qaptworker.commitchanges");
     m_roleActionMap[QApt::CommitChangesRole] = QLatin1String("org.kubuntu.qaptworker.commitchanges");
-    m_roleActionMap[QApt::UpdateXapianRole] = QString();
-    m_roleActionMap[QApt::DownloadArchivesRole] = QString();
+    m_roleActionMap[QApt::UpdateXapianRole] = QString("");
+    m_roleActionMap[QApt::DownloadArchivesRole] = QString("");
     m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker.commitchanges");
 
     m_queue->addPending(this);

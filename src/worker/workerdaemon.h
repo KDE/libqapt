@@ -56,7 +56,7 @@ signals:
                                               const QStringList &queued);
     
 public slots:
-    // Transation-based methods. Return transaction ids.
+    // Transaction-based methods. Return transaction ids.
     QString updateCache();
     QString installFile(const QString &file);
     QString commitChanges(QVariantMap instructionsList);

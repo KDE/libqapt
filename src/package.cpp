@@ -19,6 +19,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
+//krazy:excludeall=qclasses
+// Qt-only library, so things like QUrl *should* be used
+
 #include "package.h"
 
 // Qt includes

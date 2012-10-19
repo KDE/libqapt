@@ -103,7 +103,7 @@ public:
      *
      * @param other The transaction to be compared to
      */
-    bool operator==(const Transaction* rhs);
+    bool operator==(const Transaction* rhs) const;
 
     QString transactionId() const;
     int userId() const;
