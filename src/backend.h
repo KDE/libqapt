@@ -452,11 +452,24 @@ Q_SIGNALS:
      */
     void packageChanged();
 
-   /**
-    * Emits the progress of the Apt Xapian Indexer
-    *
-    * @param progress The progress percentage of the indexer
-    */
+    /**
+     * This signal is emitted when a Xapian search cache update is started.
+     *
+     * Slots connected to this signal can then listen to the xapianUpdateProgress
+     * signal for progress updates.
+     */
+    void xapianUpdateStarted();
+
+    /**
+     * This signal is emitted when a Xapian search cache update is finished.
+     */
+    void xapianUpdateFinished();
+
+    /**
+     * Emits the progress of the Apt Xapian Indexer
+     *
+     * @param progress The progress percentage of the indexer
+     */
     void xapianUpdateProgress(int percentage);
 
     /**
@@ -769,6 +782,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void emitPackageChanged();
+    void emitXapianUpdateFinished();
 };
 
 }

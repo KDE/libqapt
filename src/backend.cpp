@@ -1385,7 +1385,42 @@ void Backend::updateXapianIndex()
 {
     Q_D(Backend);
 
-    d->worker->updateXapianIndex();
+    QDBusMessage m = QDBusMessage::createMethodCall(QLatin1String("org.debian.AptXapianIndex"),
+                                                    QLatin1String("/"),
+                                                    QLatin1String("org.debian.AptXapianIndex"),
+                                                    QLatin1String("update_async"));
+    QVariantList dbusArgs;
+
+    dbusArgs << /*force*/ true << /*update_only*/ true;
+    m.setArguments(dbusArgs);
+    QDBusConnection::systemBus().send(m);
+
+    QDBusConnection::systemBus().connect(QLatin1String("org.debian.AptXapianIndex"),
+                                         QLatin1String("/"),
+                                         QLatin1String("org.debian.AptXapianIndex"),
+                                         QLatin1String("UpdateProgress"),
+                                         this, SIGNAL(xapianUpdateProgress(int)));
+    QDBusConnection::systemBus().connect(QLatin1String("org.debian.AptXapianIndex"),
+                                         QLatin1String("/"),
+                                         QLatin1String("org.debian.AptXapianIndex"),
+                                         QLatin1String("UpdateFinished"),
+                                         this, SLOT(emitXapianUpdateFinished()));
+    emit xapianUpdateStarted();
+}
+
+void Backend::emitXapianUpdateFinished()
+{
+    QDBusConnection::systemBus().disconnect(QLatin1String("org.debian.AptXapianIndex"),
+                                            QLatin1String("/"),
+                                            QLatin1String("org.debian.AptXapianIndex"),
+                                            QLatin1String("UpdateProgress"),
+                                            this, SIGNAL(xapianUpdateProgress(int)));
+    QDBusConnection::systemBus().disconnect(QLatin1String("org.debian.AptXapianIndex"),
+                                            QLatin1String("/"),
+                                            QLatin1String("org.debian.AptXapianIndex"),
+                                            QLatin1String("UpdateFinished"),
+                                            this, SLOT(xapianUpdateFinished(bool)));
+    emit xapianUpdateFinished();
 }
 
 bool Backend::addArchiveToCache(const DebFile &archive)
