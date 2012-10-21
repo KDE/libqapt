@@ -62,7 +62,6 @@ public slots:
     QString commitChanges(QVariantMap instructionsList);
     QString upgradeSystem(bool safeUpgrade);
     QString downloadArchives(const QStringList &packageNames, const QString &dest);
-    QString updateXapianIndex();
 
     // Synchronous methods
     bool writeFileToDisk(const QString &contents, const QString &path);

@@ -26,9 +26,6 @@
       <arg name="packageNames" type="as" direction="in"/>
       <arg name="dest" type="s" direction="in"/>
     </method>
-    <method name="updateXapianIndex">
-      <arg type="s" direction="out"/>
-    </method>
     <method name="writeFileToDisk">
       <arg type="b" direction="out"/>
       <arg name="contents" type="s" direction="in"/>

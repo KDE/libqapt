@@ -180,15 +180,7 @@ void AptWorker::runTransaction(Transaction *trans)
     m_trans = trans;
     trans->setStatus(QApt::RunningStatus);
     waitForLocks();
-
-    // Process transactions requiring no cache
-    switch (trans->role()) {
-    case QApt::UpdateXapianRole:
-        break;
-    default: // The transaction must need a cache
-        openCache();
-        break;
-    }
+    openCache();
 
     // Check for init error
     if (m_trans->error() != QApt::Success) {

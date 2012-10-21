@@ -151,13 +151,6 @@ QString WorkerDaemon::downloadArchives(const QStringList &packageNames, const QS
     return trans->transactionId();
 }
 
-QString WorkerDaemon::updateXapianIndex()
-{
-    Transaction *trans = createTransaction(QApt::UpdateXapianRole);
-
-    return trans->transactionId();
-}
-
 bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 {
     if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.writefiletodisk"), message().service())) {
