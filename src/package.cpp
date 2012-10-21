@@ -47,7 +47,7 @@
 #include <algorithm>
 
 #include "backend.h"
-#include "cache.h"
+#include "cache.h" // krazy:exclude=includes
 #include "config.h"
 
 namespace QApt {

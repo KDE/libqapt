@@ -18,7 +18,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "config.h"
+#include "config.h" // krazy:exclude=includes
 
 // Qt includes
 #include <QtCore/QByteArray>

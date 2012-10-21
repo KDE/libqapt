@@ -43,7 +43,7 @@
 
 // QApt includes
 #include "cache.h"
-#include "config.h"
+#include "config.h" // krazy:exclude=includes
 #include "debfile.h"
 #include "transaction.h"
 #include "workerdbus.h" // OrgKubuntuQaptworkerInterface
