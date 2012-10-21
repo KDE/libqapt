@@ -193,8 +193,6 @@ namespace QApt
         UpgradeSystemRole,
         /// The transaction will commit changes to packages
         CommitChangesRole,
-        /// The transaction will update the APT Xapian search index
-        UpdateXapianRole,
         /// The transaction will download package archives
         DownloadArchivesRole,
         /// The transaction will install a .deb file
