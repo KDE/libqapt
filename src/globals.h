@@ -50,27 +50,6 @@ namespace QApt
     typedef QStringList GroupList;
 
    /**
-    * Defines the Error type, a QVariantMap with info about errors
-    * 
-    * These are the fields that each ErrorCode can have:
-    *            <"Key", ValueType> (Description of value)
-    * InitError: <"ErrorText", QString> (APT's error description)
-    *            <"FromWorker, bool> (Whether or not an init error comes from the worker.
-    *                                 You want to quit your app if it doesn't)
-    * DiskSpaceError: <"DirectoryString", QString>
-    * FetchError: No fields
-    * CommitError: <"FailedItem, QString> (Package that failed to commit)
-    *              <"ErrorText", QString> (APT's error description)
-    * AuthError: No fields
-    * WorkerDisappeared: No fields
-    * UntrustedError: <"UntrustedItems", QStringList> (List of untrusted packages)
-    * NotFoundError: <"NotFoundString", QString> (String of the nonexistent package)
-    *                <"WarningText", QString> (APT's warning description)
-    * WrongArchError: <"RequestedArch", QString> (String of the unsupported architecture)
-    */
-    typedef QVariantMap Error;
-
-   /**
     * An enumerator listing all error types that the QApt Worker can throw
     */
     enum ErrorCode {
