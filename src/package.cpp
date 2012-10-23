@@ -506,7 +506,7 @@ QString Package::component() const
 
     QStringList split = sect.split('/');
 
-    if (split.count())
+    if (split.count() > 1)
         return split.first();
 
     return QString("main");
@@ -1161,9 +1161,9 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
 bool Package::isTrusted() const
 {
     const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
-    if (!Ver) {
+
+    if (!Ver)
         return false;
-    }
 
     pkgSourceList *Sources = d->backend->packageSourceList();
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache = d->backend->cache()->trustCache();
@@ -1175,21 +1175,20 @@ bool Package::isTrusted() const
         //FIXME: Should be done in apt
         auto trustIter = trustCache->constBegin();
         while (trustIter != trustCache->constEnd()) {
-            if (trustIter.key() == i.File()) {
-                break;
-            }
+            if (trustIter.key() == i.File())
+                break; // Found it
+            trustIter++;
         }
 
+        // Find the index of the package file from the package sources
         if (trustIter == trustCache->constEnd()) { // Not found
-            if (!Sources->FindIndex(i.File(), Index)) {
+            if (!Sources->FindIndex(i.File(), Index))
               continue;
-            }
-        } else {
+        } else
             Index = trustIter.value();
-        }
-        if (Index->IsTrusted()) {
+
+        if (Index->IsTrusted())
             return true;
-        }
     }
 
     return false;
