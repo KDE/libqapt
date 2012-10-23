@@ -444,6 +444,7 @@ private:
     Package *package(pkgCache::PkgIterator &iter) const;
 
     void setInitError();
+    void loadPackagePins();
 
 Q_SIGNALS:
     /**

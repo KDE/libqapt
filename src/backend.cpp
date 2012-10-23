@@ -238,40 +238,7 @@ bool Backend::reloadCache()
     d->redoStack.clear();
 
     // Determine which packages are pinned for display purposes
-    QString dirBase = d->config->findDirectory(QLatin1String("Dir::Etc"));
-    QString dir = dirBase % QLatin1String("preferences.d/");
-    QDir logDirectory(dir);
-    QStringList pinFiles = logDirectory.entryList(QDir::Files, QDir::Name);
-    pinFiles << dirBase % QLatin1String("preferences");
-
-    for (const QString &pinName : pinFiles) {
-        QString pinPath;
-        // Make all paths absolute
-        if (!pinName.startsWith(QLatin1Char('/'))) {
-            pinPath = dir % pinName;
-        } else {
-            pinPath = pinName;
-        }
-
-        if (!QFile::exists(pinPath))
-                continue;
-
-        FileFd Fd(pinPath.toUtf8().data(), FileFd::ReadOnly);
-
-        pkgTagFile tagFile(&Fd);
-        if (_error->PendingError()) {
-            continue;
-        }
-
-        pkgTagSection tags;
-        while (tagFile.Step(tags)) {
-            string name = tags.FindS("Package");
-            Package *pkg = package(QLatin1String(name.c_str()));
-            if (pkg) {
-                pkg->setPinned(true);
-            }
-        }
-    }
+    loadPackagePins();
 }
 
 void Backend::setInitError()
@@ -281,6 +248,41 @@ void Backend::setInitError()
     string message;
     if (_error->PopMessage(message))
         d->initErrorMessage = QString::fromStdString(message);
+}
+
+void Backend::loadPackagePins()
+{
+    Q_D(Backend);
+
+    QString dirBase = d->config->findDirectory(QLatin1String("Dir::Etc"));
+    QString dir = dirBase % QLatin1String("preferences.d/");
+    QDir logDirectory(dir);
+    QStringList pinFiles = logDirectory.entryList(QDir::Files, QDir::Name);
+    pinFiles << dirBase % QLatin1String("preferences");
+
+    for (const QString &pinName : pinFiles) {
+        // Make all paths absolute
+        QString pinPath = pinName.startsWith('/') ? pinName : dir % pinName;
+
+        if (!QFile::exists(pinPath))
+                continue;
+
+        FileFd Fd(pinPath.toUtf8().data(), FileFd::ReadOnly);
+
+        pkgTagFile tagFile(&Fd);
+        if (_error->PendingError()) {
+            _error->Discard();
+            continue;
+        }
+
+        pkgTagSection tags;
+        while (tagFile.Step(tags)) {
+            string name = tags.FindS("Package");
+            Package *pkg = package(QLatin1String(name.c_str()));
+            if (pkg)
+                pkg->setPinned(true);
+        }
+    }
 }
 
 QString Backend::initErrorMessage() const
