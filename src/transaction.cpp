@@ -110,6 +110,7 @@ Transaction::Transaction(const QString &tid)
 
 Transaction::~Transaction()
 {
+    delete d;
 }
 
 bool Transaction::operator==(const Transaction* rhs) const
