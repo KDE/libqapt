@@ -22,7 +22,6 @@
 #define QAPT_TRANSACTION_H
 
 #include <QtCore/QObject>
-#include <QtCore/QSharedPointer>
 #include <QtCore/QVariantMap>
 #include <QtDBus/QDBusVariant>
 
@@ -249,7 +248,7 @@ public:
     QString errorDetails() const;
 
 private:
-    const QSharedPointer<TransactionPrivate> d;
+    TransactionPrivate *const d;
 
     void updateTransactionId(const QString &tid);
     void updateUserId(int id);
