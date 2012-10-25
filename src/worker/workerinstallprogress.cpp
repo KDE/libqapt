@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
- *   Copyright © 2004 Canonical                                            *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
+ *   Copyright © 2004 Canonical <mvo@debian.org>                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -41,9 +41,8 @@
 
 using namespace std;
 
-WorkerInstallProgress::WorkerInstallProgress(QObject* parent, int begin, int end)
-        : QObject(parent)
-        , m_trans(nullptr)
+WorkerInstallProgress::WorkerInstallProgress(int begin, int end)
+        : m_trans(nullptr)
         , m_startCounting(false)
         , m_progressBegin(begin)
         , m_progressEnd(end)

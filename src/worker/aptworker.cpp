@@ -539,7 +539,7 @@ void AptWorker::commitChanges()
     }
 
     // Set up the install
-    WorkerInstallProgress *installProgress = new WorkerInstallProgress(this, 50, 90);
+    WorkerInstallProgress *installProgress = new WorkerInstallProgress(50, 90);
     installProgress->setTransaction(m_trans);
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 

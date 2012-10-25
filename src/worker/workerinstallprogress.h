@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
+ *   Copyright © 2004 Canonical <mvo@debian.org>                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -21,18 +22,14 @@
 #ifndef WORKERINSTALLPROGRESS_H
 #define WORKERINSTALLPROGRESS_H
 
-#include <QtCore/QRegExp>
-#include <QtCore/QVariantMap>
-
 #include <apt-pkg/packagemanager.h>
 
 class Transaction;
 
-class WorkerInstallProgress : public QObject
+class WorkerInstallProgress
 {
-    Q_OBJECT
 public:
-    explicit WorkerInstallProgress(QObject *parent, int begin = 0, int end = 100);
+    WorkerInstallProgress(int begin = 0, int end = 100);
 
     void setTransaction(Transaction *trans);
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);
