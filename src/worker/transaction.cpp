@@ -70,11 +70,11 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
         qWarning() << "Unable to register transaction on DBus";
 
     m_roleActionMap[QApt::EmptyRole] = QString("");
-    m_roleActionMap[QApt::UpdateCacheRole] = QLatin1String("org.kubuntu.qaptworker.updatecache");
-    m_roleActionMap[QApt::UpgradeSystemRole] = QLatin1String("org.kubuntu.qaptworker.commitchanges");
-    m_roleActionMap[QApt::CommitChangesRole] = QLatin1String("org.kubuntu.qaptworker.commitchanges");
+    m_roleActionMap[QApt::UpdateCacheRole] = QLatin1String("org.kubuntu.qaptworker2.updatecache");
+    m_roleActionMap[QApt::UpgradeSystemRole] = QLatin1String("org.kubuntu.qaptworker2.commitchanges");
+    m_roleActionMap[QApt::CommitChangesRole] = QLatin1String("org.kubuntu.qaptworker2.commitchanges");
     m_roleActionMap[QApt::DownloadArchivesRole] = QString("");
-    m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker.commitchanges");
+    m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker2.commitchanges");
 
     m_queue->addPending(this);
     m_idleTimer = new QTimer(this);
@@ -558,8 +558,8 @@ void Transaction::setProperty(int property, QDBusVariant value)
 void Transaction::cancel()
 {
     if (isForeignUser()) {
-        if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker.foreigncancel"),
-                                   QLatin1String("org.kubuntu.qaptworker"))) {
+        if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker2.foreigncancel"),
+                                   QLatin1String("org.kubuntu.qaptworker2"))) {
             sendErrorReply(QDBusError::AccessDenied);
             return;
         }

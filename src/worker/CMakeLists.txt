@@ -23,34 +23,34 @@ set(qapt_worker_SRCS
 )
 
 qt4_add_dbus_adaptor(qapt_worker_SRCS
-    org.kubuntu.qaptworker.xml
+    org.kubuntu.qaptworker2.xml
     workerdaemon.h
     WorkerDaemon
 )
 
-automoc4_add_executable(qaptworker
+automoc4_add_executable(qaptworker2
     ${qapt_worker_SRCS}
     ${qapt_worker_adaptor_SRCS}
 )
 
 # see our worker is pretty small :D
-target_link_libraries(qaptworker
+target_link_libraries(qaptworker2
     ${QT_QTCORE_LIBRARY}
     ${POLKITQT-1_CORE_LIBRARY}
     util
     qapt
 )
 
-install(TARGETS qaptworker DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS qaptworker2 DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-dbus_add_activation_system_service(org.kubuntu.qaptworker.service.in)
+dbus_add_activation_system_service(org.kubuntu.qaptworker2.service.in)
 
 find_package(KDE4)
 if (KDE4_FOUND)
     include(KDE4Defaults)
-    kde4_install_auth_actions(org.kubuntu.qaptworker qaptworker.actions)
+    kde4_install_auth_actions(org.kubuntu.qaptworker2 qaptworker.actions)
 else (KDE4_FOUND)
-    install(FILES org.kubuntu.qaptworker.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
+    install(FILES org.kubuntu.qaptworker2.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
 endif (KDE4_FOUND)
 
-install(FILES org.kubuntu.qaptworker.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d/)
+install(FILES org.kubuntu.qaptworker2.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d/)

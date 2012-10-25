@@ -46,7 +46,7 @@ class TransactionPrivate
             , downloadSpeed(0)
             , downloadETA(0)
         {
-            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker"),
+            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker2"),
                                                                        tid, QDBusConnection::systemBus(),
                                                                        0);
         }
@@ -94,7 +94,7 @@ Transaction::Transaction(const QString &tid)
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
     d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
-    d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker"));
+    d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker2"));
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
@@ -449,7 +449,7 @@ void Transaction::sync()
 {
     QDBusMessage call = QDBusMessage::createMethodCall(d->dbus->service(), d->tid,
                                                        "org.freedesktop.DBus.Properties", "GetAll");
-    call.setArguments(QList<QVariant>() << "org.kubuntu.qaptworker.transaction");
+    call.setArguments(QList<QVariant>() << "org.kubuntu.qaptworker2.transaction");
 
     QDBusReply<QVariantMap> reply = QDBusConnection::systemBus().call(call);
     QVariantMap propertyMap = reply.value();

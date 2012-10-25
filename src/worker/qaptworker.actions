@@ -19,7 +19,7 @@ Name[x-test]=xxKubuntuxx
 Icon=package-x-generic
 URL=http://www.kubuntu.org
 
-[org.kubuntu.qaptworker.updatecache]
+[org.kubuntu.qaptworker2.updatecache]
 Name=Update package information
 Name[da]=Information om opdateringspakke
 Name[el]=Ενημέρωση πληροφοριών πακέτων
@@ -57,7 +57,7 @@ Description[x-test]=xxTo update the software catalog you need to authenticate.xx
 Policy=yes
 Persistence=session
 
-[org.kubuntu.qaptworker.commitchanges]
+[org.kubuntu.qaptworker2.commitchanges]
 Name=Install or remove packages
 Name[cs]=Instalovat nebo odstranit balíčky
 Name[da]=Installér eller fjern pakker
@@ -96,7 +96,7 @@ Description[x-test]=xxTo install or remove software you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
 
-[org.kubuntu.qaptworker.writefiletodisk]
+[org.kubuntu.qaptworker2.writefiletodisk]
 Name=Change software configuration
 Name[da]=Skift softwarekonfiguration
 Name[el]=Αλλαγή διαμόρφωσης λογισμικού
@@ -134,7 +134,7 @@ Description[x-test]=xxTo change software settings you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
 
-[org.kubuntu.qaptworker.cancelforeign]
+[org.kubuntu.qaptworker2.cancelforeign]
 Name=Cancel the task of another user
 Name[da]=Annullér en anden brugers opgave
 Name[el]=Ακύρωση της εργασίας άλλου χρήστη

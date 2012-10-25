@@ -46,7 +46,7 @@
 #include "config.h" // krazy:exclude=includes
 #include "debfile.h"
 #include "transaction.h"
-#include "workerdbus.h" // OrgKubuntuQaptworkerInterface
+#include "workerdbus.h" // OrgKubuntuQaptworker2Interface
 
 namespace QApt {
 
@@ -101,7 +101,7 @@ public:
     bool xapianIndexExists;
 
     // DBus
-    OrgKubuntuQaptworkerInterface *worker;
+    OrgKubuntuQaptworker2Interface *worker;
 
     // Config
     Config *config;
@@ -137,7 +137,7 @@ Backend::Backend(QObject *parent)
 {
     Q_D(Backend);
 
-    d->worker = new OrgKubuntuQaptworkerInterface(QLatin1String("org.kubuntu.qaptworker"),
+    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
     connect(d->worker, SIGNAL(transactionQueueChanged(QString,QStringList)),

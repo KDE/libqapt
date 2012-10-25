@@ -1,6 +1,6 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
-  <interface name="org.kubuntu.qaptworker">
+  <interface name="org.kubuntu.qaptworker2">
     <signal name="transactionQueueChanged">
       <arg name="active" type="s" direction="out"/>
       <arg name="queued" type="as" direction="out"/>
