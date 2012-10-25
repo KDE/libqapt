@@ -39,7 +39,6 @@ public:
 
 private:
     Transaction *m_trans;
-    QRegExp m_ansiRegex;
 
     pid_t m_child_id;
     bool m_startCounting;

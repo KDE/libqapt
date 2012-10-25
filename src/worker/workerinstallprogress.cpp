@@ -110,15 +110,9 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
     // Update the interface until the child dies
     int ret;
     char masterbuf[1024];
-    QString dpkgLine;
     while (waitpid(m_child_id, &ret, WNOHANG) == 0) {
         // Read dpkg's raw output
         while(read(pty_master, masterbuf, sizeof(masterbuf)) > 0);
-
-        // Format raw dpkg output, remove ansi escape sequences
-        dpkgLine = QString(masterbuf);
-        dpkgLine.remove(m_ansiRegex);
-        //qDebug() << dpkgLine;
 
         // Update high-level status info
         updateInterface(readFromChildFD[0], pty_master);
