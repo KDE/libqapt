@@ -239,6 +239,8 @@ bool Backend::reloadCache()
 
     // Determine which packages are pinned for display purposes
     loadPackagePins();
+
+    return true;
 }
 
 void Backend::setInitError()
