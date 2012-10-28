@@ -29,7 +29,7 @@ class Transaction;
 class WorkerInstallProgress
 {
 public:
-    WorkerInstallProgress(int begin = 0, int end = 100);
+    explicit WorkerInstallProgress(int begin = 0, int end = 100);
 
     void setTransaction(Transaction *trans);
     pkgPackageManager::OrderResult start(pkgPackageManager *pm);
