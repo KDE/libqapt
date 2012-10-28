@@ -28,7 +28,7 @@
 static const char description[] =
     I18N_NOOP2("@info", "A Debian package installer");
 
-static const char version[] = "1.4";
+static const char version[] = "2.0";
 
 int main(int argc, char **argv)
 {
