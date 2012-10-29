@@ -34,7 +34,7 @@
 
 // LibQApt/DebconfKDE includes
 #include <DebconfGui.h>
-#include <LibQApt/Transaction>
+#include "../../src/transaction.h"
 
 // KDE includes
 #include <KLocale>
