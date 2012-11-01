@@ -1,3 +1,87 @@
+2.0 (as of alpha 1)
+======
+- Release Notes:
+  * This release includes API/ABI changes, that, while mostly source compatible, aren't
+    100% compatible with code written aginst LibQApt 1.x. Additionally, code that invokes
+    asynchronous worker actions will need more code to work now.
+- Features:
+  * New transaction-based worker API. Asyncronous actions run by the QApt Worker are now
+    tracked with QApt::Transaction objects. The worker transactions can be tracked and
+    controlled through the transaction object, and the transaction object will also signal
+    property/state changes for the worker transaction. This fixes the long-standing issue of
+    the QApt Backend listening for worker signals globally, potentially broadcasting information
+    about a worker action initiated by another QApt frontend.
+  * The new QApt Worker queues transactions as dispatched by either a single frontend or from
+    multiple frontends.
+  * If a non-QApt package manager such as apt-get, synaptic, aptdaemon, etc currently has a lock
+    on the package system, the QApt Worker will wait until it can obtain the lock instead of
+    immediately failing.
+  * Added a new class QApt::DownloadProgress to replace the global download progress signal in
+    QApt::Backend. Instances of QApt::Transaction will emit DownloadProgress objects to report
+    new progress information for a file the QApt Worker is downloading. (E.g. a package file,
+    on in the case of a cache update, package information lists.)
+  * QApt::ChangelogEntry now has a CVEUrls() method to return a list of urls to websites
+    describing vulnerability exploits which the version specified in the changelog entry fixes.
+  * Backend::init() and Backend::reload() now return a boolean value based on whether or not
+    the backend could be (re)initialized. If not, an error message can be retrieved through the
+    new Backend::initErrorMessage() method. If init() or reload() return false, applications
+    should immediately exit.
+  * The QApt::Backend constructor now takes a QObject parameter to use as a parent, removing the
+    need for manual deletion. (This could perhaps be considered a bug that it didn't before...)
+- API changes:
+  * The Backend::workerEvent() signal and Backend::workerState() method have been removed.
+    The new Transaction object reports state changes on a per-transaction basis now.
+  * Similarly, Backend::errorOccurred() and Backend::workerQuestion() have been replaced by
+    analgous code in the Transaction class.
+  * The Backend::setProxy() and setLocale() functions have been removed. Proxy and locale are now
+    set on a per-transaction basis via the QApt::Transaction class.
+  * Global signals for download/commit progress in QApt::Backend have been replaced by signals in
+    the Transaction class for reporting info on a per-transaction basis.
+  * The already-deprecated Backend::downloadMessage() signal was removed.
+  * The Backend::packageChanged() signal no longer emits a pointer to the package that changed.
+    There wasn't much use in emitting a pointer to the package just changed, as there was no
+    garuantee that it was the only package that had changed (without doing expensive checks on
+    every package), which meant that you had to assume that everything had changed.
+  * Added a Backend::upgradeSystem() method that starts a worker transaction to upgrade all
+    upgradeable packages. This is useful if you want to run a commit that will only upgrade
+    packages, and will result in faster upgrade marking in the worker.
+- Bugfixes:
+  * QApt::Backend will no longer emit progress information for worker actions not initiated by
+    your application. (By virtue of not emitting progress information at all. Info is now emitted
+    on a per-transaction basis.) This fixes a bunch of potential crashes where applications
+    inappropriately react to worker state changes. (Muon worked around a bunch of these,
+    but not all) (BKO: #305277, #307951)
+  * Frontends can gracefully wait in line to use the QApt Worker (BKO: #274262)
+  * The dependencies of an application marked for installation are now properly marked as
+    auto-installed. (Before they weren't, which means they couldn't be autoremoved after all
+    packages depending on them had been removed)
+- Optimizations:
+  * Public functions that took references to QLatin1String objects now take QLatin1String objects
+    passed by value. A QLatin1String is nothing more than a char pointer with some convenience
+    functions, so passing them by reference is really just introducing a double-indirection to get
+    to the char pointer. (API change, should be source compatible)
+  * QApt::Backend::origin() takes a const reference to a QString instead of a QString passed by
+    value, preventing the need to copy the QString given as a parameter. (API change, source
+    compatible)
+  * Package::name() and Package::section() have been changed to return QLatin1Strings, using the
+    implementations of the the latin1Name() and latin1Section() methods, which have been removed.
+    (API change, usage of latin1Name() and latin1Section() should be changed to name() and
+    section(). additionally, current usage that depends on the rvalues of name() and section()
+    being QString need to be changed to first assign the result of name() or section() to a
+    QString variable before running QString methods.
+  * HistoryItems are now implicitly shared, copy-on-write objects. This makes copying HistoryItem
+    instances around very cheap, and allows us to not need to use pointers to share access to them.
+    (The History class now returns QList<HistoryItem> vs QList<HistoryItem *>)
+  * Upgradeable packages that have not been marked for upgrade are no longer sent to the worker,
+    for consideration when committing packages. This speeds up the dependency calculation for
+    a commit involving a handful of packages, when hundreds of upgrades are also available.
+  * Make QApt::Package constructing faster by storing the APT pkgIterator as a member variable
+    in PackagePrivate, rather than having a pointer to a pkgIterator and storing the pkgIterator
+    on the heap. Does not appreciably reduce memory usage, but reduced the number of times a
+    heap memory allocation is performed.
+  * Small speed optimizations to Backend::stateChanges()
+
+
 1.4.0
 ======
 - Features:
