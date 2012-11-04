@@ -160,7 +160,8 @@ public:
      *         Package::State change flag.
      * @since 1.3
      */
-    QHash<Package::State, PackageList> stateChanges(CacheState oldState, PackageList excluded) const;
+    QHash<Package::State, PackageList> stateChanges(const CacheState &oldState,
+                                                    const PackageList &excluded) const;
 
     /**
      * Pointer to the QApt Backend's config object.

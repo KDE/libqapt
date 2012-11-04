@@ -722,7 +722,8 @@ CacheState Backend::currentCacheState() const
     return state;
 }
 
-QHash<Package::State, PackageList> Backend::stateChanges(CacheState oldState, PackageList excluded) const
+QHash<Package::State, PackageList> Backend::stateChanges(const CacheState &oldState,
+                                                         const PackageList &excluded) const
 {
     Q_D(const Backend);
 
