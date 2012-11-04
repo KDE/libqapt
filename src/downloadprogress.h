@@ -131,6 +131,7 @@ private:
 
 }
 
+Q_DECLARE_TYPEINFO(QApt::DownloadProgress, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QApt::DownloadProgress)
 
 #endif // DOWNLOADPROGRESS_H

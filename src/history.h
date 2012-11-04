@@ -181,4 +181,6 @@ public Q_SLOTS:
 
 }
 
+Q_DECLARE_TYPEINFO(QApt::HistoryItem, Q_MOVABLE_TYPE);
+
 #endif

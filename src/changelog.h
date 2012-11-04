@@ -87,4 +87,7 @@ private:
 
 }
 
+Q_DECLARE_TYPEINFO(QApt::ChangelogEntry, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(QApt::Changelog, Q_MOVABLE_TYPE);
+
 #endif

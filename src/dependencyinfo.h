@@ -123,4 +123,7 @@ typedef QList<DependencyInfo> DependencyItem;
 
 }
 
+Q_DECLARE_TYPEINFO(QApt::DependencyInfo, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(QList<QApt::DependencyInfo>, Q_MOVABLE_TYPE);
+
 #endif
