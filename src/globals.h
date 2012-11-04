@@ -324,6 +324,6 @@ namespace QApt
     };
 }
 
-Q_DECLARE_TYPEINFO(QList<QList<int>>, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(QList<int>, Q_MOVABLE_TYPE);
 
 #endif
