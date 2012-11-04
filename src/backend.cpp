@@ -716,7 +716,7 @@ CacheState Backend::currentCacheState() const
     int pkgSize = d->packages.size();
     state.reserve(pkgSize);
     for (int i = 0; i < pkgSize; ++i) {
-        state.append(d->packages[i]->state());
+        state.append(d->packages.at(i)->state());
     }
 
     return state;
