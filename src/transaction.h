@@ -96,7 +96,7 @@ public:
      * usually not point to the same address, but they still represent the same
      * transaction on D-Bus
      *
-     * @param other The transaction to be compared to
+     * @param rhs The transaction to be compared to
      */
     bool operator==(const Transaction* rhs) const;
 

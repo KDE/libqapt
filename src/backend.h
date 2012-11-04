@@ -469,7 +469,7 @@ Q_SIGNALS:
     /**
      * Emits the progress of the Apt Xapian Indexer
      *
-     * @param progress The progress percentage of the indexer
+     * @param percentage The progress percentage of the indexer
      */
     void xapianUpdateProgress(int percentage);
 
