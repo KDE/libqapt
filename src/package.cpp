@@ -158,7 +158,7 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
     } else
         packageState |= QApt::Package::NotInstalled;
 
-    // Broken/garbage statuses are broken until a cache reload
+    // Broken/garbage statuses are constant until a cache reload
     if (stateCache.NowBroken()) {
         packageState |= QApt::Package::NowBroken;
     }
