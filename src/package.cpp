@@ -1309,13 +1309,11 @@ bool Package::setVersion(const QString &version)
 
     d->backend->cache()->depCache()->SetCandidateVersion(Ver);
 
-    string archive;
     for (auto VF = Ver.FileList(); !VF.end(); ++VF) {
         if (!VF.File() || !VF.File().Archive())
             continue;
 
-        archive = VF.File().Archive();
-        d->backend->cache()->depCache()->SetCandidateRelease(Ver, archive);
+        d->backend->cache()->depCache()->SetCandidateRelease(Ver, VF.File().Archive());
         break;
     }
 
