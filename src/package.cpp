@@ -392,21 +392,20 @@ QStringList Package::availableVersions() const
     QStringList versions;
 
     // Get available Versions.
-    for (pkgCache::VerIterator Ver = d->packageIter.VersionList(); !Ver.end(); ++Ver) {
+    for (auto Ver = d->packageIter.VersionList(); !Ver.end(); ++Ver) {
 
         // We always take the first available version.
         pkgCache::VerFileIterator VF = Ver.FileList();
-        if (!VF.end()) {
-            pkgCache::PkgFileIterator File = VF.File();
+        if (VF.end())
+            continue;
 
-            if (File->Archive != 0) {
-                versions.append(QLatin1String(Ver.VerStr()) % QLatin1Literal(" (") %
-                QLatin1String(File.Archive()) % QLatin1Char(')'));
-            } else {
-                versions.append(QLatin1String(Ver.VerStr()) % QLatin1Literal(" (") %
-                QLatin1String(File.Site()) % QLatin1Char(')'));
-            }
-        }
+        pkgCache::PkgFileIterator File = VF.File();
+
+        // Files without an archive will have a site
+        QString archive = (File->Archive) ? QLatin1String(File.Archive()) :
+                                            QLatin1String(File.Site());
+        versions.append(QLatin1String(Ver.VerStr()) % QLatin1String(" (") %
+                        archive % ')');
     }
 
     return versions;
