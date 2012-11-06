@@ -371,7 +371,8 @@ QString Package::upstreamVersion() const
 
 QString Package::upstreamVersion(const QString &version)
 {
-    return QString::fromStdString(_system->VS->UpstreamVersion(version.toStdString().c_str()));
+    QByteArray ver = version.toLatin1();
+    return QString::fromStdString(_system->VS->UpstreamVersion(ver.constData()));
 }
 
 QString Package::architecture() const
