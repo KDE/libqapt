@@ -191,10 +191,13 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
 
     // Packages will stay undownloadable until a sources file is refreshed
     // and the cache is reloaded.
-    bool downloadable = stateCache.CandidateVerIter(*backend->cache()->depCache()).Downloadable();
-    if (!stateCache.CandidateVer || !downloadable) {
+    bool downloadable = true;
+    if (!stateCache.CandidateVer ||
+        stateCache.CandidateVerIter(*backend->cache()->depCache()).Downloadable())
+        downloadable = false;
+
+    if (!downloadable)
         packageState |= QApt::Package::NotDownloadable;
-    }
 
     state |= packageState;
 
