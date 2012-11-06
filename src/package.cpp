@@ -319,6 +319,8 @@ QString Package::maintainer() const
     if (!ver.end()) {
         pkgRecords::Parser &parser = d->backend->records()->Lookup(ver.FileList());
         maintainer = QString::fromUtf8(parser.Maintainer().data());
+        // This replacement prevents frontends from interpreting '<' as
+        // an HTML tag opening
         maintainer.replace(QLatin1Char('<'), QLatin1String("&lt;"));
     }
     return maintainer;
