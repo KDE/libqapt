@@ -1297,10 +1297,8 @@ void Package::setPurge()
 
 bool Package::setVersion(const QString &version)
 {
-    QLatin1String defaultCandVer("");
     pkgDepCache::StateCache &state = (*d->backend->cache()->depCache())[d->packageIter];
-    if (state.CandVersion)
-        defaultCandVer = QLatin1String(state.CandVersion);
+    QLatin1String defaultCandVer(state.CandVersion);
 
     bool isDefault = (version == defaultCandVer);
     pkgVersionMatch Match(version.toLatin1().constData(), pkgVersionMatch::Version);
