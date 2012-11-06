@@ -273,7 +273,7 @@ void HistoryPrivate::init()
 
 History::History(QObject *parent)
         : QObject(parent)
-        , d_ptr(new HistoryPrivate(QLatin1String(_config->FindFile("Dir::Log::History").c_str())))
+        , d_ptr(new HistoryPrivate(QString::fromStdString(_config->FindFile("Dir::Log::History"))))
 {
 }
 
