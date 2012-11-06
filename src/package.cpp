@@ -1299,25 +1299,20 @@ bool Package::setVersion(const QString &version)
 {
     QLatin1String defaultCandVer("");
     pkgDepCache::StateCache &state = (*d->backend->cache()->depCache())[d->packageIter];
-    if (state.CandVersion != nullptr) {
+    if (state.CandVersion)
         defaultCandVer = QLatin1String(state.CandVersion);
-    }
 
     bool isDefault = (version == defaultCandVer);
     pkgVersionMatch Match(version.toLatin1().constData(), pkgVersionMatch::Version);
     const pkgCache::VerIterator &Ver = Match.Find(d->packageIter);
 
-    if (Ver.end()) {
+    if (Ver.end())
         return false;
-    }
 
     d->backend->cache()->depCache()->SetCandidateVersion(Ver);
 
     string archive;
-    for (pkgCache::VerFileIterator VF = Ver.FileList();
-         VF.end() == false;
-         ++VF)
-    {
+    for (auto VF = Ver.FileList(); !VF.end(); ++VF) {
         if (!VF.File() || !VF.File().Archive())
             continue;
 
@@ -1326,11 +1321,10 @@ bool Package::setVersion(const QString &version)
         break;
     }
 
-    if (isDefault) {
+    if (isDefault)
         d->state &= ~OverrideVersion;
-    } else {
+    else
         d->state |= OverrideVersion;
-    }
 
     return true;
 }
