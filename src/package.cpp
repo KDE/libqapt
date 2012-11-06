@@ -104,8 +104,8 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(QLatin1String label,
         }
         ++verIter;
     }
-   found = pkgCache::PkgFileIterator(*packageIter.Cache());
-   return found;
+    found = pkgCache::PkgFileIterator(*packageIter.Cache());
+    return found;
 }
 
 QString PackagePrivate::getReleaseFileForOrigin(QLatin1String label, const QString &release) const
@@ -126,10 +126,10 @@ QString PackagePrivate::getReleaseFileForOrigin(QLatin1String label, const QStri
             vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
             if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
                 QString uri = backend->config()->findDirectory("Dir::State::lists")
-                % QString::fromStdString(URItoFileName((*I)->GetURI()))
-                % QLatin1String("dists_")
-                % QString::fromStdString((*I)->GetDist())
-                % QLatin1String("_Release");
+                        % QString::fromStdString(URItoFileName((*I)->GetURI()))
+                        % QLatin1String("dists_")
+                        % QString::fromStdString((*I)->GetDist())
+                        % QLatin1String("_Release");
 
                 return uri;
             }
