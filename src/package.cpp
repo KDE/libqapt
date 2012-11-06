@@ -110,30 +110,33 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(QLatin1String label,
 
 QString PackagePrivate::getReleaseFileForOrigin(QLatin1String label, const QString &release) const
 {
-    pkgCache::PkgFileIterator found = searchPkgFileIter(label, release);
+    pkgCache::PkgFileIterator pkg = searchPkgFileIter(label, release);
 
-    if (found.end()) {
+    // Return empty if no package matches the given label and release
+    if (pkg.end())
         return QString();
-    }
 
-    // search for the matching meta-index
+    // Search for the matching meta-index
     pkgSourceList *list = backend->packageSourceList();
     pkgIndexFile *index;
 
-    if(list->FindIndex(found, index)) {
-        vector<metaIndex *>::const_iterator I;
-        for(I=list->begin(); I != list->end(); ++I) {
-            vector<pkgIndexFile *>  *ifv = (*I)->GetIndexFiles();
-            if(find(ifv->begin(), ifv->end(), index) != ifv->end()) {
-                QString uri = backend->config()->findDirectory("Dir::State::lists")
-                        % QString::fromStdString(URItoFileName((*I)->GetURI()))
-                        % QLatin1String("dists_")
-                        % QString::fromStdString((*I)->GetDist())
-                        % QLatin1String("_Release");
+    // Return empty if the source list doesn't contain an index for the package
+    if (!list->FindIndex(pkg, index))
+        return QString();
 
-                return uri;
-            }
-        }
+    for (auto I = list->begin(); I != list->end(); ++I) {
+        vector<pkgIndexFile *> *ifv = (*I)->GetIndexFiles();
+        if (find(ifv->begin(), ifv->end(), index) == ifv->end())
+            continue;
+
+        // Construct release file path
+        QString uri = backend->config()->findDirectory("Dir::State::lists")
+                % QString::fromStdString(URItoFileName((*I)->GetURI()))
+                % QLatin1String("dists_")
+                % QString::fromStdString((*I)->GetDist())
+                % QLatin1String("_Release");
+
+        return uri;
     }
 
     return QString();
