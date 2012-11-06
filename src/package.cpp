@@ -237,13 +237,18 @@ QLatin1String Package::section() const
 QString Package::sourcePackage() const
 {
     QString sourcePackage;
+
+    // In the APT package record format, the only time when a "Source:" field
+    // is present is when the binary package name doesn't match the source
+    // name
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
     if (!ver.end()) {
         pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
-        sourcePackage = QLatin1String(rec.SourcePkg().c_str());
+        sourcePackage = QString::fromStdString(rec.SourcePkg());
     }
 
-    // If empty, use name. (Name would equal source package in that case)
+    // If the package record didn't have a "Source:" field, then this package's
+    // name must be the source package's name. (Or there isn't a record for this package)
     if (sourcePackage.isEmpty()) {
         sourcePackage = name();
     }
