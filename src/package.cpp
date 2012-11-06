@@ -147,42 +147,24 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
     int packageState = 0;
 
     if (!ver.end()) {
+        // Set flags exclusive to installed packages
         packageState |= QApt::Package::Installed;
 
         if (stateCache.CandidateVer && stateCache.Upgradable()) {
             packageState |= QApt::Package::Upgradeable;
-            if (stateCache.Keep()) {
+            if (stateCache.Keep())
                 packageState |= QApt::Package::Held;
-            }
         }
-
-        if (stateCache.Downgrade()) {
-            packageState |= QApt::Package::ToDowngrade;
-        }
-    } else {
+    } else
         packageState |= QApt::Package::NotInstalled;
-    }
+
+    // Broken/garbage statuses are broken until a cache reload
     if (stateCache.NowBroken()) {
         packageState |= QApt::Package::NowBroken;
     }
 
     if (stateCache.InstBroken()) {
         packageState |= QApt::Package::InstallBroken;
-    }
-
-    if (packageIter->Flags & (pkgCache::Flag::Important |
-                             pkgCache::Flag::Essential)) {
-        packageState |= QApt::Package::IsImportant;
-    }
-
-    if (packageIter->CurrentState == pkgCache::State::ConfigFiles) {
-        packageState |= QApt::Package::ResidualConfig;
-    }
-
-    if (!stateCache.CandidateVer) {
-        packageState |= QApt::Package::NotDownloadable;
-    } else if (!stateCache.CandidateVerIter(*backend->cache()->depCache()).Downloadable()) {
-        packageState |= QApt::Package::NotDownloadable;
     }
 
     if (stateCache.Garbage) {
@@ -195,6 +177,23 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
 
     if (stateCache.InstPolicyBroken()) {
         packageState |= QApt::Package::InstallPolicyBroken;
+    }
+
+    // Essential/important status can only be changed by cache reload
+    if (packageIter->Flags & (pkgCache::Flag::Important |
+                             pkgCache::Flag::Essential)) {
+        packageState |= QApt::Package::IsImportant;
+    }
+
+    if (packageIter->CurrentState == pkgCache::State::ConfigFiles) {
+        packageState |= QApt::Package::ResidualConfig;
+    }
+
+    // Packages will stay undownloadable until a sources file is refreshed
+    // and the cache is reloaded.
+    bool downloadable = stateCache.CandidateVerIter(*backend->cache()->depCache()).Downloadable();
+    if (!stateCache.CandidateVer || !downloadable) {
+        packageState |= QApt::Package::NotDownloadable;
     }
 
     state |= packageState;
