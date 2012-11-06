@@ -433,11 +433,10 @@ QString Package::availableVersion() const
 QString Package::priority() const
 {
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
-    if (!ver.end()) {
-        return QLatin1String(ver.PriorityType());
-    }
+    if (ver.end())
+        return QString();
 
-    return QString();
+    return QLatin1String(ver.PriorityType());
 }
 
 QStringList Package::installedFilesList() const
@@ -487,27 +486,25 @@ QString Package::origin() const
 {
     const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
 
-    if(!Ver.end()) {
-         pkgCache::VerFileIterator VF = Ver.FileList();
-         return QLatin1String(VF.File().Origin());
-    }
+    if(Ver.end())
+        return QString();
 
-    return QString();
+    pkgCache::VerFileIterator VF = Ver.FileList();
+    return QLatin1String(VF.File().Origin());
 }
 
 QStringList Package::archives() const
 {
     const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
 
-    if(!Ver.end()) {
-        QStringList archiveList;
-        for (pkgCache::VerFileIterator VF = Ver.FileList(); !VF.end(); ++VF) {
-            archiveList << QLatin1String(VF.File().Archive());
-        }
-            return archiveList;
-    }
+    if(Ver.end())
+        return QStringList();
 
-    return QStringList();
+    QStringList archiveList;
+    for (auto VF = Ver.FileList(); !VF.end(); ++VF)
+        archiveList << QLatin1String(VF.File().Archive());
+
+    return archiveList;
 }
 
 QString Package::component() const
@@ -526,60 +523,51 @@ QString Package::component() const
 
 QByteArray Package::md5Sum() const
 {
-    QByteArray md5Sum;
-
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
 
-    if(ver.end()) {
-        return md5Sum;
-    }
+    if(ver.end())
+        return QByteArray();
 
     pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
-    md5Sum = rec.MD5Hash().c_str();
 
-    return md5Sum;
+    return rec.MD5Hash().c_str();
 
 }
 
 QUrl Package::changelogUrl() const
 {
-    QUrl url;
-
     const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
-    if (ver.end()) {
-        return url;
-    }
+    if (ver.end())
+        return QUrl();
 
     pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
 
-    QString path = QLatin1String(rec.FileName().c_str());
-    path = path.left(path.lastIndexOf(QLatin1Char('/')) + 1);
-
+    // Find the latest version for the latest changelog
     QString versionString;
-    if (!availableVersion().isEmpty()) {
+    if (!availableVersion().isEmpty())
         versionString = availableVersion();
-    }
 
+    // Epochs in versions are ignored on changelog servers
     if (versionString.contains(QLatin1Char(':'))) {
         QStringList epochVersion = versionString.split(QLatin1Char(':'));
         // If the version has an epoch, take the stuff after the epoch
-        versionString = epochVersion[1];
+        versionString = epochVersion.at(1);
     }
 
-    path += sourcePackage() % QLatin1Char('_') % versionString % QLatin1Char('/');
-
+    // Create URL in form using the correct server, file path, and file suffix
     Config *config = d->backend->config();
     QString server = config->readEntry(QLatin1String("Apt::Changelogs::Server"),
                                        QLatin1String("http://packages.debian.org/changelogs"));
 
-    if(!server.contains(QLatin1String("debian"))) {
-        url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog"));
-    } else {
-        // Debian servers use changelog.txt
-        url = QUrl(server % QLatin1Char('/') % path % QLatin1Literal("changelog.txt"));
-    }
+    QString path = QLatin1String(rec.FileName().c_str());
+    path = path.left(path.lastIndexOf(QLatin1Char('/')) + 1);
+    path += sourcePackage() % '_' % versionString % '/';
 
-    return url;
+    bool fromDebian = server.contains(QLatin1String("debian"));
+    QString suffix = fromDebian ? QLatin1String("changelog.txt")
+                                : QLatin1String("changelog");
+
+    return QUrl(server % '/' % path % suffix);
 }
 
 QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
