@@ -111,6 +111,8 @@ private:
                    RelationType rType, DependencyType dType);
 
     QSharedDataPointer<DependencyInfoPrivate> d;
+
+    friend class Package;
 };
 
 /**

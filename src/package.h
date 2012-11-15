@@ -35,6 +35,7 @@
 namespace QApt {
 
 class Backend;
+class MarkingErrorInfo;
 
 /**
  * PackagePrivate is a class containing all private members of the Package class
@@ -493,7 +494,7 @@ public:
     */
     // TODO: QApt2: Get rid of this insane thing and use a proper OO scheme,
     // perhaps something like DependencyInfo
-    QHash<int, QHash<QString, QVariantMap> > brokenReason() const;
+    QList<QApt::MarkingErrorInfo> brokenReason() const;
 
    /**
     * Returns whether the package is signed with a trusted GPG signature.

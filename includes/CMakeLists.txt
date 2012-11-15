@@ -10,4 +10,5 @@ install( FILES
     Changelog
     Transaction
     DownloadProgress
+    MarkingErrorInfo
 DESTINATION include/LibQApt COMPONENT Devel)

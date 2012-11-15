@@ -46,9 +46,11 @@
 
 #include <algorithm>
 
+// Own includes
 #include "backend.h"
 #include "cache.h"
 #include "config.h" // krazy:exclude=includes
+#include "markingerrorinfo.h"
 
 namespace QApt {
 
@@ -1054,24 +1056,17 @@ QStringList Package::enhancedByList() const
 }
 
 
-QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
+QList<QApt::MarkingErrorInfo> Package::brokenReason() const
 {
     const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
-
-    QHash<QString, QVariantMap> wrongCandidate;
-    QHash<QString, QVariantMap> depNotInstallable;
-    QHash<QString, QVariantMap> virtualPackage;
-
-    // failTrain represents brokenness, but also the complexity of this
-    // function...
-    QHash<int, QHash<QString, QVariantMap> > failTrain;
+    QList<MarkingErrorInfo> reasons;
 
     // check if there is actually something to install
     if (!Ver) {
-        QHash<QString, QVariantMap> parentNotInstallable;
-        parentNotInstallable[name()] = QVariantMap();
-        failTrain[QApt::ParentNotInstallable] = parentNotInstallable;
-        return failTrain;
+        QApt::DependencyInfo info(name(), QString(), NoOperand, InvalidType);
+        QApt::MarkingErrorInfo error(QApt::ParentNotInstallable, info);
+        reasons.append(error);
+        return reasons;
     }
 
     for (pkgCache::DepIterator D = Ver.DependsList(); !D.end();) {
@@ -1104,58 +1099,36 @@ QHash<int, QHash<QString, QVariantMap> > Package::brokenReason() const
                 // Happens when a package needs an upgraded dep, but the dep won't
                 // upgrade. Example:
                 // "apt 0.5.4 but 0.5.3 is to be installed"
-                QVariantMap failReason;
-                failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
-                failReason[QLatin1String("RequiredVersion")] = requiredVersion;
-                failReason[QLatin1String("CandidateVersion")] = QLatin1String(Ver.VerStr());
-                if (Start != End) {
-                    failReason[QLatin1String("IsFirstOr")] = true;
-                }
-
                 QString targetName = QLatin1String(Start.TargetPkg().Name());
-                wrongCandidate[targetName] = failReason;
+                QApt::DependencyType relation = (QApt::DependencyType)End->Type;
+
+                QApt::DependencyInfo errorInfo(targetName, requiredVersion,
+                                               NoOperand, relation);
+                QApt::MarkingErrorInfo error(QApt::WrongCandidateVersion, errorInfo);
+                reasons.append(error);
             } else { // We have the package, but for some reason it won't be installed
                 // In this case, the required version does not exist at all
-                if ((*d->backend->cache()->depCache())[Targ].CandidateVerIter(*d->backend->cache()->depCache()).end()) {
-                    QVariantMap failReason;
-                    failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
-                    failReason[QLatin1String("RequiredVersion")] = requiredVersion;
-                    if (Start != End) {
-                        failReason[QLatin1String("IsFirstOr")] = true;
-                    }
+                QString targetName = QLatin1String(Start.TargetPkg().Name());
+                QApt::DependencyType relation = (QApt::DependencyType)End->Type;
 
-                    QString targetName = QLatin1String(Start.TargetPkg().Name());
-                    depNotInstallable[targetName] = failReason;
-                } else {
-                    // Who knows why it won't be installed? Getting here means we have no good reason
-                    QVariantMap failReason;
-                    failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
-                    if (Start != End) {
-                        failReason[QLatin1String("IsFirstOr")] = true;
-                    }
-
-                    QString targetName = QLatin1String(Start.TargetPkg().Name());
-                    depNotInstallable[targetName] = failReason;
-                }
+                QApt::DependencyInfo errorInfo(targetName, requiredVersion,
+                                               NoOperand, relation);
+                QApt::MarkingErrorInfo error(QApt::DepNotInstallable, errorInfo);
+                reasons.append(error);
             }
         } else {
             // Ok, candidate has provides. We're a virtual package
-            QVariantMap failReason;
-            failReason[QLatin1String("Relation")] = QLatin1String(End.DepType());
-            if (Start != End) {
-                failReason[QLatin1String("IsFirstOr")] = true;
-            }
-
             QString targetName = QLatin1String(Start.TargetPkg().Name());
-            virtualPackage[targetName] = failReason;
+            QApt::DependencyType relation = (QApt::DependencyType)End->Type;
+
+            QApt::DependencyInfo errorInfo(targetName, QString(),
+                                           NoOperand, relation);
+            QApt::MarkingErrorInfo error(QApt::VirtualPackage, errorInfo);
+            reasons.append(error);
         }
     }
 
-    failTrain[QApt::WrongCandidateVersion] = wrongCandidate;
-    failTrain[QApt::DepNotInstallable] = depNotInstallable;
-    failTrain[QApt::VirtualPackage] = virtualPackage;
-
-    return failTrain;
+    return reasons;
 }
 
 bool Package::isTrusted() const
