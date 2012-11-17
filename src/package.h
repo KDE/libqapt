@@ -54,15 +54,6 @@ class Q_DECL_EXPORT Package
 
 public:
    /**
-    * Constructor. You will most likely never use this, and it will probably
-    * become private in QApt2.
-    *
-    * @param parent The backend that this package is being made a child of
-    * @param packageIter The underlying object representing the package in APT
-    */
-    Package(QApt::Backend* parent, pkgCache::PkgIterator &packageIter);
-
-   /**
     * Destructor.
     */
     ~Package();
@@ -605,6 +596,14 @@ public:
 
 private:
     PackagePrivate *const d;
+
+    /**
+     * Internal constructor.
+     *
+     * @param parent The backend that this package is being made a child of
+     * @param packageIter The underlying object representing the package in APT
+     */
+     Package(QApt::Backend* parent, pkgCache::PkgIterator &packageIter);
 
     /**
      * Returns the internal APT representation of the package
