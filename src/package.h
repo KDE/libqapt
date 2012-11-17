@@ -478,22 +478,10 @@ public:
     QStringList enhancedByList() const;
 
    /**
-    * If a package is in a broke state, this function returns why the package
+    * If a package is in a broke state, this function returns a why the package
     * is broken by showing all errors in the dependency cache that marking the
     * package has caused.
-    *
-    * The format is a bit complex. The QHash contains a QHash corresponding to
-    * each QApt::BrokenReason. This internal QHash is a QString corresponding to
-    * a QVariantMap. The QString in this case is a package that is broken by this
-    * QApt::Package, and the QVariantMap contails details on why the corresponding
-    * package is broken. These details may vary based on what QApt::BrokenState
-    * the QHash corresponds to.
-    *
-    * \return A @c QHash of reasons why the package is broken, corresponding to a
-    * QApt::BrokenReason
     */
-    // TODO: QApt2: Get rid of this insane thing and use a proper OO scheme,
-    // perhaps something like DependencyInfo
     QList<QApt::MarkingErrorInfo> brokenReason() const;
 
    /**
