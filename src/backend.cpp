@@ -226,7 +226,7 @@ bool Backend::reloadCache()
 
         if(!Ver.end()) {
             pkgCache::VerFileIterator VF = Ver.FileList();
-            QLatin1String origin(QLatin1String(VF.File().Origin()));
+            QString origin(QLatin1String(VF.File().Origin()));
             d->originMap[origin] = VF.File().Label();
             d->siteMap[origin] = VF.File().Site();
         }
@@ -777,10 +777,11 @@ void Backend::restoreCacheState(const CacheState &state)
     pkgDepCache *deps = d->cache->depCache();
     pkgDepCache::ActionGroup group(*deps);
 
-    for (int i = 0; i < d->packages.size(); ++i) {
-        Package *pkg = d->packages[i];
+    int packageCount = d->packages.size();
+    for (int i = 0; i < packageCount; ++i) {
+        Package *pkg = d->packages.at(i);
         int flags = pkg->state();
-        int oldflags = state[i];
+        int oldflags = state.at(i);
 
         if (oldflags == flags)
             continue;
