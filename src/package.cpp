@@ -750,6 +750,12 @@ int Package::state() const
 
 int Package::staticState() const
 {
+    if (!d->staticStateCalculated) {
+        const pkgCache::VerIterator &ver = d->packageIter.CurrentVer();
+        pkgDepCache::StateCache &stateCache = (*d->backend->cache()->depCache())[d->packageIter];
+        d->initStaticState(ver, stateCache);
+    }
+
     return d->state;
 }
 
