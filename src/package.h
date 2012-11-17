@@ -245,7 +245,6 @@ public:
     */
     QUrl screenshotUrl(QApt::ScreenshotType type) const;
 
-    // TODO: QApt2: Return a QDateTime so that KDE apps can localize
    /**
     * Returns the date when Canonical's support of the package ends.
     *
@@ -253,7 +252,7 @@ public:
     *         supported now, then it will return an empty QString. The date
     *         will be localized in the "month year" format.
     */
-    QString supportedUntil() const;
+    QDateTime supportedUntil() const;
 
    /**
     * Returns the specified field of the package's debian/control file

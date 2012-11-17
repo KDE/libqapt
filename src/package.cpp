@@ -591,16 +591,16 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
     return url;
 }
 
-QString Package::supportedUntil() const
+QDateTime Package::supportedUntil() const
 {
     if (!isSupported()) {
-        return QString();
+        return QDateTime();
     }
 
     QFile lsb_release(QLatin1String("/etc/lsb-release"));
     if (!lsb_release.open(QFile::ReadOnly)) {
         // Though really, your system is screwed if this happens...
-        return QString();
+        return QDateTime();
     }
 
     pkgTagSection sec;
@@ -627,7 +627,7 @@ QString Package::supportedUntil() const
 
     if(!FileExists(releaseFile.toStdString())) {
         // happens e.g. when there is no release file and is harmless
-        return QString();
+        return QDateTime();
     }
 
     // read the relase file
@@ -636,7 +636,7 @@ QString Package::supportedUntil() const
     tag.Step(sec);
 
     if(!RFC1123StrToTime(sec.FindS("Date").data(), releaseDate)) {
-        return QString();
+        return QDateTime();
     }
 
     // Default to 18m in case the package has no "supported" field
@@ -659,7 +659,7 @@ QString Package::supportedUntil() const
         supportEnd = QDateTime::fromTime_t(releaseDate).addYears(supportTime);
     }
 
-    return supportEnd.toString(QLatin1String("MMMM yyyy"));
+    return supportEnd;
 }
 
 QString Package::controlField(QLatin1String name) const
