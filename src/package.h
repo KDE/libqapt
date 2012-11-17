@@ -611,6 +611,14 @@ private:
      */
      const pkgCache::PkgIterator &packageIterator() const;
 
+     /**
+      * Returns a set of state flags that won't change until the next
+      * cache reload, and excluding any flags that are able to change.
+      * Used internally to avoid having to calculate mutable flags when we know
+      * the flag we want to check is immutable.
+      */
+     int staticState() const;
+
      friend class Backend;
 };
 

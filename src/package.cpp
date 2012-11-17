@@ -748,6 +748,11 @@ int Package::state() const
    return packageState | d->state;
 }
 
+int Package::staticState() const
+{
+    return d->state;
+}
+
 int Package::compareVersion(const QString &v1, const QString &v2)
 {
     // Make deep copies of toStdString(), since otherwise they would

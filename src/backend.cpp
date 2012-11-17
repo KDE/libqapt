@@ -487,7 +487,7 @@ PackageList Backend::upgradeablePackages() const
     PackageList upgradeablePackages;
 
     for (Package *package : d->packages) {
-        if (package->state() & Package::Upgradeable) {
+        if (package->staticState() & Package::Upgradeable) {
             upgradeablePackages << package;
         }
     }
@@ -925,7 +925,7 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
         const pkgCache::PkgIterator &iter = package->packageIterator();
         switch (action) {
         case Package::ToInstall: {
-            int state = package->state();
+            int state = package->staticState();
             // Mark for install if not already installed, or if upgradeable
             if (!(state & Package::Installed) || (state & Package::Upgradeable)) {
                 package->setInstall();
@@ -943,7 +943,7 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
             break;
         }
         case Package::ToReInstall: {
-            int state = package->state();
+            int state = package->staticState();
 
             if(state & Package::Installed
                && !(state & Package::NotDownloadable)
@@ -956,7 +956,7 @@ void Backend::markPackages(const QApt::PackageList &packages, QApt::Package::Sta
             package->setKeep();
             break;
         case Package::ToPurge: {
-            int state = package->state();
+            int state = package->staticState();
 
             if ((state & Package::Installed) || (state & Package::ResidualConfig)) {
                 package->setPurge();
