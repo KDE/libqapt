@@ -47,8 +47,6 @@ WorkerInstallProgress::WorkerInstallProgress(int begin, int end)
         , m_progressBegin(begin)
         , m_progressEnd(end)
 {
-    setenv("DEBIAN_FRONTEND", "passthrough", 1);
-    setenv("DEBCONF_PIPE", "/tmp/qapt-sock", 1);
     setenv("APT_LISTBUGS_FRONTEND", "none", 1);
     setenv("APT_LISTCHANGES_FRONTEND", "debconf", 1);
 }
