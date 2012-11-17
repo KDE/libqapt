@@ -240,7 +240,6 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             raiseErrorMessage(text, title);
             break;
         case QApt::DiskSpaceError:
-            // FIXME: drive = transaction error details
             text = i18nc("@label",
                          "You do not have enough disk space in the directory "
                          "at %1 to continue with this operation.", m_trans->errorDetails());
