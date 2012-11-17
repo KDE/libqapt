@@ -406,13 +406,15 @@ bool AptWorker::markChanges()
     delete actionGroup;
 
     if (_error->PendingError() && ((*m_cache)->BrokenCount() == 0))
-            _error->Discard(); // We had dep errors, but fixed them
+        _error->Discard(); // We had dep errors, but fixed them
 
     if (_error->PendingError())
     {
         // We've failed to mark the packages
         m_trans->setError(QApt::MarkingError);
-        // TODO error details
+        string message;
+        if (_error->PopMessage(message))
+            m_trans->setErrorDetails(QString::fromStdString(message));
 
         return false;
     }
