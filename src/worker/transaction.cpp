@@ -481,7 +481,6 @@ void Transaction::run()
 {
     setDelayedReply(true);
     if (isForeignUser() || !authorizeRun()) {
-        qDebug() << "auth error";
         sendErrorReply(QDBusError::AccessDenied);
         return;
     }
