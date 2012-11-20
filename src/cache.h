@@ -37,14 +37,14 @@ namespace QApt {
 class CachePrivate;
 
 /**
- * The Cache class is what handles the internal APT package cache. If you are
- * using the Backend class, you will not need to worry about this class at all,
- * as it has its own Cache object and handles the opening/re-opening of the
- * internal APT cache when necessary.
+ * The Cache class is what handles the internal APT package cache. It is used
+ * internally by QApt::Backend to manage the APT cache, as well as to act as
+ * an additional cache for a list of packages that can be downloaded from a
+ * trusted source.
  *
  * @author Jonathan Thomas
  */
-class Q_DECL_EXPORT Cache : public QObject
+class Cache : public QObject
 {
     Q_OBJECT
 public:
@@ -61,24 +61,16 @@ public:
     /**
      * Returns a pointer to the interal dependency cache, which keeps track of
      * inter-package dependencies.
-     *
-     * @return A pointer to the internal @c pkgDepCache
      */
     pkgDepCache *depCache() const;
 
-    /**
-     * Returns a pointer to the interal package source list.
-     *
-     * @return A pointer to the internal @c pkgSourceList
-     */
+    /// Returns a pointer to the interal package source list.
     pkgSourceList *list() const;
 
    /**
     * Returns a pointer to QApt's cache of trusted package source index
     * files. These are used by QApt::Package to determine whether or not
     * a package is trusted
-    *
-    * @return A pointer to the trusted pkgIndexFile cache
     */
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache() const;
 
@@ -88,8 +80,7 @@ public Q_SLOTS:
      * cache when the need arises. (E.g. such as an updated sources list, or a
      * package installation or removal)
      *
-     * @return @c true if opening succeeds
-     * @return @c false if opening fails
+     * @return @c true if opening succeeds, false otherwise
      */
     bool open();
 

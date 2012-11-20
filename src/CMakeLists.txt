@@ -63,7 +63,6 @@ install(TARGETS qapt
 
 install(FILES
     backend.h
-    cache.h
     changelog.h
     config.h
     debfile.h
