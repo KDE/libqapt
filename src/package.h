@@ -398,22 +398,31 @@ public:
     */
     bool isForeignArch() const;
 
+    /// Returns a list of DependencyItems that this package depends on.
     QList<DependencyItem> depends() const;
 
+    /// Returns a list of DependencyItems that required to install this package.
     QList<DependencyItem> preDepends() const;
 
+    /// Returns a list of DependencyItems that this package suggests to be installed.
     QList<DependencyItem> suggests() const;
 
+    /// Returns a list of DependencyItems that this package recommends to be installed.
     QList<DependencyItem> recommends() const;
 
+    /// Returns a list of DependencyItems that conflict with this package
     QList<DependencyItem> conflicts() const;
 
+    /// Returns a list of DependencyItems that this package replaces.
     QList<DependencyItem> replaces() const;
 
+    /// Returns a list of DependencyItems that this package obsoletes.
     QList<DependencyItem> obsoletes() const;
 
+    /// Returns a list of DependencyItems that this package breaks.
     QList<DependencyItem> breaks() const;
 
+    /// Returns a list of DependencyItems that this package enhances.
     QList<DependencyItem> enhances() const;
 
    /**

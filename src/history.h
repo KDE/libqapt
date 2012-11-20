@@ -164,6 +164,9 @@ public:
      */
     ~History();
 
+    /**
+     * Returns a list of all history items in APT's history logs.
+     */
     HistoryItemList historyItems() const;
 
 private:
