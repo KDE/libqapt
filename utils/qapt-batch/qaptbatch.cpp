@@ -53,9 +53,9 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     setDetailsWidget(detailsWidget);
 
     if (m_mode == "install") {
-        commitChanges(QApt::Package::ToInstall);
+        commitChanges(QApt::Package::ToInstall, packages);
     } else if (m_mode == "uninstall") {
-        commitChanges(QApt::Package::ToRemove);
+        commitChanges(QApt::Package::ToRemove, packages);
     } else if (m_mode == "update") {
         m_trans = m_backend->updateCache();
     }
@@ -90,9 +90,8 @@ void QAptBatch::reject()
         KProgressDialog::reject();
 }
 
-void QAptBatch::commitChanges(int mode)
+void QAptBatch::commitChanges(int mode, const QStringList &packageStrs)
 {
-    QStringList packageStrs;
     QApt::PackageList packages;
 
     QApt::Package *pkg;
