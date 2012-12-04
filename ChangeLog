@@ -1,4 +1,4 @@
-2.0 (as of alpha 1)
+2.0 (as of alpha 2)
 ======
 - Release Notes:
   * This release includes API/ABI changes, that, while mostly source compatible, aren't
@@ -29,6 +29,8 @@
   * The QApt::Backend constructor now takes a QObject parameter to use as a parent, removing the
     need for manual deletion. (This could perhaps be considered a bug that it didn't before...)
 - API changes:
+  * The Cache class was removed. It really had no external uses and now is a trivial wrapper
+    around libapt-pkg's pkgCacheFile with a few additions for internal use.
   * The Backend::workerEvent() signal and Backend::workerState() method have been removed.
     The new Transaction object reports state changes on a per-transaction basis now.
   * Similarly, Backend::errorOccurred() and Backend::workerQuestion() have been replaced by
@@ -45,6 +47,9 @@
   * Added a Backend::upgradeSystem() method that starts a worker transaction to upgrade all
     upgradeable packages. This is useful if you want to run a commit that will only upgrade
     packages, and will result in faster upgrade marking in the worker.
+  * Added a new MarkingErrorInfo class to replace the QHash<int, QHash<QString, QVariantMap> >
+    mess that Package::brokenReason() returned. The new class features a much nicer API.
+  * Package::supportedUntil() now returns a QDateTime to allow localization in KDE applications.
 - Bugfixes:
   * QApt::Backend will no longer emit progress information for worker actions not initiated by
     your application. (By virtue of not emitting progress information at all. Info is now emitted
@@ -80,6 +85,9 @@
     on the heap. Does not appreciably reduce memory usage, but reduced the number of times a
     heap memory allocation is performed.
   * Small speed optimizations to Backend::stateChanges()
+  * Qt containers such as QList specialized for QApt types are now declared as movable, decreasing
+    the amount of memory used to store these containers.
+  * Small optimization in Package::setVersion()
 
 
 1.4.0
