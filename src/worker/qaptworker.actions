@@ -1,6 +1,7 @@
 [Domain]
 Name=Kubuntu
 Name[da]=Kubuntu
+Name[de]=Kubuntu
 Name[el]=Kubuntu
 Name[es]=Kubuntu
 Name[et]=Kubuntu
@@ -26,6 +27,7 @@ URL=http://www.kubuntu.org
 Name=Update package information
 Name[da]=Information om opdateringspakke
 Name[el]=Ενημέρωση πληροφοριών πακέτων
+Name[es]=Actualizar información de paquetes
 Name[et]=Paketi teabe uuendamine
 Name[hu]=Csomaginformációk frissítése
 Name[nl]=Pakketinformatie bijwerken
@@ -69,6 +71,7 @@ Persistence=session
 Name=Install or remove packages
 Name[cs]=Instalovat nebo odstranit balíčky
 Name[da]=Installér eller fjern pakker
+Name[de]=Pakete installieren oder entfernen
 Name[el]=Εγκατάσταση ή αφαίρεση πακέτων
 Name[es]=Instalar o eliminar paquetes
 Name[et]=Tarkvarapakettide paigaldamine ja eemaldamine
