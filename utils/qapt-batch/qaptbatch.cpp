@@ -100,6 +100,15 @@ void QAptBatch::commitChanges(int mode, const QStringList &packageStrs)
 
         if (pkg)
             packages.append(pkg);
+        else {
+            QString text = i18nc("@label",
+                                 "The package \"%1\" has not been found among your software sources. "
+                                 "Therefore, it cannot be installed. ",
+                                 packageStr);
+            QString title = i18nc("@title:window", "Package Not Found");
+            KMessageBox::error(this, text, title);
+            close();
+        }
     }
 
     m_trans = (mode == QApt::Package::ToInstall) ?
