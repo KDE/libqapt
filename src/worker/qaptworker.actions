@@ -29,6 +29,7 @@ URL=http://www.kubuntu.org
 [org.kubuntu.qaptworker2.updatecache]
 Name=Update package information
 Name[da]=Information om opdateringspakke
+Name[de]=Paketinformation aktualisieren
 Name[el]=Ενημέρωση πληροφοριών πακέτων
 Name[es]=Actualizar información de paquetes
 Name[et]=Paketi teabe uuendamine
