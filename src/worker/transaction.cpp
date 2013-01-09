@@ -616,6 +616,7 @@ void Transaction::resolveConfigFileConflict(const QString &currentPath, bool rep
         replaceFile = false; // Client is buggy, assume keep to be safe
 
     m_replaceConfFile = replaceFile;
+    m_isPaused = false;
 }
 
 void Transaction::emitIdleTimeout()
