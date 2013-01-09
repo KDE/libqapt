@@ -101,6 +101,8 @@ public:
     */
     DependencyType dependencyType() const;
 
+    static QString typeName(DependencyType type);
+
    /**
     * Whether or not the dependency is part of an "or" dependency group
     */

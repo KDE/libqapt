@@ -154,4 +154,9 @@ DependencyType DependencyInfo::dependencyType() const
     return d->dependencyType;
 }
 
+QString DependencyInfo::typeName(DependencyType type)
+{
+    return QLatin1String(pkgCache::DepType(type));
+}
+
 }
