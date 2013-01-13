@@ -23,6 +23,7 @@ Name[sr@latin]=Kubuntu
 Name[sv]=Kubuntu
 Name[uk]=Kubuntu
 Name[x-test]=xxKubuntuxx
+Name[zh_CN]=Kubuntu
 Icon=package-x-generic
 URL=http://www.kubuntu.org
 
@@ -51,6 +52,7 @@ Name[sr@latin]=Ažuriraj podatke o paketima
 Name[sv]=Uppdatera paketinformation
 Name[uk]=Оновлення даних щодо пакунків
 Name[x-test]=xxUpdate package informationxx
+Name[zh_CN]=更新软件包信息
 Description=To update the software catalog you need to authenticate.
 Description[da]=Du skal autentificere for at kunne opdatere softwarekataloget.
 Description[el]=Για την ενημέρωση του καταλόγου λογισμικού χρειάζεστε ταυτοποίηση.
