@@ -225,10 +225,10 @@ bool Backend::reloadCache()
         pkgCache::VerIterator Ver = (*depCache)[iter].CandidateVerIter(*depCache);
 
         if(!Ver.end()) {
-            pkgCache::VerFileIterator VF = Ver.FileList();
-            QString origin(QLatin1String(VF.File().Origin()));
-            d->originMap[origin] = VF.File().Label();
-            d->siteMap[origin] = VF.File().Site();
+            const pkgCache::VerFileIterator VF = Ver.FileList();
+            const QString origin(QLatin1String(VF.File().Origin()));
+            d->originMap[origin] = QLatin1String(VF.File().Label());
+            d->siteMap[origin] = QLatin1String(VF.File().Site());
         }
     }
 
