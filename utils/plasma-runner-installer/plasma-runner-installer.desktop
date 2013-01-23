@@ -75,6 +75,7 @@ Comment[tr]=Kurulu olmayan uygulamaları kurmanızı önerir
 Comment[ug]=ئورنىتىلمىغان قوللىنىشچان پروگراممىلارنى ئورنىتىشنى تەۋسىيە قىلىدۇ
 Comment[uk]=Пропонує встановити програми, потрібні для виконання певних завдань
 Comment[x-test]=xxSuggests the installation of not-installed applicationsxx
+Comment[zh_CN]=未安装应用程序的安装建议
 Comment[zh_TW]=建議安裝應用程式
 X-KDE-ServiceTypes=Plasma/Runner
 Type=Service
