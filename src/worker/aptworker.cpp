@@ -541,11 +541,11 @@ void AptWorker::commitChanges()
     }
 
     // Set up the install
-    WorkerInstallProgress *installProgress = new WorkerInstallProgress(50, 90);
-    installProgress->setTransaction(m_trans);
+    WorkerInstallProgress installProgress(50, 90);
+    installProgress.setTransaction(m_trans);
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
 
-    pkgPackageManager::OrderResult res = installProgress->start(packageManager);
+    pkgPackageManager::OrderResult res = installProgress.start(packageManager);
     bool success = (res == pkgPackageManager::Completed);
 
     // See how the installation went
@@ -553,8 +553,6 @@ void AptWorker::commitChanges()
         m_trans->setError(QApt::CommitError);
         // Error details set by WorkerInstallProgress
     }
-
-    delete installProgress;
 
     openCache(91, 95);
 }
