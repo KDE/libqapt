@@ -28,6 +28,8 @@
     should immediately exit.
   * The QApt::Backend constructor now takes a QObject parameter to use as a parent, removing the
     need for manual deletion. (This could perhaps be considered a bug that it didn't before...)
+  * Added API to QApt::DependencyInfo analgous to libapt-pkg's pkgCache::DepType() static method
+    for obtaining a user-readable string from a QApt::DependencyType.
 - API changes:
   * The Cache class was removed. It really had no external uses and now is a trivial wrapper
     around libapt-pkg's pkgCacheFile with a few additions for internal use.
