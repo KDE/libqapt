@@ -115,6 +115,8 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
         updateInterface(readFromChildFD[0], pty_master);
     }
 
+    res = (pkgPackageManager::OrderResult)WEXITSTATUS(ret);
+
     close(readFromChildFD[0]);
     close(readFromChildFD[1]);
     close(pty_master);
