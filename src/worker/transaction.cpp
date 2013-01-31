@@ -274,9 +274,9 @@ void Transaction::setExitStatus(QApt::ExitStatus exitStatus)
 {
     QMutexLocker lock(&m_dataMutex);
 
-    setStatus(QApt::FinishedStatus);
     m_exitStatus = exitStatus;
     emit propertyChanged(QApt::ExitStatusProperty, QDBusVariant(exitStatus));
+    setStatus(QApt::FinishedStatus);
     emit finished(exitStatus);
 }
 
