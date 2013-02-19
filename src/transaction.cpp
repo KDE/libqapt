@@ -405,17 +405,16 @@ void Transaction::resolveConfigFileConflict(const QString &currentPath, bool rep
 
 void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
 {
-    qDebug() << "reply";
     QDBusPendingReply<> reply = *watcher;
 
     if (reply.isError()) {
-        qDebug() << reply.error();
+        qWarning() << "found error while replying" << reply.error();
         switch (reply.error().type())
         {
         case QDBusError::AccessDenied:
             updateError(QApt::AuthError);
             emit errorOccurred(QApt::AuthError);
-            qDebug() << "auth error reply!";
+            qWarning() << "auth error reply!";
             break;
         default:
             break;
