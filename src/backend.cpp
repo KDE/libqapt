@@ -1341,7 +1341,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             tempFile.close();
 
             QString tempFileName = tempFile.fileName();
-            FILE *out = fopen(tempFileName.toStdString().c_str(),"w");
+            FILE *out = fopen(tempFileName.toUtf8(), "w");
             if (!out) {
                 return false;
             }

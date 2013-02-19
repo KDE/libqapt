@@ -178,7 +178,7 @@ QString DebFile::controlField(const QLatin1String &field) const
 
 QString DebFile::controlField(const QString &field) const
 {
-    return controlField(QLatin1String(field.toStdString().c_str()));
+    return controlField(QLatin1String(field.toLatin1()));
 }
 
 QByteArray DebFile::md5Sum() const

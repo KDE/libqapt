@@ -189,7 +189,7 @@ void Config::writeEntry(const QString &key, const bool value)
         d->writeBufferEntry(key.toAscii(), boolString);
     }
 
-    _config->Set(key.toStdString().c_str(), value);
+    _config->Set(key.toLatin1(), value);
     d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 
@@ -208,7 +208,7 @@ void Config::writeEntry(const QString &key, const int value)
         d->writeBufferEntry(key.toAscii(), intString);
     }
 
-    _config->Set(key.toStdString().c_str(), value);
+    _config->Set(key.toLatin1(), value);
     d->worker->writeFileToDisk(QString(d->buffer), APT_CONFIG_PATH);
 }
 

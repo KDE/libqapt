@@ -160,7 +160,7 @@ bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
     QFile file(path);
 
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        file.write(contents.toStdString().c_str());
+        file.write(contents.toLatin1());
 
         return true;
     }
