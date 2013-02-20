@@ -384,9 +384,9 @@ QString Package::architecture() const
 
     // the arch:all property is part of the version
     if (ver && ver.Arch())
-        return ver.Arch();
+        return QLatin1String(ver.Arch());
 
-    return d->packageIter.Arch();
+    return QLatin1String(d->packageIter.Arch());
 }
 
 QStringList Package::availableVersions() const
