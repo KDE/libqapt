@@ -306,6 +306,11 @@ void AptWorker::updateCache()
     if (!ListUpdate(*acquire, *m_cache->GetSourceList())) {
         if (!m_trans->isCancelled()) {
             m_trans->setError(QApt::FetchError);
+
+            string message;
+            while(_error->PopMessage(message))
+                m_trans->setErrorDetails(m_trans->errorDetails() +
+                                         QString::fromStdString(message));
         }
     }
 
