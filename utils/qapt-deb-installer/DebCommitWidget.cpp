@@ -92,6 +92,8 @@ void DebCommitWidget::setTransaction(QApt::Transaction *trans)
             this, SLOT(statusChanged(QApt::TransactionStatus)));
     connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
             this, SLOT(errorOccurred(QApt::ErrorCode)));
+    connect(m_trans, SIGNAL(statusDetailsChanged(QString)),
+            this, SLOT(updateTerminal(QString)));
 }
 
 void DebCommitWidget::statusChanged(QApt::TransactionStatus status)
