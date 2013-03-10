@@ -1,37 +1,91 @@
 [Domain]
 Name=Kubuntu
+Name[fi]=Kubuntu
+Name[fr]=Kubuntu
+Name[nb]=Kubuntu
+Name[nl]=Kubuntu
 Name[ro]=Kubuntu
+Name[uk]=Kubuntu
+Name[x-test]=xxKubuntuxx
 Icon=package-x-generic
 URL=http://www.kubuntu.org
 
 [org.kubuntu.qaptworker2.updatecache]
 Name=Update package information
+Name[fi]=Pakettitietojen päivittäminen
+Name[fr]=Mettre à jour les informations de mise à jour
+Name[nb]=Oppdater informasjon om pakker
+Name[nl]=Informatie over bijwerken van pakket
 Name[ro]=Actualizează informațiile despre pachete
+Name[uk]=Оновлення даних щодо пакунків
+Name[x-test]=xxUpdate package informationxx
 Description=To update the software catalog you need to authenticate.
+Description[fi]=Päivittääksesi ohjelmaluettelon sinun tulee tunnistautua.
+Description[fr]=Pour mettre à jour le catalogue des logiciels, vous devez vous authentifier.
+Description[nb]=Du må autentisere deg for å oppdatere programvarekatalogen.
+Description[nl]=Om de softwarecatalogus bij te werken moet u zich authenticeren.
 Description[ro]=Trebuie să vă autentificați pentru a actualiza catalogul de aplicații.
+Description[uk]=Для оновлення каталогу програмного забезпечення вам слід пройти розпізнавання.
+Description[x-test]=xxTo update the software catalog you need to authenticate.xx
 Policy=yes
 Persistence=session
 
 [org.kubuntu.qaptworker2.commitchanges]
 Name=Install or remove packages
+Name[fi]=Pakettien asentaminen ja poistaminen
+Name[fr]=Installer ou supprimer des paquets
+Name[nb]=Installer eller fjern pakker
+Name[nl]=Installeer of verwijder softwarepakketten
 Name[ro]=Instalează sau elimină pachete
+Name[uk]=Встановлення або вилучення пакунків
+Name[x-test]=xxInstall or remove packagesxx
 Description=To install or remove software you need to authenticate.
+Description[fi]=Asentaaksei tai poistaaksesi ohjelmia sinun tulee tunnistautua.
+Description[fr]=Pour installer ou supprimer des logiciels, vous devez vous authentifier.
+Description[nb]=Du må autentisere deg for å installere eller fjerne programvare.
+Description[nl]=Om software te installeren of te verwijderen moet u zich authenticeren.
 Description[ro]=Trebuie să vă autentificați pentru a instala sau elimina aplicații.
+Description[uk]=Для встановлення або вилучення програмного забезпечення вам слід пройти розпізнавання.
+Description[x-test]=xxTo install or remove software you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
 
 [org.kubuntu.qaptworker2.writefiletodisk]
 Name=Change software configuration
+Name[fi]=Ohjelmistoasetuksien muuttaminen
+Name[fr]=Changer la configuration des logiciels
+Name[nb]=Endre programvareoppsett
+Name[nl]=Softwareconfiguratie wijzigen
 Name[ro]=Modifică configurarea aplicațiilor
+Name[uk]=Зміна налаштувань програмного забезпечення
+Name[x-test]=xxChange software configurationxx
 Description=To change software settings you need to authenticate.
+Description[fi]=Muuttaaksesi ohjelmistoasetuksia sinun tulee tunnistautua.
+Description[fr]=Pour changer les paramètres des logiciels, vous devez vous authentifier.
+Description[nb]=Du må autentisere deg for å endre programvareoppsettet.
+Description[nl]=Om software-instellingen te wijzigen moet u zich authenticeren.
 Description[ro]=Trebuie să vă autentificați pentru a schimba configurarea aplicațiilor.
+Description[uk]=Для внесення змін до параметрів програмного забезпечення вам слід пройти розпізнавання.
+Description[x-test]=xxTo change software settings you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
 
 [org.kubuntu.qaptworker2.cancelforeign]
 Name=Cancel the task of another user
+Name[fi]=Toisen käyttäjän tehtävän peruminen
+Name[fr]=Annuler la tâche d'un autre utilisateur
+Name[nb]=Avbryt en annen brukers oppgave
+Name[nl]=Annuleer de taak van een andere gebruiker
 Name[ro]=Anulează sarcina altui utilizator
+Name[uk]=Скасування дій, визначених іншим користувачем
+Name[x-test]=xxCancel the task of another userxx
 Description=To cancel someone else's software changes you need to authenticate.
+Description[fi]=Peruaksesi jonkun toisen ohjelmistomuutokset sinun tulee tunnistautua.
+Description[fr]=Pour annuler les changements de logiciels d'un autre utilisateur, vous devez vous authentifier.
+Description[nb]=Du må autentisere deg for å abryte en annen brukers programvareendringer.
+Description[nl]=Om wijzigingen in software van iemand anders te annuleren moet u zich authenticeren.
 Description[ro]=Trebuie să vă autentificați pentru a anula modificările făcute de altcineva în aplicații.
+Description[uk]=Для скасування внесення змін до програмного забезпечення, визначеного кимось іншим, вам слід пройти розпізнавання.
+Description[x-test]=xxTo cancel someone else's software changes you need to authenticate.xx
 Policy=auth_admin
 Persistence=session
