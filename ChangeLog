@@ -1,4 +1,4 @@
-2.0 (as of beta)
+2.0 (as of RC)
 ======
 - Release Notes:
   * This release includes API/ABI changes, that, while mostly source compatible, aren't
@@ -62,6 +62,8 @@
   * The dependencies of an application marked for installation are now properly marked as
     auto-installed. (Before they weren't, which means they couldn't be autoremoved after all
     packages depending on them had been removed)
+  * Properly report errors that occur during ListUpdate that aren't reported when any particular
+    item fails. (BKO: #315155)
 - Optimizations:
   * Public functions that took references to QLatin1String objects now take QLatin1String objects
     passed by value. A QLatin1String is nothing more than a char pointer with some convenience
