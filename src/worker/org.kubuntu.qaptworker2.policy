@@ -1,43 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE policyconfig PUBLIC
- "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
- "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+"-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+"http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
 <policyconfig>
-  <vendor>Kubuntu</vendor>
-  <vendor_url>http://www.kubuntu.org</vendor_url>
-
-  <action id="org.kubuntu.qaptworker2.updateCache">
-    <description>Update software sources</description>
-    <message>Update software sources</message>
-    <defaults>
-      <allow_inactive>no</allow_inactive>
-      <allow_active>yes</allow_active>
-    </defaults>
-  </action>
-  <action id="org.kubuntu.qaptworker2.commitChanges">
-    <description>Install or remove packages</description>
-    <message>Install or remove packages</message>
-    <defaults>
-      <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
-    </defaults>
-  </action>
-  <action id="org.kubuntu.qaptworker2.writeFileToDisk">
-    <description>Change system settings</description>
-    <message>Change system settings</message>
-    <defaults>
-      <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
-    </defaults>
-  </action>
-  <action id="org.kubuntu.qaptworker2.cancelForeign">
-    <description>Cancel the task of another user</description>
-    <message> To cancel someone else's software changes, you need to authenticate.</message>
-    <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin</allow_active>
-    </defaults>
-  </action>
-
+<vendor>Kubuntu</vendor>
+<vendor_url>http://www.kubuntu.org</vendor_url>
+<icon_name>package-x-generic</icon_name>
+   <action id="org.kubuntu.qaptworker2.cancelforeign" >
+      <description xml:lang="hu">Egy másik felhasználó feladatának megszakítása</description>
+      <description xml:lang="fr">Annuler la tâche d'un autre utilisateur</description>
+      <description xml:lang="mr">दुसऱ्या वापरकर्त्याचे कार्य रद्द करा</description>
+      <description xml:lang="nb">Avbryt en annen brukers oppgave</description>
+      <description xml:lang="tr">Diğer kullanıcının görevleri iptal et</description>
+      <description xml:lang="ro">Anulează sarcina altui utilizator</description>
+      <description xml:lang="pl">Anuluj zadanie innego użytkownika</description>
+      <description xml:lang="gl">Cancelar a tarefa doutro usuario</description>
+      <description xml:lang="ru">Отменить изменения другого пользователя</description>
+      <description xml:lang="nl">De taak van een andere gebruiker annuleren</description>
+      <description xml:lang="uk"></description>
+      <description xml:lang="pt">Cancelar a tarefa de outro utilizador</description>
+      <description xml:lang="el">Ακύρωση της εργασίας άλλου χρήστη</description>
+      <description xml:lang="sk">Zrušiť úlohu iného používateľa</description>
+      <description>Cancel the task of another user</description>
+      <description xml:lang="sl">Prekliči opravilo drugega uporabnika</description>
+      <description xml:lang="zh_TW">取消其他使用者的工作</description>
+      <description xml:lang="es">Cancelar la tarea de otro usuario</description>
+      <description xml:lang="pt_BR">Cancelar a tarefa de outro usuário</description>
+      <description xml:lang="et">Teise kasutaja toimingu katkestamine</description>
+      <description xml:lang="sr">Откажи задатак другог корисника</description>
+      <description xml:lang="da">Annullér en anden brugers opgave</description>
+      <description xml:lang="sv">Avbryt en annan användares aktivitet.</description>
+      <description xml:lang="fi">Toisen käyttäjän tehtävän peruminen</description>
+      <description xml:lang="de">Laufendes Programm eines anderen Benutzers abbrechen</description>
+      <message xml:lang="hu">Másik felhasználó szoftverváltozásainak megszakításához hitelesítés szükséges.</message>
+      <message xml:lang="fr"></message>
+      <message xml:lang="mr">दुसऱ्या वापरकर्त्याचे कार्य रद्द करण्याकरीता किंवा काढण्याकरिता तुमची परवानगी घेण्याची गरज आहे.</message>
+      <message xml:lang="nb">Du må autentisere deg for å abryte en annen brukers programvareendringer.</message>
+      <message xml:lang="tr">Diğer bir kişinin yazılım değişikliklerini iptal etmek için kimlik doğrulamanız gerekiyor.</message>
+      <message xml:lang="ro">Trebuie să vă autentificați pentru a anula modificările făcute de altcineva în aplicații.</message>
+      <message xml:lang="pl">Aby anulować zmiany w oprogramowaniu kogoś innego musisz uwierzytelnić.</message>
+      <message xml:lang="gl">Para cancelar os cambios de software doutros usuarios precisas autenticarte.</message>
+      <message xml:lang="ru"></message>
+      <message xml:lang="nl">Om wijzigingen in software van iemand anders te wijzigen moet u zich authenticeren.</message>
+      <message xml:lang="uk"></message>
+      <message xml:lang="pt"></message>
+      <message xml:lang="el">Για να ακυρώσετε τις αλλαγές κάποιου άλλου στο λογισμικό χρειάζεστε ταυτοποίηση.</message>
+      <message xml:lang="sk">Na zrušenie zmien softvéru niekoho iného sa musíte overiť.</message>
+      <message>To cancel someone else's software changes you need to authenticate.</message>
+      <message xml:lang="sl"></message>
+      <message xml:lang="zh_TW">要取消其他使用者的工作，您必須通過認證。</message>
+      <message xml:lang="es">Necesita autenticarse para cancelar los cambios de software de otro usuario.</message>
+      <message xml:lang="pt_BR">Para cancelar as alterações feitas por outra pessoa você precisa se autenticar.</message>
+      <message xml:lang="et">Kellegi teise tarkvaramuutuste katkestamiseks tuleb autentida.</message>
+      <message xml:lang="sr">За отказивање туђих измена у софтверу морате се аутентификовати.</message>
+      <message xml:lang="da">Du skal autentificere for at kunne annullere andres softwareændringer.</message>
+      <message xml:lang="sv">För att avbryta någon annans programvaruändringar måste du utföra behörighetskontroll.</message>
+      <message xml:lang="fi">Peruaksesi jonkun toisen ohjelmistomuutokset sinun tulee tunnistautua.</message>
+      <message xml:lang="de"></message>
+      <defaults>
+         <allow_inactive>no</allow_inactive>
+         <allow_active>auth_admin_keep</allow_active>
+      </defaults>
+   </action>
+   <action id="org.kubuntu.qaptworker2.commitchanges" >
+      <description xml:lang="hu">Csomagok telepítése és eltávolítása</description>
+      <description xml:lang="fr">Installer ou supprimer des paquets</description>
+      <description xml:lang="mr">पॅकेजेस प्रतिष्ठापीत करा किंवा काढून टाका</description>
+      <description xml:lang="nb">Installer eller fjern pakker</description>
+      <description xml:lang="tr">Yazılım paketlerini kur veya kaldır</description>
+      <description xml:lang="ro">Instalează sau elimină pachete</description>
+      <description xml:lang="pl">Instaluj lub usuwaj pakiety</description>
+      <description xml:lang="gl">Instalar ou eliminar paquetes.</description>
+      <description xml:lang="ru">Установка и удаление пакетов</description>
+      <description xml:lang="nl">Installeer en verwijder pakketten</description>
+      <description xml:lang="uk">Встановлення або вилучення пакунків</description>
+      <description xml:lang="pt">Instalar ou remover pacotes</description>
+      <description xml:lang="el">Εγκατάσταση ή αφαίρεση πακέτων</description>
+      <description xml:lang="sk">Inštalovať alebo odstrániť balíky</description>
+      <description>Install or remove packages</description>
+      <description xml:lang="sl">Namesti ali odstrani pakete</description>
+      <description xml:lang="zh_TW">安裝或移除套件</description>
+      <description xml:lang="es">Instalar o eliminar paquetes</description>
+      <description xml:lang="pt_BR">Instalar ou remover pacotes</description>
+      <description xml:lang="et">Tarkvarapakettide paigaldamine ja eemaldamine</description>
+      <description xml:lang="sr">Инсталирај или уклони пакете</description>
+      <description xml:lang="da">Installér eller fjern pakker</description>
+      <description xml:lang="cs">Instalovat nebo odstranit balíčky</description>
+      <description xml:lang="sv">Installera eller ta bort paket</description>
+      <description xml:lang="fi">Pakettien asentaminen ja poistaminen</description>
+      <description xml:lang="de">Pakete installieren oder entfernen</description>
+      <message xml:lang="hu">Csomagok telepítéséhez vagy eltávolításához hitelesítés szükséges.</message>
+      <message xml:lang="fr"></message>
+      <message xml:lang="mr">सॉफ़्टवेअर प्रतिष्ठापीत करण्याकरीता किंवा काढण्याकरिता तुमची परवानगी घेण्याची गरज आहे.</message>
+      <message xml:lang="nb">Du må autentisere deg for å installere eller fjerne programvare.</message>
+      <message xml:lang="tr">Yazılım yüklemek veya kaldırmak için kimlik doğrulamanız gerekiyor.</message>
+      <message xml:lang="ro">Trebuie să vă autentificați pentru a instala sau elimina aplicații.</message>
+      <message xml:lang="pl">Aby zainstalować lub usunąć oprogramowanie musisz uwierzytelnić.</message>
+      <message xml:lang="gl">Para instalar ou desinstalar software precisas autenticarte.</message>
+      <message xml:lang="ru">Для установки и удаления программ требуется аутентификация.</message>
+      <message xml:lang="nl">Om software te installeren of te verwijderen moet u zich authenticeren.</message>
+      <message xml:lang="uk">Для встановлення або вилучення програмного забезпечення вам слід пройти розпізнавання.</message>
+      <message xml:lang="pt"></message>
+      <message xml:lang="el">Για να εγκαταστήσετε ή να αφαιρέσετε λογισμικό χρειάζεστε ταυτοποίηση.</message>
+      <message xml:lang="sk">Na inštalovanie alebo odstránenie softvéru sa musíte overiť.</message>
+      <message>To install or remove software you need to authenticate.</message>
+      <message xml:lang="sl"></message>
+      <message xml:lang="zh_TW">要安裝或移除軟體，您必須通過認證。</message>
+      <message xml:lang="es">Necesita autenticarse para instalar o eliminar software.</message>
+      <message xml:lang="pt_BR">Para instalar ou remover programas você precisa se autenticar.</message>
+      <message xml:lang="et">Tarkvara paigaldamiseks või eemaldamiseks tuleb autentida.</message>
+      <message xml:lang="sr">За инсталирање или уклањање софтвера морате се аутентификовати.</message>
+      <message xml:lang="da">Du skal autentificere for at kunne installere eller fjerne software.</message>
+      <message xml:lang="sv">För att installera eller ta bort programvara måste du utföra behörighetskontroll.</message>
+      <message xml:lang="fi">Asentaaksei tai poistaaksesi ohjelmia sinun tulee tunnistautua.</message>
+      <message xml:lang="de">Zum Installieren oder Entfernen von Software  müssen Sie sich authentifizieren.</message>
+      <defaults>
+         <allow_inactive>no</allow_inactive>
+         <allow_active>auth_admin_keep</allow_active>
+      </defaults>
+   </action>
+   <action id="org.kubuntu.qaptworker2.updatecache" >
+      <description xml:lang="hu">Csomaginformációk frissítése</description>
+      <description xml:lang="zh_CN">更新软件包信息</description>
+      <description xml:lang="fr">Mettre à jour les informations de mise à jour</description>
+      <description xml:lang="mr">पॅकेज माहिती अद्ययावत करा</description>
+      <description xml:lang="nb">Oppdater informasjon om pakker</description>
+      <description xml:lang="tr">Paket bilgisini güncelle</description>
+      <description xml:lang="ro">Actualizează informațiile despre pachete</description>
+      <description xml:lang="pl">Informacje o pakiecie uaktualniającym</description>
+      <description xml:lang="gl">Actualizar a información do paquete</description>
+      <description xml:lang="ru">Обновление сведений о пакете</description>
+      <description xml:lang="nl">Pakketinformatie bijwerken</description>
+      <description xml:lang="uk">Оновлення даних щодо пакунків</description>
+      <description xml:lang="pt">Actualizar a informação dos pacotes</description>
+      <description xml:lang="el">Ενημέρωση πληροφοριών πακέτων</description>
+      <description xml:lang="sk">Aktualizovať informácie o balíkoch</description>
+      <description>Update package information</description>
+      <description xml:lang="sl">Posodobi podrobnosti o paketih</description>
+      <description xml:lang="zh_TW">更新套件資訊</description>
+      <description xml:lang="es">Actualizar información de paquetes</description>
+      <description xml:lang="pt_BR">Atualizar as informações do pacote</description>
+      <description xml:lang="et">Paketi teabe uuendamine</description>
+      <description xml:lang="sr">Ажурирај податке о пакетима</description>
+      <description xml:lang="da">Information om opdateringspakke</description>
+      <description xml:lang="sv">Uppdatera paketinformation</description>
+      <description xml:lang="fi">Pakettitietojen päivittäminen</description>
+      <description xml:lang="de">Paketinformation aktualisieren</description>
+      <message xml:lang="hu">A szoftverkatalógus frissítéséhez hitelesítés szükséges.</message>
+      <message xml:lang="fr"></message>
+      <message xml:lang="mr">सॉफ़्टवेअर सूची अद्ययावत करण्याकरीता तुमची परवानगी घेण्याची गरज आहे.</message>
+      <message xml:lang="nb">Du må autentisere deg for å oppdatere programvarekatalogen.</message>
+      <message xml:lang="tr">Yazılım kataloğunu güncellemek için kimlik doğrulamanız gerekiyor.</message>
+      <message xml:lang="ro">Trebuie să vă autentificați pentru a actualiza catalogul de aplicații.</message>
+      <message xml:lang="pl">Aby uaktualnić katalog oprogramowania musisz uwierzytelnić.</message>
+      <message xml:lang="gl">Para actualizar o catálogo de software precisas autenticarte.</message>
+      <message xml:lang="ru">Для обновления каталога программ требуется аутентификация.</message>
+      <message xml:lang="nl">Om de catalogus met software bij te werken moet u zich authenticeren.</message>
+      <message xml:lang="uk">Для оновлення каталогу програмного забезпечення вам слід пройти розпізнавання.</message>
+      <message xml:lang="pt"></message>
+      <message xml:lang="el">Για την ενημέρωση του καταλόγου λογισμικού χρειάζεστε ταυτοποίηση.</message>
+      <message xml:lang="sk">Na aktualizáciu katalógu softvéru sa musíte overiť.</message>
+      <message>To update the software catalog you need to authenticate.</message>
+      <message xml:lang="sl"></message>
+      <message xml:lang="zh_TW">要更新軟體類別，您必須通過認證。</message>
+      <message xml:lang="es">Necesita autenticarse para actualizar el catálogo de software.</message>
+      <message xml:lang="pt_BR">Para atualizar o catálogo de programas você precisa se autenticar.</message>
+      <message xml:lang="et">Tarkvara uuendamiseks tuleb autentida.</message>
+      <message xml:lang="sr">За ажурирање каталога софтвера морате се аутентификовати.</message>
+      <message xml:lang="da">Du skal autentificere for at kunne opdatere softwarekataloget.</message>
+      <message xml:lang="sv">För att uppdatera programvarukatalogen måste du utföra behörighetskontroll.</message>
+      <message xml:lang="fi">Päivittääksesi ohjelmaluettelon sinun tulee tunnistautua.</message>
+      <message xml:lang="de">Zur Aktualisierung Ihres Software-Katalogs müssen Sie sich authentifizieren.</message>
+      <defaults>
+         <allow_inactive>no</allow_inactive>
+         <allow_active>yes</allow_active>
+      </defaults>
+   </action>
+   <action id="org.kubuntu.qaptworker2.writefiletodisk" >
+      <description xml:lang="hu">Szoftverbeállítás módosítása</description>
+      <description xml:lang="fr">Changer la configuration des logiciels</description>
+      <description xml:lang="mr">सॉफ़्टवेअर संयोजना बदला</description>
+      <description xml:lang="nb">Endre programvareoppsett</description>
+      <description xml:lang="tr">Yazılım yapılandırmasını değiştir</description>
+      <description xml:lang="ro">Modifică configurarea aplicațiilor</description>
+      <description xml:lang="pl">Zmień konfigurację oprogramowania</description>
+      <description xml:lang="gl">Cambiar a configuración de software.</description>
+      <description xml:lang="ru">Изменение конфигурации программного обеспечения</description>
+      <description xml:lang="nl">Softwareconfiguratie wijzigen</description>
+      <description xml:lang="uk">Зміна налаштувань програмного забезпечення</description>
+      <description xml:lang="pt">Mudar a configuração das aplicações</description>
+      <description xml:lang="el">Αλλαγή διαμόρφωσης λογισμικού</description>
+      <description xml:lang="sk">Zmeniť nastavenie softvéru</description>
+      <description>Change software configuration</description>
+      <description xml:lang="sl">Spremeni nastavitve programske opreme</description>
+      <description xml:lang="zh_TW">變更軟體設定</description>
+      <description xml:lang="es">Cambiar la configuración de software</description>
+      <description xml:lang="pt_BR">Alterar as configurações do programa</description>
+      <description xml:lang="et">Tarkvaraseadistuse muutmine</description>
+      <description xml:lang="sr">Измени поставу софтвера</description>
+      <description xml:lang="da">Skift softwarekonfiguration</description>
+      <description xml:lang="sv">Ändra programvaruinställning</description>
+      <description xml:lang="fi">Ohjelmistoasetuksien muuttaminen</description>
+      <description xml:lang="de">Software-Einstellungen ändern</description>
+      <message xml:lang="hu">A szoftverbeállítások módosításához hitelesítés szükséges.</message>
+      <message xml:lang="fr"></message>
+      <message xml:lang="mr">सॉफ़्टवेअर संयोजना बदलण्याकरिता तुमची परवानगी घेण्याची गरज आहे.</message>
+      <message xml:lang="nb">Du må autentisere deg for å endre programvareoppsettet.</message>
+      <message xml:lang="tr">Yazılım ayarlarını değiştirmek için kimlik doğrulamanız gerekiyor.</message>
+      <message xml:lang="ro">Trebuie să vă autentificați pentru a schimba configurarea aplicațiilor.</message>
+      <message xml:lang="pl">Aby zmienić ustawienia oprogramowania musisz uwierzytelnić.</message>
+      <message xml:lang="gl">Para cambiar as configuracións de software precisas autenticarte.</message>
+      <message xml:lang="ru">Для изменения конфигурации программного обеспечения требуется аутентификация.</message>
+      <message xml:lang="nl">Om instellingen voor software te wijzigen moet u zich authenticeren.</message>
+      <message xml:lang="uk">Для внесення змін до параметрів програмного забезпечення вам слід пройти розпізнавання.</message>
+      <message xml:lang="pt"></message>
+      <message xml:lang="el">Για να αλλάξετε τις ρυθμίσεις λογισμικού χρειάζεστε ταυτοποίηση.</message>
+      <message xml:lang="sk">Na zmenu nastavenia softvéru sa musíte overiť.</message>
+      <message>To change software settings you need to authenticate.</message>
+      <message xml:lang="sl"></message>
+      <message xml:lang="zh_TW">要變更軟體設定，您必須通過認證。</message>
+      <message xml:lang="es">Necesita autenticarse para cambiar las preferencias de software.</message>
+      <message xml:lang="pt_BR">Para alterar as configurações do programa você precisa se autenticar.</message>
+      <message xml:lang="et">Tarkvaraseadistuse muutmiseks tuleb autentida.</message>
+      <message xml:lang="sr">За измену поставки софтвера морате се аутентификовати.</message>
+      <message xml:lang="da">Du skal autentificere for at kunne skifte softwareindstillinger.</message>
+      <message xml:lang="sv">För att ändra programvaruinställningar måste du utföra behörighetskontroll.</message>
+      <message xml:lang="fi">Muuttaaksesi ohjelmistoasetuksia sinun tulee tunnistautua.</message>
+      <message xml:lang="de">Um Software-Einstellungen zu ändern müssen Sie sich authentifizieren.</message>
+      <defaults>
+         <allow_inactive>no</allow_inactive>
+         <allow_active>auth_admin_keep</allow_active>
+      </defaults>
+   </action>
 </policyconfig>
