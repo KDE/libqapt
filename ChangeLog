@@ -1,4 +1,4 @@
-2.0 (as of beta)
+2.0
 ======
 - Release Notes:
   * This release includes API/ABI changes, that, while mostly source compatible, aren't
@@ -36,7 +36,7 @@
   * The Backend::workerEvent() signal and Backend::workerState() method have been removed.
     The new Transaction object reports state changes on a per-transaction basis now.
   * Similarly, Backend::errorOccurred() and Backend::workerQuestion() have been replaced by
-    analgous code in the Transaction class.
+    analogous code in the Transaction class.
   * The Backend::setProxy() and setLocale() functions have been removed. Proxy and locale are now
     set on a per-transaction basis via the QApt::Transaction class.
   * Global signals for download/commit progress in QApt::Backend have been replaced by signals in
