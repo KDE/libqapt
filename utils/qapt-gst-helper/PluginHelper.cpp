@@ -59,6 +59,10 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
     , m_done(false)
     , m_details(gstDetails)
 {
+    // Set frontend capabilities
+    QApt::FrontendCaps caps = (QApt::FrontendCaps)(QApt::MediumPromptCap | QApt::UntrustedPromptCap);
+    m_backend->setFrontendCaps(caps);
+
     foreach (const QString &plugin, gstDetails) {
         PluginInfo *pluginInfo = new PluginInfo(plugin);
         if (pluginInfo->isValid()) {
@@ -402,6 +406,10 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
 
         m_trans->deleteLater();
         m_trans = 0;
+        break;
+    case QApt::WaitingConfigFilePromptStatus:
+    default:
+        break;
     }
 }
 

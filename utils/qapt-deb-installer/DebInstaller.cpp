@@ -52,6 +52,8 @@ DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
 {
     if (!m_backend->init())
         initError();
+    QApt::FrontendCaps caps = (QApt::FrontendCaps)(QApt::DebconfCap);
+    m_backend->setFrontendCaps(caps);
 
     QFileInfo fi(debFile);
     m_debFile = new QApt::DebFile(fi.absoluteFilePath());

@@ -45,6 +45,11 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     if (!m_backend->init())
         initError();
 
+    // Set frontend capabilities
+    QApt::FrontendCaps caps = (QApt::FrontendCaps)(QApt::DebconfCap | QApt::MediumPromptCap |
+                               QApt::UntrustedPromptCap);
+    m_backend->setFrontendCaps(caps);
+
     // Set this in case we auto-show before auth
     setLabelText(i18nc("@label", "Waiting for authorization"));
     progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
@@ -373,6 +378,9 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
 
         // Really a close button, but KProgressDialog use ButtonCode Cancel
         setButtonFocus(KDialog::Cancel);
+        break;
+    case QApt::WaitingConfigFilePromptStatus:
+    default:
         break;
     }
 }
