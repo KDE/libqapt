@@ -77,6 +77,7 @@ class Q_DECL_EXPORT Transaction : public QObject
     Q_PROPERTY(quint64 downloadETA READ downloadETA WRITE updateDownloadETA)
     Q_PROPERTY(QString filePath READ filePath WRITE updateFilePath)
     Q_PROPERTY(QString errorDetails READ errorDetails WRITE updateErrorDetails)
+    Q_PROPERTY(FrontendCaps frontendCaps READ frontendCaps WRITE updateFrontendCaps)
 
 public:
     /**
@@ -247,6 +248,12 @@ public:
      */
     QString errorDetails() const;
 
+    /**
+     * Returns the frontend capabilities of the frontend displaying the
+     * transaction.
+     */
+    QApt::FrontendCaps frontendCaps() const;
+
 private:
     TransactionPrivate *const d;
 
@@ -271,6 +278,7 @@ private:
     void updateDownloadETA(quint64 ETA);
     void updateFilePath(const QString &filePath);
     void updateErrorDetails(const QString &errorDetails);
+    void updateFrontendCaps(QApt::FrontendCaps frontendCaps);
 
 Q_SIGNALS:
     /**
@@ -452,6 +460,12 @@ public Q_SLOTS:
      * @see debconfPipe
      */
     void setDebconfPipe(const QString &pipe);
+
+    /**
+     * Sets the frontend capabilities for the frontend handling this
+     * transaction. E.g. advertise support for debconf, etc.
+     */
+    void setFrontendCaps(QApt::FrontendCaps frontendCaps);
 
     /**
      * Queues the transaction to be processed by the QApt Worker.

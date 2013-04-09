@@ -56,6 +56,7 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
     , m_downloadSpeed(0)
     , m_safeUpgrade(true)
     , m_replaceConfFile(false)
+    , m_frontendCaps(QApt::NoCaps)
     , m_dataMutex(QMutex::Recursive)
 {
     new TransactionAdaptor(this);
@@ -477,6 +478,11 @@ bool Transaction::replaceConfFile() const
     return m_replaceConfFile;
 }
 
+int Transaction::frontendCaps() const
+{
+    return m_frontendCaps;
+}
+
 void Transaction::run()
 {
     setDelayedReply(true);
@@ -548,6 +554,8 @@ void Transaction::setProperty(int property, QDBusVariant value)
     case QApt::PackagesProperty:
         setPackages(value.variant().toMap());
         break;
+    case QApt::FrontendCapsProperty:
+        setFrontendCaps((QApt::FrontendCaps)value.variant().toInt());
     default:
         sendErrorReply(QDBusError::InvalidArgs);
         break;
@@ -617,6 +625,13 @@ void Transaction::resolveConfigFileConflict(const QString &currentPath, bool rep
 
     m_replaceConfFile = replaceFile;
     m_isPaused = false;
+}
+
+void Transaction::setFrontendCaps(QApt::FrontendCaps frontendCaps)
+{
+    QMutexLocker lock(&m_dataMutex);
+
+    m_frontendCaps = frontendCaps;
 }
 
 void Transaction::emitIdleTimeout()

@@ -246,7 +246,9 @@ namespace QApt
         /// QString, the path of the .deb file to be installed
         FilePathProperty,
         /// QString, the string describing the current error in detail
-        ErrorDetailsProperty
+        ErrorDetailsProperty,
+        /// int, the frontend capabilities for the transaction
+        FrontendCapsProperty
     };
 
     /**
@@ -321,6 +323,15 @@ namespace QApt
         SafeUpgrade,
         /// An upgrade that may install or remove packages to accomplish the upgrade
         FullUpgrade
+    };
+
+    /// Flags for advertising frontend capabilities
+    enum FrontendCaps {
+        NoCaps = 0,
+        DebconfCap,
+        MediumPromptCap,
+        ConfigPromptCap,
+        UntrustedPromptCap
     };
 }
 

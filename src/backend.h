@@ -409,6 +409,12 @@ public:
     */
     QDateTime timeCacheLastUpdated() const;
 
+    /**
+     * Returns the capabilities advertised by the frontend associated with the QApt
+     * Backend.
+     */
+    QApt::FrontendCaps frontendCaps() const;
+
 protected:
     BackendPrivate *const d_ptr;
 
@@ -781,6 +787,16 @@ public Q_SLOTS:
     * @return @c true on success, @c false on failure
     */
     bool addArchiveToCache(const DebFile &archive);
+
+    /**
+     * Sets the capabilities of the frontend. All transactions created after this
+     * is set will inherit these capability flags.
+     *
+     * @param caps The capabilities to advertise the frontend as having
+     *
+     * @since 2.1
+     */
+    void setFrontendCaps(QApt::FrontendCaps caps);
 
 private Q_SLOTS:
     void emitPackageChanged();

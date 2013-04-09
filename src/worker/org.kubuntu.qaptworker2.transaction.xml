@@ -26,6 +26,7 @@
     <property name="downloadETA" type="t" access="read"/>
     <property name="filePath" type="s" access="read"/>
     <property name="errorDetails" type="s" access="read"/>
+    <property name="frontendCaps" type="i" access="read"/>
     <signal name="propertyChanged">
       <arg name="role" type="i" direction="out"/>
       <arg name="newValue" type="v" direction="out"/>
@@ -61,6 +62,9 @@
     <method name="resolveConfigFileConflict">
       <arg name="currentPath" type="s" direction="in"/>
       <arg name="replace" type="b" direction="in"/>
+    </method>
+    <method name="setFrontendCaps">
+        <arg name="caps" type="i" direction="in"/>
     </method>
   </interface>
 </node>

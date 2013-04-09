@@ -82,6 +82,7 @@ class TransactionPrivate
         quint64 downloadETA;
         QString filePath;
         QString errorDetails;
+        QApt::FrontendCaps frontendCaps;
 };
 
 Transaction::Transaction(const QString &tid)
@@ -323,6 +324,11 @@ QString Transaction::errorDetails() const
     return d->errorDetails;
 }
 
+QApt::FrontendCaps Transaction::frontendCaps() const
+{
+    return d->frontendCaps;
+}
+
 void Transaction::updateErrorDetails(const QString &errorDetails)
 {
     d->errorDetails = errorDetails;
@@ -336,6 +342,21 @@ void Transaction::setLocale(const QString &locale)
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
             this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::setFrontendCaps(FrontendCaps frontendCaps)
+{
+    QDBusPendingCall call = d->dbus->setProperty(QApt::FrontendCapsProperty,
+                                                 QDBusVariant((int)frontendCaps));
+
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(onCallFinished(QDBusPendingCallWatcher*)));
+}
+
+void Transaction::updateFrontendCaps(FrontendCaps frontendCaps)
+{
+    d->frontendCaps = frontendCaps;
 }
 
 void Transaction::setProxy(const QString &proxy)
@@ -472,9 +493,10 @@ void Transaction::sync()
                 // iter.value() for the QVariantMap is QDBusArgument, so we have to
                 // set this manually
                 setProperty(iter.key().toLatin1(), d->dbus->property(iter.key().toLatin1()));
-            else if (iter.key() == "downloadProgress") {
+            else if (iter.key() == QLatin1String("downloadProgress"))
                 updateDownloadProgress(iter.value().value<QApt::DownloadProgress>());
-            }
+            else if (iter.key() == QLatin1String("frontendCaps"))
+                updateFrontendCaps((FrontendCaps)iter.value().toInt());
             else
                 qDebug() << "failed to set:" << iter.key();
         }
@@ -563,6 +585,9 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         break;
     case ErrorDetailsProperty:
         updateErrorDetails(variant.variant().toString());
+        break;
+    case FrontendCapsProperty:
+        updateFrontendCaps((FrontendCaps)variant.variant().toInt());
         break;
     default:
         break;

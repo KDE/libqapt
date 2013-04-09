@@ -56,7 +56,7 @@ void WorkerInstallProgress::setTransaction(Transaction *trans)
     m_trans = trans;
     std::setlocale(LC_ALL, m_trans->locale().toAscii());
 
-    if (!trans->debconfPipe().isEmpty()) {
+    if ((trans->frontendCaps() & QApt::DebconfCap) && !trans->debconfPipe().isEmpty()) {
         setenv("DEBIAN_FRONTEND", "passthrough", 1);
         setenv("DEBCONF_PIPE", trans->debconfPipe().toAscii(), 1);
     } else {
@@ -164,11 +164,14 @@ void WorkerInstallProgress::updateInterface(int fd, int writeFd)
                 QString oldFile = strList.at(1);
                 QString newFile = strList.at(2);
 
-                m_trans->setConfFileConflict(oldFile, newFile);
-                m_trans->setStatus(QApt::WaitingConfigFilePromptStatus);
+                // Prompt for which file to use if the frontend supports that
+                if (m_trans->frontendCaps() & QApt::ConfigPromptCap) {
+                    m_trans->setConfFileConflict(oldFile, newFile);
+                    m_trans->setStatus(QApt::WaitingConfigFilePromptStatus);
 
-                while (m_trans->isPaused())
-                    usleep(200000);
+                    while (m_trans->isPaused())
+                        usleep(200000);
+                }
 
                 m_trans->setStatus(QApt::CommittingStatus);
 

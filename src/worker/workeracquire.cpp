@@ -120,6 +120,10 @@ void WorkerAcquire::Stop()
 
 bool WorkerAcquire::MediaChange(string Media, string Drive)
 {
+    // Check if frontend can prompt for media
+    if (!(m_trans->frontendCaps() & QApt::MediumPromptCap))
+        return false;
+
     // Notify listeners to the transaction
     m_trans->setMediumRequired(QString::fromUtf8(Media.c_str()),
                                QString::fromUtf8(Drive.c_str()));

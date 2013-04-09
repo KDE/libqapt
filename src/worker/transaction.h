@@ -60,6 +60,7 @@ class Transaction : public QObject, protected QDBusContext
     Q_PROPERTY(quint64 downloadETA READ downloadETA)
     Q_PROPERTY(QString filePath READ filePath)
     Q_PROPERTY(QString errorDetails READ errorDetails)
+    Q_PROPERTY(int frontendCaps READ frontendCaps)
 public:
     Transaction(TransactionQueue *queue, int userId);
     Transaction(TransactionQueue *queue, int userId,
@@ -92,6 +93,7 @@ public:
     QString errorDetails();
     bool safeUpgrade() const;
     bool replaceConfFile() const;
+    int frontendCaps() const;
 
     void setStatus(QApt::TransactionStatus status);
     void setError(QApt::ErrorCode code);
@@ -110,6 +112,7 @@ public:
     void setErrorDetails(const QString &errorDetails);
     void setSafeUpgrade(bool safeUpgrade);
     void setConfFileConflict(const QString &currentPath, const QString &newPath);
+    void setFrontendCaps(QApt::FrontendCaps frontendCaps);
 
 private:
     // Pointers to external containers
@@ -142,6 +145,7 @@ private:
     bool m_safeUpgrade;
     QString m_currentConfPath;
     bool m_replaceConfFile;
+    QApt::FrontendCaps m_frontendCaps;
 
     // Other data
     QMap<int, QString> m_roleActionMap;

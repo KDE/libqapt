@@ -490,8 +490,6 @@ void AptWorker::commitChanges()
     if (!untrustedPackages.isEmpty()) {
         bool allowUntrusted = _config->FindB("APT::Get::AllowUnauthenticated", true);
 
-        m_trans->setUntrustedPackages(untrustedPackages, allowUntrusted);
-
         if (!allowUntrusted) {
             m_trans->setError(QApt::UntrustedError);
 
@@ -499,9 +497,13 @@ void AptWorker::commitChanges()
             return;
         }
 
-        // Wait until the user approves, disapproves, or cancels the transaction
-        while (m_trans->isPaused())
-             usleep(200000);
+        if (m_trans->frontendCaps() & QApt::UntrustedPromptCap) {
+            m_trans->setUntrustedPackages(untrustedPackages, allowUntrusted);
+
+            // Wait until the user approves, disapproves, or cancels the transaction
+            while (m_trans->isPaused())
+                 usleep(200000);
+        }
 
         if (!m_trans->allowUntrusted()) {
             m_trans->setError(QApt::UntrustedError);

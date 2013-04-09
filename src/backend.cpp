@@ -61,6 +61,7 @@ public:
         , xapianDatabase(nullptr)
         , xapianIndexExists(false)
         , compressEvents(false)
+        , frontendCaps(QApt::NoCaps)
     {
     }
     ~BackendPrivate()
@@ -116,6 +117,7 @@ public:
     bool writeSelectionFile(const QString &file, const QString &path) const;
     QString customProxy;
     QString initErrorMessage;
+    QApt::FrontendCaps frontendCaps;
 };
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
@@ -651,6 +653,13 @@ bool Backend::isBroken() const
     return false;
 }
 
+QApt::FrontendCaps Backend::frontendCaps() const
+{
+    Q_D(const Backend);
+
+    return d->frontendCaps;
+}
+
 QDateTime Backend::timeCacheLastUpdated() const
 {
     QDateTime sinceUpdate;
@@ -1032,6 +1041,7 @@ QApt::Transaction * Backend::commitChanges()
 
     QDBusPendingReply<QString> rep = d->worker->commitChanges(packageList);
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1049,6 +1059,7 @@ QApt::Transaction * Backend::installPackages(PackageList packages)
 
     QDBusPendingReply<QString> rep = d->worker->commitChanges(packageList);
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1066,6 +1077,7 @@ QApt::Transaction * Backend::removePackages(PackageList packages)
 
     QDBusPendingReply<QString> rep = d->worker->commitChanges(packageList);
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1102,6 +1114,7 @@ Transaction *Backend::downloadArchives(const QString &listFile, const QString &d
 
     QDBusPendingReply<QString> rep = d->worker->downloadArchives(packages, destination);
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1112,6 +1125,7 @@ Transaction *Backend::installFile(const DebFile &debFile)
 
     QDBusPendingReply<QString> rep = d->worker->installFile(debFile.filePath());
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1127,6 +1141,7 @@ Transaction *Backend::updateCache()
 
     QDBusPendingReply<QString> rep = d->worker->updateCache();
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1138,6 +1153,7 @@ Transaction *Backend::upgradeSystem(UpgradeType upgradeType)
     bool safeUpgrade = (upgradeType == QApt::SafeUpgrade);
     QDBusPendingReply<QString> rep = d->worker->upgradeSystem(safeUpgrade);
     Transaction *trans = new Transaction(rep.value());
+    trans->setFrontendCaps(d->frontendCaps);
 
     return trans;
 }
@@ -1464,6 +1480,13 @@ bool Backend::addArchiveToCache(const DebFile &archive)
 
     // Add the package, but we'll need auth so the worker'll do it
     return d->worker->copyArchiveToCache(archive.filePath());
+}
+
+void Backend::setFrontendCaps(FrontendCaps caps)
+{
+    Q_D(Backend);
+
+    d->frontendCaps = caps;
 }
 
 }
