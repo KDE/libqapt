@@ -729,6 +729,10 @@ QHash<Package::State, PackageList> Backend::stateChanges(const CacheState &oldSt
 
     QHash<Package::State, PackageList> changes;
 
+    // Return an empty change set for invalid state caches
+    if (oldState.isEmpty())
+        return changes;
+
     for (int i = 0; i < d->packages.size(); ++i) {
         Package *pkg = d->packages.at(i);
 
