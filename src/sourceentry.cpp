@@ -33,6 +33,14 @@ public:
         , isEnabled(true)
     {}
 
+    SourceEntryPrivate(const QString &lineData, const QString &fileName)
+        : SourceEntryPrivate()
+        , line(lineData)
+        , file(fileName)
+    {
+        parseData(line);
+    }
+
     // Data members
     bool isValid;
     bool isEnabled;
@@ -44,10 +52,34 @@ public:
     QString comment;
     QString line;
     QString file;
+
+    void parseData(const QString &data);
 };
 
-SourceEntry::SourceEntry()
-    : d(new SourceEntryPrivate)
+void SourceEntryPrivate::parseData(const QString &data)
+{
+    if (data.isEmpty())
+        return;
+
+    data = data.trimmed();
+
+    // Check for stupid input
+    if (line.isEmpty() || line == '#') {
+        isValid = false;
+        return;
+    }
+
+    // Check source enable state
+    if (line.at(0) == '#') {
+        isEnabled = false;
+
+        QStringList pieces = line.remove(0, 1).split(' ');
+        qDebug() << pieces;
+    }
+}
+
+SourceEntry::SourceEntry(const QString &line, const QString &file)
+    : d(new SourceEntryPrivate(line, file))
 {
 }
 

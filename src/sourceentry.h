@@ -30,15 +30,13 @@ class SourceEntryPrivate;
 class SourceEntry
 {
 public:
-    SourceEntry();
+    SourceEntry(const QString &line, const QString &file);
     SourceEntry(const SourceEntry &);
     SourceEntry &operator=(const SourceEntry &);
     ~SourceEntry();
     
 private:
     QSharedDataPointer<SourceEntryPrivate> d;
-
-    void parse();
 };
 
 }
