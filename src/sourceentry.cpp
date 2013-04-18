@@ -23,6 +23,7 @@
 // Qt includes
 #include <QSharedData>
 #include <QStringList>
+#include <QDebug>
 
 namespace QApt {
 
@@ -34,7 +35,8 @@ public:
     {}
 
     SourceEntryPrivate(const QString &lineData, const QString &fileName)
-        : SourceEntryPrivate()
+        : isValid(true)
+        , isEnabled(true)
         , line(lineData)
         , file(fileName)
     {
@@ -61,19 +63,19 @@ void SourceEntryPrivate::parseData(const QString &data)
     if (data.isEmpty())
         return;
 
-    data = data.trimmed();
+    QString tData = data.trimmed();
 
     // Check for stupid input
-    if (line.isEmpty() || line == '#') {
+    if (tData.isEmpty() || tData == QChar('#')) {
         isValid = false;
         return;
     }
 
     // Check source enable state
-    if (line.at(0) == '#') {
+    if (tData.at(0) == '#') {
         isEnabled = false;
 
-        QStringList pieces = line.remove(0, 1).split(' ');
+        QStringList pieces = tData.remove(0, 1).split(' ');
         qDebug() << pieces;
     }
 }

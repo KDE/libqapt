@@ -11,6 +11,7 @@ set(qapt_SRCS
     transactiondbus.cpp
     downloadprogress.cpp
     markingerrorinfo.cpp
+    sourceentry.cpp
     )
 
 include_directories(
@@ -37,6 +38,7 @@ set(qapt_HDRS
     globals.h
     downloadprogress.h
     markingerrorinfo.h
+    sourceentry.h
     )
 
 qt4_wrap_cpp(qapt_SRCS ${qapt_MOC_HDRS})
@@ -73,6 +75,7 @@ install(FILES
     transaction.h
     downloadprogress.h
     markingerrorinfo.h
+    sourceentry.h
 
     DESTINATION
     include/libqapt COMPONENT Devel)
