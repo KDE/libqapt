@@ -103,4 +103,44 @@ void SourcesList::removeEntry(const SourceEntry &entry)
     d->list.removeAll(entry);
 }
 
+void SourcesList::save()
+{
+    Q_D(SourcesList);
+
+    // Write an empty default file if list is empty
+    if (d->list.isEmpty()) {
+        QString path = QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist"));
+        QString header = QString("## See sources.list(5) for more information, especially\n"
+                                 "# Remember that you can only use http, ftp or file URIs.\n"
+                                 "# CDROMs are managed through the apt-cdrom tool.\n");
+
+        d->worker->writeFileToDisk(header, path);
+        return;
+    }
+
+    // Otherwise, go through our list of source entries and write them to their
+    // respective files
+    QHash<QString, QFile *> files;
+    for (SourceEntry &entry : d->list) {
+        // Open file for writing
+        QFile *file = files[entry.file()];
+        if (!file) {
+            files[entry.file()] = file = new QFile(entry.file(), this);
+            file->open(QFile::Text | QIODevice::WriteOnly);
+        }
+
+        // Write file
+        QByteArray data = entry.toString().toLocal8Bit();
+        data += '\n';
+        file->write(data);
+    }
+
+    // Close all files
+    auto iter = files.constBegin();
+    while (iter != files.constEnd()) {
+        iter.value()->close();
+        delete iter.value();
+    }
+}
+
 }
