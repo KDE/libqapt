@@ -18,33 +18,71 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef SOURCEENTRY_H
-#define SOURCEENTRY_H
+#include "sourceslist.h"
 
 // Qt includes
-#include <QList>
-#include <QSharedDataPointer>
+#include <QDir>
+
+// APT includes
+#include <apt-pkg/configuration.h>
 
 namespace QApt {
 
-class SourceEntryPrivate;
-
-class SourceEntry
+class SourcesListPrivate
 {
 public:
-    SourceEntry(const QString &line, const QString &file);
-    SourceEntry(const SourceEntry &);
-    SourceEntry &operator=(const SourceEntry &);
-    ~SourceEntry();
-    
-private:
-    QSharedDataPointer<SourceEntryPrivate> d;
+    SourcesListPrivate()
+    {
+        reload();
+    }
+
+    // Data
+    QString filePath;
+    SourceEntryList list;
+
+    void reload();
+    void load(const QString &filePath);
 };
 
-typedef QList<SourceEntry> SourceEntryList;
+void SourcesListPrivate::reload()
+{
+    filePath = QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist"));
+    QDir partsDir(QString::fromStdString(_config->FindFile("Dir::Etc::sourceparts")));
 
+    // Load sources.list plus sources.list.d/ files
+    load(filePath);
+
+    for (const QString& file : partsDir.entryList(QStringList() << "*.list")) {
+        load(file);
+    }
 }
 
-Q_DECLARE_TYPEINFO(QApt::SourceEntry, Q_MOVABLE_TYPE);
+void SourcesListPrivate::load(const QString &filePath)
+{
+    QFile file(filePath);
 
-#endif // SOURCEENTRY_H
+    if (!file.open(QFile::Text | QIODevice::ReadOnly))
+        return;
+
+    // Make a source entry for each line in the file
+    while (!file.atEnd()) {
+        QString line = file.readLine();
+        list.append(SourceEntry(line, filePath));
+    }
+}
+
+SourcesList::SourcesList(QObject *parent)
+    : QObject(parent)
+    , d_ptr(new SourcesListPrivate())
+{
+    reload();
+}
+
+void SourcesList::reload()
+{
+    Q_D(SourcesList);
+
+    d->reload();
+}
+
+}

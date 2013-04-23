@@ -18,33 +18,35 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef SOURCEENTRY_H
-#define SOURCEENTRY_H
+#ifndef SOURCESLIST_H
+#define SOURCESLIST_H
 
 // Qt includes
-#include <QList>
-#include <QSharedDataPointer>
+#include <QObject>
+
+// Own includes
+#include "sourceentry.h"
 
 namespace QApt {
 
-class SourceEntryPrivate;
+class SourcesListPrivate;
 
-class SourceEntry
+class SourcesList : public QObject
 {
+    Q_OBJECT
 public:
-    SourceEntry(const QString &line, const QString &file);
-    SourceEntry(const SourceEntry &);
-    SourceEntry &operator=(const SourceEntry &);
-    ~SourceEntry();
-    
-private:
-    QSharedDataPointer<SourceEntryPrivate> d;
-};
+    explicit SourcesList(QObject *parent = 0);
 
-typedef QList<SourceEntry> SourceEntryList;
+private:
+    Q_DECLARE_PRIVATE(SourcesList)
+    SourcesListPrivate *const d_ptr;
+
+    void load();
+    
+public slots:
+    void reload();
+};
 
 }
 
-Q_DECLARE_TYPEINFO(QApt::SourceEntry, Q_MOVABLE_TYPE);
-
-#endif // SOURCEENTRY_H
+#endif // SOURCESLIST_H

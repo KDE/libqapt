@@ -12,6 +12,7 @@ set(qapt_SRCS
     downloadprogress.cpp
     markingerrorinfo.cpp
     sourceentry.cpp
+    sourceslist.cpp
     )
 
 include_directories(
@@ -28,6 +29,7 @@ set(qapt_MOC_HDRS
     history.h
     transaction.h
     transactiondbus.h
+    sourceslist.h
    )
 
 set(qapt_HDRS
@@ -76,6 +78,7 @@ install(FILES
     downloadprogress.h
     markingerrorinfo.h
     sourceentry.h
+    sourceslist.h
 
     DESTINATION
     include/libqapt COMPONENT Devel)
