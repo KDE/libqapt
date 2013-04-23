@@ -101,4 +101,112 @@ SourceEntry::~SourceEntry()
 {
 }
 
+bool SourceEntry::operator==(const SourceEntry &other)
+{
+    return (d->isEnabled == other.d->isEnabled &&
+            d->type == other.d->type &&
+            d->uri == other.d->uri &&
+            d->dist == other.d->dist &&
+            d->components == other.d->components);
+}
+
+bool SourceEntry::isValid() const
+{
+    return d->isValid;
+}
+
+bool SourceEntry::isEnabled() const
+{
+    return d->isEnabled;
+}
+
+QString SourceEntry::type() const
+{
+    return d->type;
+}
+
+QStringList SourceEntry::architectures() const
+{
+    return d->architectures;
+}
+
+QString SourceEntry::uri() const
+{
+    return d->uri;
+}
+
+QString SourceEntry::dist() const
+{
+    return d->dist;
+}
+
+QStringList SourceEntry::components() const
+{
+    return d->components;
+}
+
+QString SourceEntry::comment() const
+{
+    return d->comment;
+}
+
+QString SourceEntry::file() const
+{
+    return d->file;
+}
+
+QString SourceEntry::toString() const
+{
+    // FIXME: implement
+
+    return QString();
+}
+
+void SourceEntry::setEnabled(bool isEnabled)
+{
+    d->isEnabled = isEnabled;
+
+    // FIXME: add or remove # from line as necessary
+    if (isEnabled) {
+
+    } else {
+
+    }
+}
+
+void SourceEntry::setType(const QString &type)
+{
+    d->type = type;
+}
+
+void SourceEntry::setArchitectures(const QStringList &archs)
+{
+    d->architectures = archs;
+}
+
+void SourceEntry::setUri(const QString &uri)
+{
+    d->uri = uri;
+}
+
+void SourceEntry::setDist(const QString &dist)
+{
+    d->dist = dist;
+}
+
+void SourceEntry::setComponents(const QStringList &comps)
+{
+    d->components = comps;
+}
+
+void SourceEntry::setComment(const QString &comment)
+{
+    d->comment;
+}
+
+void SourceEntry::setFile(const QString &file)
+{
+    d->file = file;
+}
+
 }

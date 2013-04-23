@@ -22,8 +22,8 @@
 #define SOURCEENTRY_H
 
 // Qt includes
-#include <QList>
 #include <QSharedDataPointer>
+#include <QStringList>
 
 namespace QApt {
 
@@ -36,6 +36,28 @@ public:
     SourceEntry(const SourceEntry &);
     SourceEntry &operator=(const SourceEntry &);
     ~SourceEntry();
+
+    bool operator==(const SourceEntry &other);
+
+    bool isValid() const;
+    bool isEnabled() const;
+    QString type() const;
+    QStringList architectures() const;
+    QString uri() const;
+    QString dist() const;
+    QStringList components() const;
+    QString comment() const;
+    QString file() const;
+    QString toString() const;
+
+    void setEnabled(bool isEnabled);
+    void setType(const QString &type);
+    void setArchitectures(const QStringList &archs);
+    void setUri(const QString &uri);
+    void setDist(const QString &dist);
+    void setComponents(const QStringList &comps);
+    void setComment(const QString &comment);
+    void setFile(const QString &file);
     
 private:
     QSharedDataPointer<SourceEntryPrivate> d;

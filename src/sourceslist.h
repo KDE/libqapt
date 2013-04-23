@@ -37,11 +37,13 @@ class SourcesList : public QObject
 public:
     explicit SourcesList(QObject *parent = 0);
 
+    void addEntry(const SourceEntry &entry);
+    void removeEntry(const SourceEntry &entry);
+    void save();
+
 private:
     Q_DECLARE_PRIVATE(SourcesList)
     SourcesListPrivate *const d_ptr;
-
-    void load();
     
 public slots:
     void reload();

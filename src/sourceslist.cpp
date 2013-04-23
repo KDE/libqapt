@@ -26,6 +26,9 @@
 // APT includes
 #include <apt-pkg/configuration.h>
 
+// Own includes
+#include "workerdbus.h" // OrgKubuntuQaptworker2Interface
+
 namespace QApt {
 
 class SourcesListPrivate
@@ -35,6 +38,9 @@ public:
     {
         reload();
     }
+
+    // DBus
+    OrgKubuntuQaptworker2Interface *worker;
 
     // Data
     QString filePath;
@@ -83,6 +89,18 @@ void SourcesList::reload()
     Q_D(SourcesList);
 
     d->reload();
+}
+
+void SourcesList::addEntry(const SourceEntry &entry)
+{
+
+}
+
+void SourcesList::removeEntry(const SourceEntry &entry)
+{
+    Q_D(SourcesList);
+
+    d->list.removeAll(entry);
 }
 
 }
