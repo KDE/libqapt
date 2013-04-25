@@ -120,26 +120,21 @@ void SourcesList::save()
 
     // Otherwise, go through our list of source entries and write them to their
     // respective files
-    QHash<QString, QFile *> files;
+    QHash<QString, QString> files;
     for (SourceEntry &entry : d->list) {
-        // Open file for writing
-        QFile *file = files[entry.file()];
-        if (!file) {
-            files[entry.file()] = file = new QFile(entry.file(), this);
-            file->open(QFile::Text | QIODevice::WriteOnly);
-        }
+        QString file = files[entry.file()];
 
-        // Write file
-        QByteArray data = entry.toString().toLocal8Bit();
-        data += '\n';
-        file->write(data);
+        // Compose file
+        QString data = entry.toString() + '\n';
+        file.append(data);
     }
 
-    // Close all files
+    // Write all files
     auto iter = files.constBegin();
     while (iter != files.constEnd()) {
-        iter.value()->close();
-        delete iter.value();
+        QString data = iter.value();
+        QString filePath = iter.key();
+        d->worker->writeFileToDisk(data, filePath);
     }
 }
 
