@@ -26,6 +26,9 @@
 #include <QStringList>
 #include <QDebug>
 
+// APT includes
+#include <apt-pkg/configuration.h>
+
 namespace QApt {
 
 class SourceEntryPrivate : public QSharedData {
@@ -41,6 +44,9 @@ public:
         , line(lineData)
         , file(fileName)
     {
+        if (file.isEmpty())
+            file = QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist"));
+
         parseData(line);
     }
 
@@ -84,6 +90,21 @@ void SourceEntryPrivate::parseData(const QString &data)
 SourceEntry::SourceEntry(const QString &line, const QString &file)
     : d(new SourceEntryPrivate(line, file))
 {
+}
+
+SourceEntry::SourceEntry(const QString &type, const QString &uri, const QString &dist,
+                         const QStringList &comps, const QString &comment,
+                         const QStringList &archs, const QString &file)
+    : d(new SourceEntryPrivate(QString(), file))
+{
+    d->type = type;
+    d->uri = uri;
+    d->dist = dist;
+    d->components = comps;
+    d->comment = comment;
+    d->architectures = archs;
+
+    d->line = this->toString();
 }
 
 SourceEntry::SourceEntry(const SourceEntry &rhs)

@@ -32,7 +32,10 @@ class SourceEntryPrivate;
 class SourceEntry
 {
 public:
-    SourceEntry(const QString &line, const QString &file);
+    SourceEntry(const QString &line, const QString &file = QString());
+    SourceEntry(const QString &type, const QString &uri, const QString &dist,
+                const QStringList &comps, const QString &comment,
+                const QStringList &archs = QStringList(), const QString &file = QString());
     SourceEntry(const SourceEntry &);
     SourceEntry &operator=(const SourceEntry &);
     ~SourceEntry();

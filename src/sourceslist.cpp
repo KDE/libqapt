@@ -93,7 +93,10 @@ void SourcesList::reload()
 
 void SourcesList::addEntry(const SourceEntry &entry)
 {
+    Q_D(SourcesList);
+    // FIXME: check list for dupes before adding!
 
+    d->list.append(entry);
 }
 
 void SourcesList::removeEntry(const SourceEntry &entry)
