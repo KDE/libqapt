@@ -10,4 +10,6 @@ install( FILES
     Transaction
     DownloadProgress
     MarkingErrorInfo
+    SourceEntry
+    SourcesList
 DESTINATION include/LibQApt COMPONENT Devel)
