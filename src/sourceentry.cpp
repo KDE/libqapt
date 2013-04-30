@@ -72,18 +72,66 @@ void SourceEntryPrivate::parseData(const QString &data)
 
     QString tData = data.trimmed();
 
-    // Check for stupid input
+    // Check for nonvalid input
     if (tData.isEmpty() || tData == QChar('#')) {
         isValid = false;
         return;
     }
+
+    QStringList types;
+    types << QLatin1String("rpm") << QLatin1String("rpm-src")
+          << QLatin1String("deb") << QLatin1String("deb-src");
 
     // Check source enable state
     if (tData.at(0) == '#') {
         isEnabled = false;
 
         QStringList pieces = tData.remove(0, 1).split(' ');
-        qDebug() << pieces;
+        // Validate type of disabled entry
+        if (!types.contains(pieces.at(0))) {
+            isValid = false;
+            return;
+        }
+
+        // Remove starting '#' from tData
+        tData = tData.remove(0, 1);
+    }
+
+    // Find any #'s past the start (these are comments)
+    int idx = tData.indexOf('#');
+    if (idx > 0) {
+        // Save the comment, then remove from tData
+        comment = tData.right(tData.size() - idx);
+        tData.remove(idx, tData.size() - idx + 1);
+    }
+
+    QStringList pieces = tData.split(' ');
+    if (pieces.size() < 3) {
+        // Invalid source entry
+        isValid = false;
+        return;
+    }
+
+    // Parse type
+    type = pieces.at(0);
+    if (!types.contains(type)) {
+        isValid = false;
+        return;
+    }
+
+    // TODO: Parse architecture
+
+    // Parse URI
+    uri = pieces.at(1);
+    if (uri.isEmpty()) {
+        isValid = false;
+        return;
+    }
+
+    // Parse distro and (optionally) components
+    dist = pieces.at(2);
+    if (pieces.size() > 3) {
+        components = pieces.mid(3, pieces.size());
     }
 }
 
