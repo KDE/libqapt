@@ -242,7 +242,7 @@ void SourceEntry::setComponents(const QStringList &comps)
 
 void SourceEntry::setComment(const QString &comment)
 {
-    d->comment;
+    d->comment = comment;
 }
 
 void SourceEntry::setFile(const QString &file)
