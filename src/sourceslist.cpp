@@ -84,6 +84,11 @@ SourcesList::SourcesList(QObject *parent)
     reload();
 }
 
+SourcesList::~SourcesList()
+{
+    delete d_ptr;
+}
+
 void SourcesList::reload()
 {
     Q_D(SourcesList);

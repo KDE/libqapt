@@ -29,7 +29,7 @@ namespace QApt {
 
 class SourceEntryPrivate;
 
-class SourceEntry
+class Q_DECL_EXPORT SourceEntry
 {
 public:
     SourceEntry(const QString &line, const QString &file = QString());

@@ -31,11 +31,12 @@ namespace QApt {
 
 class SourcesListPrivate;
 
-class SourcesList : public QObject
+class Q_DECL_EXPORT SourcesList : public QObject
 {
     Q_OBJECT
 public:
     explicit SourcesList(QObject *parent = 0);
+    ~SourcesList();
 
     void addEntry(const SourceEntry &entry);
     void removeEntry(const SourceEntry &entry);
