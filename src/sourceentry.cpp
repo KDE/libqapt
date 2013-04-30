@@ -22,6 +22,7 @@
 
 // Qt includes
 #include <QSharedData>
+#include <QStringBuilder>
 #include <QStringList>
 #include <QDebug>
 
@@ -157,9 +158,28 @@ QString SourceEntry::file() const
 
 QString SourceEntry::toString() const
 {
-    // FIXME: implement
+    if (!d->isValid)
+        return d->line;
 
-    return QString();
+    QString line;
+
+    if (!d->isEnabled)
+        line = QLatin1String("# ");
+
+    line += d->type;
+
+    if (!d->architectures.isEmpty())
+        line += QString(" [arch=%1]").arg(d->architectures.join(QChar(',')));
+
+    line += ' ' % d->uri % ' ' % d->dist;
+
+    if (!d->components.isEmpty())
+        line += ' ' + d->components.join(QChar(' '));
+
+    if (!d->comment.isEmpty())
+        line += QLatin1String(" #") % d->comment % '\n';
+
+    return line;
 }
 
 void SourceEntry::setEnabled(bool isEnabled)
