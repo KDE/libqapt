@@ -253,13 +253,17 @@ QString SourceEntry::toString() const
 
 void SourceEntry::setEnabled(bool isEnabled)
 {
+    if (isEnabled == d->isEnabled)
+        return;
+
     d->isEnabled = isEnabled;
 
-    // FIXME: add or remove # from line as necessary
     if (isEnabled) {
-
+        // Remove #
+        d->line.remove(0, 1);
     } else {
-
+        // Add #
+        d->line.prepend('#');
     }
 }
 
