@@ -101,7 +101,7 @@ void SourceEntryPrivate::parseData(const QString &data)
     int idx = tData.indexOf('#');
     if (idx > 0) {
         // Save the comment, then remove from tData
-        comment = tData.right(tData.size() - idx);
+        comment = tData.right(tData.size() - idx - 1);
         tData.remove(idx, tData.size() - idx + 1);
     }
 
