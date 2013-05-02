@@ -81,7 +81,6 @@ SourcesList::SourcesList(QObject *parent)
     : QObject(parent)
     , d_ptr(new SourcesListPrivate())
 {
-    reload();
 }
 
 SourcesList::~SourcesList()
@@ -93,6 +92,7 @@ void SourcesList::reload()
 {
     Q_D(SourcesList);
 
+    d->list.clear();
     d->reload();
 }
 
@@ -130,7 +130,7 @@ void SourcesList::save()
     // respective files
     QHash<QString, QString> files;
     for (SourceEntry &entry : d->list) {
-        qDebug() << entry.file();
+        //qDebug() << entry.file();
         QString file = files[entry.file()];
 
         // Compose file
@@ -144,7 +144,7 @@ void SourcesList::save()
     while (iter != files.constEnd()) {
         QString data = iter.value();
         QString filePath = iter.key();
-        //qDebug() << data << "\n\n";
+        qDebug() << data << "\n\n";
         //d->worker->writeFileToDisk(data, filePath);
         ++iter;
     }
