@@ -81,6 +81,11 @@ SourcesList::SourcesList(QObject *parent)
     : QObject(parent)
     , d_ptr(new SourcesListPrivate())
 {
+    Q_D(SourcesList);
+
+    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
+                                                  QLatin1String("/"), QDBusConnection::systemBus(),
+                                                  this);
 }
 
 SourcesList::~SourcesList()
@@ -130,7 +135,6 @@ void SourcesList::save()
     // respective files
     QHash<QString, QString> files;
     for (SourceEntry &entry : d->list) {
-        //qDebug() << entry.file();
         QString file = files[entry.file()];
 
         // Compose file
@@ -144,8 +148,7 @@ void SourcesList::save()
     while (iter != files.constEnd()) {
         QString data = iter.value();
         QString filePath = iter.key();
-        qDebug() << data << "\n\n";
-        //d->worker->writeFileToDisk(data, filePath);
+        d->worker->writeFileToDisk(data, filePath);
         ++iter;
     }
 }
