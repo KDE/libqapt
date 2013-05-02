@@ -152,7 +152,7 @@ void SourceEntryPrivate::parseData(const QString &data)
     // Parse distro and (optionally) components
     dist = pieces.at(2);
     if (pieces.size() > 3) {
-        components = pieces.mid(3, pieces.size());
+        components = pieces.mid(3);
     }
 }
 
