@@ -37,6 +37,7 @@ class Q_DECL_EXPORT SourcesList : public QObject
 public:
     explicit SourcesList(QObject *parent = 0);
     ~SourcesList();
+    SourceEntryList entries() const;
 
     void addEntry(const SourceEntry &entry);
     void removeEntry(const SourceEntry &entry);

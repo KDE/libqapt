@@ -93,6 +93,13 @@ SourcesList::~SourcesList()
     delete d_ptr;
 }
 
+SourceEntryList SourcesList::entries() const
+{
+    Q_D(const SourcesList);
+
+    return d->list;
+}
+
 void SourcesList::reload()
 {
     Q_D(SourcesList);
