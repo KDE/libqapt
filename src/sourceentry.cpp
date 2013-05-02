@@ -228,7 +228,7 @@ QString SourceEntry::file() const
 QString SourceEntry::toString() const
 {
     if (!d->isValid)
-        return d->line;
+        return d->line.trimmed();
 
     QString line;
 
@@ -246,7 +246,7 @@ QString SourceEntry::toString() const
         line += ' ' + d->components.join(QChar(' '));
 
     if (!d->comment.isEmpty())
-        line += QLatin1String(" #") % d->comment % '\n';
+        line += QLatin1String(" #") % d->comment;
 
     return line;
 }
