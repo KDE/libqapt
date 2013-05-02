@@ -119,7 +119,28 @@ void SourceEntryPrivate::parseData(const QString &data)
         return;
     }
 
-    // TODO: Parse architecture
+    // Parse architecture
+    if (pieces.at(1).trimmed().at(0) == '[') {
+        QStringList options = pieces.takeAt(1).remove('[').remove(']').split(';');
+        for (const QString &option : options) {
+            QStringList parts = option.split('=');
+
+            if (parts.size() != 2) {
+                isValid = false;
+                return;
+            }
+
+            QString key = parts.at(0);
+            QString value = parts.at(1);
+
+            if (key != QLatin1String("arch")) {
+                isValid = false;
+                return;
+            }
+
+            architectures = value.split(',');
+        }
+    }
 
     // Parse URI
     uri = pieces.at(1);
