@@ -135,6 +135,7 @@ void SourcesList::save()
         // Compose file
         QString data = entry.toString() + '\n';
         file.append(data);
+        files[entry.file()] = file;
     }
 
     // Write all files
@@ -142,7 +143,9 @@ void SourcesList::save()
     while (iter != files.constEnd()) {
         QString data = iter.value();
         QString filePath = iter.key();
-        d->worker->writeFileToDisk(data, filePath);
+        qDebug() << data << "\n\n";
+        //d->worker->writeFileToDisk(data, filePath);
+        ++iter;
     }
 }
 
