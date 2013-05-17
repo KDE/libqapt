@@ -1231,22 +1231,24 @@ bool Backend::loadSelections(const QString &path)
         line = line.trimmed();
 
         QByteArray aKey;
-        QByteArray aValue;
-        int eqpos = line.indexOf("\t\t");
+        std::string keyString;
+        const char *data = line.constData();
+        if (ParseQuoteWord(data, keyString) == false)
+            return false;
+        aKey = QByteArray(keyString.c_str());
 
-        if (eqpos < 0) {
-            // Invalid
-            lineIndex++;
-            continue;
-        } else {
-            aKey = line.left(eqpos);
-            aValue = line.right(line.size() - eqpos -2);
-        }
+        QByteArray aValue;
+        std::string valueString;
+        if (ParseQuoteWord(data, valueString) == false)
+            return false;
+        aValue = QByteArray(valueString.c_str());
 
         if (aValue.at(0) == 'i') {
             actionMap[aKey] = Package::ToInstall;
-        } else if ((aValue.at(0) == 'd') || (aValue.at(0) == 'u')) {
+        } else if ((aValue.at(0) == 'd') || (aValue.at(0) == 'u') || (aValue.at(0) == 'r')) {
             actionMap[aKey] = Package::ToRemove;
+        } else if ((aValue.at(0) == 'p')) {
+            actionMap[aKey] = Package::ToPurge;
         }
 
         ++lineIndex;
@@ -1280,6 +1282,10 @@ bool Backend::loadSelections(const QString &path)
            case Package::ToRemove:
                Fix.Remove(pkgIter);
                cache.MarkDelete(pkgIter, false);
+               break;
+           case Package::ToPurge:
+               Fix.Remove(pkgIter);
+               cache.MarkDelete(pkgIter, true);
                break;
         }
         ++mapIter;
