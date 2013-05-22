@@ -1247,7 +1247,7 @@ bool Backend::loadSelections(const QString &path)
             actionMap[aKey] = Package::ToInstall;
         } else if ((aValue.at(0) == 'd') || (aValue.at(0) == 'u') || (aValue.at(0) == 'r')) {
             actionMap[aKey] = Package::ToRemove;
-        } else if ((aValue.at(0) == 'p')) {
+        } else if (aValue.at(0) == 'p') {
             actionMap[aKey] = Package::ToPurge;
         }
 
