@@ -1,3 +1,9 @@
+2.0.1:
+======
+- Bugfixes:
+  * Fixed a crash that could occur if an empty cache state is passed to
+    Backend::stateChanges(). An empty change set is returned in this case.
+
 2.0
 ======
 - Release Notes:
