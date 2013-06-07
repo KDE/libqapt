@@ -40,7 +40,7 @@ public:
     SourceEntry &operator=(const SourceEntry &);
     ~SourceEntry();
 
-    bool operator==(const SourceEntry &other);
+    bool operator==(const SourceEntry &other) const;
 
     bool isValid() const;
     bool isEnabled() const;

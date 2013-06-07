@@ -192,7 +192,7 @@ SourceEntry::~SourceEntry()
 {
 }
 
-bool SourceEntry::operator==(const SourceEntry &other)
+bool SourceEntry::operator==(const SourceEntry &other) const
 {
     return (d->isEnabled == other.d->isEnabled &&
             d->type == other.d->type &&
