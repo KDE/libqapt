@@ -47,7 +47,7 @@ private:
     Q_DECLARE_PRIVATE(SourcesList)
     SourcesListPrivate *const d_ptr;
     
-public slots:
+public Q_SLOTS:
     void reload();
 };
 
