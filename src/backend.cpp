@@ -1354,6 +1354,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 
             pkgTagFile tagFile(&Fd);
             if (_error->PendingError()) {
+                fclose(out);
                 return false;
             }
 
@@ -1375,6 +1376,7 @@ bool Backend::setPackagePinned(Package *package, bool pin)
                     fprintf(out, "\n");
                 }
             }
+            fclose(out);
 
             if (!tempFile.open()) {
                 return false;
