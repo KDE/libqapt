@@ -1,3 +1,24 @@
+2.1: (as of 2.1 alpha)
+======
+- Features:
+  * Added a new SourcesList class for manipulating APT source list files.
+  * Added a new SourceEntry class for manipulating individual APT sources within source list
+    files.
+  * Added a "frontend capabilities" API which frontends use to advertise which forms of user
+    interaction they support during the commit process. (Config file conflict, untrusted packages
+    prompt, debconf, etc) This will prevent frontends that don't explicitly support these
+    interactions from hanging the commit process indefinitely.
+  * Add support for the new Synaptic marking file syntax (BKO: #314549)
+- Bugfixes:
+  * Stop leaking a file descriptor when reading APT pin files.
+  * Stop taking the address of a temporary variable in the package search function.
+
+2.0.1:
+======
+- Bugfixes:
+  * Fixed a crash that could occur if an empty cache state is passed to
+    Backend::stateChanges(). An empty change set is returned in this case.
+
 2.0
 ======
 - Release Notes:
