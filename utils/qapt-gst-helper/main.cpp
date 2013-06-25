@@ -30,7 +30,7 @@
 static const char description[] =
     I18N_NOOP2("@info", "A GStreamer codec installer using QApt");
 
-static const char version[] = "2.0";
+static const char version[] = "2.1";
 
 int main(int argc, char **argv)
 {
