@@ -111,7 +111,12 @@ void SourcesList::reload()
 void SourcesList::addEntry(const SourceEntry &entry)
 {
     Q_D(SourcesList);
-    // FIXME: check list for dupes before adding!
+
+    // TODO: More sophisticated dupe checking, e.g. in the case of adding new components
+    for (const SourceEntry &item : this->entries()) {
+        if (entry == item)
+            return;
+    }
 
     d->list.append(entry);
 }
