@@ -1,5 +1,6 @@
 [Domain]
 Name=Kubuntu
+Name[bs]=Kubuntu
 Name[ca]=Kubuntu
 Name[da]=Kubuntu
 Name[de]=Kubuntu
@@ -37,6 +38,7 @@ URL=http://www.kubuntu.org
 
 [org.kubuntu.qaptworker2.updatecache]
 Name=Update package information
+Name[bs]=Ažuriraj paketske informacije
 Name[ca]=Actualització de la informació dels paquets
 Name[da]=Information om opdateringspakke
 Name[de]=Paketinformation aktualisieren
@@ -70,6 +72,7 @@ Name[x-test]=xxUpdate package informationxx
 Name[zh_CN]=更新软件包信息
 Name[zh_TW]=更新套件資訊
 Description=To update the software catalog you need to authenticate.
+Description[bs]=Za ažuriranje softverskog kataloga potrebna je autentifikacija
 Description[ca]=Heu d'autenticar-vos per actualitzar el catàleg de programari.
 Description[da]=Du skal autentificere for at kunne opdatere softwarekataloget.
 Description[de]=Zur Aktualisierung Ihres Software-Katalogs müssen Sie sich authentifizieren.
@@ -106,6 +109,7 @@ Persistence=session
 
 [org.kubuntu.qaptworker2.commitchanges]
 Name=Install or remove packages
+Name[bs]=Instalacija i pregled softverskih paketa
 Name[ca]=Instal·la i suprimeix paquets de programari
 Name[cs]=Instalovat nebo odstranit balíčky
 Name[da]=Installér eller fjern pakker
@@ -139,6 +143,7 @@ Name[uk]=Встановлення або вилучення пакунків
 Name[x-test]=xxInstall or remove packagesxx
 Name[zh_TW]=安裝或移除套件
 Description=To install or remove software you need to authenticate.
+Description[bs]=Za instalaciju ili uklanjanje softvera treba se autentificirati
 Description[ca]=Heu d'autenticar-vos per instal·lar o suprimir programari.
 Description[da]=Du skal autentificere for at kunne installere eller fjerne software.
 Description[de]=Zum Installieren oder Entfernen von Software müssen Sie sich authentifizieren.
@@ -175,6 +180,7 @@ Persistence=session
 
 [org.kubuntu.qaptworker2.writefiletodisk]
 Name=Change software configuration
+Name[bs]=Promjena softverske konfiguracije
 Name[ca]=Canvi de la configuració del programari
 Name[da]=Skift softwarekonfiguration
 Name[de]=Software-Einstellungen ändern
@@ -207,6 +213,7 @@ Name[uk]=Зміна налаштувань програмного забезпе
 Name[x-test]=xxChange software configurationxx
 Name[zh_TW]=變更軟體設定
 Description=To change software settings you need to authenticate.
+Description[bs]=Za promjenu postavku softvera treba se autentificirati
 Description[ca]=Heu d'autenticar-vos per canviar l'arranjament del programari.
 Description[da]=Du skal autentificere for at kunne skifte softwareindstillinger.
 Description[de]=Um Software-Einstellungen zu ändern, müssen Sie sich authentifizieren.
@@ -243,6 +250,7 @@ Persistence=session
 
 [org.kubuntu.qaptworker2.cancelforeign]
 Name=Cancel the task of another user
+Name[bs]=Otkaži zadatak drugog korisnika
 Name[ca]=Cancel·la la tasca d'un altre usuari
 Name[da]=Annullér en anden brugers opgave
 Name[de]=Laufendes Programm eines anderen Benutzers abbrechen
@@ -275,6 +283,7 @@ Name[uk]=Скасування дій, визначених іншим корис
 Name[x-test]=xxCancel the task of another userxx
 Name[zh_TW]=取消其他使用者的工作
 Description=To cancel someone else's software changes you need to authenticate.
+Description[bs]=Za otkazivanje tuđih promjena softvera treba se autentificirati
 Description[ca]=Heu d'autenticar-vos per cancel·lar els canvis de programari d'altres.
 Description[da]=Du skal autentificere for at kunne annullere andres softwareændringer.
 Description[de]=Um die Software eines anderen Benutzers abzubrechen, müssen Sie sich authentifizieren.
