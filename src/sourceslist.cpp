@@ -22,6 +22,7 @@
 
 // Qt includes
 #include <QDir>
+#include <QDebug>
 
 // APT includes
 #include <apt-pkg/configuration.h>
@@ -34,32 +35,53 @@ namespace QApt {
 class SourcesListPrivate
 {
 public:
-    SourcesListPrivate()
+    SourcesListPrivate(const QStringList &sourcesList = QStringList())
+    : sourceFiles(QStringList())
+    , list(QHash<QString,QApt::SourceEntryList>())
     {
+        if ( sourcesList.isEmpty() ) {
+            setDefaultSourcesFiles();
+        } else {
+            sourceFiles.append(sourcesList);
+        }
         reload();
     }
 
+    // File list
+    QStringList sourceFiles;
+    
     // DBus
     OrgKubuntuQaptworker2Interface *worker;
 
     // Data
-    QString filePath;
-    SourceEntryList list;
+    QHash< QString, QApt::SourceEntryList > list;
 
+    void setDefaultSourcesFiles();
     void reload();
     void load(const QString &filePath);
 };
 
+void SourcesListPrivate::setDefaultSourcesFiles()
+{
+    sourceFiles.append(QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist")));
+    
+    // Go through the parts dir and append those
+    QDir partsDir(QString::fromStdString(_config->FindFile("Dir::Etc::sourceparts")));
+    for (const QString& file : partsDir.entryList(QStringList() << "*.list")) {
+        sourceFiles.append(partsDir.filePath(file));
+    }
+
+    return;
+}
+
 void SourcesListPrivate::reload()
 {
-    filePath = QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist"));
-    QDir partsDir(QString::fromStdString(_config->FindFile("Dir::Etc::sourceparts")));
-
-    // Load sources.list plus sources.list.d/ files
-    load(filePath);
-
-    for (const QString& file : partsDir.entryList(QStringList() << "*.list")) {
-        load(partsDir.filePath(file));
+    list.empty();
+    
+    for (const QString& file : sourceFiles) {
+        if ( ! file.isNull() && ! file.isEmpty() ) {
+            load(file);
+        }
     }
 }
 
@@ -67,19 +89,32 @@ void SourcesListPrivate::load(const QString &filePath)
 {
     QFile file(filePath);
 
-    if (!file.open(QFile::Text | QIODevice::ReadOnly))
+    if (!file.open(QFile::Text | QIODevice::ReadOnly)) {
+        qWarning() << "Unable to open the file " << filePath << " as read-only text";
         return;
+    }
 
     // Make a source entry for each line in the file
     while (!file.atEnd()) {
         QString line = file.readLine();
-        list.append(SourceEntry(line, filePath));
+        list[filePath].append(SourceEntry(line, filePath));
     }
 }
 
 SourcesList::SourcesList(QObject *parent)
     : QObject(parent)
     , d_ptr(new SourcesListPrivate())
+{
+    Q_D(SourcesList);
+
+    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
+                                                  QLatin1String("/"), QDBusConnection::systemBus(),
+                                                  this);
+}
+
+SourcesList::SourcesList(QObject *parent, const QStringList &sourcesFileList)
+    : QObject(parent)
+    , d_ptr(new SourcesListPrivate(sourcesFileList))
 {
     Q_D(SourcesList);
 
@@ -97,71 +132,111 @@ SourceEntryList SourcesList::entries() const
 {
     Q_D(const SourcesList);
 
-    return d->list;
+    SourceEntryList to_return;
+    
+    for (const SourceEntryList &oneList : d->list.values()) {
+        to_return.append(oneList);
+    }
+    
+    return to_return;
+}
+
+SourceEntryList SourcesList::entries(const QString &sourceFile) const
+{
+    Q_D(const SourcesList);
+
+    return d->list[sourceFile];
 }
 
 void SourcesList::reload()
 {
     Q_D(SourcesList);
 
-    d->list.clear();
     d->reload();
 }
 
 void SourcesList::addEntry(const SourceEntry &entry)
 {
     Q_D(SourcesList);
-
-    // TODO: More sophisticated dupe checking, e.g. in the case of adding new components
-    for (const SourceEntry &item : this->entries()) {
-        if (entry == item)
-            return;
+    
+    QString entryForFile = entry.file();
+    
+    // Default to the zeroth file if no file is specified.
+    if (entryForFile.isEmpty()) {
+        entryForFile = sourceFiles().at(0);
     }
 
-    d->list.append(entry);
+    // TODO: More sophisticated dupe checking, e.g. in the case of adding new components
+    for (const SourceEntry &item : this->entries(entryForFile)) {
+        if (entry == item) {
+            return;
+        }
+    }
+
+    d->list[entryForFile].append(entry);
 }
 
 void SourcesList::removeEntry(const SourceEntry &entry)
 {
     Q_D(SourcesList);
 
-    d->list.removeAll(entry);
+    // If we have a file in the entry given, optimize the remove.
+    const QString &entryForFile = entry.file();
+    if (!entryForFile.isEmpty()) {
+        d->list[entryForFile].removeAll(entry);
+        return;
+    }
+    
+    for (QString &sourcesFile : sourceFiles()) {
+        d->list[sourcesFile].removeAll(entry);
+    }
+    
+    return;
+}
+
+bool SourcesList::containsEntry(const SourceEntry& entry, const QString& sourceFile)
+{
+    // Don't optimize for the file if we don't have a usable file
+    if (sourceFile.isEmpty()) {
+        return this->entries().contains(entry);
+    }
+    
+    return this->entries(sourceFile).contains(entry);
+}
+
+QStringList SourcesList::sourceFiles()
+{
+    Q_D(SourcesList);
+
+    return d->sourceFiles;
+}
+
+QString SourcesList::dataForSourceFile(const QString& sourceFile)
+{    
+    QString to_return;
+    
+    for (const SourceEntry &listEntry : this->entries(sourceFile)) {
+        to_return.append(listEntry.toString() + '\n');
+    }
+    
+    if (to_return.isEmpty()) {
+        to_return.append(QString("## See sources.list(5) for more information, especially\n"
+                                 "# Remember that you can only use http, ftp or file URIs.\n"
+                                 "# CDROMs are managed through the apt-cdrom tool.\n"));
+    }
+    
+    return to_return;
 }
 
 void SourcesList::save()
 {
     Q_D(SourcesList);
 
-    // Write an empty default file if list is empty
-    if (d->list.isEmpty()) {
-        QString path = QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist"));
-        QString header = QString("## See sources.list(5) for more information, especially\n"
-                                 "# Remember that you can only use http, ftp or file URIs.\n"
-                                 "# CDROMs are managed through the apt-cdrom tool.\n");
-
-        d->worker->writeFileToDisk(header, path);
-        return;
-    }
-
-    // Otherwise, go through our list of source entries and write them to their
-    // respective files
-    QHash<QString, QString> files;
-    for (SourceEntry &entry : d->list) {
-        QString file = files[entry.file()];
-
-        // Compose file
-        QString data = entry.toString() + '\n';
-        file.append(data);
-        files[entry.file()] = file;
-    }
-
-    // Write all files
-    auto iter = files.constBegin();
-    while (iter != files.constEnd()) {
-        QString data = iter.value();
-        QString filePath = iter.key();
-        d->worker->writeFileToDisk(data, filePath);
-        ++iter;
+    for (const QString &sourceFile : this->sourceFiles()) {
+        qDebug() << "Writing file " << sourceFile << " with: " << this->dataForSourceFile(sourceFile);
+        if (d->worker->writeFileToDisk(this->dataForSourceFile(sourceFile), sourceFile)) {
+            qWarning() << "Failed to write the file to disk (dbus call failed)!";
+        }
     }
 }
 

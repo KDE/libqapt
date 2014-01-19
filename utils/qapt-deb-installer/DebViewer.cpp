@@ -20,6 +20,7 @@
 
 #include "DebViewer.h"
 
+#include <QtCore/QPointer>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QStringBuilder>
@@ -276,9 +277,10 @@ void DebViewer::detailsButtonClicked()
     excluded.append(m_backend->package(m_debFile->packageName()));
     auto changes = m_backend->stateChanges(m_oldCacheState, excluded);
 
-    if (changes.isEmpty())
+    if (changes.isEmpty()) {
         return;
+    }
 
-    ChangesDialog *dialog = new ChangesDialog(this, changes);
+    QPointer<ChangesDialog> dialog = new ChangesDialog(this, changes);
     dialog->exec();
 }

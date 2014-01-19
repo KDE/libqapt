@@ -20,6 +20,7 @@
 
 #include "DebInstaller.h"
 
+#include <QtCore/QPointer>
 #include <KApplication>
 #include <KAboutData>
 #include <KCmdLineArgs>
@@ -56,9 +57,9 @@ int main(int argc, char **argv)
         debFile = args->arg(0);
     }
 
-    DebInstaller debInstaller(0, debFile);
+    QPointer<DebInstaller> debInstaller = new DebInstaller(0, debFile);
 
-    switch (debInstaller.exec()) {
+    switch (debInstaller->exec()) {
         case QDialog::Accepted:
             return 0;
             break;

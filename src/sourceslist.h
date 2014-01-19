@@ -36,16 +36,23 @@ class Q_DECL_EXPORT SourcesList : public QObject
     Q_OBJECT
 public:
     explicit SourcesList(QObject *parent = 0);
+    explicit SourcesList(QObject *parent, const QStringList &sourcesFileList);
     ~SourcesList();
     SourceEntryList entries() const;
-
+    SourceEntryList entries(const QString &sourceFile) const;
+    
     void addEntry(const SourceEntry &entry);
     void removeEntry(const SourceEntry &entry);
+    bool containsEntry(const SourceEntry &entry, const QString &sourceFile = QString());
+    QStringList sourceFiles();
+        
     void save();
 
 private:
     Q_DECLARE_PRIVATE(SourcesList)
     SourcesListPrivate *const d_ptr;
+
+    QString dataForSourceFile(const QString &sourceFile);
     
 public Q_SLOTS:
     void reload();

@@ -57,9 +57,9 @@ public:
         : cache(nullptr)
         , records(nullptr)
         , maxStackSize(20)
-        , config(nullptr)
         , xapianDatabase(nullptr)
         , xapianIndexExists(false)
+        , config(nullptr)
         , compressEvents(false)
         , frontendCaps(QApt::NoCaps)
     {
@@ -1292,7 +1292,6 @@ bool Backend::loadSelections(const QString &path)
         ++mapIter;
     }
 
-    Fix.InstallProtect();
     Fix.Resolve(true);
 
     emit packageChanged();
@@ -1418,8 +1417,6 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 
 void Backend::updateXapianIndex()
 {
-    Q_D(Backend);
-
     QDBusMessage m = QDBusMessage::createMethodCall(QLatin1String("org.debian.AptXapianIndex"),
                                                     QLatin1String("/"),
                                                     QLatin1String("org.debian.AptXapianIndex"),

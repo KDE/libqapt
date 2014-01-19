@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "qaptbatch.h"
+#include <QtCore/QPointer>
 #include <KApplication>
 #include <KAboutData>
 #include <KCmdLineArgs>
@@ -73,8 +74,8 @@ int main(int argc, char **argv)
     }
 
     KApplication app;
-    QAptBatch batchInstaller(mode, packages, winId);
-    switch (batchInstaller.exec()) {
+    QPointer<QAptBatch> batchInstaller = new QAptBatch(mode, packages, winId);
+    switch (batchInstaller->exec()) {
         case QDialog::Accepted:
             return 0;
             break;

@@ -46,7 +46,7 @@ public:
    /**
     * Default constructor
     */
-    DebFile(const QString &filePath);
+    explicit DebFile(const QString &filePath);
 
    /**
     * Default destructor

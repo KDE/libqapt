@@ -3,10 +3,10 @@ project(libqapt)
 cmake_minimum_required(VERSION 2.6.0)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-set(qapt_VERSION 2.0.65)
+set(qapt_VERSION 2.1.1)
 
 set(qapt_lib_SOVERSION 2)
-set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.0.65)
+set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.1.1)
 
 configure_file(
        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/cmake_uninstall.cmake.in"
@@ -175,6 +175,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 
 add_subdirectory(src)
 add_subdirectory(includes)
+add_subdirectory(tests)
 
 find_package(KDE4)
 if (KDE4_FOUND)
@@ -200,3 +201,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
 install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/QAptConfig.cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/QApt/
         COMPONENT Devel )
+
+add_test(NAME sourceslisttest COMMAND ./tests/sourceslisttest)
+

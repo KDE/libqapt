@@ -1,4 +1,16 @@
-2.1: (as of 2.1 alpha)
+2.1.1:
+======
+- Features:
+  * Handles multiple sources.list-formatted files
+  * Supports arbitrary sources.list loading, parsing, and writing
+    (meaning you can load any source file directly, or use the default set.)
+  * Added the ability to query a list of all loaded sources.list files.
+  * You can now fetch only the files for a specific repository.
+- Bugfixes:
+  * There was a bug in the unreleased alpha where removing all entries from
+    any file could potentially result in overwriting the defaulatet /etc/apt/sources.list.
+
+2.1: (as of 2.1 alpha, unreleased)
 ======
 - Features:
   * Added a new SourcesList class for manipulating APT source list files.

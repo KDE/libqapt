@@ -84,7 +84,7 @@ public:
      * Constructor
      * @param tid The D-Bus path (transaction id) of the transaction
      */
-    Transaction(const QString &tid);
+    explicit Transaction(const QString &tid);
 
     /// Destructor
     ~Transaction();
