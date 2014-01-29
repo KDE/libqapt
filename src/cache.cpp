@@ -26,15 +26,6 @@
 
 namespace QApt {
 
-class CacheBuildProgress : public OpProgress
-{
-public:
-    void Update() {
-        // Evil but Necessary, libapt-pkg not thread safe, afaict
-        QCoreApplication::processEvents();
-    }
-};
-
 class CachePrivate
 {
 public:
@@ -50,7 +41,6 @@ public:
         delete trustCache;
     }
 
-    CacheBuildProgress progressMeter;
     pkgCacheFile *cache;
 
     QHash<pkgCache::PkgFileIterator, pkgIndexFile*> *trustCache;
@@ -76,7 +66,7 @@ bool Cache::open()
     d->trustCache->clear();
 
     // Build the cache, return whether it opened
-    return d->cache->ReadOnlyOpen(&d->progressMeter);
+    return d->cache->ReadOnlyOpen();
 }
 
 pkgDepCache *Cache::depCache() const
