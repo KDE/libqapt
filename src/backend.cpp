@@ -1018,27 +1018,27 @@ QApt::Transaction * Backend::commitChanges()
                               Package::ToRemove);
         switch (status) {
         case Package::IsManuallyHeld:
-            packageList.insert(fullName.c_str(), Package::Held);
+            packageList.insert(QString::fromStdString(fullName), Package::Held);
             break;
         case Package::NewInstall:
             if (!(flags & Package::IsAuto)) {
-                packageList.insert(fullName.c_str(), Package::ToInstall);
+                packageList.insert(QString::fromStdString(fullName), Package::ToInstall);
             }
             break;
         case Package::ToReInstall:
-            packageList.insert(fullName.c_str(), Package::ToReInstall);
+            packageList.insert(QString::fromStdString(fullName), Package::ToReInstall);
             break;
         case Package::ToUpgrade:
-            packageList.insert(fullName.c_str(), Package::ToUpgrade);
+            packageList.insert(QString::fromStdString(fullName), Package::ToUpgrade);
             break;
         case Package::ToDowngrade:
-            packageList.insert(QString(fullName.c_str()) % ',' % package->availableVersion(), Package::ToDowngrade);
+            packageList.insert(QString(QString::fromStdString(fullName)) % ',' % package->availableVersion(), Package::ToDowngrade);
             break;
         case Package::ToRemove:
             if(flags & Package::ToPurge) {
-                packageList.insert(fullName.c_str(), Package::ToPurge);
+                packageList.insert(QString::fromStdString(fullName), Package::ToPurge);
             } else {
-                packageList.insert(fullName.c_str(), Package::ToRemove);
+                packageList.insert(QString::fromStdString(fullName), Package::ToRemove);
             }
             break;
         }
