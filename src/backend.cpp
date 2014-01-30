@@ -743,6 +743,8 @@ QHash<Package::State, PackageList> Backend::stateChanges(const CacheState &oldSt
     if (oldState.isEmpty())
         return changes;
 
+    Q_ASSERT(d->packages.size() == oldState.size());
+
     for (int i = 0; i < d->packages.size(); ++i) {
         Package *pkg = d->packages.at(i);
 
