@@ -53,7 +53,7 @@ class ConfigPrivate
 
 void ConfigPrivate::writeBufferEntry(const QByteArray &key, const QByteArray &value)
 {
-    unsigned int lineIndex = 0;
+    int lineIndex = 0;
     bool changed = false;
 
     QList<QByteArray> lines = buffer.split('\n');

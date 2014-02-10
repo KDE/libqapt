@@ -1,0 +1,12 @@
+## First test
+deb http://apttest/ubuntu saucy partner
+deb-src http://apttest/ubuntu saucy partner
+deb http://apttest/ubuntu saucy contrib main partner
+deb [arch=i386] http://apttest/ubuntu saucy partner
+deb [arch=i386,ppc] http://apttest/ubuntu saucy partner
+deb [arch=i386,ppc] http://apttest/ubuntu saucy contrib main partner
+deb [arch=i386,ppc] https://apttest/ubuntu saucy contrib main partner
+
+# deb [arch=i386,ppc] http://apttest/ubuntu saucy contrib main partner
+#deb [arch=i386,ppc] http://apttest/ubuntu saucy contrib main partner
+###deb [arch=i386,ppc] http://apttest/ubuntu saucy contrib main partner

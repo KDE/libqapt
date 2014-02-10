@@ -586,6 +586,8 @@ QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
             if(url.isEmpty())
                 url = QUrl("http://screenshots.debian.net/screenshot/" % name());
             break;
+        default:
+            qDebug() << "I do not know how to handle the screenshot type given to me: " << QString::number(type);
     }
 
     return url;
@@ -1247,7 +1249,6 @@ void Package::setRemove()
     Fix.Protect(d->packageIter);
     Fix.Remove(d->packageIter);
 
-    Fix.InstallProtect();
     Fix.Resolve(true);
 
     d->backend->cache()->depCache()->SetReInstall(d->packageIter, false);
@@ -1267,7 +1268,6 @@ void Package::setPurge()
     Fix.Protect(d->packageIter);
     Fix.Remove(d->packageIter);
 
-    Fix.InstallProtect();
     Fix.Resolve(true);
 
     d->backend->cache()->depCache()->SetReInstall(d->packageIter, false);

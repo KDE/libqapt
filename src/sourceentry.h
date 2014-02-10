@@ -32,11 +32,12 @@ class SourceEntryPrivate;
 class Q_DECL_EXPORT SourceEntry
 {
 public:
-    SourceEntry(const QString &line, const QString &file = QString());
-    SourceEntry(const QString &type, const QString &uri, const QString &dist,
+    explicit SourceEntry();
+    explicit SourceEntry(const QString &line, const QString &file = QString());
+    explicit SourceEntry(const QString &type, const QString &uri, const QString &dist,
                 const QStringList &comps, const QString &comment,
                 const QStringList &archs = QStringList(), const QString &file = QString());
-    SourceEntry(const SourceEntry &);
+    SourceEntry(const SourceEntry &entry);
     SourceEntry &operator=(const SourceEntry &);
     ~SourceEntry();
 

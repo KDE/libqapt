@@ -154,6 +154,7 @@ QString WorkerDaemon::downloadArchives(const QStringList &packageNames, const QS
 bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 {
     if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker2.writefiletodisk"), message().service())) {
+        qDebug() << "Failed to authorize!!";
         return false;
     }
 
@@ -161,10 +162,10 @@ bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         file.write(contents.toLatin1());
-
         return true;
     }
 
+    qDebug() << "Failed to write file to disk: " << file.errorString();
     return false;
 }
 

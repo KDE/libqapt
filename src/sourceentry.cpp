@@ -70,7 +70,7 @@ void SourceEntryPrivate::parseData(const QString &data)
     if (data.isEmpty())
         return;
 
-    QString tData = data.trimmed();
+    QString tData = data.simplified();
 
     // Check for nonvalid input
     if (tData.isEmpty() || tData == QChar('#')) {
@@ -85,16 +85,12 @@ void SourceEntryPrivate::parseData(const QString &data)
     // Check source enable state
     if (tData.at(0) == '#') {
         isEnabled = false;
-
-        QStringList pieces = tData.remove(0, 1).split(' ');
-        // Validate type of disabled entry
-        if (!types.contains(pieces.at(0))) {
-            isValid = false;
-            return;
-        }
-
+    }
+    // Handle multiple comment characters (hey, it happens!)
+    while (tData.at(0) == '#') {
         // Remove starting '#' from tData
         tData = tData.remove(0, 1);
+        tData = tData.trimmed();
     }
 
     // Find any #'s past the start (these are comments)
@@ -154,6 +150,11 @@ void SourceEntryPrivate::parseData(const QString &data)
     if (pieces.size() > 3) {
         components = pieces.mid(3);
     }
+}
+
+SourceEntry::SourceEntry()
+    : d(new SourceEntryPrivate())
+{
 }
 
 SourceEntry::SourceEntry(const QString &line, const QString &file)

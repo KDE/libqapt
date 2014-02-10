@@ -34,7 +34,7 @@ class CommitWidget : public KVBox
 {
     Q_OBJECT
 public:
-    CommitWidget(QWidget *parent = 0);
+    explicit CommitWidget(QWidget *parent = 0);
 
     void setTransaction(QApt::Transaction *trans);
     void clear();

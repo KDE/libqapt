@@ -36,7 +36,7 @@ public:
     /**
      * Default constructor, empty values
      */
-    MarkingErrorInfo();
+    explicit MarkingErrorInfo();
 
     /**
      * Constructs a marking error information object with the given
@@ -45,12 +45,12 @@ public:
      * @param reason Why a marking is broken
      * @param info Additional dependency information describing the error
      */
-    MarkingErrorInfo(QApt::BrokenReason reason, const DependencyInfo &info = DependencyInfo());
+    explicit MarkingErrorInfo(QApt::BrokenReason reason, const DependencyInfo &info = DependencyInfo());
 
     /**
      * Copy constructor
      */
-    MarkingErrorInfo(const MarkingErrorInfo &other);
+    explicit MarkingErrorInfo(const MarkingErrorInfo &other);
 
     /**
      * Default Destructor
