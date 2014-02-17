@@ -1,5 +1,5 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
+ * transactionerrorhandlingtest - A test for error handling in QApt::Transaction
  * Copyright 2014  Michael D. Stemle <themanchicken@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
