@@ -29,6 +29,10 @@
 
 class QDBusPendingCallWatcher;
 
+#ifdef __CURRENTLY_UNIT_TESTING__
+class TransactionErrorHandlingTest;
+#endif
+
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this
  * library fall under this namespace.
@@ -51,6 +55,10 @@ class Q_DECL_EXPORT Transaction : public QObject
 {
     Q_OBJECT
 
+#ifdef __CURRENTLY_UNIT_TESTING__
+    friend TransactionErrorHandlingTest;
+#endif
+    
     Q_ENUMS(TransactionRole)
     Q_ENUMS(TransactionStatus)
     Q_ENUMS(ErrorCode)
@@ -126,6 +134,12 @@ public:
      * the method is called.
      */
     QApt::ErrorCode error() const;
+    
+    /**
+     * Returns the error string for the error code that may or may not be set.
+     * Returns QString::null if no error
+     */
+    QString errorString() const;
 
     /**
      * Returns the locale code the transaction is using to perform translations

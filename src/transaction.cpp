@@ -164,6 +164,97 @@ QApt::ErrorCode Transaction::error() const
     return d->error;
 }
 
+QString Transaction::errorString() const
+{
+    QString text;
+
+    if (this->error() == QApt::ErrorCode::Success) {
+        return QString::null;
+    }
+    
+    switch (this->error()) {
+    case QApt::UnknownError:
+        text = QObject::tr(
+            "An unknown error has occurred, here are the details: %1",
+            "error"
+        ).arg( this->errorDetails() );
+        break;
+        
+    case QApt::InitError:
+        text = QObject::tr(
+            "The package system could not be initialized, your "
+            "configuration may be broken.",
+            "error"
+        );
+        break;
+        
+    case QApt::LockError:
+        text = QObject::tr(
+            "Another application seems to be using the package "
+            "system at this time. You must close all other package "
+            "managers before you will be able to install or remove "
+            "any packages.",
+            "error"
+        );
+        break;
+
+    case QApt::DiskSpaceError:
+        text = QObject::tr(
+            "You do not have enough disk space in the directory "
+            "at %1 to continue with this operation.",
+            "error"
+        ).arg( this->errorDetails() );
+        break;
+        
+    case QApt::FetchError:
+        text = QObject::tr(
+            "Could not download packages",
+            "error"
+        );
+        break;
+        
+    case QApt::CommitError:
+        text = QObject::tr(
+            "An error occurred while applying changes: %1",
+            "error"
+        ).arg( this->errorDetails() );
+        break;
+    
+    case QApt::AuthError:
+        text = QObject::tr(
+            "This operation cannot continue since proper "
+            "authorization was not provided",
+            "error"
+        );
+        break;
+        
+    case QApt::WorkerDisappeared:
+        text = QObject::tr(
+            "It appears that the QApt worker has either crashed "
+            "or disappeared. Please report a bug to the QApt maintainers",
+            "error"
+        );
+        break;
+        
+    case QApt::UntrustedError:
+        text = QObject::tr(
+            "The following package(s) has not been verified by its author(s). "
+            "Downloading untrusted packages has been disallowed "
+            "by your current configuration.",
+            "error",
+            this->untrustedPackages().size()
+        );
+        break;
+        
+    default:
+        text = QString::null;
+        break;
+    }
+
+    return text;
+
+}
+
 void Transaction::updateError(ErrorCode error)
 {
     d->error = error;

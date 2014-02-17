@@ -202,5 +202,6 @@ install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/QAptConfig.cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/QApt/
         COMPONENT Devel )
 
-add_test(NAME sourceslisttest COMMAND ./tests/sourceslisttest)
+add_test(NAME sourceslisttest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/sourceslisttest)
+add_test(NAME transactionerrorhandlingtest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/transactionerrorhandlingtest)
 
