@@ -52,6 +52,14 @@ QTEST_MAIN(TransactionErrorHandlingTest);
 
 #define EXPECTED_MESSAGE_UNTRUSTED_ERROR_2  "The following packages have not been verified by their authors. Downloading untrusted packages has been disallowed by your current configuration."
 
+#define EXPECTED_MESSAGE_DOWNLOAD_DISALLOWED_ERROR "Downloads are currently disallowed."
+
+#define EXPECTED_MESSAGE_NOTFOUND_ERROR     "Error: Not Found"
+
+#define EXPECTED_MESSAGE_WRONGARCH_ERROR    "Error: Wrong architecture"
+
+#define EXPECTED_MESSAGE_MARKING_ERROR      "Error: Marking error"
+
 void TransactionErrorHandlingTest::initTestCase()
 {
     // Called before the first testfunction is executed
@@ -194,6 +202,46 @@ void TransactionErrorHandlingTest::testUntrustedError()
     QVERIFY2(
         this->subject->errorString() == EXPECTED_MESSAGE_UNTRUSTED_ERROR,
         "Verify that we got the error message we expected to get for UntrustedError..."
+    );
+}
+
+void TransactionErrorHandlingTest::testDownloadDisallowedError()
+{
+    this->subject->updateError( QApt::ErrorCode::DownloadDisallowedError );
+
+    QVERIFY2(
+        this->subject->errorString() == EXPECTED_MESSAGE_DOWNLOAD_DISALLOWED_ERROR,
+        "Verify that we got the error message we expected to get for DownloadDisallowedError..."
+    );
+}
+
+void TransactionErrorHandlingTest::testNotFoundError()
+{
+    this->subject->updateError( QApt::ErrorCode::NotFoundError );
+
+    QVERIFY2(
+        this->subject->errorString() == EXPECTED_MESSAGE_NOTFOUND_ERROR,
+        "Verify that we got the error message we expected to get for NotFoundError..."
+    );
+}
+
+void TransactionErrorHandlingTest::testWrongArchError()
+{
+    this->subject->updateError( QApt::ErrorCode::WrongArchError );
+
+    QVERIFY2(
+        this->subject->errorString() == EXPECTED_MESSAGE_WRONGARCH_ERROR,
+        "Verify that we got the error message we expected to get for WrongArchError..."
+    );
+}
+
+void TransactionErrorHandlingTest::testMarkingError()
+{
+    this->subject->updateError( QApt::ErrorCode::MarkingError );
+
+    QVERIFY2(
+        this->subject->errorString() == EXPECTED_MESSAGE_MARKING_ERROR,
+        "Verify that we got the error message we expected to get for MarkingError..."
     );
 }
 

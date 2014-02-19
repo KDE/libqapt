@@ -52,7 +52,11 @@ private slots:
     void testCommitError();
     void testAuthError();
     void testWorkerDisappeared();
-    void testUntrustedError(); // This one tests some plurals in translation
+    void testUntrustedError(); // This one should test some plurals in translation
+    void testDownloadDisallowedError();
+    void testNotFoundError();
+    void testWrongArchError();
+    void testMarkingError();
 };
 // }
 

@@ -173,23 +173,24 @@ QString Transaction::errorString() const
     }
     
     switch (this->error()) {
-    case QApt::UnknownError:
-        text = QObject::tr(
+    case QApt::ErrorCode::Success:
+    case QApt::ErrorCode::UnknownError:
+        text = tr(
             "An unknown error has occurred, here are the details: %1",
             "error"
         ).arg( this->errorDetails() );
         break;
         
-    case QApt::InitError:
-        text = QObject::tr(
+    case QApt::ErrorCode::InitError:
+        text = tr(
             "The package system could not be initialized, your "
             "configuration may be broken.",
             "error"
         );
         break;
         
-    case QApt::LockError:
-        text = QObject::tr(
+    case QApt::ErrorCode::LockError:
+        text = tr(
             "Another application seems to be using the package "
             "system at this time. You must close all other package "
             "managers before you will be able to install or remove "
@@ -198,46 +199,46 @@ QString Transaction::errorString() const
         );
         break;
 
-    case QApt::DiskSpaceError:
-        text = QObject::tr(
+    case QApt::ErrorCode::DiskSpaceError:
+        text = tr(
             "You do not have enough disk space in the directory "
             "at %1 to continue with this operation.",
             "error"
         ).arg( this->errorDetails() );
         break;
         
-    case QApt::FetchError:
-        text = QObject::tr(
+    case QApt::ErrorCode::FetchError:
+        text = tr(
             "Could not download packages",
             "error"
         );
         break;
         
-    case QApt::CommitError:
-        text = QObject::tr(
+    case QApt::ErrorCode::CommitError:
+        text = tr(
             "An error occurred while applying changes: %1",
             "error"
         ).arg( this->errorDetails() );
         break;
     
-    case QApt::AuthError:
-        text = QObject::tr(
+    case QApt::ErrorCode::AuthError:
+        text = tr(
             "This operation cannot continue since proper "
             "authorization was not provided",
             "error"
         );
         break;
         
-    case QApt::WorkerDisappeared:
-        text = QObject::tr(
+    case QApt::ErrorCode::WorkerDisappeared:
+        text = tr(
             "It appears that the QApt worker has either crashed "
             "or disappeared. Please report a bug to the QApt maintainers",
             "error"
         );
         break;
         
-    case QApt::UntrustedError:
-        text = QObject::tr(
+    case QApt::ErrorCode::UntrustedError:
+        text = tr(
             "The following package(s) has not been verified by its author(s). "
             "Downloading untrusted packages has been disallowed "
             "by your current configuration.",
@@ -245,9 +246,21 @@ QString Transaction::errorString() const
             this->untrustedPackages().size()
         );
         break;
-        
-    default:
-        text = QString::null;
+
+    case QApt::ErrorCode::DownloadDisallowedError:
+        text = tr("Downloads are currently disallowed.", "error");
+        break;
+
+    case QApt::ErrorCode::NotFoundError:
+        text = tr("Error: Not Found", "error");
+        break;
+
+    case QApt::ErrorCode::WrongArchError:
+        text = tr("Error: Wrong architecture", "error");
+        break;
+
+    case QApt::ErrorCode::MarkingError:
+        text = tr("Error: Marking error", "error");
         break;
     }
 
