@@ -109,7 +109,7 @@ void TransactionErrorHandlingTest::testUnknownError()
         "Verify that we got the error message we expected to get for UnknownError..."
     );
     
-    this->subject->updateErrorDetails( QString::null );
+    this->subject->updateErrorDetails( QString() );
 }
 
 void TransactionErrorHandlingTest::testInitError()
@@ -143,7 +143,7 @@ void TransactionErrorHandlingTest::testDiskSpaceError()
         "Verify that we got the error message we expected to get for DiskSpaceError..."
     );
     
-    this->subject->updateErrorDetails( QString::null );
+    this->subject->updateErrorDetails( QString() );
 }
 
 void TransactionErrorHandlingTest::testFetchError()
@@ -167,7 +167,7 @@ void TransactionErrorHandlingTest::testCommitError()
         "Verify that we got the error message we expected to get for CommitError..."
     );
     
-    this->subject->updateErrorDetails( QString::null );
+    this->subject->updateErrorDetails( QString() );
 }
 
 void TransactionErrorHandlingTest::testAuthError()

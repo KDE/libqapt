@@ -169,7 +169,7 @@ QString Transaction::errorString() const
     QString text;
 
     if (this->error() == QApt::ErrorCode::Success) {
-        return QString::null;
+        return QString();
     }
     
     switch (this->error()) {
