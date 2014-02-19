@@ -60,7 +60,7 @@ public:
         , xapianDatabase(nullptr)
         , xapianIndexExists(false)
         , config(nullptr)
-        , compressEvents(false)
+        , actionGroup(nullptr)
         , frontendCaps(QApt::NoCaps)
     {
     }
@@ -71,6 +71,7 @@ public:
         delete records;
         delete config;
         delete xapianDatabase;
+        delete actionGroup;
     }
     // Caches
     // The canonical list of all unique, non-virutal package objects
@@ -844,7 +845,7 @@ bool Backend::areEventsCompressed() const
 {
     Q_D(const Backend);
 
-    return d->compressEvents;
+    return d->actionGroup != nullptr;
 }
 
 void Backend::undo()
@@ -993,12 +994,15 @@ void Backend::setCompressEvents(bool enabled)
     Q_D(Backend);
 
     if (enabled) {
+         // Ignore if already compressed
+        if (d->actionGroup != nullptr)
+            return;
+
+        // Presence of an ActionGroup compresses marking events over its lifetime
         d->actionGroup = new pkgDepCache::ActionGroup(*d->cache->depCache());
-        d->compressEvents = true;
     } else {
         delete d->actionGroup;
-        d->actionGroup = 0;
-        d->compressEvents = false;
+        d->actionGroup = nullptr;
         emit packageChanged();
     }
 }
