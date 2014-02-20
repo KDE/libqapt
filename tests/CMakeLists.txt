@@ -1,15 +1,9 @@
-set(CMAKE_AUTOMOC TRUE)
-include(FindPkgConfig REQUIRED)
-find_package(QApt REQUIRED)
-
 set(sourceslisttest_SRCS
     sourceslisttest.cpp
  )
 set(transactionerrorhandlingtest_SRCS
     transactionerrorhandlingtest.cpp
  )
-
-include( FindPkgConfig )
 
 include_directories( ../src ${KDE4_INCLUDES} ${QT_INCLUDES} )
 
