@@ -1,6 +1,7 @@
 project(libqapt)
 
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.6)
+set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 set(qapt_VERSION 2.1.1)
@@ -34,7 +35,6 @@ macro(dbus_add_activation_system_service _sources)
 endmacro(dbus_add_activation_system_service _sources)
 
 find_package(Qt4 REQUIRED)
-find_package(Automoc4 REQUIRED)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
 find_package(QtGStreamer)

@@ -43,7 +43,5 @@ protected:
     void setupMatch(const QString &package, const QString &term, Plasma::QueryMatch &action);
 };
 
-K_EXPORT_PLASMA_RUNNER(installer, InstallerRunner)
-
 #endif
 

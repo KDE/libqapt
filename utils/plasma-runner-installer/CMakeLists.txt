@@ -1,4 +1,4 @@
-include_directories(${KDE4_INCLUDES} ${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${KDE4_INCLUDES} ${QT_INCLUDES})
 
 set(krunner_installer_SRCS
     installerrunner.cpp

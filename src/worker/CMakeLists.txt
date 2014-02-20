@@ -28,7 +28,7 @@ qt4_add_dbus_adaptor(qapt_worker_SRCS
     WorkerDaemon
 )
 
-automoc4_add_executable(qaptworker2
+add_executable(qaptworker2
     ${qapt_worker_SRCS}
     ${qapt_worker_adaptor_SRCS}
 )

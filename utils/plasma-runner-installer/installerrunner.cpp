@@ -30,6 +30,8 @@
 #include <KService>
 #include <KServiceTypeTrader>
 
+K_EXPORT_PLASMA_RUNNER(installer, InstallerRunner)
+
 InstallerRunner::InstallerRunner(QObject *parent, const QVariantList &args)
     : Plasma::AbstractRunner(parent, args)
 {
@@ -118,6 +120,4 @@ void InstallerRunner::setupMatch(const QString &package, const QString &term, Pl
 
     match.setIcon(KIcon("applications-other"));
 }
-
-#include "installerrunner.moc"
 
