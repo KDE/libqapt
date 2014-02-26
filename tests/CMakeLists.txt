@@ -5,7 +5,12 @@ set(transactionerrorhandlingtest_SRCS
     transactionerrorhandlingtest.cpp
  )
 
-include_directories( ../src ${KDE4_INCLUDES} ${QT_INCLUDES} )
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_BINARY_DIR}/src
+    ${KDE4_INCLUDES}
+    ${QT_INCLUDES}
+)
 
 add_executable(sourceslisttest ${sourceslisttest_SRCS})
 add_executable(transactionerrorhandlingtest ${transactionerrorhandlingtest_SRCS})
