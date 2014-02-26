@@ -23,7 +23,7 @@
 #include "transactionerrorhandlingtest.h"
 
 #include <QtTest>
-#include <LibQApt/Transaction>
+#include <transaction.h>
 
 QTEST_MAIN(TransactionErrorHandlingTest);
 
