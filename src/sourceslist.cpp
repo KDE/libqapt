@@ -59,16 +59,30 @@ public:
     void setDefaultSourcesFiles();
     void reload();
     void load(const QString &filePath);
+    
+    void addSourcesFile(const QString &filePath);
 };
+
+void SourcesListPrivate::addSourcesFile ( const QString& filePath )
+{
+    // Just some basic deduping
+    if (sourceFiles.contains(filePath)) {
+        return;
+    }
+    
+    sourceFiles.append(filePath);
+    
+    return;
+}
 
 void SourcesListPrivate::setDefaultSourcesFiles()
 {
-    sourceFiles.append(QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist")));
+    addSourcesFile(QString::fromStdString(_config->FindFile("Dir::Etc::sourcelist")));
     
     // Go through the parts dir and append those
     QDir partsDir(QString::fromStdString(_config->FindFile("Dir::Etc::sourceparts")));
     for (const QString& file : partsDir.entryList(QStringList() << "*.list")) {
-        sourceFiles.append(partsDir.filePath(file));
+        addSourcesFile(partsDir.filePath(file));
     }
 
     return;
@@ -76,7 +90,7 @@ void SourcesListPrivate::setDefaultSourcesFiles()
 
 void SourcesListPrivate::reload()
 {
-    list.empty();
+    list.clear();
     
     for (const QString& file : sourceFiles) {
         if ( ! file.isNull() && ! file.isEmpty() ) {
@@ -88,12 +102,12 @@ void SourcesListPrivate::reload()
 void SourcesListPrivate::load(const QString &filePath)
 {
     QFile file(filePath);
-
+    
     if (!file.open(QFile::Text | QIODevice::ReadOnly)) {
         qWarning() << "Unable to open the file " << filePath << " as read-only text: " << file.errorString();
         return;
     }
-
+    
     // Make a source entry for each line in the file
     while (!file.atEnd()) {
         QString line = file.readLine();

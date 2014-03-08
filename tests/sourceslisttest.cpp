@@ -178,6 +178,17 @@ void SourcesListTest::testConstructor()
             + QString::number(shouldntBeEmpty.count())
         )
     );
+    int previousCount = subjectDefaultConstructor.entries().count();
+    subjectDefaultConstructor.reload();
+    QVERIFY2(
+        previousCount == subjectDefaultConstructor.entries().count(),
+        qPrintable(
+            "The default constructor should have given us the same number of entries as the subsequent reload() call. I had "
+            + QString::number(previousCount)
+            + " and now I have "
+            + QString::number(subjectDefaultConstructor.entries().count())
+        )
+    );
     
     QApt::SourcesList subjectParentOnly(&parentObject);
     shouldntBeEmpty = subjectParentOnly.sourceFiles();
@@ -569,6 +580,8 @@ void SourcesListTest::testRemoveSource()
     QApt::SourceEntry entryOne;
     QApt::SourceEntry entryTwo;
 
+    subject.reload();
+    
     // Construct our two sources
     entryOne.setType("deb");
     entryOne.setUri("https://foo.com/bar");
@@ -672,6 +685,26 @@ void SourcesListTest::testSaveSources()
         qPrintable(
             "I expected to have 2 sources after loading again. I found "
             + QString::number(loadingAfterSecondSave.entries().count())
+            + " entries."
+        )
+    );
+
+    loadingAfterSecondSave.save();
+    QVERIFY2(
+        loadingAfterSecondSave.entries().count() == 2,
+        qPrintable(
+            "I expected to have 2 sources after adding another. I found "
+            + QString::number(loadingAfterSecondSave.entries().count())
+            + " entries."
+        )
+    );
+
+    QApt::SourcesList loadingAfterSecondSaveB(0, outfilesListJustOne);
+    QVERIFY2(
+        loadingAfterSave.entries().count() == 2,
+        qPrintable(
+            "I expected to have 2 sources after loading again. I found "
+            + QString::number(loadingAfterSecondSaveB.entries().count())
             + " entries."
         )
     );
