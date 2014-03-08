@@ -49,6 +49,7 @@ private slots:
 private:
     QStringList sampleSourcesHasOneFile;
     QStringList sampleSourcesHasTwoFiles;
+    QStringList sampleSourcesHasDuplicateFiles;
     QString outputFile;
     QString dummyFile;
     

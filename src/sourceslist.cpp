@@ -42,7 +42,7 @@ public:
         if ( sourcesList.isEmpty() ) {
             setDefaultSourcesFiles();
         } else {
-            sourceFiles.append(sourcesList);
+            addSourcesFileList(sourcesList);
         }
         reload();
     }
@@ -61,6 +61,7 @@ public:
     void load(const QString &filePath);
     
     void addSourcesFile(const QString &filePath);
+    void addSourcesFileList(const QStringList &filePathList);
 };
 
 void SourcesListPrivate::addSourcesFile ( const QString& filePath )
@@ -71,6 +72,15 @@ void SourcesListPrivate::addSourcesFile ( const QString& filePath )
     }
     
     sourceFiles.append(filePath);
+    
+    return;
+}
+
+void SourcesListPrivate::addSourcesFileList ( const QStringList& filePathList )
+{
+    for (const QString &filePathEntry : filePathList) {
+        addSourcesFile(filePathEntry);
+    }
     
     return;
 }

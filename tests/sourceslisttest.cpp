@@ -127,6 +127,13 @@ void SourcesListTest::initTestCase()
             QString(cwd+"/data/test2.list")
         }
     );
+    sampleSourcesHasDuplicateFiles = QStringList(
+        {
+            QString(cwd+"/data/test1.list"),
+            QString(cwd+"/data/test1.list"),
+            QString(cwd+"/data/test2.list")
+        }
+    );
     
     
     outputFile = QString(cwd+"/data/write_test.list");
@@ -206,6 +213,17 @@ void SourcesListTest::testConstructor()
     shouldntBeEmpty = subjectListOnly.sourceFiles();
     QVERIFY2(
         subjectListOnly.parent() == 0,
+        "The list-only constructor doesn't have a zero parent?!"
+    );
+    QVERIFY2(
+        shouldntBeEmpty.count() == 2,
+        "The list-only constructor should have given us an empty file list, but it didn't."
+    );
+
+    QApt::SourcesList subjectDuplicateListOnly(0, sampleSourcesHasDuplicateFiles);
+    shouldntBeEmpty = subjectDuplicateListOnly.sourceFiles();
+    QVERIFY2(
+        subjectDuplicateListOnly.parent() == 0,
         "The list-only constructor doesn't have a zero parent?!"
     );
     QVERIFY2(
