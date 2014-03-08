@@ -625,10 +625,19 @@ void SourcesListTest::testSaveSources()
     
     subject.addEntry(entryOne);
     
+    qDebug() << "Here's your sources list:\n" << subject.toString();
+    
+    QVERIFY2(
+                subject.containsEntry(entryOne),
+                qPrintable(
+                    "I expected to have the entry "
+                    + entryOne.toString()
+                )
+    );
     QVERIFY2(
         subject.entries().count() == 1,
         qPrintable(
-            "I expected to have 2 sources. I found "
+            "I expected to have 1 sources. I found "
             + QString::number(subject.entries().count())
             + " entries."
         )

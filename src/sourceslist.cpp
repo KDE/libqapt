@@ -90,7 +90,7 @@ void SourcesListPrivate::load(const QString &filePath)
     QFile file(filePath);
 
     if (!file.open(QFile::Text | QIODevice::ReadOnly)) {
-        qWarning() << "Unable to open the file " << filePath << " as read-only text";
+        qWarning() << "Unable to open the file " << filePath << " as read-only text: " << file.errorString();
         return;
     }
 
@@ -228,16 +228,34 @@ QString SourcesList::dataForSourceFile(const QString& sourceFile)
     return to_return;
 }
 
+QString SourcesList::toString() const
+{
+    Q_D(const SourcesList);
+    
+    QString toReturn;
+    
+    for (const QString &sourceFile : d->sourceFiles) {
+        toReturn += sourceFile + "\n";
+        for (const QApt::SourceEntry &sourceEntry : this->entries(sourceFile)) {
+            toReturn += sourceEntry.toString() + "\n";
+        }
+    }
+    
+    return toReturn;
+}
+
 void SourcesList::save()
 {
     Q_D(SourcesList);
 
     for (const QString &sourceFile : this->sourceFiles()) {
         qDebug() << "Writing file " << sourceFile << " with: " << this->dataForSourceFile(sourceFile);
-        if (d->worker->writeFileToDisk(this->dataForSourceFile(sourceFile), sourceFile)) {
+        if (! d->worker->writeFileToDisk(this->dataForSourceFile(sourceFile), sourceFile)) {
             qWarning() << "Failed to write the file to disk (dbus call failed)!";
         }
     }
+
+    return;
 }
 
 }

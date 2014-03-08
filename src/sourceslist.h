@@ -40,12 +40,12 @@ public:
     ~SourcesList();
     SourceEntryList entries() const;
     SourceEntryList entries(const QString &sourceFile) const;
-    
+
     void addEntry(const SourceEntry &entry);
     void removeEntry(const SourceEntry &entry);
     bool containsEntry(const SourceEntry &entry, const QString &sourceFile = QString());
     QStringList sourceFiles();
-        
+    QString toString() const;
     void save();
 
 private:
