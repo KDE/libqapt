@@ -72,7 +72,7 @@ void DebFilePrivate::init()
             isValid = true;
         }
     } catch (...) {
-        // MemControlExtract likes to throw out of range exceptions when i
+        // MemControlExtract likes to throw out of range exceptions when it
         // encounters an invalid file. Catch those to prevent the application
         // from exploding.
         return;
