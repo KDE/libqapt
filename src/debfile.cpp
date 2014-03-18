@@ -38,7 +38,7 @@ class DebFilePrivate
 {
     public:
         DebFilePrivate(const QString &path)
-            : isValid(true)
+            : isValid(false)
             , filePath(path)
             , extractor(0)
         {
@@ -64,10 +64,18 @@ void DebFilePrivate::init()
     debDebFile deb(in);
 
     // Extract control data
-    extractor = new debDebFile::MemControlExtract("control");
-    if(!extractor->Read(deb)) {
-      isValid = false;
-      return;
+    try {
+        extractor = new debDebFile::MemControlExtract("control");
+        if(!extractor->Read(deb)) {
+            return; // not valid.
+        } else {
+            isValid = true;
+        }
+    } catch (...) {
+        // MemControlExtract likes to throw out of range exceptions when i
+        // encounters an invalid file. Catch those to prevent the application
+        // from exploding.
+        return;
     }
 
     controlData = extractor->Section;
