@@ -453,7 +453,8 @@ void PluginHelper::incrementProgress()
 void PluginHelper::reject()
 {
     if (m_done) {
-        accept();
+        qApp->quit();
+        return;
     }
 
     if (m_partialFound) {
