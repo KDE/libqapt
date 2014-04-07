@@ -25,7 +25,7 @@
 #include <KCmdLineArgs>
 #include <KLocale>
 
-#include <QGst/Init>
+#include <gstreamer-1.0/gst/gst.h>
 
 static const char description[] =
     I18N_NOOP2("@info", "A GStreamer codec installer using QApt");
@@ -46,7 +46,10 @@ int main(int argc, char **argv)
     KCmdLineArgs::addCmdLineOptions(options);
 
     KApplication app;
-    QGst::init(&argc, &argv);
+
+#warning gst init error not handled
+    GError *error = nullptr;
+    gst_init_check(&argc, &argv, &error);
 
     // do not restore!
     if (app.isSessionRestored()) {

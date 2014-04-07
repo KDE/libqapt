@@ -37,7 +37,6 @@ endmacro(dbus_add_activation_system_service _sources)
 find_package(Qt4 REQUIRED)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
-find_package(QtGStreamer)
 
 set(POLKITQT-1_MIN_VERSION "0.98.1")
 find_package(PolkitQt-1 REQUIRED)
@@ -189,8 +188,6 @@ if (KDE4_FOUND)
 
 macro_log_feature(KDE4_FOUND "KDE" "Development libraries for the KDE Platform"
                   "http://kde.org" FALSE "" "Used to build optional utilities that use QApt")
-macro_log_feature(QTGSTREAMER_FOUND "QtGStreamer" "Qt wrapper around the GStreamer multimedia framework"
-                  "http://gstreamer.freedesktop.org" FALSE "" "Used to build an optional GStreamer plugin installer")
 
 macro_display_feature_log()
 endif (KDE4_FOUND)

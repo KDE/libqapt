@@ -25,8 +25,6 @@
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
 
-#include <QGst/Caps>
-
 class PluginInfo;
 
 namespace QApt {

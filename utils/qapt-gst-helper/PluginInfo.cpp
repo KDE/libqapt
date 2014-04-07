@@ -26,7 +26,8 @@
 #include <KDebug>
 
 PluginInfo::PluginInfo(const QString &gstDetails)
-          : m_pluginType(InvalidType)
+          : m_structure(nullptr)
+          , m_pluginType(InvalidType)
           , m_data(gstDetails)
           , m_isValid(true)
 {
@@ -35,6 +36,7 @@ PluginInfo::PluginInfo(const QString &gstDetails)
 
 PluginInfo::~PluginInfo()
 {
+    gst_structure_free(m_structure);
 }
 
 void PluginInfo::parseDetails(const QString &gstDetails)
@@ -84,8 +86,8 @@ void PluginInfo::parseDetails(const QString &gstDetails)
         m_pluginType = InvalidType;
     }
 
-    m_structure = QGst::Structure::fromString(m_capsInfo.toStdString().c_str());
-    if (!m_structure.isValid()) {
+    m_structure = gst_structure_new_from_string(m_capsInfo.toUtf8().constData());
+    if (!m_structure) {
         kDebug() << "Failed to parse structure: " << m_capsInfo;
         m_isValid = false;
         return;
@@ -93,15 +95,15 @@ void PluginInfo::parseDetails(const QString &gstDetails)
 
     /* remove fields that are almost always just MIN-MAX of some sort
      * in order to make the caps look less messy */
-    m_structure.removeField("pixel-aspect-ratio");
-    m_structure.removeField("framerate");
-    m_structure.removeField("channels");
-    m_structure.removeField("width");
-    m_structure.removeField("height");
-    m_structure.removeField("rate");
-    m_structure.removeField("depth");
-    m_structure.removeField("clock-rate");
-    m_structure.removeField("bitrate");
+    gst_structure_remove_field(m_structure, "pixel-aspect-ratio");
+    gst_structure_remove_field(m_structure, "framerate");
+    gst_structure_remove_field(m_structure, "channels");
+    gst_structure_remove_field(m_structure, "width");
+    gst_structure_remove_field(m_structure, "height");
+    gst_structure_remove_field(m_structure, "rate");
+    gst_structure_remove_field(m_structure, "depth");
+    gst_structure_remove_field(m_structure, "clock-rate");
+    gst_structure_remove_field(m_structure, "bitrate");
 }
 
 QString PluginInfo::version() const

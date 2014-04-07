@@ -50,8 +50,48 @@ bool GstMatcher::matches(QApt::Package *package)
     if (package->isInstalled())
         return false;
 
-    if (package->controlField(QLatin1String("Gstreamer-Version")) != m_info->version())
-        return false;
+    // There is a bug in Ubuntu (and supposedly Debian) where it lists an incorrect
+    // version, see below. To work around the problem a more fuzzy match is used,
+    // to force strict matching, use export QAPT_GST_STRICT_VERSION_MATCH=1.
+    if (!qgetenv("QAPT_GST_STRICT_VERSION_MATCH").isEmpty()) {
+        if (package->controlField(QLatin1String("Gstreamer-Version")) != m_info->version())
+            return false;
+    } else {
+        // Excitingly silly code following...
+
+        QString packageVersion = package->controlField(QLatin1String("Gstreamer-Version"));
+
+        if (packageVersion.isEmpty()) // No version, discard.
+            return false;
+
+        QStringList packageVersionFields = packageVersion.split(QChar('.'));
+        if (packageVersionFields.size() != 2) // must be x.y or we don't consider it a valid API version number.
+            return false;
+
+        QStringList infoVersionFields = m_info->version().split(QChar('.'));
+
+        // x and y in x.y: both of the package need to be greater or equal to the ones
+        // in the request.
+        // WARNING: This is a bloody workaround for Ubuntu having broken versions.
+        //          In particular Ubuntu thinks that gst_version(...) is the same
+        //          as the GST_API_VERSION, which worked out fine for 0.1x but fails
+        //          for 1.x. For example at the time of writing api version is at 1.0
+        //          but gst_version is at 1.2. libgstreamer will however continue to
+        //          ask for api version, so we get a request for 1.0 but the packages
+        //          say they are 1.2 .... -.-
+        for (int i = 0; i < 2; ++i) {
+            int packageVersion = packageVersionFields.at(i).toInt();
+            int infoVersion = infoVersionFields.at(i).toInt();
+            if (packageVersion < infoVersion)
+                return false;
+        }
+
+        // At this point we have assured that the package has a version, that it is
+        // of the form x.y and that the package's x.y is >= the request's x.y.
+        // We now consider the version an acceptable match.
+
+        // End of excitingly silly code.
+    }
 
     QString typeName = m_aptTypes[m_info->pluginType()];
     QString typeData = package->controlField(typeName);
@@ -59,29 +99,33 @@ bool GstMatcher::matches(QApt::Package *package)
     if (typeData.isEmpty())
         return false;
 
-    QGst::CapsPtr packageCaps = QGst::Caps::fromString(typeData);
-    QGst::CapsPtr pluginCaps = QGst::Caps::fromString(m_info->capsInfo());
+    // We are handling gobjects that need cleanup, so we'll do a delayed return.
+    bool ret = false;
+
+    GstCaps *packageCaps = gst_caps_from_string(typeData.toUtf8().constData());
+    GstCaps *pluginCaps = gst_caps_from_string(m_info->capsInfo().toUtf8().constData());
 
     switch (m_info->pluginType()) {
     case PluginInfo::Encoder:
     case PluginInfo::Decoder:
-        if (!packageCaps || !pluginCaps || packageCaps->isEmpty() || pluginCaps->isEmpty())
-            return false;
+        if (!packageCaps || !pluginCaps || gst_caps_is_empty(packageCaps) || gst_caps_is_empty(pluginCaps))
+            ret = false;
 
-        return pluginCaps->canIntersect(packageCaps);
+        ret = gst_caps_can_intersect(pluginCaps, packageCaps);
+        break;
     case PluginInfo::Element:
     case PluginInfo::UriSink:
     case PluginInfo::UriSource:
-        return typeData.contains(m_info->capsInfo());
-    default:
+        ret = typeData.contains(m_info->capsInfo());
         break;
     }
 
-    return false;
+    gst_caps_unref(pluginCaps);
+    gst_caps_unref(packageCaps);
+    return ret;
 }
 
 bool GstMatcher::hasMatches() const
 {
     return m_info->isValid();
 }
-
