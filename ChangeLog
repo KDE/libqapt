@@ -1,4 +1,4 @@
-2.1.1:
+2.2.0:
 ======
 - Features:
   * Handles multiple sources.list-formatted files
@@ -6,9 +6,12 @@
     (meaning you can load any source file directly, or use the default set.)
   * Added the ability to query a list of all loaded sources.list files.
   * You can now fetch only the files for a specific repository.
+  * gstreamer1.0 port completed by Harald Sitter
+  * Dropped qtgstreamer in favor of native gstreamer API
 - Bugfixes:
   * There was a bug in the unreleased alpha where removing all entries from
     any file could potentially result in overwriting the defaulatet /etc/apt/sources.list.
+  * Various minor (but important) bug fixes (Harald)
 
 2.1: (as of 2.1 alpha, unreleased)
 ======
