@@ -4,10 +4,10 @@ cmake_minimum_required(VERSION 2.8.6)
 set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-set(qapt_VERSION 2.1.70)
+set(qapt_VERSION 2.2.0)
 
 set(qapt_lib_SOVERSION 2)
-set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.1.70)
+set(qapt_lib_VERSION ${qapt_lib_SOVERSION}.2.0)
 
 configure_file(
        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/cmake_uninstall.cmake.in"
