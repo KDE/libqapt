@@ -82,8 +82,13 @@ bool GstMatcher::matches(QApt::Package *package)
         for (int i = 0; i < 2; ++i) {
             int packageVersion = packageVersionFields.at(i).toInt();
             int infoVersion = infoVersionFields.at(i).toInt();
-            if (packageVersion < infoVersion)
-                return false;
+            if (i == 0) {
+                if (packageVersion != infoVersion)
+                    return false;
+            } else {
+                if (packageVersion < infoVersion)
+                    return false;
+            }
         }
 
         // At this point we have assured that the package has a version, that it is
