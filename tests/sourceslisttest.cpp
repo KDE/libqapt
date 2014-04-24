@@ -249,8 +249,8 @@ void SourcesListTest::testConstructor()
  * 2. Verify that we loaded the file using entries()
  * 3. Verify that we loaded the file using entries(filename)
  */
-#define SOURCES_COUNT 12
-#define TEST1_MD5     "327eec1a9e826859e478258e75c07fbb"
+#define SOURCES_COUNT 13
+#define TEST1_MD5     "56717306e28a529f89b56c6ee6082375"
 void SourcesListTest::testLoadSourcesOneFile()
 {
     QVERIFY2(sampleSourcesHasOneFile.count() == 1, "Verify we have only one source...");
@@ -428,6 +428,19 @@ void SourcesListTest::testLoadSourcesOneFile()
         "i386!ppc",
         false, // <-- Note, disabled!
         true
+    );
+    // This line ensures that lines only containing comment characters (e.g. ##)
+    // are discarded as invalid.
+    verifySourceEntry(
+        "Line #12",
+        entries[12],
+        "",
+        "",
+        "",
+        "",
+        "",
+        false, // <-- Note, disabled!
+        false
     );
 }
 

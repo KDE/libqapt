@@ -87,7 +87,7 @@ void SourceEntryPrivate::parseData(const QString &data)
         isEnabled = false;
     }
     // Handle multiple comment characters (hey, it happens!)
-    while (tData.at(0) == '#') {
+    while (tData.size() > 0 && tData.at(0) == '#') {
         // Remove starting '#' from tData
         tData = tData.remove(0, 1);
         tData = tData.trimmed();
