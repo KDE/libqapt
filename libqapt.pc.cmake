@@ -5,6 +5,6 @@ includedir=@CMAKE_INSTALL_PREFIX@/include/libqapt
 
 Name: libqapt
 Description: Qt wrapper around libapt-pkg
-Version: @qapt_VERSION@
-Libs: -L${libdir} -lqapt
+Version: @QAPT_VERSION_STRING@
+Libs: -L${libdir} -lQApt
 Cflags: -I${includedir}

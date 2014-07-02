@@ -22,7 +22,7 @@ set(qapt_worker_SRCS
     workerinstallprogress.cpp
 )
 
-qt4_add_dbus_adaptor(qapt_worker_SRCS
+qt5_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker2.xml
     workerdaemon.h
     WorkerDaemon
@@ -35,15 +35,15 @@ add_executable(qaptworker2
 
 # see our worker is pretty small :D
 target_link_libraries(qaptworker2
-    ${QT_QTCORE_LIBRARY}
+    Qt5::Core
     ${POLKITQT-1_CORE_LIBRARY}
     util
-    qapt
+    QApt
 )
 
 install(TARGETS qaptworker2 DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-dbus_add_activation_system_service(org.kubuntu.qaptworker2.service.in)
+# dbus_add_activation_system_service(org.kubuntu.qaptworker2.service.in)
 
 find_package(KDE4)
 if (KDE4_FOUND)

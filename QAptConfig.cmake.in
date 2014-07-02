@@ -1,0 +1,23 @@
+# QAptConfig.cmake provides information about the installed Solid library.
+# It can be used directly from CMake via find_package(QApt NO_MODULE)
+#
+# The following CMake variables are provided:
+#   QAPT_VERSION_MAJOR - the major version number of Solid
+#   QAPT_VERSION_MINOR - the minor version number of Solid
+#   QAPT_VERSION_PATCH - the patch version number of Solid
+#   QAPT_INCLUDE_DIRS  - the include directories to use
+#   QAPT_HAVE_WINDOWS_WBEM - TRUE if WBEM is supported as backend under Windows
+#   QAPT_HAVE_UDev         - TRUE if device discovery via udev is supported
+#   QAPT_USE_UDisk2        - TRUE is udisk2 is used instead of udisk on UNIX systems
+#
+# Additionally, the following imported library targets are created, which may be used directly
+# with target_link_libraries():
+#   QApt - the QApt library
+
+@PACKAGE_INIT@
+
+#set(QAPT_DBUS_INTERFACES_DIR "${PACKAGE_PREFIX_DIR}/@DBUS_INTERFACES_INSTALL_DIR@")
+
+find_dependency(Qt5Widgets @REQUIRED_QT_VERSION@)
+
+include("${CMAKE_CURRENT_LIST_DIR}/QAptTargets.cmake")

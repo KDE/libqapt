@@ -186,7 +186,7 @@ void Config::writeEntry(const QString &key, const bool value)
         d->buffer.append(key + ' ' + boolString);
         d->newFile = false;
     } else {
-        d->writeBufferEntry(key.toAscii(), boolString);
+        d->writeBufferEntry(key.toLatin1(), boolString);
     }
 
     _config->Set(key.toLatin1(), value);
@@ -199,13 +199,13 @@ void Config::writeEntry(const QString &key, const int value)
 
     QByteArray intString;
 
-    intString = '\"' + QString::number(value).toAscii() + "\";";
+    intString = '\"' + QString::number(value).toLatin1() + "\";";
 
     if (d->newFile) {
-        d->buffer.append(key.toAscii() + ' ' + intString);
+        d->buffer.append(key.toLatin1() + ' ' + intString);
         d->newFile = false;
     } else {
-        d->writeBufferEntry(key.toAscii(), intString);
+        d->writeBufferEntry(key.toLatin1(), intString);
     }
 
     _config->Set(key.toLatin1(), value);
@@ -218,13 +218,13 @@ void Config::writeEntry(const QString &key, const QString &value)
 
     QByteArray valueString;
 
-    valueString = '\"' + value.toAscii() + "\";";
+    valueString = '\"' + value.toLatin1() + "\";";
 
     if (d->newFile) {
         d->buffer.append(key + ' ' + valueString);
         d->newFile = false;
     } else {
-        d->writeBufferEntry(key.toAscii(), valueString);
+        d->writeBufferEntry(key.toLatin1(), valueString);
     }
 
     _config->Set(key.toStdString(), value.toStdString());

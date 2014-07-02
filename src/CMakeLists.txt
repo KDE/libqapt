@@ -12,61 +12,50 @@ set(qapt_SRCS
     downloadprogress.cpp
     markingerrorinfo.cpp
     sourceentry.cpp
-    sourceslist.cpp
-    )
+    sourceslist.cpp)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_BINARY_DIR}/src
-    )
+# add_subdirectory(worker)
 
-add_subdirectory(worker)
-
-set(qapt_HDRS
-    package.h
-    debfile.h
-    dependencyinfo.h
-    changelog.h
-    globals.h
-    downloadprogress.h
-    markingerrorinfo.h
-    sourceentry.h
-    )
-
-qt4_add_dbus_interface(qapt_SRCS
+qt5_add_dbus_interface(qapt_SRCS
                        worker/org.kubuntu.qaptworker2.xml
                        workerdbus)
 
-add_library(qapt SHARED ${qapt_SRCS})
-set_target_properties(qapt PROPERTIES
-    VERSION ${qapt_lib_VERSION}
-    SOVERSION ${qapt_lib_SOVERSION}
-    )
+add_library(QApt SHARED ${qapt_SRCS})
 
-target_link_libraries(qapt
-    ${QT_QTDBUS_LIBRARIES}
-    ${QT_QTCORE_LIBRARIES}
-    ${APTPKG_LIBRARIES}
-    ${XAPIAN_LIBRARIES}
-    )
+set_target_properties(QApt
+    PROPERTIES
+    VERSION ${QAPT_VERSION_STRING}
+    SOVERSION ${QAPT_SOVERSION}
+    EXPORT_NAME QApt)
 
-install(TARGETS qapt
-    LIBRARY DESTINATION lib${LIB_SUFFIX})
+target_link_libraries(QApt
+    PUBLIC
+        Qt5::Widgets
+        ${APTPKG_LIBRARIES}
+    PRIVATE
+        Qt5::DBus
+        ${XAPIAN_LIBRARIES})
 
-install(FILES
-    backend.h
-    changelog.h
-    config.h
-    debfile.h
-    dependencyinfo.h
-    history.h
-    package.h
-    globals.h
-    transaction.h
-    downloadprogress.h
-    markingerrorinfo.h
-    sourceentry.h
-    sourceslist.h
+install(TARGETS QApt EXPORT QAptTargets LIBRARY DESTINATION ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 
-    DESTINATION
-    include/libqapt COMPONENT Devel)
+ecm_generate_headers(QAPT_CAMEL_CASE_HEADERS
+    HEADER_NAMES
+        Backend
+        Changelog
+        Config
+        DebFile
+        DependencyInfo
+        DownloadProgress
+        Globals
+        History
+        MarkingErrorInfo
+        Package
+        SourceEntry
+        SourcesList
+        Transaction
+
+  REQUIRED_HEADERS QAPT_HEADERS
+  PREFIX qapt)
+
+install(FILES ${QAPT_HEADERS} DESTINATION include/qapt COMPONENT Devel)
+install(FILES ${QAPT_CAMEL_CASE_HEADERS} DESTINATION include/QApt COMPONENT Devel)
