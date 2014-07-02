@@ -21,9 +21,9 @@
 #ifndef PLUGINHELPER_H
 #define PLUGINHELPER_H
 
-#include <QtCore/QStringList>
+#include <QStringList>
 
-#include <KProgressDialog>
+#include <QProgressDialog>
 
 #include <../../src/globals.h>
 
@@ -42,7 +42,7 @@ class PluginInfo;
 #define ERR_PARTIAL_SUCCESS 3
 #define ERR_CANCEL 4
 
-class PluginHelper : public KProgressDialog
+class PluginHelper : public QProgressDialog
 {
     Q_OBJECT
 public:

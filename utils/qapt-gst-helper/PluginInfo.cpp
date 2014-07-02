@@ -23,7 +23,7 @@
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
 
-#include <KDebug>
+#include <QDebug>
 
 PluginInfo::PluginInfo(const QString &gstDetails)
           : m_structure(nullptr)
@@ -82,13 +82,13 @@ void PluginInfo::parseDetails(const QString &gstDetails)
     } else if (m_typeName == "element") {
         m_pluginType = Element;
     } else {
-        kDebug() << "invalid plugin type";
+        qDebug() << "invalid plugin type";
         m_pluginType = InvalidType;
     }
 
     m_structure = gst_structure_new_from_string(m_capsInfo.toUtf8().constData());
     if (!m_structure) {
-        kDebug() << "Failed to parse structure: " << m_capsInfo;
+        qDebug() << "Failed to parse structure: " << m_capsInfo;
         m_isValid = false;
         return;
     }

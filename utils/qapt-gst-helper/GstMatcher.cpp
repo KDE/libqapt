@@ -21,7 +21,7 @@
 
 #include "GstMatcher.h"
 
-#include <KDebug>
+#include <QDebug>
 
 #include <../../src/package.h>
 

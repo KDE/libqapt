@@ -85,7 +85,7 @@ find_package(KF5I18n 5.0.0 REQUIRED)
 find_package(KF5KIO 5.0.0 REQUIRED)
 find_package(KF5TextWidgets 5.0.0 REQUIRED)
 find_package(KF5WidgetsAddons 5.0.0 REQUIRED)
-find_package(KF5WindowSystem 5.0.0gREQUIRED)
+find_package(KF5WindowSystem 5.0.0 REQUIRED)
 
 
 # if (KDE4_FOUND)

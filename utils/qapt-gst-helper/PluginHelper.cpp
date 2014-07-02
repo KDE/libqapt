@@ -27,13 +27,14 @@
 #include <QtCore/QTimer>
 
 // KDE includes
-#include <KApplication>
-#include <KIcon>
-#include <KLocale>
-#include <KMessageBox>
+#include <QApplication>
+#include <QIcon>
+#include <KLocalizedString>
+#include <QMessageBox>
 #include <KProtocolManager>
 #include <KWindowSystem>
 #include <QDebug>
+#include <KStandardGuiItem>
 
 // LibQApt includes
 #include "../../src/backend.h"
@@ -51,7 +52,7 @@
 #define tExit(x) m_finder->stop(); m_finderThread->quit(); m_finderThread->wait(); qApp->exit(x); return;
 
 PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int winId)
-    : KProgressDialog(parent)
+    : QProgressDialog(parent)
     , m_backend(new QApt::Backend(this))
     , m_trans(nullptr)
     , m_winId(winId)
@@ -78,7 +79,7 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
 void PluginHelper::run()
 {
     if (!m_searchList.size()) {
-        KMessageBox::error(this, i18nc("@info Error message", "No valid plugin "
+        QMessageBox::warning(this, i18nc("@info Error message", "No valid plugin "
                                        "info was provided, so no plugins could "
                                        "be found."),
                            i18nc("@title:window", "Couldn't Find Plugins"));
@@ -88,7 +89,8 @@ void PluginHelper::run()
     canSearch();
 
     setLabelText(i18nc("@info:progress", "Looking for plugins"));
-    progressBar()->setMaximum(m_searchList.count());
+#warning todo
+//    setMaximum(m_searchList.count());
     incrementProgress();
     show();
 
@@ -118,13 +120,14 @@ void PluginHelper::initError()
                          "configuration may be broken.");
     QString title = i18nc("@title:window", "Initialization error");
 
-    KMessageBox::detailedError(this, text, details, title);
+    #warning todo
+//    QMessageBox::detailedError(this, text, details, title);
     exit(ERR_RANDOM_ERR);
 }
 
 void PluginHelper::canSearch()
 {
-    int ret = KMessageBox::No;
+    int ret = QMessageBox::No;
     QStringList niceNames;
 
     foreach (PluginInfo *pluginInfo, m_searchList) {
@@ -169,17 +172,18 @@ void PluginHelper::canSearch()
     QString msg = QLatin1Literal("<h3>") % title % QLatin1Literal("</h3>") % message;
     KGuiItem searchButton = KStandardGuiItem::yes();
     searchButton.setText(i18nc("Search for packages" ,"Search"));
-    searchButton.setIcon(KIcon("edit-find"));
-    ret = KMessageBox::questionYesNoWId(m_winId, msg, title, searchButton);
+    searchButton.setIcon(QIcon("edit-find"));
+    #warning todo
+//    ret = QMessageBox::questionYesNoWId(m_winId, msg, title, searchButton);
 
-    if (ret != KMessageBox::Yes) {
+    if (ret != QMessageBox::Yes) {
         reject();
     }
 }
 
 void PluginHelper::offerInstallPackages()
 {
-    int ret = KMessageBox::No;
+    int ret = QMessageBox::No;
 
     for (QApt::Package *package : m_foundCodecs) {
         package->setInstall();
@@ -201,12 +205,13 @@ void PluginHelper::offerInstallPackages()
 
     KGuiItem installButton = KStandardGuiItem::yes();
     installButton.setText(i18nc("Install packages" ,"Install"));
-    installButton.setIcon(KIcon("download"));
+    installButton.setIcon(QIcon("download"));
 
-    ret = KMessageBox::questionYesNoListWId(m_winId, msg, nameList, title,
-                                            installButton, KStandardGuiItem::no());
+    #warning todo
+//    ret = QMessageBox::questionYesNoListWId(m_winId, msg, nameList, title,
+//                                            installButton, KStandardGuiItem::no());
 
-    if (ret != KMessageBox::Yes) {
+    if (ret != QMessageBox::Yes) {
         tExit(ERR_CANCEL);
     } else {
         install();
@@ -215,7 +220,8 @@ void PluginHelper::offerInstallPackages()
 
 void PluginHelper::cancellableChanged(bool cancellable)
 {
-    setAllowCancel(cancellable);
+    #warning todo
+//    setAllowCancel(cancellable);
 }
 
 void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
@@ -229,7 +235,8 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            KMessageBox::detailedErrorWId(m_winId, text, m_trans->errorDetails(), title);
+            #warning todo
+//            QMessageBox::detailedErrorWId(m_winId, text, m_trans->errorDetails(), title);
             // TODO: Report some sort of init error with the exit value
             tExit(ERR_RANDOM_ERR);
             break;
@@ -253,13 +260,15 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
         case QApt::FetchError:
             text = i18nc("@label", "Could not download packages");
             title = i18nc("@title:window", "Download failed");
-            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            #warning todo
+//            QMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::CommitError:
             text = i18nc("@label", "An error occurred while applying changes:");
             title = i18nc("@title:window", "Commit Error");
-            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            #warning todo
+//            QMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::AuthError:
@@ -273,7 +282,8 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             text = i18nc("@label", "It appears that the QApt worker has either crashed "
                          "or disappeared. Please report a bug to the QApt maintainers");
             title = i18nc("@title:window", "Unexpected Error");
-            KMessageBox::errorWId(m_winId, text, title);
+            #warning todo
+//            QMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::UntrustedError: {
@@ -290,7 +300,8 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                              untrustedItems.size());
             }
             title = i18nc("@title:window", "Untrusted Packages");
-            KMessageBox::errorListWId(m_winId, text, untrustedItems, title);
+            #warning todo
+//            QMessageBox::errorListWId(m_winId, text, untrustedItems, title);
             tExit(ERR_RANDOM_ERR);
             break;
         }
@@ -300,7 +311,8 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                         "Therefore, it cannot be installed. ",
                         m_trans->errorDetails());
             title = i18nc("@title:window", "Package Not Found");
-            KMessageBox::errorWId(m_winId, text, title);
+            #warning todo
+//            QMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::UnknownError:
@@ -317,7 +329,8 @@ void PluginHelper::provideMedium(const QString &label, const QString &mountPoint
     QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
                          label, mountPoint);
 
-    KMessageBox::informationWId(m_winId, text, title);
+    #warning todo
+//    QMessageBox::informationWId(m_winId, text, title);
     m_trans->provideMedium(mountPoint);
 }
 
@@ -334,17 +347,18 @@ void PluginHelper::untrustedPrompt(const QStringList &untrustedPackages)
                           "security risk, as the presence of unverifiable software "
                           "can be a sign of tampering.</warning> Do you wish to continue?",
                           untrustedPackages.size());
-    int result = KMessageBox::Cancel;
+    int result = QMessageBox::Cancel;
 
-    result = KMessageBox::warningContinueCancelListWId(m_winId, text,
-                                                       untrustedPackages, title);
+    #warning todo
+//    result = QMessageBox::warningContinueCancelListWId(m_winId, text,
+//                                                       untrustedPackages, title);
 
-    bool installUntrusted = (result == KMessageBox::Continue);
-    m_trans->replyUntrustedPrompt(installUntrusted);
+//    bool installUntrusted = (result == QMessageBox::Continue);
+//    m_trans->replyUntrustedPrompt(installUntrusted);
 
-    if (!installUntrusted) {
-        tExit(ERR_CANCEL);
-    }
+//    if (!installUntrusted) {
+//        tExit(ERR_CANCEL);
+//    }
 }
 
 void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
@@ -352,28 +366,28 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
     switch (status) {
     case QApt::SetupStatus:
     case QApt::WaitingStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Progress bar label when waiting to start",
                            "Waiting to start."));
         break;
     case QApt::AuthenticationStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Status label when waiting for a password",
                            "Waiting for authentication."));
         break;
     case QApt::WaitingMediumStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Status label when waiting for a CD-ROM",
                            "Waiting for required media."));
         break;
     case QApt::WaitingLockStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Status label",
                            "Waiting for other package managers to quit."));
         break;
     case QApt::RunningStatus:
         // We're ready for "real" progress now
-        progressBar()->setMaximum(100);
+        setMaximum(100);
         break;
     case QApt::LoadingCacheStatus:
         setLabelText(i18nc("@label Status label",
@@ -386,7 +400,8 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
     case QApt::CommittingStatus:
         setWindowTitle(i18nc("@title:window", "Installing"));
         setLabelText(i18nc("@info:status", "Installing codecs"));
-        setButtons(KDialog::Cancel);
+        #warning todo
+//        setButtons(KDialog::Cancel);
         break;
     case QApt::FinishedStatus:
         if (m_trans->exitStatus() == QApt::ExitCancelled) {
@@ -400,9 +415,10 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
             m_done = true;
         }
 
-        progressBar()->setValue(100);
+        setValue(100);
         // Really a close button, but KProgressDialog uses ButtonCode Cancel
-        setButtonFocus(KDialog::Cancel);
+        #warning todo
+//        setButtonFocus(KDialog::Cancel);
 
         m_trans->deleteLater();
         m_trans = 0;
@@ -415,7 +431,7 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
 
 void PluginHelper::raiseErrorMessage(const QString &text, const QString &title)
 {
-    KMessageBox::error(this, text, title);
+    QMessageBox::warning(this, text, title);
     tExit(ERR_RANDOM_ERR);
 }
 
@@ -435,14 +451,14 @@ void PluginHelper::notFoundError()
 {
     QString text = i18nc("@info", "No plugins could be found");
     QString title = i18nc("@title", "Plugins Not Found");
-    KMessageBox::error(this, text, title);
+    QMessageBox::warning(this, text, title);
     exit(ERR_NO_PLUGINS);
 }
 
 void PluginHelper::incrementProgress()
 {
-    progressBar()->setValue(progressBar()->value() + 1);
-    if (progressBar()->value() == progressBar()->maximum()) {
+    setValue(value() + 1);
+    if (value() == maximum()) {
         if (m_foundCodecs.isEmpty()) {
             notFoundError();
         }
@@ -497,7 +513,7 @@ void PluginHelper::install()
     m_trans->run();
 
     setLabelText(i18nc("@label Progress bar label when waiting to start", "Waiting"));
-    progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
+    setMaximum(0); // Set progress bar to indeterminate/busy
     setAutoClose(false);
     show();
 }
@@ -508,7 +524,7 @@ void PluginHelper::updateProgress(int percentage)
         --percentage;
     }
 
-    progressBar()->setValue(percentage);
+    setValue(percentage);
 }
 
 void PluginHelper::updateCommitStatus(const QString& message)
