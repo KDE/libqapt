@@ -25,6 +25,7 @@
 #include <QtCore/QStringBuilder>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
+#include <QPushButton>
 
 // KDE includes
 #include <QApplication>
@@ -37,6 +38,7 @@
 #include <KStandardGuiItem>
 
 // LibQApt includes
+#warning relative includes
 #include "../../src/backend.h"
 #include "../../src/config.h"
 #include "../../src/transaction.h"
@@ -74,6 +76,10 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
     if (m_winId) {
         KWindowSystem::setMainWindow(this, m_winId);
     }
+
+    QPushButton *button = new QPushButton(this);
+    KGuiItem::assign(button, KStandardGuiItem::cancel());
+    setCancelButton(button);
 }
 
 void PluginHelper::run()
@@ -89,8 +95,7 @@ void PluginHelper::run()
     canSearch();
 
     setLabelText(i18nc("@info:progress", "Looking for plugins"));
-#warning todo
-//    setMaximum(m_searchList.count());
+    setMaximum(m_searchList.count());
     incrementProgress();
     show();
 
@@ -109,6 +114,13 @@ void PluginHelper::run()
     m_finder->moveToThread(m_finderThread);
     m_finder->setSearchList(m_searchList);
     m_finderThread->start();
+}
+
+void PluginHelper::setCloseButton()
+{
+    QPushButton *button = new QPushButton(this);
+    KGuiItem::assign(button, KStandardGuiItem::close());
+    setCancelButton(button);
 }
 
 void PluginHelper::initError()
@@ -217,8 +229,10 @@ void PluginHelper::offerInstallPackages()
 
 void PluginHelper::cancellableChanged(bool cancellable)
 {
-    #warning todo
-//    setAllowCancel(cancellable);
+    QPushButton *button = new QPushButton(this);
+    KGuiItem::assign(button, KStandardGuiItem::cancel());
+    button->setEnabled(cancellable);
+    setCancelButton(button);
 }
 
 void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
@@ -339,16 +353,15 @@ void PluginHelper::untrustedPrompt(const QStringList &untrustedPackages)
                           untrustedPackages.size());
     int result = KMessageBox::Cancel;
 
-    #warning todo
-//    result = KMessageBox::errorContinueCancelListWId(m_winId, text,
-//                                                       untrustedPackages, title);
+    result = KMessageBox::warningContinueCancelListWId(m_winId, text,
+                                                       untrustedPackages, title);
 
-//    bool installUntrusted = (result == KMessageBox::Continue);
-//    m_trans->replyUntrustedPrompt(installUntrusted);
+    bool installUntrusted = (result == KMessageBox::Continue);
+    m_trans->replyUntrustedPrompt(installUntrusted);
 
-//    if (!installUntrusted) {
-//        tExit(ERR_CANCEL);
-//    }
+    if (!installUntrusted) {
+        tExit(ERR_CANCEL);
+    }
 }
 
 void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
@@ -390,8 +403,6 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
     case QApt::CommittingStatus:
         setWindowTitle(i18nc("@title:window", "Installing"));
         setLabelText(i18nc("@info:status", "Installing codecs"));
-        #warning todo
-//        setButtons(KDialog::Cancel);
         break;
     case QApt::FinishedStatus:
         if (m_trans->exitStatus() == QApt::ExitCancelled) {
@@ -406,9 +417,7 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
         }
 
         setValue(100);
-        // Really a close button, but KProgressDialog uses ButtonCode Cancel
-        #warning todo
-//        setButtonFocus(KDialog::Cancel);
+        setCloseButton();
 
         m_trans->deleteLater();
         m_trans = 0;

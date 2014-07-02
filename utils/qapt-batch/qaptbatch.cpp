@@ -286,16 +286,15 @@ void QAptBatch::untrustedPrompt(const QStringList &untrustedPackages)
                           untrustedPackages.size());
     int result = KMessageBox::Cancel;
 
-#warning todo
-//    result = KMessageBox::errorContinueCancelListWId(m_winId, text,
-//                                                       untrustedPackages, title);
+    result = KMessageBox::warningContinueCancelListWId(m_winId, text,
+                                                       untrustedPackages, title);
 
-//    bool installUntrusted = (result == KMessageBox::AcceptRole);
-//    m_trans->replyUntrustedPrompt(installUntrusted);
+    bool installUntrusted = (result == KMessageBox::Continue);
+    m_trans->replyUntrustedPrompt(installUntrusted);
 
-//    if (!installUntrusted) {
-//        close();
-//    }
+    if (!installUntrusted) {
+        close();
+    }
 }
 
 void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)

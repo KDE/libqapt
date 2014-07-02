@@ -64,11 +64,14 @@ private:
     QThread *m_finderThread;
     PluginFinder *m_finder;
 
+    void setCloseButton();
+
 private Q_SLOTS:
     void initError();
     void canSearch();
     void offerInstallPackages();
     void cancellableChanged(bool cancellable);
+
     void transactionErrorOccurred(QApt::ErrorCode error);
     void transactionStatusChanged(QApt::TransactionStatus status);
     void provideMedium(const QString &label, const QString &mountPoint);
