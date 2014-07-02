@@ -25,7 +25,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <KLocalizedString>
-#include <QMessageBox>
+#include <KMessageBox>
 #include <QPushButton>
 #include <KProtocolManager>
 #include <KWindowSystem>
@@ -103,8 +103,7 @@ void QAptBatch::initError()
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
     QString title = i18nc("@title:window", "Initialization error");
-#warning TODO
-//    QMessageBox::detailedError(this, text, details, title);
+    KMessageBox::detailedError(this, text, details, title);
     exit(-1);
 }
 
@@ -132,7 +131,7 @@ void QAptBatch::commitChanges(int mode, const QStringList &packageStrs)
                                  "Therefore, it cannot be installed. ",
                                  packageStr);
             QString title = i18nc("@title:window", "Package Not Found");
-            QMessageBox::warning(this, text, title);
+            KMessageBox::error(this, text, title);
             close();
         }
     }
@@ -184,8 +183,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-#warning TODO
-//            QMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             QApplication::quit();
             break;
         }
@@ -214,8 +212,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
         case QApt::CommitError:
             text = i18nc("@label", "An error occurred while applying changes:");
             title = i18nc("@title:window", "Commit error");
-#warning TODO
-//            QMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             break;
         case QApt::AuthError:
             text = i18nc("@label",
@@ -228,7 +225,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
             text = i18nc("@label", "It appears that the QApt worker has either crashed "
                          "or disappeared. Please report a bug to the QApt maintainers");
             title = i18nc("@title:window", "Unexpected Error");
-            QMessageBox::warning(this, text, title);
+            KMessageBox::error(this, text, title);
             close();
             break;
         case QApt::UntrustedError: {
@@ -245,8 +242,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
                              untrustedItems.size());
             }
             title = i18nc("@title:window", "Untrusted Packages");
-#warning TODO
-//            QMessageBox::errorList(this, text, untrustedItems, title);
+            KMessageBox::errorList(this, text, untrustedItems, title);
             close();
             break;
         }
@@ -256,7 +252,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
                         "Therefore, it cannot be installed. ",
                         m_trans->errorDetails());
             title = i18nc("@title:window", "Package Not Found");
-            QMessageBox::warning(this, text, title);
+            KMessageBox::error(this, text, title);
             close();
             break;
         }
@@ -271,8 +267,7 @@ void QAptBatch::provideMedium(const QString &label, const QString &mountPoint)
     QString title = i18nc("@title:window", "Media Change Required");
     QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
                          label, mountPoint);
-#warning TODO
-//    QMessageBox::informationWId(m_winId, text, title);
+    KMessageBox::informationWId(m_winId, text, title);
     m_trans->provideMedium(mountPoint);
 }
 
@@ -289,23 +284,23 @@ void QAptBatch::untrustedPrompt(const QStringList &untrustedPackages)
                           "security risk, as the presence of unverifiable software "
                           "can be a sign of tampering.</warning> Do you wish to continue?",
                           untrustedPackages.size());
-    int result = QMessageBox::Cancel;
+    int result = KMessageBox::Cancel;
 
-#warning TODO
-//    result = QMessageBox::warningContinueCancelListWId(m_winId, text,
+#warning todo
+//    result = KMessageBox::errorContinueCancelListWId(m_winId, text,
 //                                                       untrustedPackages, title);
 
-    bool installUntrusted = (result == QMessageBox::AcceptRole);
-    m_trans->replyUntrustedPrompt(installUntrusted);
+//    bool installUntrusted = (result == KMessageBox::AcceptRole);
+//    m_trans->replyUntrustedPrompt(installUntrusted);
 
-    if (!installUntrusted) {
-        close();
-    }
+//    if (!installUntrusted) {
+//        close();
+//    }
 }
 
 void QAptBatch::raiseErrorMessage(const QString &text, const QString &title)
 {
-    QMessageBox::warning(0, text, title);
+    KMessageBox::error(0, text, title);
     close();
 }
 

@@ -30,7 +30,7 @@
 #include <QApplication>
 #include <QIcon>
 #include <KLocalizedString>
-#include <QMessageBox>
+#include <KMessageBox>
 #include <KProtocolManager>
 #include <KWindowSystem>
 #include <QDebug>
@@ -79,7 +79,7 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
 void PluginHelper::run()
 {
     if (!m_searchList.size()) {
-        QMessageBox::warning(this, i18nc("@info Error message", "No valid plugin "
+        KMessageBox::error(this, i18nc("@info Error message", "No valid plugin "
                                        "info was provided, so no plugins could "
                                        "be found."),
                            i18nc("@title:window", "Couldn't Find Plugins"));
@@ -120,14 +120,13 @@ void PluginHelper::initError()
                          "configuration may be broken.");
     QString title = i18nc("@title:window", "Initialization error");
 
-    #warning todo
-//    QMessageBox::detailedError(this, text, details, title);
+    KMessageBox::detailedError(this, text, details, title);
     exit(ERR_RANDOM_ERR);
 }
 
 void PluginHelper::canSearch()
 {
-    int ret = QMessageBox::No;
+    int ret = KMessageBox::No;
     QStringList niceNames;
 
     foreach (PluginInfo *pluginInfo, m_searchList) {
@@ -173,17 +172,16 @@ void PluginHelper::canSearch()
     KGuiItem searchButton = KStandardGuiItem::yes();
     searchButton.setText(i18nc("Search for packages" ,"Search"));
     searchButton.setIcon(QIcon("edit-find"));
-    #warning todo
-//    ret = QMessageBox::questionYesNoWId(m_winId, msg, title, searchButton);
+    ret = KMessageBox::questionYesNoWId(m_winId, msg, title, searchButton);
 
-    if (ret != QMessageBox::Yes) {
+    if (ret != KMessageBox::Yes) {
         reject();
     }
 }
 
 void PluginHelper::offerInstallPackages()
 {
-    int ret = QMessageBox::No;
+    int ret = KMessageBox::No;
 
     for (QApt::Package *package : m_foundCodecs) {
         package->setInstall();
@@ -207,11 +205,10 @@ void PluginHelper::offerInstallPackages()
     installButton.setText(i18nc("Install packages" ,"Install"));
     installButton.setIcon(QIcon("download"));
 
-    #warning todo
-//    ret = QMessageBox::questionYesNoListWId(m_winId, msg, nameList, title,
-//                                            installButton, KStandardGuiItem::no());
+    ret = KMessageBox::questionYesNoListWId(m_winId, msg, nameList, title,
+                                            installButton, KStandardGuiItem::no());
 
-    if (ret != QMessageBox::Yes) {
+    if (ret != KMessageBox::Yes) {
         tExit(ERR_CANCEL);
     } else {
         install();
@@ -235,8 +232,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
-            #warning todo
-//            QMessageBox::detailedErrorWId(m_winId, text, m_trans->errorDetails(), title);
+            KMessageBox::detailedErrorWId(m_winId, text, m_trans->errorDetails(), title);
             // TODO: Report some sort of init error with the exit value
             tExit(ERR_RANDOM_ERR);
             break;
@@ -260,15 +256,13 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
         case QApt::FetchError:
             text = i18nc("@label", "Could not download packages");
             title = i18nc("@title:window", "Download failed");
-            #warning todo
-//            QMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::CommitError:
             text = i18nc("@label", "An error occurred while applying changes:");
             title = i18nc("@title:window", "Commit Error");
-            #warning todo
-//            QMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
+            KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::AuthError:
@@ -282,8 +276,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
             text = i18nc("@label", "It appears that the QApt worker has either crashed "
                          "or disappeared. Please report a bug to the QApt maintainers");
             title = i18nc("@title:window", "Unexpected Error");
-            #warning todo
-//            QMessageBox::errorWId(m_winId, text, title);
+            KMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::UntrustedError: {
@@ -300,8 +293,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                              untrustedItems.size());
             }
             title = i18nc("@title:window", "Untrusted Packages");
-            #warning todo
-//            QMessageBox::errorListWId(m_winId, text, untrustedItems, title);
+            KMessageBox::errorListWId(m_winId, text, untrustedItems, title);
             tExit(ERR_RANDOM_ERR);
             break;
         }
@@ -311,8 +303,7 @@ void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
                         "Therefore, it cannot be installed. ",
                         m_trans->errorDetails());
             title = i18nc("@title:window", "Package Not Found");
-            #warning todo
-//            QMessageBox::errorWId(m_winId, text, title);
+            KMessageBox::errorWId(m_winId, text, title);
             tExit(ERR_RANDOM_ERR);
             break;
         case QApt::UnknownError:
@@ -329,8 +320,7 @@ void PluginHelper::provideMedium(const QString &label, const QString &mountPoint
     QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
                          label, mountPoint);
 
-    #warning todo
-//    QMessageBox::informationWId(m_winId, text, title);
+    KMessageBox::informationWId(m_winId, text, title);
     m_trans->provideMedium(mountPoint);
 }
 
@@ -347,13 +337,13 @@ void PluginHelper::untrustedPrompt(const QStringList &untrustedPackages)
                           "security risk, as the presence of unverifiable software "
                           "can be a sign of tampering.</warning> Do you wish to continue?",
                           untrustedPackages.size());
-    int result = QMessageBox::Cancel;
+    int result = KMessageBox::Cancel;
 
     #warning todo
-//    result = QMessageBox::warningContinueCancelListWId(m_winId, text,
+//    result = KMessageBox::errorContinueCancelListWId(m_winId, text,
 //                                                       untrustedPackages, title);
 
-//    bool installUntrusted = (result == QMessageBox::Continue);
+//    bool installUntrusted = (result == KMessageBox::Continue);
 //    m_trans->replyUntrustedPrompt(installUntrusted);
 
 //    if (!installUntrusted) {
@@ -431,7 +421,7 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
 
 void PluginHelper::raiseErrorMessage(const QString &text, const QString &title)
 {
-    QMessageBox::warning(this, text, title);
+    KMessageBox::error(this, text, title);
     tExit(ERR_RANDOM_ERR);
 }
 
@@ -451,7 +441,7 @@ void PluginHelper::notFoundError()
 {
     QString text = i18nc("@info", "No plugins could be found");
     QString title = i18nc("@title", "Plugins Not Found");
-    QMessageBox::warning(this, text, title);
+    KMessageBox::error(this, text, title);
     exit(ERR_NO_PLUGINS);
 }
 
