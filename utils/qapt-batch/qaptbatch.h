@@ -21,18 +21,23 @@
 #ifndef QAPTBATCH_H
 #define QAPTBATCH_H
 
-// KDE includes
-#include <KProgressDialog>
+// Qt includes
+#include <QDialog>
 
 // LibQApt includes
 #include "../../src/globals.h"
+
+class DetailsWidget;
+class QDialogButtonBox;
+class QLabel;
+class QProgressBar;
 
 namespace QApt {
     class Backend;
     class Transaction;
 }
 
-class QAptBatch : public KProgressDialog
+class QAptBatch : public QDialog
 {
     Q_OBJECT
 public:
@@ -49,6 +54,13 @@ private:
     QString m_mode;
     QStringList m_packages;
     bool m_done;
+
+    // ui
+    QLabel *m_label;
+    QProgressBar *m_progressBar;
+    DetailsWidget *m_detailsWidget;
+    QPushButton *m_cancelButton;
+    QDialogButtonBox *m_buttonBox;
 
     void setTransaction(QApt::Transaction *trans);
 

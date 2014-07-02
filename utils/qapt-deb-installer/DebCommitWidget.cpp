@@ -24,20 +24,21 @@
 #include <QtCore/QDir>
 #include <QtCore/QStringBuilder>
 #include <QtCore/QUuid>
-#include <QtGui/QLabel>
-#include <QtGui/QProgressBar>
-#include <QtGui/QVBoxLayout>
+#include <QLabel>
+#include <QProgressBar>
+#include <QVBoxLayout>
 
 // KDE includes
-#include <KMessageBox>
+#include <QMessageBox>
 #include <KTextEdit>
 
 // LibQApt/DebconfKDE includes
-#include <DebconfGui.h>
+//#include <DebconfGui.h>
+#warning relative include fufufu
 #include "../../src/transaction.h"
 
 // KDE includes
-#include <KLocale>
+#include <KLocalizedString>
 
 DebCommitWidget::DebCommitWidget(QWidget *parent)
     : QWidget(parent)
@@ -65,17 +66,19 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     uuid.remove('{').remove('}').remove('-');
     m_pipe = QDir::tempPath() % QLatin1String("/qapt-sock-") % uuid;
 
-    m_debconfGui = new DebconfKde::DebconfGui(m_pipe, this);
-    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
-    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
-    m_debconfGui->hide();
+#warning todo
+//    m_debconfGui = new DebconfKde::DebconfGui(m_pipe, this);
+//    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
+//    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
+//    m_debconfGui->hide();
 
     m_progressBar = new QProgressBar(this);
     m_progressBar->hide();
 
     layout->addWidget(m_headerLabel);
     layout->addWidget(m_terminal);
-    layout->addWidget(m_debconfGui);
+#warning todo
+//    layout->addWidget(m_debconfGui);
     layout->addWidget(m_progressBar);
 }
 
@@ -158,7 +161,8 @@ void DebCommitWidget::errorOccurred(QApt::ErrorCode error)
                         "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
             details = m_trans->errorDetails();
-            KMessageBox::detailedError(this, text, details, title);
+#warning todo
+//            QMessageBox::detailedError(this, text, details, title);
             break;
         }
         case QApt::WrongArchError:
@@ -166,7 +170,8 @@ void DebCommitWidget::errorOccurred(QApt::ErrorCode error)
                          "This package is incompatible with your computer.");
             title = i18nc("@title:window", "Incompatible Package");
             details =  m_trans->errorDetails();
-            KMessageBox::detailedError(this, text, details, title);
+#warning todo
+//            QMessageBox::detailedError(this, text, details, title);
             break;
         default:
             break;
@@ -192,12 +197,14 @@ void DebCommitWidget::updateTerminal(const QString &message)
 void DebCommitWidget::showDebconf()
 {
     m_terminal->hide();
-    m_debconfGui->show();
+#warning todo
+//    m_debconfGui->show();
 }
 
 void DebCommitWidget::hideDebconf()
 {
-    m_debconfGui->hide();
+    #warning todo
+//    m_debconfGui->hide();
     m_terminal->show();
 }
 

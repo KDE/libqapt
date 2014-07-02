@@ -21,7 +21,7 @@
 #ifndef DETAILSWIDGET_H
 #define DETAILSWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "../../src/globals.h"
 

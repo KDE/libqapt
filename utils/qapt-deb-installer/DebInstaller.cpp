@@ -22,15 +22,15 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QStringBuilder>
-#include <QtGui/QStackedWidget>
+#include <QStackedWidget>
 
-#include <KApplication>
-#include <KIcon>
-#include <KLocale>
+#include <QApplication>
+#include <QIcon>
+#include <KLocalizedString>
 #include <KProtocolManager>
-#include <KPushButton>
-#include <KMessageBox>
-#include <KDebug>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QDebug>
 
 #include <apt-pkg/debversion.h>
 #include <apt-pkg/pkgsystem.h>
@@ -45,7 +45,7 @@
 #include "DebViewer.h"
 
 DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
-    : KDialog(parent)
+    : QDialog(parent)
     , m_backend(new QApt::Backend(this))
     , m_trans(nullptr)
     , m_commitWidget(nullptr)
@@ -70,21 +70,24 @@ void DebInstaller::initError()
                          "configuration may be broken.");
     QString title = i18nc("@title:window", "Initialization error");
 
-    KMessageBox::detailedError(this, text, details, title);
+#warning todo
+//    QMessageBox::detailedError(this, text, details, title);
     exit(-1);
 }
 
 void DebInstaller::initGUI()
 {
-    setButtons(KDialog::Cancel | KDialog::Apply);
-    setButtonText(KDialog::Apply, i18nc("@label", "Install Package"));
-    m_applyButton = button(KDialog::Apply);
-    m_cancelButton = button(KDialog::Cancel);
+    #warning todo
+//    setButtons(KDialog::Cancel | KDialog::Apply);
+//    setButtonText(KDialog::Apply, i18nc("@label", "Install Package"));
+//    m_applyButton = button(KDialog::Apply);
+//    m_cancelButton = button(KDialog::Cancel);
 
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(installDebFile()));
 
     m_stack = new QStackedWidget(this);
-    setMainWidget(m_stack);
+    #warning todo
+//    setMainWidget(m_stack);
 
     m_debViewer = new DebViewer(m_stack);
     m_debViewer->setBackend(m_backend);
@@ -97,8 +100,8 @@ void DebInstaller::initGUI()
         QString text = i18nc("@label",
                              "Could not open <filename>%1</filename>. It does not appear to be a "
                              "valid Debian package file.", m_debFile->filePath());
-        KMessageBox::error(this, text, QString());
-        KApplication::instance()->quit();
+        QMessageBox::warning(this, text, QString());
+        QApplication::instance()->quit();
         return;
     }
 
@@ -134,7 +137,8 @@ void DebInstaller::transactionStatusChanged(QApt::TransactionStatus status)
             setupTransaction(m_trans);
             m_trans->run();
         } else
-            setButtons(KDialog::Close);
+            #warning todo
+//            setButtons(KDialog::Close);
     default:
         break;
     }

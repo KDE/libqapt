@@ -21,7 +21,7 @@
 #ifndef DEBCOMMITWIDGET_H
 #define DEBCOMMITWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "../../src/globals.h"
 

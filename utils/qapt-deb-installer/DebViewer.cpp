@@ -24,17 +24,16 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QStringBuilder>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-#include <KGlobal>
-#include <KIcon>
-#include <KLocale>
-#include <KTabWidget>
-#include <KTextBrowser>
-#include <KVBox>
-#include <KDebug>
+#include <QIcon>
+#include <KLocalizedString>
+#include <QTabWidget>
+#include <QTextBrowser>
+#include <QDebug>
+#include <KFormat>
 
 #include "../../src/backend.h"
 #include "../../src/debfile.h"
@@ -97,11 +96,14 @@ DebViewer::DebViewer(QWidget *parent)
     m_versionInfoWidget->setLayout(versionInfoLayout);
 
     QLabel *infoIcon = new QLabel(m_versionInfoWidget);
-    infoIcon->setPixmap(KIcon("dialog-information").pixmap(32, 32));
+    infoIcon->setPixmap(QIcon("dialog-information").pixmap(32, 32));
 
-    KVBox *verInfoBox = new KVBox(m_versionInfoWidget);
+    QWidget *verInfoBox = new QWidget(m_versionInfoWidget);
+    verInfoBox->setLayout(new QVBoxLayout);
     m_versionTitleLabel = new QLabel(verInfoBox);
     m_versionInfoLabel = new QLabel(verInfoBox);
+    verInfoBox->layout()->addWidget(m_versionTitleLabel);
+    verInfoBox->layout()->addWidget(m_versionInfoLabel);
 
     QWidget *versionSpacer = new QWidget(m_versionInfoWidget);
     versionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -113,10 +115,12 @@ DebViewer::DebViewer(QWidget *parent)
 
 
     // Details tab widget
-    KTabWidget *detailsWidget = new KTabWidget(this);
+    QTabWidget *detailsWidget = new QTabWidget(this);
 
-    KVBox *descriptionTab = new KVBox(detailsWidget);
-    m_descriptionWidget = new KTextBrowser(descriptionTab);
+    QWidget *descriptionTab = new QWidget(detailsWidget);
+    descriptionTab->setLayout(new QVBoxLayout);
+    m_descriptionWidget = new QTextBrowser(descriptionTab);
+    descriptionTab->layout()->addWidget(m_descriptionWidget);
 
     QWidget *detailsTab = new QWidget(detailsWidget);
     QGridLayout *detailsGrid = new QGridLayout(detailsTab);
@@ -161,8 +165,10 @@ DebViewer::DebViewer(QWidget *parent)
     detailsGrid->setColumnStretch(1, 1);
     detailsGrid->setRowStretch(5, 1);
 
-    KVBox *fileTab = new KVBox(detailsWidget);
-    m_fileWidget = new KTextBrowser(fileTab);
+    QWidget *fileTab = new QWidget(detailsWidget);
+    fileTab->setLayout(new QVBoxLayout);
+    m_fileWidget = new QTextBrowser(fileTab);
+    fileTab->layout()->addWidget(m_fileWidget);
 
 
     detailsWidget->addTab(descriptionTab, i18nc("@title:tab", "Description"));
@@ -211,7 +217,7 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     }
 
     if (iconPath.isEmpty()) {
-        icon = KIcon("application-x-deb");
+        icon = QIcon("application-x-deb");
     }
 
     m_iconLabel->setPixmap(icon.pixmap(48,48));
@@ -228,7 +234,7 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     m_descriptionWidget->append(shortDesc + longDesc);
 
     m_versionLabel->setText(debFile->version());
-    m_sizeLabel->setText(KGlobal::locale()->formatByteSize(debFile->installedSize() * 1024));
+    m_sizeLabel->setText(KFormat().formatByteSize(debFile->installedSize() * 1024));
     m_maintainerLabel->setText(debFile->maintainer());
     m_sectionLabel->setText(debFile->section());
     m_homepageLabel->setText(debFile->homepage());

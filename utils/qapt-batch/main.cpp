@@ -19,11 +19,14 @@
  ***************************************************************************/
 
 #include "qaptbatch.h"
-#include <QtCore/QPointer>
-#include <KApplication>
+
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QDebug>
+#include <QPointer>
+
 #include <KAboutData>
-#include <KCmdLineArgs>
-#include <KLocale>
+#include <KLocalizedString>
 
 static const char description[] =
     I18N_NOOP2("@info", "A batch installer using QApt");
@@ -32,48 +35,69 @@ static const char version[] = "2.1";
 
 int main(int argc, char **argv)
 {
-    KAboutData about("qaptbatch", 0, ki18nc("@title", "QApt Batch Installer"), version, ki18nc("@info", description),
-                     KAboutData::License_GPL, ki18nc("@info:credit", "(C) 2010 Jonathan Thomas"), KLocalizedString(), 0, "echidnaman@kubuntu.org");
-    about.addAuthor( ki18nc("@info:credit", "Jonathan Thomas"), KLocalizedString(), "echidnaman@kubuntu.org" );
-    about.setProgramIconName("applications-other");
-    KCmdLineArgs::init(argc, argv, &about);
+    QApplication app(argc, argv);
 
-    KCmdLineOptions options;
-    options.add("attach <winid>", ki18nc("@info:shell","Attaches the window to an X app specified by winid"));
-    options.add("install", ki18nc("@info:shell", "Install a package"));
-    options.add("uninstall", ki18nc("@info:shell", "Remove a package"));
-    options.add("update", ki18nc("@info:shell", "Update the package cache"));
-    options.add("+[Package(s)]", ki18nc("@info:shell", "Packages to be operated upon"));
-    KCmdLineArgs::addCmdLineOptions(options);
+    KAboutData aboutData("qaptbatch",
+                         i18nc("@title", "QApt Batch Installer"),
+                         version,
+                         i18nc("@info", description),
+                         KAboutLicense::LicenseKey::GPL,
+                         i18nc("@info:credit", "(C) 2010 Jonathan Thomas"));
 
-    int winId;
+    aboutData.addAuthor(i18nc("@info:credit", "Jonathan Thomas"),
+                        QString(),
+                        QStringLiteral("echidnaman@kubuntu.org"));
+    aboutData.addAuthor(i18nc("@info:credit", "Harald Sitter"),
+                        i18nc("@info:credit", "Qt 5 port"),
+                        QStringLiteral("apachelogger@kubuntu.org"));
+    aboutData.setProgramIconName(QStringLiteral("applications-other"));
+
+    QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addVersionOption();
+    QCommandLineOption attachOption(QStringLiteral("attach"),
+                                    i18nc("@info:shell", "Attaches the window to an X app specified by winid"),
+                                    i18nc("@info:shell value name", "winid"),
+                                    QStringLiteral("0"));
+    parser.addOption(attachOption);
+    QCommandLineOption installOption(QStringLiteral("install"),
+                                    i18nc("@info:shell", "Install a package"));
+    parser.addOption(installOption);
+    QCommandLineOption uninstallOption(QStringLiteral("uninstall"),
+                                    i18nc("@info:shell", "Remove a package"));
+    parser.addOption(uninstallOption);
+    QCommandLineOption updateOption(QStringLiteral("update"),
+                                    i18nc("@info:shell", "Update the package cache"));
+    parser.addOption(updateOption);
+    parser.addPositionalArgument("packages",
+                                 i18nc("@info:shell", "Packages to be operated upon"));
+    aboutData.setupCommandLine(&parser);
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
+
     QString mode;
 
-    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
+    int winId = parser.value(attachOption).toInt();
 
-    if (args->isSet("attach") && args->count() > 0) {
-        winId = args->getOption("attach").toInt();
-    } else {
-        winId = 0;
-    }
-
-    if (args->isSet("install") && args->count() > 0) {
-        mode = QString("install");
-    } else if (args->isSet("uninstall") && args->count() > 0) {
-        mode = QString("uninstall");
-    } else if (args->isSet("update")) {
-        mode = QString("update");
-    } else {
+    if (!(parser.isSet(installOption) ^ parser.isSet(uninstallOption) ^ parser.isSet(updateOption))) {
+        qCritical() << i18nc("@info:shell error", "Only one operation mode may be defined.");
         return 1;
     }
 
-    QStringList packages;
-
-    for(int i = 0; i < args->count(); i++) { // Counting start at 0!
-        packages << args->arg(i);
+    if (parser.isSet(installOption)) {
+        mode = QStringLiteral("install");
+    } else if (parser.isSet(uninstallOption)) {
+        mode = QStringLiteral("uninstall");
+    } else if (parser.isSet(updateOption)) {
+        mode = QStringLiteral("update");
+    } else {
+        qCritical() << i18nc("@info:shell error", "No operation mode defined.");
+        return 1;
     }
 
-    KApplication app;
+    QStringList packages = parser.positionalArguments();
+
+    Q_UNUSED(app);
     QPointer<QAptBatch> batchInstaller = new QAptBatch(mode, packages, winId);
     switch (batchInstaller->exec()) {
         case QDialog::Accepted:
@@ -83,4 +107,5 @@ int main(int argc, char **argv)
         default:
             return 1;
     }
+    app.exec();
 }

@@ -23,7 +23,7 @@
 
 #include <QtCore/QStringList>
 
-#include <KDialog>
+#include <QDialog>
 
 #include "../../src/debfile.h"
 #include "../../src/globals.h"
@@ -38,7 +38,7 @@ namespace QApt {
 class DebCommitWidget;
 class DebViewer;
 
-class DebInstaller : public KDialog
+class DebInstaller : public QDialog
 {
     Q_OBJECT
 public:
@@ -55,8 +55,8 @@ private:
     QStackedWidget *m_stack;
     DebViewer *m_debViewer;
     DebCommitWidget *m_commitWidget;
-    KPushButton *m_applyButton;
-    KPushButton *m_cancelButton;
+    QPushButton *m_applyButton;
+    QPushButton *m_cancelButton;
 
     //Misc
     QString m_statusString;
