@@ -23,6 +23,7 @@
 
 #include <QtCore/QStringBuilder>
 #include <QtCore/QStringList>
+#include <QtCore/QTextCodec>
 #include <QDebug>
 
 #include <apt-pkg/error.h>
@@ -55,6 +56,22 @@ void WorkerInstallProgress::setTransaction(Transaction *trans)
 {
     m_trans = trans;
     std::setlocale(LC_ALL, m_trans->locale().toAscii());
+
+    // FIXME: bloody workaround.
+    //        Since QLocale::system and consequently QTextCodec::forLocale is
+    //        set way before we get here there's a need to manually override
+    //        the already set default codec with that is requested by the client.
+    //        Since the client talks to us about posix locales however we cannot
+    //        expect a reliable mapping from split(.).last() to a proper codec.
+    //        Also there is no explicit Qt api to translate a given posix locale
+    //        to QLocale & QTextCodec.
+    //        Ultimately transactions should get new properties for QLocale::name
+    //        and QTextCodec::name, assuming generally meaningful values we can
+    //        through those properties accurately recreate the client locale env.
+    QTextCodec *codec = QTextCodec::codecForName(m_trans->locale().split('.').last().toUtf8());
+    QTextCodec::setCodecForCStrings(codec);
+    QTextCodec::setCodecForLocale(codec);
+    QTextCodec::setCodecForTr(codec);
 
     if ((trans->frontendCaps() & QApt::DebconfCap) && !trans->debconfPipe().isEmpty()) {
         setenv("DEBIAN_FRONTEND", "passthrough", 1);
