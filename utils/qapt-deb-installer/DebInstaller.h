@@ -28,6 +28,7 @@
 #include "../../src/debfile.h"
 #include "../../src/globals.h"
 
+class QDialogButtonBox;
 class QStackedWidget;
 
 namespace QApt {
@@ -57,6 +58,7 @@ private:
     DebCommitWidget *m_commitWidget;
     QPushButton *m_applyButton;
     QPushButton *m_cancelButton;
+    QDialogButtonBox *m_buttonBox;
 
     //Misc
     QString m_statusString;
