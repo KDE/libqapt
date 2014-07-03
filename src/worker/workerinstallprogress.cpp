@@ -68,10 +68,12 @@ void WorkerInstallProgress::setTransaction(Transaction *trans)
     //        Ultimately transactions should get new properties for QLocale::name
     //        and QTextCodec::name, assuming generally meaningful values we can
     //        through those properties accurately recreate the client locale env.
-    QTextCodec *codec = QTextCodec::codecForName(m_trans->locale().split('.').last().toUtf8());
-    QTextCodec::setCodecForCStrings(codec);
-    QTextCodec::setCodecForLocale(codec);
-    QTextCodec::setCodecForTr(codec);
+    if (m_trans->locale().contains(QChar('.'))) {
+        QTextCodec *codec = QTextCodec::codecForName(m_trans->locale().split(QChar('.')).last().toUtf8());
+        QTextCodec::setCodecForCStrings(codec);
+        QTextCodec::setCodecForLocale(codec);
+        QTextCodec::setCodecForTr(codec);
+    }
 
     if ((trans->frontendCaps() & QApt::DebconfCap) && !trans->debconfPipe().isEmpty()) {
         setenv("DEBIAN_FRONTEND", "passthrough", 1);
