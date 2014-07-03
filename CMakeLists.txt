@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(ECMGenerateHeaders)
+include(ECMGeneratePriFile)
 include(ECMPackageConfigHelpers)
 include(ECMPoQmTools)
 include(ECMSetupVersion)
@@ -101,6 +102,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libqapt.pc.cmake
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     COMPONENT Devel)
+
+ecm_generate_pri_file(BASE_NAME QApt
+    LIB_NAME QApt
+    DEPS "core widgets dbus"
+    FILENAME_VAR PRI_FILENAME
+    INCLUDE_INSTALL_DIR include/QApt)
+install(FILES ${PRI_FILENAME} DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
 
 # add_test(NAME sourceslisttest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/sourceslisttest)
 # add_test(NAME transactionerrorhandlingtest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/transactionerrorhandlingtest)
