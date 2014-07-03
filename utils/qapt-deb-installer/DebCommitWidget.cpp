@@ -29,11 +29,11 @@
 #include <QVBoxLayout>
 
 // KDE includes
-#include <QMessageBox>
+#include <KMessageBox>
 #include <KTextEdit>
 
 // LibQApt/DebconfKDE includes
-//#include <DebconfGui.h>
+#include <DebconfGui.h>
 #warning relative include fufufu
 #include "../../src/transaction.h"
 
@@ -66,19 +66,17 @@ DebCommitWidget::DebCommitWidget(QWidget *parent)
     uuid.remove('{').remove('}').remove('-');
     m_pipe = QDir::tempPath() % QLatin1String("/qapt-sock-") % uuid;
 
-#warning todo
-//    m_debconfGui = new DebconfKde::DebconfGui(m_pipe, this);
-//    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
-//    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
-//    m_debconfGui->hide();
+    m_debconfGui = new DebconfKde::DebconfGui(m_pipe, this);
+    m_debconfGui->connect(m_debconfGui, SIGNAL(activated()), this, SLOT(showDebconf()));
+    m_debconfGui->connect(m_debconfGui, SIGNAL(deactivated()), this, SLOT(hideDebconf()));
+    m_debconfGui->hide();
 
     m_progressBar = new QProgressBar(this);
     m_progressBar->hide();
 
     layout->addWidget(m_headerLabel);
     layout->addWidget(m_terminal);
-#warning todo
-//    layout->addWidget(m_debconfGui);
+    layout->addWidget(m_debconfGui);
     layout->addWidget(m_progressBar);
 }
 
@@ -161,8 +159,7 @@ void DebCommitWidget::errorOccurred(QApt::ErrorCode error)
                         "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
             details = m_trans->errorDetails();
-#warning todo
-//            QMessageBox::detailedError(this, text, details, title);
+            KMessageBox::detailedError(this, text, details, title);
             break;
         }
         case QApt::WrongArchError:
@@ -170,8 +167,7 @@ void DebCommitWidget::errorOccurred(QApt::ErrorCode error)
                          "This package is incompatible with your computer.");
             title = i18nc("@title:window", "Incompatible Package");
             details =  m_trans->errorDetails();
-#warning todo
-//            QMessageBox::detailedError(this, text, details, title);
+            KMessageBox::detailedError(this, text, details, title);
             break;
         default:
             break;
@@ -197,14 +193,12 @@ void DebCommitWidget::updateTerminal(const QString &message)
 void DebCommitWidget::showDebconf()
 {
     m_terminal->hide();
-#warning todo
-//    m_debconfGui->show();
+    m_debconfGui->show();
 }
 
 void DebCommitWidget::hideDebconf()
 {
-    #warning todo
-//    m_debconfGui->hide();
+    m_debconfGui->hide();
     m_terminal->show();
 }
 

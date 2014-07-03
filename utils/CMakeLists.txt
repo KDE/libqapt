@@ -2,7 +2,7 @@ find_package(DebconfKDE REQUIRED)
 
 add_subdirectory(qapt-batch)
 message(WARNING "deb-installer needs debconf, not ported")
-# add_subdirectory(qapt-deb-installer)
+add_subdirectory(qapt-deb-installer)
 # add_subdirectory(qapt-deb-thumbnailer)
 # add_subdirectory(plasma-runner-installer)
 

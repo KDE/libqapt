@@ -29,7 +29,7 @@
 #include <KLocalizedString>
 #include <KProtocolManager>
 #include <QPushButton>
-#include <QMessageBox>
+#include <KMessageBox>
 #include <QDebug>
 
 #include <apt-pkg/debversion.h>
@@ -70,8 +70,7 @@ void DebInstaller::initError()
                          "configuration may be broken.");
     QString title = i18nc("@title:window", "Initialization error");
 
-#warning todo
-//    QMessageBox::detailedError(this, text, details, title);
+    KMessageBox::detailedError(this, text, details, title);
     exit(-1);
 }
 
@@ -100,7 +99,7 @@ void DebInstaller::initGUI()
         QString text = i18nc("@label",
                              "Could not open <filename>%1</filename>. It does not appear to be a "
                              "valid Debian package file.", m_debFile->filePath());
-        QMessageBox::warning(this, text, QString());
+        KMessageBox::error(this, text, QString());
         QApplication::instance()->quit();
         return;
     }

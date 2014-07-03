@@ -17,6 +17,7 @@ target_link_libraries(qapt-deb-installer
     KF5::KIOCore
     KF5::TextWidgets
     KF5::WidgetsAddons
+    DebconfKDE
     QApt)
 
 install(TARGETS qapt-deb-installer ${INSTALL_TARGETS_DEFAULT_ARGS})
