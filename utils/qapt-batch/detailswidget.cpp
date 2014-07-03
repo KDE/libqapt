@@ -32,7 +32,7 @@
 #include <QVBoxLayout>
 
 // LibQApt includes
-#include "../../src/transaction.h"
+#include <QApt/Transaction>
 
 DetailsWidget::DetailsWidget(QWidget *parent)
     : QWidget(parent)

@@ -22,8 +22,8 @@
 #ifndef GSTMATCHER_H
 #define GSTMATCHER_H
 
-#include <QtCore/QVector>
-#include <QtCore/QStringList>
+#include <QVector>
+#include <QStringList>
 
 class PluginInfo;
 

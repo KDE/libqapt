@@ -23,7 +23,7 @@
 
 #include <QWidget>
 
-#include "../../src/globals.h"
+#include <QApt/Globals>
 
 class QLabel;
 class QPushButton;

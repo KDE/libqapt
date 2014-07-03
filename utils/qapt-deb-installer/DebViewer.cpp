@@ -20,23 +20,23 @@
 
 #include "DebViewer.h"
 
-#include <QtCore/QPointer>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QStringBuilder>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
-
+#include <QDebug>
+#include <QDir>
+#include <QFile>
 #include <QIcon>
-#include <KLocalizedString>
+#include <QLabel>
+#include <QPointer>
+#include <QPushButton>
+#include <QStringBuilder>
 #include <QTabWidget>
 #include <QTextBrowser>
-#include <QDebug>
-#include <KFormat>
+#include <QVBoxLayout>
 
-#include "../../src/backend.h"
-#include "../../src/debfile.h"
+#include <KFormat>
+#include <KLocalizedString>
+
+#include <QApt/Backend>
+#include <QApt/DebFile>
 
 #include "ChangesDialog.h"
 

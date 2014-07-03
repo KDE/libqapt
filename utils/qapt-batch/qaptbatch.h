@@ -25,7 +25,7 @@
 #include <QDialog>
 
 // LibQApt includes
-#include "../../src/globals.h"
+#include <QApt/Globals>
 
 class DetailsWidget;
 class QDialogButtonBox;

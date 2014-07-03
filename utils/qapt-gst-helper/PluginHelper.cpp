@@ -21,27 +21,25 @@
 #include "PluginHelper.h"
 
 // Qt includes
-#include <QCoreApplication>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QThread>
-#include <QtCore/QTimer>
+#include <QApplication>
+#include <QDebug>
+#include <QIcon>
+#include <QStringBuilder>
+#include <QThread>
+#include <QTimer>
 #include <QPushButton>
 
 // KDE includes
-#include <QApplication>
-#include <QIcon>
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KProtocolManager>
-#include <KWindowSystem>
-#include <QDebug>
 #include <KStandardGuiItem>
+#include <KWindowSystem>
 
 // LibQApt includes
-#warning relative includes
-#include "../../src/backend.h"
-#include "../../src/config.h"
-#include "../../src/transaction.h"
+#include <QApt/Backend>
+#include <QApt/Config>
+#include <QApt/Transaction>
 
 // Own includes
 #include "PluginFinder.h"

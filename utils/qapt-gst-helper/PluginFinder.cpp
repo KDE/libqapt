@@ -20,9 +20,9 @@
 
 #include "PluginFinder.h"
 
-#include <QtCore/QThread>
+#include <QThread>
 
-#include "../../src/backend.h"
+#include <QApt/Backend>
 
 #include "GstMatcher.h"
 #include "PluginInfo.h"

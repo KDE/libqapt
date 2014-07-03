@@ -20,11 +20,12 @@
 
 #include "DebInstaller.h"
 
-#include <QtCore/QPointer>
 #include <QApplication>
+#include <QCommandLineParser>
+#include <QPointer>
+
 #include <KAboutData>
 #include <KLocalizedString>
-#include <QCommandLineParser>
 
 static const char description[] =
     I18N_NOOP2("@info", "A Debian package installer");

@@ -2,14 +2,11 @@ set(qaptbatch_SRCS
     main.cpp
     qaptbatch.cpp
     detailswidget.cpp
-#    ../../src/transactiondbus.cpp)
 )
-message(WARNING "relative include wtf")
 
 add_executable(qapt-batch ${qaptbatch_SRCS})
 
 target_link_libraries(qapt-batch
-#     KF5::KUI
     KF5::CoreAddons
     KF5::I18n
     KF5::KIOCore

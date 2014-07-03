@@ -20,26 +20,24 @@
 
 #include "qaptbatch.h"
 
-// KDE includes
 #include <QApplication>
 #include <QDebug>
-#include <QIcon>
-#include <KLocalizedString>
-#include <KMessageBox>
-#include <QPushButton>
-#include <KProtocolManager>
-#include <KWindowSystem>
-
-#include <KStandardGuiItem>
-
-
 #include <QDialogButtonBox>
+#include <QIcon>
 #include <QLabel>
 #include <QProgressBar>
+#include <QPushButton>
 #include <QVBoxLayout>
 
-#include "../../src/backend.h"
-#include "../../src/transaction.h"
+#include <KLocalizedString>
+#include <KMessageBox>
+#include <KProtocolManager>
+#include <KStandardGuiItem>
+#include <KWindowSystem>
+
+#include <QApt/Backend>
+#include <QApt/Transaction>
+
 #include "detailswidget.h"
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)

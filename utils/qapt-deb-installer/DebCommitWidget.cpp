@@ -29,16 +29,13 @@
 #include <QVBoxLayout>
 
 // KDE includes
+#include <KLocalizedString>
 #include <KMessageBox>
 #include <KTextEdit>
 
 // LibQApt/DebconfKDE includes
 #include <DebconfGui.h>
-#warning relative include fufufu
-#include "../../src/transaction.h"
-
-// KDE includes
-#include <KLocalizedString>
+#include <QApt/Transaction>
 
 DebCommitWidget::DebCommitWidget(QWidget *parent)
     : QWidget(parent)

@@ -21,11 +21,10 @@
 #ifndef PLUGINHELPER_H
 #define PLUGINHELPER_H
 
+#include <QProgressDialog>
 #include <QStringList>
 
-#include <QProgressDialog>
-
-#include <../../src/globals.h>
+#include <QApt/Globals>
 
 class QThread;
 

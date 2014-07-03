@@ -20,10 +20,9 @@
 
 #include "PluginInfo.h"
 
-#include <QtCore/QStringBuilder>
-#include <QtCore/QStringList>
-
 #include <QDebug>
+#include <QStringBuilder>
+#include <QStringList>
 
 PluginInfo::PluginInfo(const QString &gstDetails)
           : m_structure(nullptr)

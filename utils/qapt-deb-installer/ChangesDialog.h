@@ -26,8 +26,7 @@
 #include <QDialog>
 
 // LibQApt includes
-#warning relative include
-#include "../../src/package.h"
+#include <QApt/Package>
 
 class QStandardItemModel;
 

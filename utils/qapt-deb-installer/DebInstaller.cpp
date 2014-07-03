@@ -20,27 +20,27 @@
 
 #include "DebInstaller.h"
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QStringBuilder>
+#include <QApplication>
+#include <QDebug>
+#include <QFileInfo>
+#include <QIcon>
+#include <QPushButton>
 #include <QStackedWidget>
+#include <QStringBuilder>
 #include <QVBoxLayout>
 
-#include <QApplication>
-#include <QIcon>
 #include <KLocalizedString>
 #include <KProtocolManager>
-#include <QPushButton>
 #include <KMessageBox>
-#include <QDebug>
 
 #include <apt-pkg/debversion.h>
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/version.h>
 
-#include "../../src/backend.h"
-#include "../../src/config.h"
-#include "../../src/dependencyinfo.h"
-#include "../../src/transaction.h"
+#include <QApt/Backend>
+#include <QApt/Config>
+#include <QApt/DependencyInfo>
+#include <QApt/Transaction>
 
 #include "DebCommitWidget.h"
 #include "DebViewer.h"

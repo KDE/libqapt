@@ -21,12 +21,11 @@
 #ifndef DEBINSTALLER_H
 #define DEBINSTALLER_H
 
-#include <QtCore/QStringList>
-
 #include <QDialog>
+#include <QStringList>
 
-#include "../../src/debfile.h"
-#include "../../src/globals.h"
+#include <QApt/DebFile>
+#include <QApt/Globals>
 
 class QDialogButtonBox;
 class QStackedWidget;

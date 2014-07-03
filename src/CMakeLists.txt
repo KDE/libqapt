@@ -22,6 +22,9 @@ qt5_add_dbus_interface(qapt_SRCS
 
 add_library(QApt SHARED ${qapt_SRCS})
 
+# Set header paths for target so the utils can find them.
+target_include_directories(QApt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..;${CMAKE_CURRENT_BINARY_DIR}/..>")
+
 set_target_properties(QApt
     PROPERTIES
     VERSION ${QAPT_VERSION_STRING}
@@ -55,7 +58,7 @@ ecm_generate_headers(QAPT_CAMEL_CASE_HEADERS
         Transaction
 
   REQUIRED_HEADERS QAPT_HEADERS
-  PREFIX qapt)
+  PREFIX QApt)
 
 install(FILES ${QAPT_HEADERS} DESTINATION include/qapt COMPONENT Devel)
 install(FILES ${QAPT_CAMEL_CASE_HEADERS} DESTINATION include/QApt COMPONENT Devel)

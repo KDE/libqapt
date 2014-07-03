@@ -22,6 +22,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+
 #include <KAboutData>
 #include <KLocalizedString>
 
