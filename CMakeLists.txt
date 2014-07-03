@@ -42,6 +42,7 @@ ecm_setup_version(3.0.0 VARIABLE_PREFIX QAPT
                         PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/QAptConfigVersion.cmake"
                         SOVERSION 3)
 
+message(WARNING "gettext and tr in the same source is insanely tricky, maybe we should give some ki18n to qapt...")
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
     ecm_install_po_files_as_qm(po)
 endif()
