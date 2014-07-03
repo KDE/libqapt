@@ -628,6 +628,14 @@ void AptWorker::downloadArchives()
 void AptWorker::installFile()
 {
     m_trans->setStatus(QApt::RunningStatus);
+
+    // FIXME: bloody workaround.
+    //        setTransaction contains logic WRT locale and debconf setup, which
+    //        is also useful to dpkg. For now simply reuse WorkerInstallProgress
+    //        as it has no adverse effects.
+    WorkerInstallProgress installProgress(50, 90);
+    installProgress.setTransaction(m_trans);
+
     QApt::DebFile deb(m_trans->filePath());
 
     QString debArch = deb.architecture();
