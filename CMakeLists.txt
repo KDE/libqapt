@@ -69,12 +69,13 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h
 add_subdirectory(src)
 # add_subdirectory(tests)
 
-find_package(KF5CoreAddons 5.0.0 REQUIRED)
-find_package(KF5I18n 5.0.0 REQUIRED)
-find_package(KF5KIO 5.0.0 REQUIRED)
-find_package(KF5TextWidgets 5.0.0 REQUIRED)
-find_package(KF5WidgetsAddons 5.0.0 REQUIRED)
-find_package(KF5WindowSystem 5.0.0 REQUIRED)
+set(KF5_DEP_VERSION "5.0.0")
+find_package(KF5CoreAddons ${KF5_DEP_VERSION} REQUIRED)
+find_package(KF5I18n ${KF5_DEP_VERSION} REQUIRED)
+find_package(KF5KIO ${KF5_DEP_VERSION} REQUIRED)
+find_package(KF5TextWidgets ${KF5_DEP_VERSION} REQUIRED)
+find_package(KF5WidgetsAddons ${KF5_DEP_VERSION} REQUIRED)
+find_package(KF5WindowSystem ${KF5_DEP_VERSION} REQUIRED)
 
 find_package(DebconfKDE REQUIRED)
 
