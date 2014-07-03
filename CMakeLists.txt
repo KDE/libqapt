@@ -92,14 +92,13 @@ find_package(DebconfKDE REQUIRED)
 # 
 # endif (KDE4_FOUND)
 
-# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libqapt.pc.cmake
-#     ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
-#     @ONLY
-# )
-# 
-# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
-#         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig
-#         COMPONENT Devel )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libqapt.pc.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
+    @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT Devel)
 
 # add_test(NAME sourceslisttest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/sourceslisttest)
 # add_test(NAME transactionerrorhandlingtest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/transactionerrorhandlingtest)
