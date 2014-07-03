@@ -88,6 +88,8 @@ find_package(KF5TextWidgets 5.0.0 REQUIRED)
 find_package(KF5WidgetsAddons 5.0.0 REQUIRED)
 find_package(KF5WindowSystem 5.0.0 REQUIRED)
 
+find_package(DebconfKDE REQUIRED)
+
 
 # if (KDE4_FOUND)
 #     include(KDE4Defaults)
