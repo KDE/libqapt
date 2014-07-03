@@ -51,7 +51,7 @@ void WorkerAcquire::setTransaction(Transaction *trans)
 {
     m_trans = trans;
     if (!trans->proxy().isEmpty())
-        setenv("http_proxy", m_trans->proxy().toAscii(), 1);
+        setenv("http_proxy", m_trans->proxy().toLatin1(), 1);
 }
 
 void WorkerAcquire::Start()

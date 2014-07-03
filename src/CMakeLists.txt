@@ -14,7 +14,7 @@ set(qapt_SRCS
     sourceentry.cpp
     sourceslist.cpp)
 
-# add_subdirectory(worker)
+add_subdirectory(worker)
 
 qt5_add_dbus_interface(qapt_SRCS
                        worker/org.kubuntu.qaptworker2.xml

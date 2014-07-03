@@ -55,7 +55,7 @@ WorkerInstallProgress::WorkerInstallProgress(int begin, int end)
 void WorkerInstallProgress::setTransaction(Transaction *trans)
 {
     m_trans = trans;
-    std::setlocale(LC_ALL, m_trans->locale().toAscii());
+    std::setlocale(LC_ALL, m_trans->locale().toLatin1());
 
     // FIXME: bloody workaround.
     //        Since QLocale::system and consequently QTextCodec::forLocale is
@@ -70,14 +70,12 @@ void WorkerInstallProgress::setTransaction(Transaction *trans)
     //        through those properties accurately recreate the client locale env.
     if (m_trans->locale().contains(QChar('.'))) {
         QTextCodec *codec = QTextCodec::codecForName(m_trans->locale().split(QChar('.')).last().toUtf8());
-        QTextCodec::setCodecForCStrings(codec);
         QTextCodec::setCodecForLocale(codec);
-        QTextCodec::setCodecForTr(codec);
     }
 
     if ((trans->frontendCaps() & QApt::DebconfCap) && !trans->debconfPipe().isEmpty()) {
         setenv("DEBIAN_FRONTEND", "passthrough", 1);
-        setenv("DEBCONF_PIPE", trans->debconfPipe().toAscii(), 1);
+        setenv("DEBCONF_PIPE", trans->debconfPipe().toLatin1(), 1);
     } else {
         setenv("DEBIAN_FRONTEND", "noninteractive", 1);
     }

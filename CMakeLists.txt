@@ -26,8 +26,8 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED DBus Widgets)
 find_package(Xapian REQUIRED)
 find_package(AptPkg REQUIRED)
 
-# set(POLKITQT-1_MIN_VERSION "0.98.1")
-# find_package(PolkitQt-1 REQUIRED)
+set(POLKITQT-1_MIN_VERSION "0.98.1")
+find_package(PolkitQt-1 REQUIRED)
 
 # Find the required Libaries
 include_directories(
