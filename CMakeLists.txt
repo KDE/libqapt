@@ -78,7 +78,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h
 # endmacro(dbus_add_activation_system_service _sources)
 
 add_subdirectory(src)
-# add_subdirectory(includes)
 # add_subdirectory(tests)
 
 find_package(KF5CoreAddons 5.0.0 REQUIRED)
