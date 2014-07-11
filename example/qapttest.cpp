@@ -21,11 +21,11 @@
 #include "qapttest.h"
 
 #include <QtCore/QDir>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QStackedWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QStackedWidget>
 
 #include <KDebug>
 #include <KIcon>

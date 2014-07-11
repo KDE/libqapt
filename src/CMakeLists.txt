@@ -24,6 +24,7 @@ add_library(QApt SHARED ${qapt_SRCS})
 
 # Set header paths for target so the utils can find them.
 target_include_directories(QApt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..;${CMAKE_CURRENT_BINARY_DIR}/..>")
+target_include_directories(QApt INTERFACE "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/QApt>" )
 
 set_target_properties(QApt
     PROPERTIES
@@ -60,5 +61,5 @@ ecm_generate_headers(QAPT_CAMEL_CASE_HEADERS
   REQUIRED_HEADERS QAPT_HEADERS
   PREFIX QApt)
 
-install(FILES ${QAPT_HEADERS} DESTINATION include/qapt COMPONENT Devel)
-install(FILES ${QAPT_CAMEL_CASE_HEADERS} DESTINATION include/QApt COMPONENT Devel)
+install(FILES ${QAPT_HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/qapt COMPONENT Devel)
+install(FILES ${QAPT_CAMEL_CASE_HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/QApt COMPONENT Devel)

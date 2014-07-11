@@ -1,5 +1,3 @@
-find_package(DebconfKDE REQUIRED)
-
 add_subdirectory(qapt-batch)
 add_subdirectory(qapt-deb-installer)
 # add_subdirectory(qapt-deb-thumbnailer)

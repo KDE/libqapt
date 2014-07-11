@@ -1,5 +1,3 @@
-include_directories(${KDE4_INCLUDES} ${QT_INCLUDES})
-
 set(krunner_installer_SRCS
     installerrunner.cpp
 )

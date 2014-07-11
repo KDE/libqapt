@@ -22,8 +22,8 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStringBuilder>
-#include <QtGui/QImage>
-#include <QtGui/QPainter>
+#include <QImage>
+#include <QPainter>
 
 #include <KIcon>
 

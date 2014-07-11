@@ -20,10 +20,10 @@
 
 #include "cacheupdatewidget.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QListView>
-#include <QtGui/QProgressBar>
-#include <QtGui/QPushButton>
+#include <QLabel>
+#include <QListView>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QStandardItemModel>
 
 #include <KIcon>

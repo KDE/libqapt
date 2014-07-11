@@ -8,8 +8,6 @@ set(transactionerrorhandlingtest_SRCS
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}/src
-    ${KDE4_INCLUDES}
-    ${QT_INCLUDES}
 )
 
 add_executable(sourceslisttest ${sourceslisttest_SRCS})
@@ -33,7 +31,7 @@ target_link_libraries(sourceslisttest
                       ${QT_QTTEST_LIBRARIES}
                       ${APTPKG_LIBRARIES}
                       ${XAPIAN_LIBRARIES}
-                      debconf-kde)
+                      DebconfKDE::Main)
 target_link_libraries(transactionerrorhandlingtest
                       -L../src/ qapt
                       ${QT_QTCORE_LIBRARIES}
@@ -41,7 +39,7 @@ target_link_libraries(transactionerrorhandlingtest
                       ${QT_QTTEST_LIBRARIES}
                       ${APTPKG_LIBRARIES}
                       ${XAPIAN_LIBRARIES}
-                      debconf-kde)
+                      DebconfKDE::Main)
 
 add_test(NAME sourceslisttest COMMAND sourceslisttest)
 add_test(NAME transactionerrorhandlingtest COMMAND sourceslisttest)
