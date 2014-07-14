@@ -23,7 +23,6 @@ add_executable(qaptworker2
     ${qapt_worker_SRCS}
     ${qapt_worker_adaptor_SRCS})
 
-# see our worker is pretty small :D
 target_link_libraries(qaptworker2
     Qt5::Core
     Qt5::DBus
@@ -40,13 +39,10 @@ configure_file(org.kubuntu.qaptworker2.service.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.kubuntu.qaptworker2.service
         DESTINATION ${DBUS_SYSTEM_SERVICES_INSTALL_DIR})
 
-message(WARNING "kde4 dependent cmake stuff")
-find_package(KDE4)
-if (KDE4_FOUND)
-    include(KDE4Defaults)
-    kde4_install_auth_actions(org.kubuntu.qaptworker2 qaptworker.actions)
-else (KDE4_FOUND)
+if(KF5Auth_FOUND)
+    kauth_install_actions(org.kubuntu.qaptworker2 qaptworker.actions)
+else()
     install(FILES org.kubuntu.qaptworker2.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
-endif (KDE4_FOUND)
+endif()
 
 install(FILES org.kubuntu.qaptworker2.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d/)

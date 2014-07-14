@@ -71,29 +71,41 @@ add_subdirectory(src)
 # add_subdirectory(tests)
 
 set(KF5_DEP_VERSION "5.0.0")
-find_package(KF5CoreAddons ${KF5_DEP_VERSION} REQUIRED)
-find_package(KF5I18n ${KF5_DEP_VERSION} REQUIRED)
-find_package(KF5KIO ${KF5_DEP_VERSION} REQUIRED)
-find_package(KF5TextWidgets ${KF5_DEP_VERSION} REQUIRED)
-find_package(KF5WidgetsAddons ${KF5_DEP_VERSION} REQUIRED)
-find_package(KF5WindowSystem ${KF5_DEP_VERSION} REQUIRED)
 
-find_package(DebconfKDE REQUIRED)
+# Only used to install worker actions
+find_package(KF5Auth ${KF5_DEP_VERSION})
 
+# Used for utils
+find_package(KF5CoreAddons ${KF5_DEP_VERSION})
+find_package(KF5I18n ${KF5_DEP_VERSION})
+find_package(KF5KIO ${KF5_DEP_VERSION})
+find_package(KF5TextWidgets ${KF5_DEP_VERSION})
+find_package(KF5WidgetsAddons ${KF5_DEP_VERSION})
+find_package(KF5WindowSystem ${KF5_DEP_VERSION})
 
-# if (KDE4_FOUND)
-#     include(KDE4Defaults)
+find_package(DebconfKDE)
+find_package(GStreamer)
+find_package(GLIB2)
+
+set(WITH_UTILS
+    KF5CoreAddons_FOUND AND KF5I18n_FOUND AND KF5KIO_FOUND AND KF5TextWidgets_FOUND
+    AND KF5WidgetsAddons_FOUND AND KF5WindowSystem_FOUND
+    AND DebconfKDE_FOUND)
+
+set(WITH_GSTREAMER
+    WITH_KF5 AND GSTREAMER_FOUND AND GLIB2_FOUND)
+
+add_feature_info(qapt-utils WITH_UTILS "Runtime utilities using KDE frameworks")
+add_feature_info(qapt-gst-helper WITH_GSTREAMER "GStreamer codec helper util")
+
+if(WITH_UTILS)
     add_subdirectory(utils)
 
     #Do not remove or modify these.  The release script substitutes in for these
     #comments with appropriate doc and translation directories.
     #PO_SUBDIR
     #DOC_SUBDIR
-
-# macro_log_feature(KDE4_FOUND "KDE" "Development libraries for the KDE Platform"
-#                   "http://kde.org" FALSE "" "Used to build optional utilities that use QApt")
-# 
-# endif (KDE4_FOUND)
+endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libqapt.pc.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/libqapt.pc
