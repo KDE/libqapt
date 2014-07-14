@@ -23,6 +23,9 @@
 
 #include <QString>
 
+// Apt and Gst both define FLAG, forcefully undef the Apt def and hope nothing
+// breaks :/
+#undef FLAG
 #include <gst/gst.h>
 
 class PluginInfo
