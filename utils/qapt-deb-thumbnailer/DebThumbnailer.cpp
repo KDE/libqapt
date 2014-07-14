@@ -25,7 +25,7 @@
 #include <QImage>
 #include <QPainter>
 
-#include <KIcon>
+#include <QIcon>
 
 #include "../../src/debfile.h"
 
@@ -72,7 +72,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
         return false;
     }
 
-    QPixmap mimeIcon = KIcon("application-x-deb").pixmap(width, height);
+    QPixmap mimeIcon = QIcon::fromTheme("application-x-deb").pixmap(width, height);
     QPixmap appOverlay = QPixmap(destPath % iconPath).scaledToWidth(width/2);
 
     QPainter painter(&mimeIcon);

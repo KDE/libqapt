@@ -23,7 +23,6 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFileInfo>
-#include <QIcon>
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QStringBuilder>

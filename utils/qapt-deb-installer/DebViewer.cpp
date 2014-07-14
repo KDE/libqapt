@@ -96,7 +96,7 @@ DebViewer::DebViewer(QWidget *parent)
     m_versionInfoWidget->setLayout(versionInfoLayout);
 
     QLabel *infoIcon = new QLabel(m_versionInfoWidget);
-    infoIcon->setPixmap(QIcon("dialog-information").pixmap(32, 32));
+    infoIcon->setPixmap(QIcon::fromTheme("dialog-information").pixmap(32, 32));
 
     QWidget *verInfoBox = new QWidget(m_versionInfoWidget);
     verInfoBox->setLayout(new QVBoxLayout);
@@ -217,7 +217,7 @@ void DebViewer::setDebFile(QApt::DebFile *debFile)
     }
 
     if (iconPath.isEmpty()) {
-        icon = QIcon("application-x-deb");
+        icon = QIcon::fromTheme("application-x-deb");
     }
 
     m_iconLabel->setPixmap(icon.pixmap(48,48));

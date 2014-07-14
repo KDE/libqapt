@@ -103,7 +103,7 @@ void ChangesDialog::addPackages(const QApt::StateChanges &changes)
             item = new QStandardItem;
             item->setText(package->name());
             item->setEditable(false);
-            item->setIcon(QIcon("muon"));
+            item->setIcon(QIcon::fromTheme("muon"));
 
             root->appendRow(item);
         }

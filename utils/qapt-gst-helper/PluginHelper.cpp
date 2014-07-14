@@ -181,7 +181,7 @@ void PluginHelper::canSearch()
     QString msg = QLatin1Literal("<h3>") % title % QLatin1Literal("</h3>") % message;
     KGuiItem searchButton = KStandardGuiItem::yes();
     searchButton.setText(i18nc("Search for packages" ,"Search"));
-    searchButton.setIcon(QIcon("edit-find"));
+    searchButton.setIcon(QIcon::fromTheme("edit-find"));
     ret = KMessageBox::questionYesNoWId(m_winId, msg, title, searchButton);
 
     if (ret != KMessageBox::Yes) {
@@ -213,7 +213,7 @@ void PluginHelper::offerInstallPackages()
 
     KGuiItem installButton = KStandardGuiItem::yes();
     installButton.setText(i18nc("Install packages" ,"Install"));
-    installButton.setIcon(QIcon("download"));
+    installButton.setIcon(QIcon::fromTheme("download"));
 
     ret = KMessageBox::questionYesNoListWId(m_winId, msg, nameList, title,
                                             installButton, KStandardGuiItem::no());
