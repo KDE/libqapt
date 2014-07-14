@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2011 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2014 Harald Sitter <apachelogger@kubuntu.org>             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -79,7 +80,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
 
     QString iconPath = iconsList.last();
 
-// FIXME: two users at the same time cannot use the thumbnailer or bad things happen
+    // FIXME: two users at the same time cannot use the thumbnailer or bad things happen
     QDir tempDir = QDir::temp();
     tempDir.mkdir(QStringLiteral("kde-deb-thumbnailer"));
 
