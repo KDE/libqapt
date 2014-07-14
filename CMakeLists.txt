@@ -67,8 +67,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h
         DESTINATION include/qapt
         COMPONENT Devel)
 
+add_subdirectory(autotests)
 add_subdirectory(src)
-# add_subdirectory(tests)
 
 set(KF5_DEP_VERSION "5.0.0")
 
@@ -129,8 +129,5 @@ ecm_generate_pri_file(BASE_NAME QApt
     FILENAME_VAR PRI_FILENAME
     INCLUDE_INSTALL_DIR include/QApt)
 install(FILES ${PRI_FILENAME} DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
-
-# add_test(NAME sourceslisttest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/sourceslisttest)
-# add_test(NAME transactionerrorhandlingtest COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/transactionerrorhandlingtest)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
