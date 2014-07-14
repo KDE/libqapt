@@ -1,7 +1,7 @@
 add_subdirectory(qapt-batch)
 add_subdirectory(qapt-deb-installer)
 add_subdirectory(qapt-deb-thumbnailer)
-# add_subdirectory(plasma-runner-installer)
+add_subdirectory(plasma-runner-installer)
 
 if(WITH_GSTREAMER)
     add_definitions(-fexceptions)
