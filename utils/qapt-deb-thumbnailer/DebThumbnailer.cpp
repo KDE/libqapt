@@ -26,12 +26,13 @@
 #include <QPainter>
 
 #include <QIcon>
+#include <QDebug>
 
-#include "../../src/debfile.h"
+#include <QApt/DebFile>
 
 extern "C"
 {
-    KDE_EXPORT ThumbCreator *new_creator()
+    Q_DECL_EXPORT ThumbCreator *new_creator()
     {
         return new DebThumbnailer;
     }
@@ -51,10 +52,25 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
     const QApt::DebFile debFile(path);
 
     if (!debFile.isValid()) {
+        qDebug() << Q_FUNC_INFO << "debfile not valid";
         return false;
     }
 
     QStringList iconsList = debFile.iconList();
+
+    // Drop everything but pngs and xpms.
+    // ::iconList is based on ::fileList which contrary to what the name suggests
+    // does a full content list including parent directories.
+    // To get sensible results we therefore need to discard everything we cannot
+    // identify as supported.
+    // TODO: should debfile ever get more sensible this should be changed to
+    //       exclude unsupported formats (svg) rather than include supported ones.
+    for (auto it = iconsList.begin(); it != iconsList.end(); ++it) {
+        if (!(*it).endsWith(QStringLiteral(".png")) && !(*it).endsWith(QStringLiteral(".xpm"))) {
+            iconsList.erase(it);
+        }
+    }
+
     qSort(iconsList);
 
     if (iconsList.isEmpty()) {
@@ -64,7 +80,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
     QString iconPath = iconsList.last();
 
     QDir tempDir = QDir::temp();
-    tempDir.mkdir(QLatin1String("kde-deb-thumbnailer"));
+    tempDir.mkdir(QStringLiteral("kde-deb-thumbnailer"));
 
     QString destPath = QDir::tempPath() % QLatin1Literal("/kde-deb-thumbnailer/");
 
