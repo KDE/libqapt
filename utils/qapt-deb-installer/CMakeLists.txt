@@ -5,10 +5,6 @@ set(qapt-deb-installer_SRCS
     DebViewer.cpp
     ChangesDialog.cpp)
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif (CMAKE_COMPILER_IS_GNUCXX)
-
 add_executable(qapt-deb-installer ${qapt-deb-installer_SRCS})
 
 target_link_libraries(qapt-deb-installer
