@@ -79,6 +79,7 @@ bool DebThumbnailer::create(const QString &path, int width, int height, QImage &
 
     QString iconPath = iconsList.last();
 
+// FIXME: two users at the same time cannot use the thumbnailer or bad things happen
     QDir tempDir = QDir::temp();
     tempDir.mkdir(QStringLiteral("kde-deb-thumbnailer"));
 
