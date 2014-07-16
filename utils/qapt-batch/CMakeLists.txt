@@ -12,6 +12,6 @@ target_link_libraries(qapt-batch
     KF5::KIOCore
     KF5::WidgetsAddons
     KF5::WindowSystem
-    QApt)
+    QApt::Main)
 
 install(TARGETS qapt-batch ${INSTALL_TARGETS_DEFAULT_ARGS})

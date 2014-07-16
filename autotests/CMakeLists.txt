@@ -18,9 +18,9 @@ configure_file(
 ecm_add_test(sourceslisttest.cpp
     LINK_LIBRARIES
         Qt5::Test
-        QApt)
+        QApt::Main)
 
 ecm_add_test(transactionerrorhandlingtest.cpp
     LINK_LIBRARIES
         Qt5::Test
-        QApt)
+        QApt::Main)

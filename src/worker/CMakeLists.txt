@@ -28,7 +28,7 @@ target_link_libraries(qaptworker2
     Qt5::DBus
     ${POLKITQT-1_CORE_LIBRARY}
     util
-    QApt)
+    QApt::Main)
 
 message(WARNING "worker randomly links against -lutil...")
 

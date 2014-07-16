@@ -21,6 +21,7 @@ qt5_add_dbus_interface(qapt_SRCS
                        workerdbus)
 
 add_library(QApt SHARED ${qapt_SRCS})
+add_library(QApt::Main ALIAS QApt)
 
 # Set header paths for target so the utils can find them.
 target_include_directories(QApt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..;${CMAKE_CURRENT_BINARY_DIR}/..>")
@@ -30,7 +31,7 @@ set_target_properties(QApt
     PROPERTIES
     VERSION ${QAPT_VERSION_STRING}
     SOVERSION ${QAPT_SOVERSION}
-    EXPORT_NAME QApt)
+    EXPORT_NAME Main)
 
 target_link_libraries(QApt
     PUBLIC

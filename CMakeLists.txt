@@ -62,7 +62,8 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/QAptConfig.cmake"
         COMPONENT Devel)
 install(EXPORT QAptTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        FILE QAptTargets.cmake)#  NAMESPACE KF5:: )
+        FILE QAptTargets.cmake
+        NAMESPACE QApt:: )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h
         DESTINATION include/qapt
         COMPONENT Devel)

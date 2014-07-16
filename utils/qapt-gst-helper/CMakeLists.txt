@@ -18,6 +18,6 @@ target_link_libraries(qapt-gst-helper
     KF5::KIOCore
     KF5::WidgetsAddons
     KF5::WindowSystem
-    QApt)
+    QApt::Main)
 
 install(TARGETS qapt-gst-helper DESTINATION ${LIBEXEC_INSTALL_DIR})

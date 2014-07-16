@@ -14,7 +14,7 @@ target_link_libraries(qapt-deb-installer
     KF5::TextWidgets
     KF5::WidgetsAddons
     DebconfKDE::Main
-    QApt)
+    QApt::Main)
 
 install(TARGETS qapt-deb-installer ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(PROGRAMS qapt-deb-installer.desktop  DESTINATION ${XDG_APPS_INSTALL_DIR})
