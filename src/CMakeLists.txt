@@ -25,7 +25,7 @@ add_library(QApt::Main ALIAS QApt)
 
 # Set header paths for target so the utils can find them.
 target_include_directories(QApt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..;${CMAKE_CURRENT_BINARY_DIR}/..>")
-target_include_directories(QApt INTERFACE "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/QApt>" )
+target_include_directories(QApt INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/QApt>" )
 
 set_target_properties(QApt
     PROPERTIES
