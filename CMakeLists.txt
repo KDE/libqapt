@@ -9,7 +9,6 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(ECMGenerateHeaders)
-include(ECMGeneratePriFile)
 include(ECMPackageConfigHelpers)
 include(ECMPoQmTools)
 include(ECMSetupVersion)
@@ -17,6 +16,7 @@ include(FeatureSummary)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
+include(ECMGeneratePriFile) # This needs InstallDirs 
 
 # Turn exceptions on
 kde_enable_exceptions()
