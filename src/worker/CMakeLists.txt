@@ -26,7 +26,7 @@ add_executable(qaptworker2
 target_link_libraries(qaptworker2
     Qt5::Core
     Qt5::DBus
-    ${POLKITQT-1_CORE_LIBRARY}
+    PolkitQt5-1::Core
     util
     QApt::Main)
 
