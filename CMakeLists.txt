@@ -43,34 +43,6 @@ ecm_setup_version(3.0.0 VARIABLE_PREFIX QAPT
                         PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/QAptConfigVersion.cmake"
                         SOVERSION 3)
 
-message(WARNING "gettext and tr in the same source is insanely tricky, maybe we should give some ki18n to qapt...")
-if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
-    ecm_install_po_files_as_qm(po)
-endif()
-
-# create a Config.cmake and a ConfigVersion.cmake file and install them
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/QApt")
-
-ecm_configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/QAptConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/QAptConfig.cmake"
-    INSTALL_DESTINATION  ${CMAKECONFIG_INSTALL_DIR})
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/QAptConfig.cmake"
-              "${CMAKE_CURRENT_BINARY_DIR}/QAptConfigVersion.cmake"
-        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        COMPONENT Devel)
-install(EXPORT QAptTargets
-        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        FILE QAptTargets.cmake
-        NAMESPACE QApt:: )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h
-        DESTINATION include/qapt
-        COMPONENT Devel)
-
-add_subdirectory(autotests)
-add_subdirectory(src)
-
 set(KF5_DEP_VERSION "5.0.0")
 
 # Only used to install worker actions
@@ -106,6 +78,34 @@ set(WITH_GSTREAMER
 
 add_feature_info(qapt-utils WITH_UTILS "Runtime utilities using KDE frameworks")
 add_feature_info(qapt-gst-helper WITH_GSTREAMER "GStreamer codec helper util")
+
+message(WARNING "gettext and tr in the same source is insanely tricky, maybe we should give some ki18n to qapt...")
+if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
+    ecm_install_po_files_as_qm(po)
+endif()
+
+# create a Config.cmake and a ConfigVersion.cmake file and install them
+set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/QApt")
+
+ecm_configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/QAptConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/QAptConfig.cmake"
+    INSTALL_DESTINATION  ${CMAKECONFIG_INSTALL_DIR})
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/QAptConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/QAptConfigVersion.cmake"
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        COMPONENT Devel)
+install(EXPORT QAptTargets
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        FILE QAptTargets.cmake
+        NAMESPACE QApt:: )
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h
+        DESTINATION include/qapt
+        COMPONENT Devel)
+
+add_subdirectory(autotests)
+add_subdirectory(src)
 
 if(WITH_UTILS)
     add_subdirectory(utils)
