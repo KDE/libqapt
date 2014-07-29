@@ -1240,7 +1240,7 @@ void Package::setReInstall()
     }
 }
 
-
+// TODO: merge into one function with bool_purge param
 void Package::setRemove()
 {
     pkgProblemResolver Fix(d->backend->cache()->depCache());
@@ -1249,10 +1249,11 @@ void Package::setRemove()
     Fix.Protect(d->packageIter);
     Fix.Remove(d->packageIter);
 
-    Fix.Resolve(true);
-
     d->backend->cache()->depCache()->SetReInstall(d->packageIter, false);
     d->backend->cache()->depCache()->MarkDelete(d->packageIter, false);
+
+    Fix.Resolve(true);
+
     d->state &= ~IsManuallyHeld;
 
     if (!d->backend->areEventsCompressed()) {
@@ -1268,10 +1269,11 @@ void Package::setPurge()
     Fix.Protect(d->packageIter);
     Fix.Remove(d->packageIter);
 
-    Fix.Resolve(true);
-
     d->backend->cache()->depCache()->SetReInstall(d->packageIter, false);
     d->backend->cache()->depCache()->MarkDelete(d->packageIter, true);
+
+    Fix.Resolve(true);
+
     d->state &= ~IsManuallyHeld;
 
     if (!d->backend->areEventsCompressed()) {
