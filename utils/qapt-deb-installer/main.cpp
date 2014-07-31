@@ -50,6 +50,7 @@ int main(int argc, char **argv)
                         i18nc("@info:credit", "Qt 5 port"),
                         QStringLiteral("apachelogger@kubuntu.org"));
     aboutData.setProgramIconName("applications-other");
+    KAboutData::setApplicationData(aboutData);
 
     QCommandLineParser parser;
     parser.addHelpOption();
