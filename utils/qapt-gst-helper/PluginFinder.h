@@ -21,8 +21,8 @@
 #ifndef PLUGINFINDER_H
 #define PLUGINFINDER_H
 
-#include <QtCore/QObject>
-#include <QtCore/QList>
+#include <QObject>
+#include <QList>
 
 namespace QApt {
     class Backend;

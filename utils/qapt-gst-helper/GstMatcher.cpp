@@ -21,9 +21,9 @@
 
 #include "GstMatcher.h"
 
-#include <KDebug>
+#include <QDebug>
 
-#include <../../src/package.h>
+#include <QApt/Package>
 
 #include "PluginInfo.h"
 

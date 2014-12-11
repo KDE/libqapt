@@ -20,27 +20,39 @@
 
 #include "qaptbatch.h"
 
-// KDE includes
-#include <KApplication>
-#include <KDebug>
-#include <KIcon>
-#include <KLocale>
+#include <QApplication>
+#include <QDebug>
+#include <QDialogButtonBox>
+#include <QIcon>
+#include <QLabel>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+#include <KLocalizedString>
 #include <KMessageBox>
 #include <KProtocolManager>
+#include <KStandardGuiItem>
 #include <KWindowSystem>
 
-#include "../../src/backend.h"
-#include "../../src/transaction.h"
+#include <QApt/Backend>
+#include <QApt/Transaction>
+
 #include "detailswidget.h"
 
 QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
-    : KProgressDialog()
+    : QDialog()
     , m_backend(new QApt::Backend(this))
     , m_winId(winId)
     , m_lastRealProgress(0)
     , m_mode(mode)
     , m_packages(packages)
     , m_done(false)
+    , m_label(new QLabel(this))
+    , m_progressBar(new QProgressBar(this))
+    , m_detailsWidget(new DetailsWidget(this))
+    , m_cancelButton(new QPushButton(this))
+    , m_buttonBox(new QDialogButtonBox(this))
 {
     if (!m_backend->init())
         initError();
@@ -51,11 +63,8 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     m_backend->setFrontendCaps(caps);
 
     // Set this in case we auto-show before auth
-    setLabelText(i18nc("@label", "Waiting for authorization"));
-    progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
-
-    DetailsWidget *detailsWidget = new DetailsWidget(this);
-    setDetailsWidget(detailsWidget);
+    m_label->setText(i18nc("@label", "Waiting for authorization"));
+    m_progressBar->setMaximum(0); // Set progress bar to indeterminate/busy
 
     if (m_mode == "install") {
         commitChanges(QApt::Package::ToInstall, packages);
@@ -64,14 +73,24 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     } else if (m_mode == "update") {
         m_trans = m_backend->updateCache();
     }
-
-    detailsWidget->setTransaction(m_trans);
+    m_detailsWidget->setTransaction(m_trans);
     setTransaction(m_trans);
 
     if (winId)
         KWindowSystem::setMainWindow(this, winId);
 
-    setAutoClose(false);
+    KGuiItem::assign(m_cancelButton, KStandardGuiItem::cancel());
+    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    m_buttonBox->addButton(m_cancelButton, QDialogButtonBox::RejectRole);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(m_label);
+    layout->addWidget(m_progressBar);
+    layout->addWidget(m_detailsWidget);
+    layout->addWidget(m_buttonBox);
+    setLayout(layout);
+
+    m_detailsWidget->show();
 }
 
 void QAptBatch::initError()
@@ -82,7 +101,6 @@ void QAptBatch::initError()
                          "The package system could not be initialized, your "
                          "configuration may be broken.");
     QString title = i18nc("@title:window", "Initialization error");
-
     KMessageBox::detailedError(this, text, details, title);
     exit(-1);
 }
@@ -92,7 +110,7 @@ void QAptBatch::reject()
     if (m_done)
         accept();
     else
-        KProgressDialog::reject();
+        QDialog::reject();
 }
 
 void QAptBatch::commitChanges(int mode, const QStringList &packageStrs)
@@ -147,7 +165,7 @@ void QAptBatch::setTransaction(QApt::Transaction *trans)
     connect(m_trans, SIGNAL(statusDetailsChanged(QString)),
             this, SLOT(updateCommitMessage(QString)));
 
-    connect(this, SIGNAL(cancelClicked()), m_trans, SLOT(cancel()));
+    connect(this, SIGNAL(rejected()), m_trans, SLOT(cancel()));
 
     m_trans->run();
 }
@@ -164,7 +182,7 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
                          "configuration may be broken.");
             title = i18nc("@title:window", "Initialization error");
             KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
-            KApplication::instance()->quit();
+            QApplication::quit();
             break;
         }
         case QApt::LockError:
@@ -192,7 +210,6 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
         case QApt::CommitError:
             text = i18nc("@label", "An error occurred while applying changes:");
             title = i18nc("@title:window", "Commit error");
-
             KMessageBox::detailedError(this, text, m_trans->errorDetails(), title);
             break;
         case QApt::AuthError:
@@ -248,7 +265,6 @@ void QAptBatch::provideMedium(const QString &label, const QString &mountPoint)
     QString title = i18nc("@title:window", "Media Change Required");
     QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
                          label, mountPoint);
-
     KMessageBox::informationWId(m_winId, text, title);
     m_trans->provideMedium(mountPoint);
 }
@@ -290,61 +306,62 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
     switch (status) {
     case QApt::SetupStatus:
     case QApt::WaitingStatus:
-        progressBar()->setMaximum(0);
-        setLabelText(i18nc("@label Progress bar label when waiting to start",
+        m_progressBar->setMaximum(0);
+        m_label->setText(i18nc("@label Progress bar label when waiting to start",
                            "Waiting to start."));
         break;
     case QApt::AuthenticationStatus:
-        progressBar()->setMaximum(0);
-        setLabelText(i18nc("@label Status label when waiting for a password",
+        m_progressBar->setMaximum(0);
+        m_label->setText(i18nc("@label Status label when waiting for a password",
                            "Waiting for authentication."));
         break;
     case QApt::WaitingMediumStatus:
-        progressBar()->setMaximum(0);
-        setLabelText(i18nc("@label Status label when waiting for a CD-ROM",
+        m_label->setText(i18nc("@label Status label when waiting for a CD-ROM",
                            "Waiting for required media."));
         break;
     case QApt::WaitingLockStatus:
-        progressBar()->setMaximum(0);
-        setLabelText(i18nc("@label Status label",
+        m_progressBar->setMaximum(0);
+        m_label->setText(i18nc("@label Status label",
                            "Waiting for other package managers to quit."));
         break;
     case QApt::RunningStatus:
         // We're ready for "real" progress now
-        progressBar()->setMaximum(100);
+        m_progressBar->setMaximum(100);
         break;
     case QApt::LoadingCacheStatus:
-        setLabelText(i18nc("@label Status label",
+        m_label->setText(i18nc("@label Status label",
                            "Loading package cache."));
         break;
     case QApt::DownloadingStatus:
         if (m_trans->role() == QApt::UpdateCacheRole) {
             setWindowTitle(i18nc("@title:window", "Refreshing Package Information"));
-            setLabelText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
+            m_label->setText(i18nc("@info:status", "Checking for new, removed or upgradeable packages"));
         } else {
             setWindowTitle(i18nc("@title:window", "Downloading"));
-            setLabelText(i18ncp("@info:status",
+            m_label->setText(i18ncp("@info:status",
                                 "Downloading package file",
                                 "Downloading package files",
                                 m_packages.count()));
         }
 
-        setButtons(KDialog::Cancel | KDialog::Details);
-        setButtonFocus(KDialog::Details);
+#warning TODO
+//        setButtons(KDialog::Cancel | KDialog::Details);
+//        setButtonFocus(KDialog::Details);
         break;
     case QApt::CommittingStatus:
         setWindowTitle(i18nc("@title:window", "Installing Packages"));
-        setButtons(KDialog::Cancel);
+#warning TODO
+//        setButtons(KDialog::Cancel);
         break;
-    case QApt::FinishedStatus:
+    case QApt::FinishedStatus: {
         if (m_mode == "install") {
             setWindowTitle(i18nc("@title:window", "Installation Complete"));
 
             if (m_trans->error() != QApt::Success) {
-                setLabelText(i18nc("@label",
+                m_label->setText(i18nc("@label",
                                    "Package installation failed."));
             } else {
-                setLabelText(i18ncp("@label",
+                m_label->setText(i18ncp("@label",
                                     "Package successfully installed.",
                                     "Packages successfully installed.", m_packages.size()));
             }
@@ -352,11 +369,11 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
             setWindowTitle(i18nc("@title:window", "Removal Complete"));
 
             if (m_trans->error() != QApt::Success) {
-                setLabelText(i18nc("@label",
+                m_label->setText(i18nc("@label",
                                    "Package removal failed."));
                 qDebug() << m_trans->error();
             } else {
-                setLabelText(i18ncp("@label",
+                m_label->setText(i18ncp("@label",
                                     "Package successfully uninstalled.",
                                     "Packages successfully uninstalled.", m_packages.size()));
             }
@@ -364,21 +381,23 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
             setWindowTitle(i18nc("@title:window", "Refresh Complete"));
 
             if (m_trans->error() != QApt::Success) {
-                setLabelText(i18nc("@info:status", "Refresh failed."));
+                m_label->setText(i18nc("@info:status", "Refresh failed."));
             } else {
-                setLabelText(i18nc("@label", "Package information successfully refreshed."));
+                m_label->setText(i18nc("@label", "Package information successfully refreshed."));
             }
         }
 
-        progressBar()->setValue(100);
+        m_progressBar->setValue(100);
         m_done = true;
 
         m_trans->deleteLater();
         m_trans = 0;
 
-        // Really a close button, but KProgressDialog use ButtonCode Cancel
-        setButtonFocus(KDialog::Cancel);
+        KGuiItem::assign(m_cancelButton, KStandardGuiItem::close());
+        // Force enable in case cancellable was false previously.
+        m_cancelButton->setEnabled(true);
         break;
+    }
     case QApt::WaitingConfigFilePromptStatus:
     default:
         break;
@@ -387,7 +406,7 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
 
 void QAptBatch::cancellableChanged(bool cancellable)
 {
-    setAllowCancel(cancellable);
+    m_cancelButton->setEnabled(cancellable);
 }
 
 void QAptBatch::updateProgress(int progress)
@@ -397,15 +416,15 @@ void QAptBatch::updateProgress(int progress)
     }
 
     if (progress > 100) {
-        progressBar()->setMaximum(0);
+        m_progressBar->setMaximum(0);
     } else if (progress > m_lastRealProgress) {
-        progressBar()->setMaximum(100);
-        progressBar()->setValue(progress);
+        m_progressBar->setMaximum(100);
+        m_progressBar->setValue(progress);
         m_lastRealProgress = progress;
     }
 }
 
 void QAptBatch::updateCommitMessage(const QString& message)
 {
-    setLabelText(message);
+    m_label->setText(message);
 }

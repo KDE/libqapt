@@ -21,17 +21,18 @@
 #include "detailswidget.h"
 
 // Qt includes
-#include <QtGui/QGridLayout>
-#include <QtGui/QLabel>
+#include <QApplication>
+#include <QGridLayout>
+#include <QLabel>
 #include <QDebug>
 
 // KDE includes
-#include <KGlobal>
-#include <KLocale>
-#include <KVBox>
+#include <KFormat>
+#include <KLocalizedString>
+#include <QVBoxLayout>
 
 // LibQApt includes
-#include "../../src/transaction.h"
+#include <QApt/Transaction>
 
 DetailsWidget::DetailsWidget(QWidget *parent)
     : QWidget(parent)
@@ -39,23 +40,27 @@ DetailsWidget::DetailsWidget(QWidget *parent)
 {
     QGridLayout *layout = new QGridLayout(this);
 
-    KVBox *columnOne = new KVBox(this);
-    KVBox *columnTwo = new KVBox(this);
+    QVBoxLayout *columnOne = new QVBoxLayout;
+    QVBoxLayout *columnTwo = new QVBoxLayout;
 
-    layout->addWidget(columnOne);
-    layout->addWidget(columnTwo, 0, 1);
+    layout->addLayout(columnOne, 0, 0);
+    layout->addLayout(columnTwo, 0, 1);
     setLayout(layout);
 
-    QLabel *label1 = new QLabel(columnOne);
+    QLabel *label1 = new QLabel(this);
     label1->setText(i18nc("@label Remaining time", "Remaining Time:"));
     label1->setAlignment(Qt::AlignRight);
+    columnOne->addWidget(label1);
 
-    QLabel *label2 = new QLabel(columnOne);
+    QLabel *label2 = new QLabel(this);
     label2->setText(i18nc("@label Download Rate", "Speed:"));
     label2->setAlignment(Qt::AlignRight);
+    columnOne->addWidget(label2);
 
-    m_timeLabel = new QLabel(columnTwo);
-    m_speedLabel = new QLabel(columnTwo);
+    m_timeLabel = new QLabel(this);
+    columnTwo->addWidget(m_timeLabel);
+    m_speedLabel = new QLabel(this);
+    columnTwo->addWidget(m_speedLabel);
 }
 
 void DetailsWidget::setTransaction(QApt::Transaction *trans)
@@ -80,6 +85,10 @@ void DetailsWidget::transactionStatusChanged(QApt::TransactionStatus status)
     case QApt::CommittingStatus:
     case QApt::FinishedStatus:
         hide();
+        if (parentWidget()) {
+             // Update size to prevent the dialog from looking silly.
+            parentWidget()->adjustSize();
+        }
         break;
     default:
         break;
@@ -93,7 +102,7 @@ void DetailsWidget::updateTimeText(quint64 eta)
 
     // Greater than zero and less than 2 days
     if (ETAMilliseconds > 0 && ETAMilliseconds < 2*24*60*60) {
-        timeRemaining = KGlobal::locale()->prettyFormatDuration(ETAMilliseconds);
+        timeRemaining = KFormat().formatDuration(ETAMilliseconds);
     } else {
         timeRemaining = i18nc("@info:progress Remaining time", "Unknown");
     }
@@ -104,6 +113,6 @@ void DetailsWidget::updateTimeText(quint64 eta)
 void DetailsWidget::updateSpeedText(quint64 speed)
 {
     QString downloadSpeed = i18nc("@info:progress Download rate",
-                                  "%1/s", KGlobal::locale()->formatByteSize(speed));
+                                  "%1/s", KFormat().formatByteSize(speed));
     m_speedLabel->setText(downloadSpeed);
 }

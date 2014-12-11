@@ -20,11 +20,12 @@
 
 #include "DebInstaller.h"
 
-#include <QtCore/QPointer>
-#include <KApplication>
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QPointer>
+
 #include <KAboutData>
-#include <KCmdLineArgs>
-#include <KLocale>
+#include <KLocalizedString>
 
 static const char description[] =
     I18N_NOOP2("@info", "A Debian package installer");
@@ -33,28 +34,42 @@ static const char version[] = "2.1";
 
 int main(int argc, char **argv)
 {
-    KAboutData about("qapt-deb-installer", 0, ki18nc("@title", "QApt Package Installer"), version, ki18nc("@info", description),
-                     KAboutData::License_GPL, ki18nc("@info:credit", "(C) 2011 Jonathan Thomas"), KLocalizedString(), 0, "echidnaman@kubuntu.org");
-    about.addAuthor( ki18nc("@info:credit", "Jonathan Thomas"), KLocalizedString(), "echidnaman@kubuntu.org" );
-    about.setProgramIconName("applications-other");
-    KCmdLineArgs::init(argc, argv, &about);
+    QApplication app(argc, argv);
 
-    KCmdLineOptions options;
-    options.add("+[File]", ki18nc("@info:shell", ".deb file"));
-    KCmdLineArgs::addCmdLineOptions(options);
+    KAboutData aboutData("qapt-deb-installer",
+                         i18nc("@title", "QApt Package Installer"),
+                         version,
+                         i18nc("@info", description),
+                         KAboutLicense::LicenseKey::GPL,
+                         i18nc("@info:credit", "(C) 2011 Jonathan Thomas"));
 
-    KApplication app;
+    aboutData.addAuthor(i18nc("@info:credit", "Jonathan Thomas"),
+                        QString(),
+                        QStringLiteral("echidnaman@kubuntu.org"));
+    aboutData.addAuthor(i18nc("@info:credit", "Harald Sitter"),
+                        i18nc("@info:credit", "Qt 5 port"),
+                        QStringLiteral("apachelogger@kubuntu.org"));
+    aboutData.setProgramIconName("applications-other");
+    KAboutData::setApplicationData(aboutData);
+
+    QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument("file",
+                                 i18nc("@info:shell argument", ".deb file"));
+    aboutData.setupCommandLine(&parser);
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
 
     // do not restore!
     if (app.isSessionRestored()) {
         exit(0);
     }
 
-    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     QString debFile;
 
-    if (args->count()) {
-        debFile = args->arg(0);
+    if (parser.positionalArguments().size() > 0) {
+        debFile = parser.positionalArguments().at(0);
     }
 
     QPointer<DebInstaller> debInstaller = new DebInstaller(0, debFile);

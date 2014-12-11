@@ -22,6 +22,7 @@
 #define QAPT_CACHE_H
 
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 
 #include <apt-pkg/pkgcache.h>
 

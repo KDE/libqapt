@@ -21,11 +21,10 @@
 #ifndef PLUGINHELPER_H
 #define PLUGINHELPER_H
 
-#include <QtCore/QStringList>
+#include <QProgressDialog>
+#include <QStringList>
 
-#include <KProgressDialog>
-
-#include <../../src/globals.h>
+#include <QApt/Globals>
 
 class QThread;
 
@@ -42,7 +41,7 @@ class PluginInfo;
 #define ERR_PARTIAL_SUCCESS 3
 #define ERR_CANCEL 4
 
-class PluginHelper : public KProgressDialog
+class PluginHelper : public QProgressDialog
 {
     Q_OBJECT
 public:
@@ -64,11 +63,14 @@ private:
     QThread *m_finderThread;
     PluginFinder *m_finder;
 
+    void setCloseButton();
+
 private Q_SLOTS:
     void initError();
     void canSearch();
     void offerInstallPackages();
     void cancellableChanged(bool cancellable);
+
     void transactionErrorOccurred(QApt::ErrorCode error);
     void transactionStatusChanged(QApt::TransactionStatus status);
     void provideMedium(const QString &label, const QString &mountPoint);

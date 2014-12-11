@@ -20,35 +20,38 @@
 
 #include "DebInstaller.h"
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QStringBuilder>
-#include <QtGui/QStackedWidget>
+#include <QApplication>
+#include <QDebug>
+#include <QFileInfo>
+#include <QPushButton>
+#include <QStackedWidget>
+#include <QStringBuilder>
+#include <QVBoxLayout>
 
-#include <KApplication>
-#include <KIcon>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KProtocolManager>
-#include <KPushButton>
 #include <KMessageBox>
-#include <KDebug>
 
 #include <apt-pkg/debversion.h>
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/version.h>
 
-#include "../../src/backend.h"
-#include "../../src/config.h"
-#include "../../src/dependencyinfo.h"
-#include "../../src/transaction.h"
+#include <QApt/Backend>
+#include <QApt/Config>
+#include <QApt/DependencyInfo>
+#include <QApt/Transaction>
 
 #include "DebCommitWidget.h"
 #include "DebViewer.h"
 
 DebInstaller::DebInstaller(QWidget *parent, const QString &debFile)
-    : KDialog(parent)
+    : QDialog(parent)
     , m_backend(new QApt::Backend(this))
     , m_trans(nullptr)
     , m_commitWidget(nullptr)
+    , m_applyButton(new QPushButton(this))
+    , m_cancelButton(new QPushButton(this))
+    , m_buttonBox(new QDialogButtonBox(this))
 {
     if (!m_backend->init())
         initError();
@@ -76,15 +79,21 @@ void DebInstaller::initError()
 
 void DebInstaller::initGUI()
 {
-    setButtons(KDialog::Cancel | KDialog::Apply);
-    setButtonText(KDialog::Apply, i18nc("@label", "Install Package"));
-    m_applyButton = button(KDialog::Apply);
-    m_cancelButton = button(KDialog::Cancel);
+    KGuiItem::assign(m_applyButton, KStandardGuiItem::apply());
+    m_applyButton->setText(i18nc("@label", "Install Package"));
+    KGuiItem::assign(m_cancelButton, KStandardGuiItem::cancel());
 
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(installDebFile()));
+    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+    setLayout(new QVBoxLayout);
 
     m_stack = new QStackedWidget(this);
-    setMainWidget(m_stack);
+    layout()->addWidget(m_stack);
+
+    m_buttonBox->addButton(m_applyButton, QDialogButtonBox::AcceptRole);
+    m_buttonBox->addButton(m_cancelButton, QDialogButtonBox::RejectRole);
+    layout()->addWidget(m_buttonBox);
 
     m_debViewer = new DebViewer(m_stack);
     m_debViewer->setBackend(m_backend);
@@ -98,7 +107,7 @@ void DebInstaller::initGUI()
                              "Could not open <filename>%1</filename>. It does not appear to be a "
                              "valid Debian package file.", m_debFile->filePath());
         KMessageBox::error(this, text, QString());
-        KApplication::instance()->quit();
+        QApplication::instance()->quit();
         return;
     }
 
@@ -133,8 +142,14 @@ void DebInstaller::transactionStatusChanged(QApt::TransactionStatus status)
             m_trans = m_backend->installFile(*m_debFile);
             setupTransaction(m_trans);
             m_trans->run();
-        } else
-            setButtons(KDialog::Close);
+        } else {
+            m_buttonBox->removeButton(m_applyButton);
+
+            KGuiItem::assign(m_cancelButton, KStandardGuiItem::close());
+            m_cancelButton->setEnabled(true);
+            m_cancelButton->setFocus();
+            m_cancelButton->grabKeyboard();
+        }
     default:
         break;
     }

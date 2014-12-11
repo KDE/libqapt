@@ -1,14 +1,7 @@
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/src
-)
-
-if ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr") # If the prefix is usr, things will not be in /usr/etc/
-    set(SYSCONF_INSTALL_DIR "/etc") # ...but rather in /etc
-else ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
-    set(SYSCONF_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/etc") # Otherwise, trust the prefix
-endif ("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+    ${CMAKE_SOURCE_DIR}/src)
 
 set(qapt_worker_SRCS
     main.cpp
@@ -19,38 +12,37 @@ set(qapt_worker_SRCS
     transactionqueue.cpp
     workeracquire.cpp
     workerdaemon.cpp
-    workerinstallprogress.cpp
-)
+    workerinstallprogress.cpp)
 
-qt4_add_dbus_adaptor(qapt_worker_SRCS
+qt5_add_dbus_adaptor(qapt_worker_SRCS
     org.kubuntu.qaptworker2.xml
     workerdaemon.h
-    WorkerDaemon
-)
+    WorkerDaemon)
 
 add_executable(qaptworker2
     ${qapt_worker_SRCS}
-    ${qapt_worker_adaptor_SRCS}
-)
+    ${qapt_worker_adaptor_SRCS})
 
-# see our worker is pretty small :D
 target_link_libraries(qaptworker2
-    ${QT_QTCORE_LIBRARY}
-    ${POLKITQT-1_CORE_LIBRARY}
+    Qt5::Core
+    Qt5::DBus
+    PolkitQt5-1::Core
     util
-    qapt
-)
+    QApt::Main)
+
+message(WARNING "worker randomly links against -lutil...")
 
 install(TARGETS qaptworker2 DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-dbus_add_activation_system_service(org.kubuntu.qaptworker2.service.in)
+configure_file(org.kubuntu.qaptworker2.service.in
+               ${CMAKE_CURRENT_BINARY_DIR}/org.kubuntu.qaptworker2.service)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.kubuntu.qaptworker2.service
+        DESTINATION ${DBUS_SYSTEM_SERVICES_INSTALL_DIR})
 
-find_package(KDE4)
-if (KDE4_FOUND)
-    include(KDE4Defaults)
-    kde4_install_auth_actions(org.kubuntu.qaptworker2 qaptworker.actions)
-else (KDE4_FOUND)
+if(KF5Auth_FOUND)
+    kauth_install_actions(org.kubuntu.qaptworker2 qaptworker.actions)
+else()
     install(FILES org.kubuntu.qaptworker2.policy DESTINATION ${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions)
-endif (KDE4_FOUND)
+endif()
 
 install(FILES org.kubuntu.qaptworker2.conf DESTINATION ${SYSCONF_INSTALL_DIR}/dbus-1/system.d/)

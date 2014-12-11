@@ -24,20 +24,18 @@
 #include <QtCore/QDir>
 #include <QtCore/QStringBuilder>
 #include <QtCore/QUuid>
-#include <QtGui/QLabel>
-#include <QtGui/QProgressBar>
-#include <QtGui/QVBoxLayout>
+#include <QLabel>
+#include <QProgressBar>
+#include <QVBoxLayout>
 
 // KDE includes
+#include <KLocalizedString>
 #include <KMessageBox>
 #include <KTextEdit>
 
 // LibQApt/DebconfKDE includes
 #include <DebconfGui.h>
-#include "../../src/transaction.h"
-
-// KDE includes
-#include <KLocale>
+#include <QApt/Transaction>
 
 DebCommitWidget::DebCommitWidget(QWidget *parent)
     : QWidget(parent)

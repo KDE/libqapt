@@ -21,24 +21,25 @@
 #include "PluginHelper.h"
 
 // Qt includes
-#include <QCoreApplication>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QThread>
-#include <QtCore/QTimer>
+#include <QApplication>
+#include <QDebug>
+#include <QIcon>
+#include <QStringBuilder>
+#include <QThread>
+#include <QTimer>
+#include <QPushButton>
 
 // KDE includes
-#include <KApplication>
-#include <KIcon>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KMessageBox>
 #include <KProtocolManager>
+#include <KStandardGuiItem>
 #include <KWindowSystem>
-#include <QDebug>
 
 // LibQApt includes
-#include "../../src/backend.h"
-#include "../../src/config.h"
-#include "../../src/transaction.h"
+#include <QApt/Backend>
+#include <QApt/Config>
+#include <QApt/Transaction>
 
 // Own includes
 #include "PluginFinder.h"
@@ -51,7 +52,7 @@
 #define tExit(x) m_finder->stop(); m_finderThread->quit(); m_finderThread->wait(); qApp->exit(x); return;
 
 PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int winId)
-    : KProgressDialog(parent)
+    : QProgressDialog(parent)
     , m_backend(new QApt::Backend(this))
     , m_trans(nullptr)
     , m_winId(winId)
@@ -73,6 +74,10 @@ PluginHelper::PluginHelper(QWidget *parent, const QStringList &gstDetails, int w
     if (m_winId) {
         KWindowSystem::setMainWindow(this, m_winId);
     }
+
+    QPushButton *button = new QPushButton(this);
+    KGuiItem::assign(button, KStandardGuiItem::cancel());
+    setCancelButton(button);
 }
 
 void PluginHelper::run()
@@ -88,7 +93,7 @@ void PluginHelper::run()
     canSearch();
 
     setLabelText(i18nc("@info:progress", "Looking for plugins"));
-    progressBar()->setMaximum(m_searchList.count());
+    setMaximum(m_searchList.count());
     incrementProgress();
     show();
 
@@ -107,6 +112,13 @@ void PluginHelper::run()
     m_finder->moveToThread(m_finderThread);
     m_finder->setSearchList(m_searchList);
     m_finderThread->start();
+}
+
+void PluginHelper::setCloseButton()
+{
+    QPushButton *button = new QPushButton(this);
+    KGuiItem::assign(button, KStandardGuiItem::close());
+    setCancelButton(button);
 }
 
 void PluginHelper::initError()
@@ -169,7 +181,7 @@ void PluginHelper::canSearch()
     QString msg = QLatin1Literal("<h3>") % title % QLatin1Literal("</h3>") % message;
     KGuiItem searchButton = KStandardGuiItem::yes();
     searchButton.setText(i18nc("Search for packages" ,"Search"));
-    searchButton.setIcon(KIcon("edit-find"));
+    searchButton.setIcon(QIcon::fromTheme("edit-find"));
     ret = KMessageBox::questionYesNoWId(m_winId, msg, title, searchButton);
 
     if (ret != KMessageBox::Yes) {
@@ -201,7 +213,7 @@ void PluginHelper::offerInstallPackages()
 
     KGuiItem installButton = KStandardGuiItem::yes();
     installButton.setText(i18nc("Install packages" ,"Install"));
-    installButton.setIcon(KIcon("download"));
+    installButton.setIcon(QIcon::fromTheme("download"));
 
     ret = KMessageBox::questionYesNoListWId(m_winId, msg, nameList, title,
                                             installButton, KStandardGuiItem::no());
@@ -215,7 +227,10 @@ void PluginHelper::offerInstallPackages()
 
 void PluginHelper::cancellableChanged(bool cancellable)
 {
-    setAllowCancel(cancellable);
+    QPushButton *button = new QPushButton(this);
+    KGuiItem::assign(button, KStandardGuiItem::cancel());
+    button->setEnabled(cancellable);
+    setCancelButton(button);
 }
 
 void PluginHelper::transactionErrorOccurred(QApt::ErrorCode code)
@@ -352,28 +367,28 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
     switch (status) {
     case QApt::SetupStatus:
     case QApt::WaitingStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Progress bar label when waiting to start",
                            "Waiting to start."));
         break;
     case QApt::AuthenticationStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Status label when waiting for a password",
                            "Waiting for authentication."));
         break;
     case QApt::WaitingMediumStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Status label when waiting for a CD-ROM",
                            "Waiting for required media."));
         break;
     case QApt::WaitingLockStatus:
-        progressBar()->setMaximum(0);
+        setMaximum(0);
         setLabelText(i18nc("@label Status label",
                            "Waiting for other package managers to quit."));
         break;
     case QApt::RunningStatus:
         // We're ready for "real" progress now
-        progressBar()->setMaximum(100);
+        setMaximum(100);
         break;
     case QApt::LoadingCacheStatus:
         setLabelText(i18nc("@label Status label",
@@ -386,7 +401,6 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
     case QApt::CommittingStatus:
         setWindowTitle(i18nc("@title:window", "Installing"));
         setLabelText(i18nc("@info:status", "Installing codecs"));
-        setButtons(KDialog::Cancel);
         break;
     case QApt::FinishedStatus:
         if (m_trans->exitStatus() == QApt::ExitCancelled) {
@@ -400,9 +414,8 @@ void PluginHelper::transactionStatusChanged(QApt::TransactionStatus status)
             m_done = true;
         }
 
-        progressBar()->setValue(100);
-        // Really a close button, but KProgressDialog uses ButtonCode Cancel
-        setButtonFocus(KDialog::Cancel);
+        setValue(100);
+        setCloseButton();
 
         m_trans->deleteLater();
         m_trans = 0;
@@ -441,8 +454,8 @@ void PluginHelper::notFoundError()
 
 void PluginHelper::incrementProgress()
 {
-    progressBar()->setValue(progressBar()->value() + 1);
-    if (progressBar()->value() == progressBar()->maximum()) {
+    setValue(value() + 1);
+    if (value() == maximum()) {
         if (m_foundCodecs.isEmpty()) {
             notFoundError();
         }
@@ -497,7 +510,7 @@ void PluginHelper::install()
     m_trans->run();
 
     setLabelText(i18nc("@label Progress bar label when waiting to start", "Waiting"));
-    progressBar()->setMaximum(0); // Set progress bar to indeterminate/busy
+    setMaximum(0); // Set progress bar to indeterminate/busy
     setAutoClose(false);
     show();
 }
@@ -508,7 +521,7 @@ void PluginHelper::updateProgress(int percentage)
         --percentage;
     }
 
-    progressBar()->setValue(percentage);
+    setValue(percentage);
 }
 
 void PluginHelper::updateCommitStatus(const QString& message)

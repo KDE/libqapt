@@ -21,7 +21,7 @@
 #ifndef INSTALLERRUNNER_H
 #define INSTALLERRUNNER_H
 
-#include <Plasma/AbstractRunner>
+#include <KRunner/AbstractRunner>
 
 /**
  * This runner checks if the query exists as an executable in the normal paths

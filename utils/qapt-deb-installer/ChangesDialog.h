@@ -23,10 +23,10 @@
 
 // Qt includes
 #include <QStandardItemModel>
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // LibQApt includes
-#include "../../src/package.h"
+#include <QApt/Package>
 
 class QStandardItemModel;
 

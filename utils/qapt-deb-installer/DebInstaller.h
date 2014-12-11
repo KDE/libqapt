@@ -21,13 +21,13 @@
 #ifndef DEBINSTALLER_H
 #define DEBINSTALLER_H
 
-#include <QtCore/QStringList>
+#include <QDialog>
+#include <QStringList>
 
-#include <KDialog>
+#include <QApt/DebFile>
+#include <QApt/Globals>
 
-#include "../../src/debfile.h"
-#include "../../src/globals.h"
-
+class QDialogButtonBox;
 class QStackedWidget;
 
 namespace QApt {
@@ -38,7 +38,7 @@ namespace QApt {
 class DebCommitWidget;
 class DebViewer;
 
-class DebInstaller : public KDialog
+class DebInstaller : public QDialog
 {
     Q_OBJECT
 public:
@@ -55,8 +55,9 @@ private:
     QStackedWidget *m_stack;
     DebViewer *m_debViewer;
     DebCommitWidget *m_commitWidget;
-    KPushButton *m_applyButton;
-    KPushButton *m_cancelButton;
+    QPushButton *m_applyButton;
+    QPushButton *m_cancelButton;
+    QDialogButtonBox *m_buttonBox;
 
     //Misc
     QString m_statusString;

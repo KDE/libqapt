@@ -21,13 +21,12 @@
 #include "installerrunner.h"
 
 // Qt includes
-#include <QtCore/QDir>
+#include <QDir>
+#include <QIcon>
 
 // KDE includes
-#include <KIcon>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KProcess>
-#include <KService>
 #include <KServiceTypeTrader>
 
 K_EXPORT_PLASMA_RUNNER(installer, InstallerRunner)
@@ -95,7 +94,7 @@ void InstallerRunner::match(Plasma::RunnerContext &context)
     }
 
 
-    context.addMatches(term, matches);
+    context.addMatches(matches);
 }
 
 void InstallerRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match)
@@ -118,6 +117,7 @@ void InstallerRunner::setupMatch(const QString &package, const QString &term, Pl
         match.setSubtext(i18n("The \"%1\" package contains %2", package, term));
     }
 
-    match.setIcon(KIcon("applications-other"));
+    match.setIcon(QIcon::fromTheme("applications-other"));
 }
 
+#include "installerrunner.moc"

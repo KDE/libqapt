@@ -21,14 +21,14 @@
 #include "ChangesDialog.h"
 
 // Qt includes
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QTreeView>
-#include <QtGui/QVBoxLayout>
+#include <QIcon>
+#include <QLabel>
+#include <QPushButton>
+#include <QTreeView>
+#include <QVBoxLayout>
 
 // KDE includes
-#include <KIcon>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KStandardGuiItem>
 
 ChangesDialog::ChangesDialog(QWidget *parent, const QApt::StateChanges &changes)
@@ -103,7 +103,7 @@ void ChangesDialog::addPackages(const QApt::StateChanges &changes)
             item = new QStandardItem;
             item->setText(package->name());
             item->setEditable(false);
-            item->setIcon(KIcon("muon"));
+            item->setIcon(QIcon::fromTheme("muon"));
 
             root->appendRow(item);
         }

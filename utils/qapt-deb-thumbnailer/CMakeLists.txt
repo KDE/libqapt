@@ -1,12 +1,10 @@
-set(qapt-deb-thumbnailer_SRCS DebThumbnailer.cpp)
+add_library(debthumbnailer MODULE DebThumbnailer.cpp)
 
-include_directories(${KDE4_INCLUDES}
-                    ${QT_INCLUDES})
+target_link_libraries(debthumbnailer
+    KF5::KIOWidgets
+    QApt::Main)
 
-kde4_add_plugin(debthumbnailer ${qapt-deb-thumbnailer_SRCS})
+message(WARNING "make sure thumbnailer actually works")
 
-target_link_libraries(debthumbnailer ${KDE4_KIO_LIBS} qapt)
-
-install(TARGETS debthumbnailer DESTINATION ${PLUGIN_INSTALL_DIR} )
-
-install(FILES  debthumbnailer.desktop DESTINATION ${SERVICES_INSTALL_DIR})
+install(TARGETS debthumbnailer DESTINATION ${PLUGIN_INSTALL_DIR})
+install(FILES debthumbnailer.desktop DESTINATION ${SERVICES_INSTALL_DIR})

@@ -21,14 +21,13 @@
 #ifndef DEBVIEWER_H
 #define DEBVIEWER_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
-#include "../../src/globals.h"
+#include <QApt/Globals>
 
 class QLabel;
 class QPushButton;
-
-class KTextBrowser;
+class QTextBrowser;
 
 namespace QApt {
     class Backend;
@@ -54,13 +53,13 @@ private:
     QWidget *m_versionInfoWidget;
     QLabel *m_versionTitleLabel;
     QLabel *m_versionInfoLabel;
-    KTextBrowser *m_descriptionWidget;
+    QTextBrowser *m_descriptionWidget;
     QLabel *m_versionLabel;
     QLabel *m_sizeLabel;
     QLabel *m_maintainerLabel;
     QLabel *m_sectionLabel;
     QLabel *m_homepageLabel;
-    KTextBrowser *m_fileWidget;
+    QTextBrowser *m_fileWidget;
 
 public Q_SLOTS:
     void setBackend(QApt::Backend *backend);

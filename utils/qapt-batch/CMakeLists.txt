@@ -2,12 +2,16 @@ set(qaptbatch_SRCS
     main.cpp
     qaptbatch.cpp
     detailswidget.cpp
-    ../../src/transactiondbus.cpp)
+)
 
-include_directories(${KDE4_INCLUDES} ${QT_INCLUDES})
+add_executable(qapt-batch ${qaptbatch_SRCS})
 
-kde4_add_executable(qapt-batch ${qaptbatch_SRCS})
-
-target_link_libraries(qapt-batch ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS} qapt)
+target_link_libraries(qapt-batch
+    KF5::CoreAddons
+    KF5::I18n
+    KF5::KIOCore
+    KF5::WidgetsAddons
+    KF5::WindowSystem
+    QApt::Main)
 
 install(TARGETS qapt-batch ${INSTALL_TARGETS_DEFAULT_ARGS})
