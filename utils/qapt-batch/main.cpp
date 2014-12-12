@@ -23,6 +23,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
+#include <QIcon>
 #include <QPointer>
 
 #include <KAboutData>
@@ -36,6 +37,7 @@ static const char version[] = "2.1";
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+    app.setWindowIcon(QIcon::fromTheme("applications-other"));
 
     KAboutData aboutData("qaptbatch",
                          i18nc("@title", "QApt Batch Installer"),
@@ -50,7 +52,6 @@ int main(int argc, char **argv)
     aboutData.addAuthor(i18nc("@info:credit", "Harald Sitter"),
                         i18nc("@info:credit", "Qt 5 port"),
                         QStringLiteral("apachelogger@kubuntu.org"));
-    aboutData.setProgramIconName(QStringLiteral("applications-other"));
     KAboutData::setApplicationData(aboutData);
 
     QCommandLineParser parser;
