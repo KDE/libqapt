@@ -42,7 +42,7 @@ Name[zh_TW]=Kubuntu
 Icon=package-x-generic
 URL=http://www.kubuntu.org
 
-[org.kubuntu.qaptworker2.updatecache]
+[@QAPT_WORKER_RDN_VERSIONED@.updatecache]
 Name=Update package information
 Name[bs]=Ažuriraj paketske informacije
 Name[ca]=Actualització de la informació dels paquets
@@ -126,7 +126,7 @@ Description[zh_TW]=要更新軟體類別，您必須通過認證。
 Policy=yes
 Persistence=session
 
-[org.kubuntu.qaptworker2.commitchanges]
+[@QAPT_WORKER_RDN_VERSIONED@.commitchanges]
 Name=Install or remove packages
 Name[bs]=Instalacija i pregled softverskih paketa
 Name[ca]=Instal·la i suprimeix paquets de programari
@@ -211,7 +211,7 @@ Description[zh_TW]=要安裝或移除軟體，您必須通過認證。
 Policy=auth_admin
 Persistence=session
 
-[org.kubuntu.qaptworker2.writefiletodisk]
+[@QAPT_WORKER_RDN_VERSIONED@.writefiletodisk]
 Name=Change software configuration
 Name[bs]=Promjena softverske konfiguracije
 Name[ca]=Canvi de la configuració del programari
@@ -295,7 +295,7 @@ Description[zh_TW]=要變更軟體設定，您必須通過認證。
 Policy=auth_admin
 Persistence=session
 
-[org.kubuntu.qaptworker2.cancelforeign]
+[@QAPT_WORKER_RDN_VERSIONED@.cancelforeign]
 Name=Cancel the task of another user
 Name[bs]=Otkaži zadatak drugog korisnika
 Name[ca]=Cancel·la la tasca d'un altre usuari

@@ -30,9 +30,10 @@
 // Own includes
 #include "aptworker.h"
 #include "qaptauthorization.h"
-#include "qaptworker2adaptor.h"
 #include "transaction.h"
 #include "transactionqueue.h"
+#include "workeradaptor.h"
+#include "urihelper.h"
 
 #define IDLE_TIMEOUT 30000 // 30 seconds
 
@@ -59,9 +60,9 @@ WorkerDaemon::WorkerDaemon(int &argc, char **argv)
     QApt::DownloadProgress::registerMetaTypes();
 
     // Start up D-Bus service
-    new Qaptworker2Adaptor(this);
+    new WorkerAdaptor(this);
 
-    if (!QDBusConnection::systemBus().registerService(QLatin1String("org.kubuntu.qaptworker2"))) {
+    if (!QDBusConnection::systemBus().registerService(QLatin1String(s_workerReverseDomainName))) {
         // Another worker is already here, quit
         QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
         qWarning() << "Couldn't register service" << QDBusConnection::systemBus().lastError().message();
@@ -153,7 +154,7 @@ QString WorkerDaemon::downloadArchives(const QStringList &packageNames, const QS
 
 bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker2.writefiletodisk"), message().service())) {
+    if (!QApt::Auth::authorize(dbusActionUri("writefiletodisk"), message().service())) {
         qDebug() << "Failed to authorize!!";
         return false;
     }
@@ -171,7 +172,7 @@ bool WorkerDaemon::writeFileToDisk(const QString &contents, const QString &path)
 
 bool WorkerDaemon::copyArchiveToCache(const QString &archivePath)
 {
-    if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker2.writefiletodisk"), message().service())) {
+    if (!QApt::Auth::authorize(dbusActionUri("writefiletodisk"), message().service())) {
         return false;
     }
 

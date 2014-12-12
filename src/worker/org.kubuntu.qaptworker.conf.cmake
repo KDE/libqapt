@@ -5,11 +5,11 @@
 
   <!-- Only user root can own the QAptWorker service -->
   <policy user="root">
-    <allow own="org.kubuntu.qaptworker2"/>
+    <allow own="@QAPT_WORKER_RDN_VERSIONED@"/>
   </policy>
 
   <policy context="default">
-    <allow send_destination="org.kubuntu.qaptworker2"/>
+    <allow send_destination="@QAPT_WORKER_RDN_VERSIONED@"/>
   </policy>
 
 </busconfig>

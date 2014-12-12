@@ -28,7 +28,7 @@
 #include <apt-pkg/configuration.h>
 
 // Own includes
-#include "workerdbus.h" // OrgKubuntuQaptworker2Interface
+#include "dbusinterfaces_p.h"
 
 namespace QApt {
 
@@ -51,7 +51,7 @@ public:
     QStringList sourceFiles;
     
     // DBus
-    OrgKubuntuQaptworker2Interface *worker;
+    WorkerInterface *worker;
 
     // Data
     QHash< QString, QApt::SourceEntryList > list;
@@ -131,7 +131,7 @@ SourcesList::SourcesList(QObject *parent)
 {
     Q_D(SourcesList);
 
-    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
+    d->worker = new WorkerInterface(QLatin1String(s_workerReverseDomainName),
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
 }
@@ -142,7 +142,7 @@ SourcesList::SourcesList(QObject *parent, const QStringList &sourcesFileList)
 {
     Q_D(SourcesList);
 
-    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
+    d->worker = new WorkerInterface(QLatin1String(s_workerReverseDomainName),
                                                   QLatin1String("/"), QDBusConnection::systemBus(),
                                                   this);
 }

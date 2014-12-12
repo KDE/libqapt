@@ -112,7 +112,7 @@ public:
     void setErrorDetails(const QString &errorDetails);
     void setSafeUpgrade(bool safeUpgrade);
     void setConfFileConflict(const QString &currentPath, const QString &newPath);
-    void setFrontendCaps(QApt::FrontendCaps frontendCaps);
+    void setFrontendCaps(int frontendCaps);
 
 private:
     // Pointers to external containers

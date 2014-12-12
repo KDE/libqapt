@@ -8,7 +8,6 @@ set(qapt_SRCS
     dependencyinfo.cpp
     changelog.cpp
     transaction.cpp
-    transactiondbus.cpp
     downloadprogress.cpp
     markingerrorinfo.cpp
     sourceentry.cpp
@@ -16,9 +15,31 @@ set(qapt_SRCS
 
 add_subdirectory(worker)
 
+set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.transaction.xml
+    APPEND PROPERTY
+        INCLUDE downloadprogress.h
+)
+set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.transaction.xml
+    APPEND PROPERTY
+        NO_NAMESPACE 1
+)
+
+message(WARNING "super shit access to transaction xml file")
 qt5_add_dbus_interface(qapt_SRCS
-                       worker/org.kubuntu.qaptworker2.xml
-                       workerdbus)
+                       ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.transaction.xml
+                       transactioninterface_p)
+
+set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.xml
+    APPEND PROPERTY
+        NO_NAMESPACE 1
+)
+
+message(WARNING "super shit access to worker xml file")
+qt5_add_dbus_interface(qapt_SRCS
+                       ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.xml
+                       workerinterface_p)
+
+configure_file(dbusinterfaces_p.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/dbusinterfaces_p.h)
 
 add_library(QApt SHARED ${qapt_SRCS})
 add_library(QApt::Main ALIAS QApt)

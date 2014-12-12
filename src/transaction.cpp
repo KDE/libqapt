@@ -25,7 +25,7 @@
 #include <QDebug>
 
 // Own includes
-#include "transactiondbus.h"
+#include "dbusinterfaces_p.h"
 
 namespace QApt {
 
@@ -46,9 +46,9 @@ class TransactionPrivate
             , downloadSpeed(0)
             , downloadETA(0)
         {
-            dbus = new OrgKubuntuQaptworkerTransactionInterface(QLatin1String("org.kubuntu.qaptworker2"),
-                                                                       tid, QDBusConnection::systemBus(),
-                                                                       0);
+            dbus = new TransactionInterface(QLatin1String(s_workerReverseDomainName),
+                                            tid, QDBusConnection::systemBus(),
+                                            0);
         }
 
         ~TransactionPrivate()
@@ -57,7 +57,7 @@ class TransactionPrivate
         }
 
         // DBus
-        OrgKubuntuQaptworkerTransactionInterface *dbus;
+        TransactionInterface *dbus;
         QDBusServiceWatcher *watcher;
 
         // Data
@@ -95,7 +95,7 @@ Transaction::Transaction(const QString &tid)
     d->watcher = new QDBusServiceWatcher(this);
     d->watcher->setConnection(QDBusConnection::systemBus());
     d->watcher->setWatchMode(QDBusServiceWatcher::WatchForOwnerChange);
-    d->watcher->addWatchedService(QLatin1String("org.kubuntu.qaptworker2"));
+    d->watcher->addWatchedService(QLatin1String(s_workerReverseDomainName));
 
     connect(d->dbus, SIGNAL(propertyChanged(int,QDBusVariant)),
             this, SLOT(updateProperty(int,QDBusVariant)));
@@ -571,9 +571,11 @@ void Transaction::serviceOwnerChanged(QString name, QString oldOwner, QString ne
 
 void Transaction::sync()
 {
+    QString arg = QString("%1.%2").arg(QLatin1String(s_workerReverseDomainName),
+                                       QLatin1String("transaction"));
     QDBusMessage call = QDBusMessage::createMethodCall(d->dbus->service(), d->tid,
                                                        "org.freedesktop.DBus.Properties", "GetAll");
-    call.setArguments(QList<QVariant>() << "org.kubuntu.qaptworker2.transaction");
+    call.setArguments(QList<QVariant>() << arg);
 
     QDBusReply<QVariantMap> reply = QDBusConnection::systemBus().call(call);
     QVariantMap propertyMap = reply.value();

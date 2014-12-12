@@ -28,8 +28,9 @@
 
 // Own includes
 #include "qaptauthorization.h"
-#include "transactionadapter.h"
+#include "transactionadaptor.h"
 #include "transactionqueue.h"
+#include "worker/urihelper.h"
 
 #define IDLE_TIMEOUT 30000 // 30 seconds
 
@@ -71,11 +72,11 @@ Transaction::Transaction(TransactionQueue *queue, int userId,
         qWarning() << "Unable to register transaction on DBus";
 
     m_roleActionMap[QApt::EmptyRole] = QString("");
-    m_roleActionMap[QApt::UpdateCacheRole] = QLatin1String("org.kubuntu.qaptworker2.updatecache");
-    m_roleActionMap[QApt::UpgradeSystemRole] = QLatin1String("org.kubuntu.qaptworker2.commitchanges");
-    m_roleActionMap[QApt::CommitChangesRole] = QLatin1String("org.kubuntu.qaptworker2.commitchanges");
+    m_roleActionMap[QApt::UpdateCacheRole] = dbusActionUri("updatecache");
+    m_roleActionMap[QApt::UpgradeSystemRole] = dbusActionUri("commitchanges");
+    m_roleActionMap[QApt::CommitChangesRole] = dbusActionUri("commitchanges");
     m_roleActionMap[QApt::DownloadArchivesRole] = QString("");
-    m_roleActionMap[QApt::InstallFileRole] = QLatin1String("org.kubuntu.qaptworker2.commitchanges");
+    m_roleActionMap[QApt::InstallFileRole] = dbusActionUri("commitchanges");
 
     m_queue->addPending(this);
     m_idleTimer = new QTimer(this);
@@ -555,7 +556,7 @@ void Transaction::setProperty(int property, QDBusVariant value)
         setPackages(value.variant().toMap());
         break;
     case QApt::FrontendCapsProperty:
-        setFrontendCaps((QApt::FrontendCaps)value.variant().toInt());
+        setFrontendCaps(value.variant().toInt());
     default:
         sendErrorReply(QDBusError::InvalidArgs);
         break;
@@ -565,8 +566,8 @@ void Transaction::setProperty(int property, QDBusVariant value)
 void Transaction::cancel()
 {
     if (isForeignUser()) {
-        if (!QApt::Auth::authorize(QLatin1String("org.kubuntu.qaptworker2.foreigncancel"),
-                                   QLatin1String("org.kubuntu.qaptworker2"))) {
+        if (!QApt::Auth::authorize(dbusActionUri("foreigncancel"),
+                                   QLatin1String(s_workerReverseDomainName))) {
             sendErrorReply(QDBusError::AccessDenied);
             return;
         }
@@ -627,11 +628,11 @@ void Transaction::resolveConfigFileConflict(const QString &currentPath, bool rep
     m_isPaused = false;
 }
 
-void Transaction::setFrontendCaps(QApt::FrontendCaps frontendCaps)
+void Transaction::setFrontendCaps(int frontendCaps)
 {
     QMutexLocker lock(&m_dataMutex);
 
-    m_frontendCaps = frontendCaps;
+    m_frontendCaps = (QApt::FrontendCaps)frontendCaps;
 }
 
 void Transaction::emitIdleTimeout()

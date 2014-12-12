@@ -1,6 +1,6 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
-  <interface name="org.kubuntu.qaptworker2.transaction">
+  <interface name="@QAPT_WORKER_RDN_VERSIONED@.transaction">
     <property name="transactionId" type="s" access="read"/>
     <property name="userId" type="i" access="read"/>
     <property name="role" type="i" access="read"/>

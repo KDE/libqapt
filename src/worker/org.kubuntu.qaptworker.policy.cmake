@@ -6,7 +6,7 @@
   <vendor>Kubuntu</vendor>
   <vendor_url>http://www.kubuntu.org</vendor_url>
 
-  <action id="org.kubuntu.qaptworker2.updatecache">
+  <action id="@QAPT_WORKER_RDN_VERSIONED@.updatecache">
     <description>Update software sources</description>
     <message>Update software sources</message>
     <defaults>
@@ -14,7 +14,7 @@
       <allow_active>yes</allow_active>
     </defaults>
   </action>
-  <action id="org.kubuntu.qaptworker2.commitchanges">
+  <action id="@QAPT_WORKER_RDN_VERSIONED@.commitchanges">
     <description>Install or remove packages</description>
     <message>Install or remove packages</message>
     <defaults>
@@ -22,7 +22,7 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
-  <action id="org.kubuntu.qaptworker2.writefiletodisk">
+  <action id="@QAPT_WORKER_RDN_VERSIONED@.writefiletodisk">
     <description>Change system settings</description>
     <message>Change system settings</message>
     <defaults>
@@ -30,7 +30,7 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
-  <action id="org.kubuntu.qaptworker2.cancelforeign">
+  <action id="@QAPT_WORKER_RDN_VERSIONED@.cancelforeign">
     <description>Cancel the task of another user</description>
     <message> To cancel someone else's software changes, you need to authenticate.</message>
     <defaults>

@@ -44,9 +44,9 @@
 // QApt includes
 #include "cache.h"
 #include "config.h" // krazy:exclude=includes
+#include "dbusinterfaces_p.h"
 #include "debfile.h"
 #include "transaction.h"
-#include "workerdbus.h" // OrgKubuntuQaptworker2Interface
 
 namespace QApt {
 
@@ -103,7 +103,7 @@ public:
     bool xapianIndexExists;
 
     // DBus
-    OrgKubuntuQaptworker2Interface *worker;
+    WorkerInterface *worker;
 
     // Config
     Config *config;
@@ -140,9 +140,9 @@ Backend::Backend(QObject *parent)
 {
     Q_D(Backend);
 
-    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
-                                                  QLatin1String("/"), QDBusConnection::systemBus(),
-                                                  this);
+    d->worker = new WorkerInterface(QLatin1String(s_workerReverseDomainName),
+                                    QLatin1String("/"), QDBusConnection::systemBus(),
+                                    this);
     connect(d->worker, SIGNAL(transactionQueueChanged(QString,QStringList)),
             this, SIGNAL(transactionQueueChanged(QString,QStringList)));
     DownloadProgress::registerMetaTypes();

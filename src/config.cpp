@@ -32,7 +32,7 @@
 #include <apt-pkg/configuration.h>
 
 // Own includes
-#include "workerdbus.h" // OrgKubuntuQaptworker2Interface
+#include "dbusinterfaces_p.h"
 
 namespace QApt {
 
@@ -42,7 +42,7 @@ class ConfigPrivate
 {
     public:
         // DBus
-        OrgKubuntuQaptworker2Interface *worker;
+        WorkerInterface *worker;
 
         // Data
         QByteArray buffer;
@@ -115,9 +115,9 @@ Config::Config(QObject *parent)
 {
     Q_D(Config);
 
-    d->worker = new OrgKubuntuQaptworker2Interface(QLatin1String("org.kubuntu.qaptworker2"),
-                                                  QLatin1String("/"), QDBusConnection::systemBus(),
-                                                  this);
+    d->worker = new WorkerInterface(QLatin1String(s_workerReverseDomainName),
+                                    QLatin1String("/"), QDBusConnection::systemBus(),
+                                    this);
 
     QFile file(APT_CONFIG_PATH);
 

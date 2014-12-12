@@ -1,5 +1,4 @@
-project(libqapt)
-
+project(qapt)
 cmake_minimum_required(VERSION 2.8.12)
 
 find_package(ECM 0.0.14 REQUIRED NO_MODULE)
@@ -16,7 +15,7 @@ include(FeatureSummary)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
-include(ECMGeneratePriFile) # This needs InstallDirs 
+include(ECMGeneratePriFile) # This needs InstallDirs
 
 # Turn exceptions on
 kde_enable_exceptions()
@@ -42,6 +41,17 @@ ecm_setup_version(3.0.0 VARIABLE_PREFIX QAPT
                         VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/qaptversion.h"
                         PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/QAptConfigVersion.cmake"
                         SOVERSION 3)
+
+set(QAPT_WORKER_VERSION 3)
+set(QAPT_WORKER_RDN org.kubuntu.qaptworker)
+set(QAPT_WORKER_RDN_VERSIONED ${QAPT_WORKER_RDN}${QAPT_WORKER_VERSION})
+
+# For forwarding into C++ convert them into properly excaped strings.
+set(QAPT_WORKER_VERSION_STRING \"${QAPT_WORKER_VERSION}\")
+set(QAPT_WORKER_RDN_VERSIONED_STRING \"${QAPT_WORKER_RDN_VERSIONED}\")
+
+add_definitions(-DQAPT_WORKER_VERSION_STRING=${QAPT_WORKER_VERSION_STRING})
+add_definitions(-DQAPT_WORKER_RDN_VERSIONED_STRING=${QAPT_WORKER_RDN_VERSIONED_STRING})
 
 set(KF5_DEP_VERSION "5.0.0")
 
