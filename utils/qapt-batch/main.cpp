@@ -39,6 +39,8 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon::fromTheme("applications-other"));
 
+    KLocalizedString::setApplicationDomain("qapt-batch");
+
     KAboutData aboutData("qaptbatch",
                          i18nc("@title", "QApt Batch Installer"),
                          version,

@@ -38,6 +38,8 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon::fromTheme("applications-other"));
 
+    KLocalizedString::setApplicationDomain("qapt-deb-installer");
+
     KAboutData aboutData("qapt-deb-installer",
                          i18nc("@title", "QApt Package Installer"),
                          version,

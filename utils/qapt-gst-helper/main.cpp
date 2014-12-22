@@ -39,6 +39,8 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon::fromTheme("applications-other"));
 
+    KLocalizedString::setApplicationDomain("qapt-gst-helper");
+
     KAboutData aboutData("qapt-gst-helper",
                          i18nc("@title", "QApt Codec Searcher"),
                          version,
