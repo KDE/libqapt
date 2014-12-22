@@ -27,7 +27,8 @@
 #include <KAboutData>
 #include <KLocalizedString>
 
-#include <gstreamer-1.0/gst/gst.h>
+#include <gst/gst.h>
+#include <gst/pbutils/install-plugins.h>
 
 static const char description[] =
     I18N_NOOP2("@info", "A GStreamer codec installer using QApt");
@@ -70,9 +71,15 @@ int main(int argc, char **argv)
     parser.process(app);
     aboutData.processCommandLine(&parser);
 
-#warning gst init error not handled
     GError *error = nullptr;
     gst_init_check(&argc, &argv, &error);
+    if (error) {
+        // TODO: we should probably show an error message. API documention suggests
+        // so at least. Then again explaining random init errors to the user
+        // might be a bit tricky.
+#warning FIXME 3.1 show error msgbox when gstreamer init fails
+        return GST_INSTALL_PLUGINS_ERROR;
+    }
 
     // do not restore!
     if (app.isSessionRestored()) {
