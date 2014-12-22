@@ -23,12 +23,12 @@
 
 // Qt includes
 #include <QDialog>
+#include <QDialogButtonBox>
 
 // LibQApt includes
 #include <QApt/Globals>
 
 class DetailsWidget;
-class QDialogButtonBox;
 class QLabel;
 class QProgressBar;
 
