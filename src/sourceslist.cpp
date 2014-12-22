@@ -255,9 +255,9 @@ QString SourcesList::toString() const
     QString toReturn;
 
     for (const QString &sourceFile : d->sourceFiles) {
-        toReturn += sourceFile + "\n";
+        toReturn += sourceFile + '\n';
         for (const QApt::SourceEntry &sourceEntry : entries(sourceFile)) {
-            toReturn += sourceEntry.toString() + "\n";
+            toReturn += sourceEntry.toString() + '\n';
         }
     }
 
