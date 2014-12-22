@@ -32,7 +32,7 @@
 static const char description[] =
     I18N_NOOP2("@info", "A batch installer using QApt");
 
-static const char version[] = "2.1";
+static const char version[] = CMAKE_PROJECT_VERSION;
 
 int main(int argc, char **argv)
 {
