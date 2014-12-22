@@ -71,20 +71,20 @@ find_package(DebconfKDE)
 find_package(GStreamer)
 find_package(GLIB2)
 
-set(WITH_UTILS
-    KF5CoreAddons_FOUND
-    AND KF5I18n_FOUND
-    AND KF5KIO_FOUND
-    AND KF5Runner_FOUND
-    AND KF5TextWidgets_FOUND
-    AND KF5WidgetsAddons_FOUND
-    AND KF5WindowSystem_FOUND
-    AND DebconfKDE_FOUND)
+if (KF5CoreAddons_FOUND
+        AND KF5I18n_FOUND
+        AND KF5KIO_FOUND
+        AND KF5Runner_FOUND
+        AND KF5TextWidgets_FOUND
+        AND KF5WidgetsAddons_FOUND
+        AND KF5WindowSystem_FOUND
+        AND DebconfKDE_FOUND)
+    set(WITH_UTILS true)
+endif()
 
-set(WITH_GSTREAMER
-    WITH_KF5
-    AND GSTREAMER_FOUND
-    AND GLIB2_FOUND)
+if (WITH_UTILS AND GSTREAMER_FOUND AND GLIB2_FOUND)
+    set(WITH_GSTREAMER true)
+endif()
 
 add_feature_info(qapt-utils WITH_UTILS "Runtime utilities using KDE frameworks")
 add_feature_info(qapt-gst-helper WITH_GSTREAMER "GStreamer codec helper util")
