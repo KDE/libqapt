@@ -53,8 +53,6 @@ target_link_libraries(qaptworker${QAPT_WORKER_VERSION}
     util
     QApt::Main)
 
-message(WARNING "worker randomly links against -lutil...")
-
 install(TARGETS qaptworker${QAPT_WORKER_VERSION} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${QAPT_WORKER_RDN_VERSIONED}.service

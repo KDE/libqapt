@@ -24,7 +24,7 @@ set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSION
         NO_NAMESPACE 1
 )
 
-message(WARNING "super shit access to transaction xml file")
+message(WARNING "terrible use of transaction xml file")
 qt5_add_dbus_interface(qapt_SRCS
                        ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.transaction.xml
                        transactioninterface_p)
@@ -34,7 +34,7 @@ set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSION
         NO_NAMESPACE 1
 )
 
-message(WARNING "super shit access to worker xml file")
+message(WARNING "terrible use of  worker xml file")
 qt5_add_dbus_interface(qapt_SRCS
                        ${CMAKE_CURRENT_BINARY_DIR}/worker/${QAPT_WORKER_RDN_VERSIONED}.xml
                        workerinterface_p)
