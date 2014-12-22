@@ -31,7 +31,8 @@
 
 namespace QApt {
 
-class SourceEntryPrivate : public QSharedData {
+class SourceEntryPrivate : public QSharedData
+{
 public:
     SourceEntryPrivate()
         : isValid(true)

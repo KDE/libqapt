@@ -62,7 +62,7 @@ public:
     void setComponents(const QStringList &comps);
     void setComment(const QString &comment);
     void setFile(const QString &file);
-    
+
 private:
     QSharedDataPointer<SourceEntryPrivate> d;
 };
