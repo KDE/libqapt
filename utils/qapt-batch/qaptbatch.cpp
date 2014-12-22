@@ -51,7 +51,6 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     , m_label(new QLabel(this))
     , m_progressBar(new QProgressBar(this))
     , m_detailsWidget(new DetailsWidget(this))
-    , m_cancelButton(new QPushButton(this))
     , m_buttonBox(new QDialogButtonBox(this))
 {
     if (!m_backend->init())
@@ -79,9 +78,11 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     if (winId)
         KWindowSystem::setMainWindow(this, winId);
 
-    KGuiItem::assign(m_cancelButton, KStandardGuiItem::cancel());
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-    m_buttonBox->addButton(m_cancelButton, QDialogButtonBox::RejectRole);
+    // Create buttons.
+    m_buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Close);
+
+    setVisibleButtons(QDialogButtonBox::Cancel);
+    connect(m_buttonBox, &QDialogButtonBox::rejected, this, &QAptBatch::reject);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(m_label);
@@ -89,8 +90,6 @@ QAptBatch::QAptBatch(QString mode, QStringList packages, int winId)
     layout->addWidget(m_detailsWidget);
     layout->addWidget(m_buttonBox);
     setLayout(layout);
-
-    m_detailsWidget->show();
 }
 
 void QAptBatch::initError()
@@ -168,6 +167,12 @@ void QAptBatch::setTransaction(QApt::Transaction *trans)
     connect(this, SIGNAL(rejected()), m_trans, SLOT(cancel()));
 
     m_trans->run();
+}
+
+void QAptBatch::setVisibleButtons(QDialogButtonBox::StandardButtons buttons)
+{
+    m_buttonBox->button(QDialogButtonBox::Cancel)->setVisible(buttons & QDialogButtonBox::Cancel);
+    m_buttonBox->button(QDialogButtonBox::Close)->setVisible(buttons & QDialogButtonBox::Close);
 }
 
 void QAptBatch::errorOccurred(QApt::ErrorCode code)
@@ -344,14 +349,11 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
                                 m_packages.count()));
         }
 
-#warning TODO
-//        setButtons(KDialog::Cancel | KDialog::Details);
-//        setButtonFocus(KDialog::Details);
+        setVisibleButtons(QDialogButtonBox::Cancel);
         break;
     case QApt::CommittingStatus:
         setWindowTitle(i18nc("@title:window", "Installing Packages"));
-#warning TODO
-//        setButtons(KDialog::Cancel);
+        setVisibleButtons(QDialogButtonBox::Cancel);
         break;
     case QApt::FinishedStatus: {
         if (m_mode == "install") {
@@ -393,9 +395,8 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
         m_trans->deleteLater();
         m_trans = 0;
 
-        KGuiItem::assign(m_cancelButton, KStandardGuiItem::close());
-        // Force enable in case cancellable was false previously.
-        m_cancelButton->setEnabled(true);
+        setVisibleButtons(QDialogButtonBox::Close);
+        m_buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     }
     case QApt::WaitingConfigFilePromptStatus:
@@ -406,7 +407,7 @@ void QAptBatch::transactionStatusChanged(QApt::TransactionStatus status)
 
 void QAptBatch::cancellableChanged(bool cancellable)
 {
-    m_cancelButton->setEnabled(cancellable);
+    m_buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(cancellable);
 }
 
 void QAptBatch::updateProgress(int progress)

@@ -43,26 +43,7 @@ class QAptBatch : public QDialog
 public:
     explicit QAptBatch(QString mode, QStringList packages, int winId);
 
-    void reject();
-
-private:
-    QApt::Backend *m_backend;
-    QApt::Transaction *m_trans;
-
-    int m_winId;
-    int m_lastRealProgress;
-    QString m_mode;
-    QStringList m_packages;
-    bool m_done;
-
-    // ui
-    QLabel *m_label;
-    QProgressBar *m_progressBar;
-    DetailsWidget *m_detailsWidget;
-    QPushButton *m_cancelButton;
-    QDialogButtonBox *m_buttonBox;
-
-    void setTransaction(QApt::Transaction *trans);
+    void reject() Q_DECL_OVERRIDE Q_DECL_FINAL;
 
 private Q_SLOTS:
     void initError();
@@ -76,6 +57,25 @@ private Q_SLOTS:
 
     void updateProgress(int progress);
     void updateCommitMessage(const QString& message);
+
+private:
+    void setTransaction(QApt::Transaction *trans);
+    void setVisibleButtons(QDialogButtonBox::StandardButtons buttons);
+
+    QApt::Backend *m_backend;
+    QApt::Transaction *m_trans;
+
+    int m_winId;
+    int m_lastRealProgress;
+    QString m_mode;
+    QStringList m_packages;
+    bool m_done;
+
+    // ui
+    QLabel *m_label;
+    QProgressBar *m_progressBar;
+    DetailsWidget *m_detailsWidget;
+    QDialogButtonBox *m_buttonBox;
 };
 
 #endif
