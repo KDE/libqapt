@@ -111,8 +111,7 @@ QList<DependencyItem> DependencyInfo::parseDepends(const QString &field, Depende
         }
 
         if (hadOr) {
-            depItem = depends.last();
-            depends.removeLast();
+            depItem = depends.takeLast();
         }
 
         if (op & pkgCache::Dep::Or) {
