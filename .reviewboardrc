@@ -1,4 +1,4 @@
 REPOSITORY = "git://anongit.kde.org/libqapt"
 REVIEWBOARD_URL = "https://git.reviewboard.kde.org"
-TARGET_GROUPS = "libqapt"
+TARGET_GROUPS = "libqapt, kubuntu"
 BRANCH = "master"
