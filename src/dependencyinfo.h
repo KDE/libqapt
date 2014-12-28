@@ -101,6 +101,10 @@ public:
     */
     DependencyType dependencyType() const;
 
+    /**
+    /**
+     * @return a localized string representation of the type.
+     */
     static QString typeName(DependencyType type);
 
 private:
