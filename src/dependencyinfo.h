@@ -103,11 +103,6 @@ public:
 
     static QString typeName(DependencyType type);
 
-   /**
-    * Whether or not the dependency is part of an "or" dependency group
-    */
-    bool isOrDependency() const;
-
 private:
     DependencyInfo(const QString &package,
                    const QString &version,
