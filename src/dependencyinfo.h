@@ -109,8 +109,10 @@ public:
     bool isOrDependency() const;
 
 private:
-    DependencyInfo(const QString &package, const QString &version,
-                   RelationType rType, DependencyType dType);
+    DependencyInfo(const QString &package,
+                   const QString &version,
+                   RelationType rType,
+                   DependencyType dType);
 
     QSharedDataPointer<DependencyInfoPrivate> d;
 

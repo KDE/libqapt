@@ -27,27 +27,25 @@
 
 namespace QApt {
 
-class DependencyInfoPrivate : public QSharedData {
+class DependencyInfoPrivate : public QSharedData
+{
 public:
     DependencyInfoPrivate()
         : QSharedData()
         , relationType(NoOperand)
-        , dependencyType(InvalidType) {}
+        , dependencyType(InvalidType)
+    {}
 
-    DependencyInfoPrivate(const QString &package, const QString &version,
-                          RelationType rType, DependencyType dType)
+    DependencyInfoPrivate(const QString &package,
+                          const QString &version,
+                          RelationType rType,
+                          DependencyType dType)
         : QSharedData()
         , packageName(package)
         , packageVersion(version)
         , relationType(rType)
-        , dependencyType(dType) {}
-
-    DependencyInfoPrivate(const DependencyInfoPrivate &other)
-        : QSharedData(other)
-        , packageName(other.packageName)
-        , packageVersion(other.packageVersion)
-        , relationType(other.relationType)
-        , dependencyType(other.dependencyType) {}
+        , dependencyType(dType)
+    {}
 
     QString packageName;
     QString packageVersion;
