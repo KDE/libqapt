@@ -163,8 +163,6 @@ void DebInstaller::errorOccurred(QApt::ErrorCode error)
         m_applyButton->setEnabled(true);
         m_cancelButton->setEnabled(true);
         break;
-    default:
-        break;
     }
 }
 
