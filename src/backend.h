@@ -96,7 +96,7 @@ public:
 
    /**
     * Returns whether or not APT is configured for installing packages for
-    * additional foriegn CPU architectures.
+    * additional foreign CPU architectures.
     */
     bool isMultiArchEnabled() const;
 
