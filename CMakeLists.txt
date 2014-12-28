@@ -75,9 +75,9 @@ find_package(KF5TextWidgets ${KF5_DEP_VERSION})
 find_package(KF5WidgetsAddons ${KF5_DEP_VERSION})
 find_package(KF5WindowSystem ${KF5_DEP_VERSION})
 
-find_package(DebconfKDE)
-find_package(GStreamer)
-find_package(GLIB2)
+find_package(DebconfKDE 1.0)
+find_package(GStreamer 1.0)
+find_package(GLIB2 2.0)
 
 if (KF5CoreAddons_FOUND
         AND KF5I18n_FOUND
