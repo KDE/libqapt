@@ -680,9 +680,7 @@ void AptWorker::updateDpkgProgress()
 
 void AptWorker::dpkgFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    Q_UNUSED(exitCode);
-
-    if (exitStatus) {
+    if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         m_trans->setError(QApt::CommitError);
         m_trans->setErrorDetails(m_dpkgProcess->readAllStandardError());
     }
