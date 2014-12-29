@@ -1,4 +1,5 @@
 /***************************************************************************
+ *   Copyright © 2014 Harald Sitter <sitter@kde.org>                       *
  *   Copyright © 2011 Jonathan Thomas <echidnaman@kubuntu.org>             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
@@ -100,6 +101,15 @@ public:
     * @return The @c DependencyType of the dependency
     */
     DependencyType dependencyType() const;
+
+    /**
+     * @return the multi-arch annotation defining on whether Multi-Arch: allowed
+     *         dependency candidates may be used to resolve the dependency.
+     *         A non-empty annotation would be either 'any', 'native' or a
+     *         specific architecture tag (please refer to the multi-arch specifiation
+     *         for additional information on what the tags mean).
+     */
+    QString multiArchAnnotation() const;
 
     /**
      * @return a localized string representation of the type.

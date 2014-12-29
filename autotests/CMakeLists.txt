@@ -15,6 +15,11 @@ configure_file(
     COPYONLY
 )
 
+ecm_add_test(dependencyinfotest.cpp
+    LINK_LIBRARIES
+        Qt5::Test
+        QApt::Main)
+
 ecm_add_test(sourceslisttest.cpp
     LINK_LIBRARIES
         Qt5::Test
