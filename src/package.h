@@ -339,6 +339,25 @@ public:
     */
     bool isSupported() const;
 
+    /**
+     * Check whether the candidate version for an update should actually be
+     * installed. This is based on an optional Phased-Update-Percentage control
+     * field specifying a number between 0 and 100 indicating how many systems
+     * should get this update.
+     *
+     * Whether or not a system is in the update phase is determined by a
+     * repeatable discrete random number calculation.
+     *
+     * @returns @c false if a candidate definitely does not fall into the update
+     *          phase or there is no candidate. @c true is returned in all other cases.
+     *
+     * @warning this function uses statics and is not in the least way threadsafe
+     *          nor reentrant.
+     *
+     * @since 3.1
+     */
+    bool isInUpdatePhase() const;
+
    /**
     * A package prepared for MultiArch can have any of three MultiArch "states"
     * that control how dpkg treats the package as a dependency. A package can

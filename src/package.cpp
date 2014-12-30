@@ -25,12 +25,13 @@
 #include "package.h"
 
 // Qt includes
-#include <QtCore/QFile>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QStringList>
-#include <QtCore/QTemporaryFile>
-#include <QtCore/QTextStream>
+#include <QCryptographicHash>
 #include <QDebug>
+#include <QFile>
+#include <QStringBuilder>
+#include <QStringList>
+#include <QTemporaryFile>
+#include <QTextStream>
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
@@ -63,6 +64,8 @@ class PackagePrivate
             , state(0)
             , staticStateCalculated(false)
             , foreignArchCalculated(false)
+            , isInUpdatePhase(false)
+            , inUpdatePhaseCalculated(false)
         {
         }
 
@@ -76,12 +79,16 @@ class PackagePrivate
         bool staticStateCalculated;
         bool isForeignArch;
         bool foreignArchCalculated;
+        bool isInUpdatePhase;
+        bool inUpdatePhaseCalculated;
 
         pkgCache::PkgFileIterator searchPkgFileIter(QLatin1String label, const QString &release) const;
         QString getReleaseFileForOrigin(QLatin1String label, const QString &release) const;
 
         // Calculate state flags that cannot change
         void initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache);
+
+        bool setInUpdatePhase(bool inUpdatePhase);
 };
 
 pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(QLatin1String label, const QString &release) const
@@ -204,6 +211,13 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
     state |= packageState;
 
     staticStateCalculated = true;
+}
+
+bool PackagePrivate::setInUpdatePhase(bool inUpdatePhase)
+{
+    inUpdatePhaseCalculated = true;
+    isInUpdatePhase = inUpdatePhase;
+    return inUpdatePhase;
 }
 
 Package::Package(QApt::Backend* backend, pkgCache::PkgIterator &packageIter)
@@ -792,6 +806,80 @@ bool Package::isSupported() const
     }
 
     return false;
+}
+
+bool Package::isInUpdatePhase() const
+{
+    if (!(state() & Package::Upgradeable)) {
+        return false;
+    }
+
+    // Try to use the cached values, otherwise we have to do the calculation.
+    if (d->inUpdatePhaseCalculated) {
+        return d->isInUpdatePhase;
+    }
+
+    bool intConversionOk = true;
+    int phasedUpdatePercent = controlField(QLatin1String("Phased-Update-Percentage")).toInt(&intConversionOk);
+    if (!intConversionOk) {
+        // Upgradable but either the phase percent field is not there at all
+        // or it has a non-convertable value.
+        // In either case this package is good for upgrade.
+        return d->setInUpdatePhase(true);
+    }
+
+    // This is a more or less an exact reimplemenation of the update phasing
+    // algorithm Ubuntu uses.
+    // Deciding whether a machine is in the phasing pool or not happens in
+    // two steps.
+    // 1. repeatable random number generation between 0..100
+    // 2. comparision of random number with phasing percentage and marking
+    //    as upgradable if rand is greater than the phasing.
+
+    // Repeatable discrete random number generation is based on
+    // the MD5 hash of "sourcename-sourceversion-dbusmachineid", this
+    // hash is used as seed for the random number generator to provide
+    // stable randomness based on the stable seed. Combined with the discrete
+    // quasi-randomiziation we get about even distribution of machines accross
+    // phases.
+    static QString machineId;
+    if (machineId.isNull()) {
+        QFile file(QStringLiteral("/var/lib/dbus/machine-id"));
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            machineId = file.readLine().trimmed();
+        }
+    }
+
+    if (machineId.isEmpty()) {
+        // Without machineId we cannot differentiate one machine from another, so
+        // we have no way to build a unique hash.
+        return true; // Don't change cache as we might have more luck next time.
+    }
+
+    QString seedString = QStringLiteral("%1-%2-%3").arg(sourcePackage(),
+                                                        availableVersion(),
+                                                        machineId);
+    QByteArray seed = QCryptographicHash::hash(seedString.toLatin1(), QCryptographicHash::Md5);
+    // MD5 would be 128bits, that's two quint64 stdlib random default_engine
+    // uses a uint32 seed though, so we'd loose precision anyway, so screw
+    // this, we'll get the first 32bit and screw the rest! This is not
+    // rocket science, worst case the update only arrives once the phasing
+    // tag is removed.
+    seed = seed.toHex();
+    seed.truncate(8 /* each character in a hex string values 4 bit, 8*4=32bit */);
+
+    bool ok = false;
+    uint a = seed.toUInt(&ok, 16);
+    Q_ASSERT(ok); // Hex conversion always is supposed to work at this point.
+
+    std::default_random_engine generator(a);
+    std::uniform_int_distribution<int> distribution(0, 100);
+    int rand = distribution(generator);
+
+    // rand is the percentage at which the machine starts to be in the phase.
+    // Once rand is less than the phasing percentage e.g. 40rand vs. 50phase
+    // the machine is supposed to start phasing.
+    return d->setInUpdatePhase(rand <= phasedUpdatePercent);
 }
 
 bool Package::isMultiArchDuplicate() const
