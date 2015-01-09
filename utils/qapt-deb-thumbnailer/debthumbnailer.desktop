@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Service
 Name=Debian Package Files
+Name[ar]=ملفّات حزم دبيانيّة
 Name[bs]=Debian paketne datoteke
 Name[ca]=Fitxers de paquets Debian
 Name[ca@valencia]=Fitxers de paquets Debian
