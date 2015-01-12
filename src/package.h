@@ -279,7 +279,7 @@ public:
     * Returns the amount of hard drive space that the currently-installed
     * version of this package takes up.
     * This is human-unreadable, so KDE applications may wish to run this
-    * through the KGlobal::locale()->formatByteSize() function to get a
+    * through the KFormat().formatByteSize() function to get a
     * localized, human-readable number.
     *
     * Returns -1 on error.
@@ -292,7 +292,7 @@ public:
     * Returns the amount of hard drive space that this package will take up
     * once installed.
     * This is human-unreadable, so KDE applications may wish to run this
-    * through the KGlobal::locale()->formatByteSize() function to get a
+    * through the KFormat().formatByteSize() function to get a
     * localized, human-readable number.
     *
     * Returns -1 on error.
@@ -304,7 +304,7 @@ public:
    /**
     * Returns the download size of the package archive in bytes.
     * This is human-unreadable, so KDE applications may wish to run this
-    * through the KGlobal::locale()->formatByteSize() function to get a
+    * through the KFormat().formatByteSize() function to get a
     * localized, human-readable number.
     *
     * Returns -1 on error.
