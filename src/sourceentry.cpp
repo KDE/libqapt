@@ -25,6 +25,7 @@
 #include <QStringBuilder>
 #include <QStringList>
 #include <QDebug>
+#include <QRegularExpression>
 
 // APT includes
 #include <apt-pkg/configuration.h>
@@ -79,10 +80,6 @@ void SourceEntryPrivate::parseData(const QString &data)
         return;
     }
 
-    QStringList types;
-    types << QLatin1String("rpm") << QLatin1String("rpm-src")
-          << QLatin1String("deb") << QLatin1String("deb-src");
-
     // Check source enable state
     if (tData.at(0) == '#') {
         isEnabled = false;
@@ -102,23 +99,22 @@ void SourceEntryPrivate::parseData(const QString &data)
         tData.remove(idx, tData.size() - idx + 1);
     }
 
-    QStringList pieces = tData.split(' ');
-    if (pieces.size() < 3) {
-        // Invalid source entry
-        isValid = false;
-        return;
-    }
+    const QRegularExpression rx("^([a-z\\-]+) *");
+    QRegularExpressionMatch match = rx.match(tData);
 
     // Parse type
-    type = pieces.at(0);
-    if (!types.contains(type)) {
+    type = match.captured(1);
+    const QSet<QString> types = { QLatin1String("rpm"), QLatin1String("rpm-src"), QLatin1String("deb"), QLatin1String("deb-src") };
+    if (!match.isValid() || !types.contains(type)) {
         isValid = false;
         return;
     }
-
-    // Parse architecture
-    if (pieces.at(1).trimmed().at(0) == '[') {
-        QStringList options = pieces.takeAt(1).remove('[').remove(']').split(';');
+    
+    int start = match.capturedEnd(), end = tData.size();
+    // Parse architecture, see https://wiki.debian.org/Multiarch/HOWTO, Setting up sources
+    if (tData[start] == '[') {
+        QString metadata = tData.mid(start+1, tData.indexOf(']')-start-1);
+        QStringList options = metadata.split(';');
         for (const QString &option : options) {
             QStringList parts = option.split('=');
 
@@ -128,29 +124,53 @@ void SourceEntryPrivate::parseData(const QString &data)
             }
 
             QString key = parts.at(0);
-            QString value = parts.at(1);
-
             if (key != QLatin1String("arch")) {
                 isValid = false;
                 return;
             }
 
+            QString value = parts.at(1);
             architectures = value.split(',');
         }
+        
+        start+=metadata.size()+2;
+        for (; tData[start] == ' '; ++start)
+        {}
+    }
+    
+    bool inString = false;
+    bool done = false;
+    for (int i = start; !done && i<end; ++i) {
+        switch (tData[i].toLatin1()) {
+        case ' ':
+            if (!inString) {
+                uri = tData.mid(start, i-start);
+                start = i+1;
+                done = true;
+            } break;
+        case '[':
+            inString = true;
+            break;
+        case ']':
+            inString = false;
+            break;
+        }
+    }
+    if (uri.isEmpty() || !done) {
+        isValid = false;
+        return;
     }
 
-    // Parse URI
-    uri = pieces.at(1);
-    if (uri.isEmpty()) {
+    QStringList pieces = tData.mid(start).split(' ', QString::SkipEmptyParts);
+    if (pieces.isEmpty()) {
+        // Invalid source entry
         isValid = false;
         return;
     }
 
     // Parse distro and (optionally) components
-    dist = pieces.at(2);
-    if (pieces.size() > 3) {
-        components = pieces.mid(3);
-    }
+    dist = pieces.takeFirst();
+    components = pieces;
 }
 
 SourceEntry::SourceEntry()

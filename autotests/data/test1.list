@@ -11,3 +11,4 @@ deb [arch=i386,ppc] https://apttest/ubuntu saucy contrib main partner
 #deb [arch=i386,ppc] http://apttest/ubuntu saucy contrib main partner
 ###deb [arch=i386,ppc] http://apttest/ubuntu saucy contrib main partner
 ##
+deb cdrom:[Kubuntu 11.10 _Oneiric Ocelot_ - Release amd64 (20111012)]/ oneiric main restricted

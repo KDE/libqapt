@@ -249,7 +249,7 @@ void SourcesListTest::testConstructor()
  * 2. Verify that we loaded the file using entries()
  * 3. Verify that we loaded the file using entries(filename)
  */
-#define SOURCES_COUNT 13
+#define SOURCES_COUNT 14
 #define TEST1_MD5     "56717306e28a529f89b56c6ee6082375"
 void SourcesListTest::testLoadSourcesOneFile()
 {
@@ -441,6 +441,17 @@ void SourcesListTest::testLoadSourcesOneFile()
         "",
         false, // <-- Note, disabled!
         false
+    );
+    verifySourceEntry(
+        "Line #13",
+        entries[13],
+        "deb",
+        "cdrom:[Kubuntu 11.10 _Oneiric Ocelot_ - Release amd64 (20111012)]/",
+        "oneiric",
+        "main!restricted",
+        "",
+        true,
+        true
     );
 }
 
