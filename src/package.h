@@ -204,6 +204,14 @@ public:
     QString origin() const;
 
    /**
+    * Returns the site the package comes from.
+    * (e.g. archive.ubuntu.com)
+    *
+    * \return The site the package originates from
+    */
+    QString site() const;
+
+   /**
     * Returns a list of archives that the candidate version of the package is
     * available from.
     * (E.g. oneiric, oneiric-updates, sid, etc)

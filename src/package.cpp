@@ -509,6 +509,17 @@ QString Package::origin() const
     return QLatin1String(VF.File().Origin());
 }
 
+QString Package::site() const
+{
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+
+    if(Ver.end())
+        return QString();
+
+    pkgCache::VerFileIterator VF = Ver.FileList();
+    return QString::fromUtf8(VF.File().Site());
+}
+
 QStringList Package::archives() const
 {
     const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
