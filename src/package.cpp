@@ -506,7 +506,7 @@ QString Package::origin() const
         return QString();
 
     pkgCache::VerFileIterator VF = Ver.FileList();
-    return QLatin1String(VF.File().Origin());
+    return QString::fromUtf8(VF.File().Origin());
 }
 
 QString Package::site() const
