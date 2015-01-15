@@ -370,7 +370,10 @@ int Transaction::progress() const
 
 void Transaction::updateProgress(int progress)
 {
-    d->progress = progress;
+    if (d->progress != progress) {
+        d->progress = progress;
+        emit progressChanged(progress());
+    }
 }
 
 DownloadProgress Transaction::downloadProgress() const
@@ -664,7 +667,6 @@ void Transaction::updateProperty(int type, const QDBusVariant &variant)
         break;
     case ProgressProperty:
         updateProgress(variant.variant().toInt());
-        emit progressChanged(progress());
         break;
     case DownloadProgressProperty: {
         QApt::DownloadProgress prog;
