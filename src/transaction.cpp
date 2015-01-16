@@ -372,7 +372,7 @@ void Transaction::updateProgress(int progress)
 {
     if (d->progress != progress) {
         d->progress = progress;
-        emit progressChanged(progress());
+        emit progressChanged(d->progress);
     }
 }
 
