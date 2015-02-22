@@ -544,6 +544,11 @@ void Transaction::onCallFinished(QDBusPendingCallWatcher *watcher)
             emit errorOccurred(QApt::AuthError);
             qWarning() << "auth error reply!";
             break;
+        case QDBusError::NoReply:
+            updateError(QApt::AuthError);
+            emit errorOccurred(QApt::AuthError);
+            qWarning() << "No reply error!";
+            break;
         default:
             break;
         }
