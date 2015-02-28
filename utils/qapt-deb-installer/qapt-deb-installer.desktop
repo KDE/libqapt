@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=QApt Package Installer
 Name[ar]=مثبّت الحزم كيو-آبت
+Name[ast]=Instalador de paquetes QApt
 Name[bs]=QApt instaler paketa
 Name[ca]=Instal·lador de paquets QApt
 Name[ca@valencia]=Instal·lador de paquets QApt
@@ -45,6 +46,7 @@ Name[zh_CN]=QApt 软件包安装器
 Name[zh_TW]=QApt 套件安裝程式
 GenericName=Package Installer
 GenericName[ar]=مثبّت حزم
+GenericName[ast]=Instalador de paquetes
 GenericName[bs]=Instaler paketa
 GenericName[ca]=Instal·lador de paquets
 GenericName[ca@valencia]=Instal·lador de paquets
@@ -89,6 +91,7 @@ GenericName[zh_CN]=软件包安装器
 GenericName[zh_TW]=套件安裝程式
 Comment=Install and view software packages
 Comment[ar]=ثبّت حزم البرمجيّات واعرضها
+Comment[ast]=Instala y ve los paquetes de software
 Comment[bs]=Instalacija i pregled softverskih paketa
 Comment[ca]=Instal·la i mostra paquets de programari
 Comment[ca@valencia]=Instal·la i mostra paquets de programari
