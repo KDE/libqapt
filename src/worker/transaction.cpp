@@ -486,7 +486,6 @@ int Transaction::frontendCaps() const
 
 void Transaction::run()
 {
-    setDelayedReply(true);
     if (isForeignUser() || !authorizeRun()) {
         sendErrorReply(QDBusError::AccessDenied);
         return;
