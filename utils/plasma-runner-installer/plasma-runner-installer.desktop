@@ -1,7 +1,6 @@
 [Desktop Entry]
 Name=Installer
 Name[ar]=المثبّت
-Name[ast]=Instalador
 Name[bs]=Instaler
 Name[ca]=Instal·lador
 Name[ca@valencia]=Instal·lador
@@ -47,7 +46,6 @@ Name[zh_CN]=安装器
 Name[zh_TW]=安裝程式
 Comment=Suggests the installation of not-installed applications
 Comment[ar]=يقترح تثبيت تطبيقات غير مثبّتة
-Comment[ast]=Suxer la instalación d'aplicaciones non instalaes
 Comment[bs]=Predlaže instalaciju neinstaliranih paketa
 Comment[ca]=Suggereix la instal·lació d'aplicacions no instal·lades
 Comment[ca@valencia]=Suggereix la instal·lació d'aplicacions no instal·lades
