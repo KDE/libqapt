@@ -156,16 +156,14 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
     int packageState = 0;
 
     if (!ver.end()) {
-        // Set flags exclusive to installed packages
         packageState |= QApt::Package::Installed;
 
         if (stateCache.CandidateVer && stateCache.Upgradable()) {
             packageState |= QApt::Package::Upgradeable;
-            if (stateCache.Keep())
-                packageState |= QApt::Package::Held;
         }
-    } else
+    } else {
         packageState |= QApt::Package::NotInstalled;
+    }
 
     // Broken/garbage statuses are constant until a cache reload
     if (stateCache.NowBroken()) {
@@ -770,6 +768,9 @@ int Package::state() const
         }
     } else if (stateCache.Keep()) {
         packageState |= ToKeep;
+        if (stateCache.Held()) {
+            packageState |= QApt::Package::Held;
+        }
     }
 
    return packageState | d->state;
