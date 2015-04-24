@@ -766,6 +766,29 @@ QHash<Package::State, PackageList> Backend::stateChanges(const CacheState &oldSt
                    Package::ToDowngrade |
                    Package::ToRemove);
 
+        if (status == 0) {
+            qWarning() << "Package" << pkg->name() << "had a state change,"
+                       << "it can however not be presented as a unique state."
+                       << "This is often an indication that the package is"
+                       << "supposed to be upgraded but can't because its"
+                       << "dependencies are not satisfied. This is not"
+                       << "considered a held package unless its upgrade is"
+                       << "necessary or causing breakage. A simple unsatisfied"
+                       << "dependency without the need to upgrade is not"
+                       << "considered an issue and thus not reported.\n"
+                       << "States were:"
+                       << (Package::States)oldState.at(i)
+                       << "->"
+                       << (Package::States)pkg->state();
+            // Apt pretends packages like this are not held (which is reflected)
+            // in the state loss. Whether or not this is intentional is not
+            // obvious at the time of writing in case it isn't the states
+            // here would add up again and the package rightfully would be
+            // reported as held. So we would never get here.
+            // Until then ignore these packages as we cannot serialize their
+            // state anyway.
+            continue;
+        }
         // Add this package/status pair to the changes hash
         PackageList list = changes.value((Package::State)status);
         list.append(pkg);
