@@ -74,6 +74,7 @@ find_package(KF5Runner ${KF5_DEP_VERSION})
 find_package(KF5TextWidgets ${KF5_DEP_VERSION})
 find_package(KF5WidgetsAddons ${KF5_DEP_VERSION})
 find_package(KF5WindowSystem ${KF5_DEP_VERSION})
+find_package(KF5IconThemes ${KF5_DEP_VERSION})
 
 find_package(DebconfKDE 1.0)
 find_package(GStreamer 1.0)
@@ -86,6 +87,7 @@ if (KF5CoreAddons_FOUND
         AND KF5TextWidgets_FOUND
         AND KF5WidgetsAddons_FOUND
         AND KF5WindowSystem_FOUND
+        AND KF5IconThemes_FOUND
         AND DebconfKDE_FOUND)
     set(WITH_UTILS true)
 endif()
