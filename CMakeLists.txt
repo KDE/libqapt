@@ -94,6 +94,7 @@ endif()
 
 if (WITH_UTILS AND GSTREAMER_FOUND AND GLIB2_FOUND)
     set(WITH_GSTREAMER true)
+    add_definitions(${GSTREAMER_DEFINITIONS})
 endif()
 
 add_feature_info(qapt-utils WITH_UTILS "Runtime utilities using KDE frameworks")
