@@ -53,7 +53,7 @@ class DebFilePrivate
         bool isValid;
         QString filePath;
         debDebFile::MemControlExtract *extractor;
-        pkgTagSection controlData;
+        pkgTagSection *controlData;
 
         void init();
 };
@@ -78,7 +78,7 @@ void DebFilePrivate::init()
         return;
     }
 
-    controlData = extractor->Section;
+    controlData = &extractor->Section;
 }
 
 DebFile::DebFile(const QString &filePath)
@@ -103,47 +103,47 @@ QString DebFile::filePath() const
 
 QString DebFile::packageName() const
 {
-    return QString::fromStdString(d->controlData.FindS("Package"));
+    return QString::fromStdString(d->controlData->FindS("Package"));
 }
 
 QString DebFile::sourcePackage() const
 {
-    return QString::fromStdString(d->controlData.FindS("Source"));
+    return QString::fromStdString(d->controlData->FindS("Source"));
 }
 
 QString DebFile::version() const
 {
-    return QString::fromStdString(d->controlData.FindS("Version"));
+    return QString::fromStdString(d->controlData->FindS("Version"));
 }
 
 QString DebFile::architecture() const
 {
-    return QString::fromStdString(d->controlData.FindS("Architecture"));
+    return QString::fromStdString(d->controlData->FindS("Architecture"));
 }
 
 QString DebFile::maintainer() const
 {
-    return QString::fromStdString(d->controlData.FindS("Maintainer"));
+    return QString::fromStdString(d->controlData->FindS("Maintainer"));
 }
 
 QString DebFile::section() const
 {
-    return QString::fromStdString(d->controlData.FindS("Section"));
+    return QString::fromStdString(d->controlData->FindS("Section"));
 }
 
 QString DebFile::priority() const
 {
-    return QString::fromStdString(d->controlData.FindS("Priority"));
+    return QString::fromStdString(d->controlData->FindS("Priority"));
 }
 
 QString DebFile::homepage() const
 {
-    return QString::fromStdString(d->controlData.FindS("Homepage"));
+    return QString::fromStdString(d->controlData->FindS("Homepage"));
 }
 
 QString DebFile::longDescription() const
 {
-    QString rawDescription = QLatin1String(d->controlData.FindS("Description").c_str());
+    QString rawDescription = QLatin1String(d->controlData->FindS("Description").c_str());
     // Remove short description
     rawDescription.remove(shortDescription() + '\n');
 
@@ -174,14 +174,14 @@ QString DebFile::longDescription() const
 
 QString DebFile::shortDescription() const
 {
-    QString longDesc = QLatin1String(d->controlData.FindS("Description").c_str());
+    QString longDesc = QLatin1String(d->controlData->FindS("Description").c_str());
 
     return longDesc.left(longDesc.indexOf(QLatin1Char('\n')));
 }
 
 QString DebFile::controlField(const QLatin1String &field) const
 {
-    return QString::fromStdString(d->controlData.FindS(field.latin1()));
+    return QString::fromStdString(d->controlData->FindS(field.latin1()));
 }
 
 QString DebFile::controlField(const QString &field) const
@@ -266,52 +266,52 @@ QStringList DebFile::iconList() const
 
 QList<DependencyItem> DebFile::depends() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Depends")), Depends);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Depends")), Depends);
 }
 
 QList<DependencyItem> DebFile::preDepends() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Pre-Depends")), PreDepends);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Pre-Depends")), PreDepends);
 }
 
 QList<DependencyItem> DebFile::suggests() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Suggests")), Suggests);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Suggests")), Suggests);
 }
 
 QList<DependencyItem> DebFile::recommends() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Recommends")), Recommends);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Recommends")), Recommends);
 }
 
 QList<DependencyItem> DebFile::conflicts() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Conflicts")), Conflicts);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Conflicts")), Conflicts);
 }
 
 QList<DependencyItem> DebFile::replaces() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Replaces")), Replaces);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Replaces")), Replaces);
 }
 
 QList<DependencyItem> DebFile::obsoletes() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Obsoletes")), Obsoletes);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Obsoletes")), Obsoletes);
 }
 
 QList<DependencyItem> DebFile::breaks() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Breaks")), Breaks);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Breaks")), Breaks);
 }
 
 QList<DependencyItem> DebFile::enhances() const
 {
-    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData.FindS("Enhance")), Enhances);
+    return DependencyInfo::parseDepends(QString::fromStdString(d->controlData->FindS("Enhance")), Enhances);
 }
 
 qint64 DebFile::installedSize() const
 {
-    QString sizeString = QLatin1String(d->controlData.FindS("Installed-Size").c_str());
+    QString sizeString = QLatin1String(d->controlData->FindS("Installed-Size").c_str());
 
     return sizeString.toLongLong();
 }

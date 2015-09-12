@@ -416,8 +416,9 @@ QStringList Package::availableVersions() const
         pkgCache::PkgFileIterator File = VF.File();
 
         // Files without an archive will have a site
-        QString archive = (File->Archive) ? QLatin1String(File.Archive()) :
-                                            QLatin1String(File.Site());
+        QString archive = File.Archive()
+                ? QLatin1String(File.Archive())
+                : QLatin1String(File.Site());
         versions.append(QLatin1String(Ver.VerStr()) % QLatin1String(" (") %
                         archive % ')');
     }
