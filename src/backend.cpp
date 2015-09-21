@@ -174,6 +174,8 @@ bool Backend::reloadCache()
 {
     Q_D(Backend);
 
+    emit cacheReloadStarted();
+
     if (!d->cache->open()) {
         setInitError();
         return false;
@@ -242,6 +244,8 @@ bool Backend::reloadCache()
 
     // Determine which packages are pinned for display purposes
     loadPackagePins();
+
+    emit cacheReloadFinished();
 
     return true;
 }

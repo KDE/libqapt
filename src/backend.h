@@ -461,6 +461,29 @@ Q_SIGNALS:
     void packageChanged();
 
     /**
+     * Emitted when the apt cache reload is started.
+     *
+     * After this signal is emitted all @c Package in the backend will be
+     * deleted. Therefore, all pointers obtained in precedence from the backend
+     * shall not be used anymore. This includes any @c PackageList returned by
+     * availablePackages(), upgradeablePackages(), markedPackages() and search().
+     *
+     * Also @c pkgCache::PkgIterator are invalidated.
+     *
+     * Wait for signal cacheReloadFinished() before requesting a new list of packages.
+     *
+     * @see reloadCache()
+     */
+    void cacheReloadStarted();
+
+    /**
+     * Emitted after the apt cache has been reloaded.
+     *
+     * @see cacheReloadStarted();
+     */
+    void cacheReloadFinished();
+
+    /**
      * This signal is emitted when a Xapian search cache update is started.
      *
      * Slots connected to this signal can then listen to the xapianUpdateProgress
