@@ -830,9 +830,13 @@ void Backend::restoreCacheState(const CacheState &state)
         if (oldflags == flags)
             continue;
 
+        if ((flags & Package::ToReInstall) && !(oldflags & Package::ToReInstall)) {
+            deps->SetReInstall(pkg->packageIterator(), false);
+        }
+
         if (oldflags & Package::ToReInstall) {
             deps->MarkInstall(pkg->packageIterator(), true);
-            deps->SetReInstall(pkg->packageIterator(), false);
+            deps->SetReInstall(pkg->packageIterator(), true);
         } else if (oldflags & Package::ToInstall) {
             deps->MarkInstall(pkg->packageIterator(), true);
         } else if (oldflags & Package::ToRemove) {

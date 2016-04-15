@@ -200,7 +200,7 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
     // and the cache is reloaded.
     bool downloadable = true;
     if (!stateCache.CandidateVer ||
-        stateCache.CandidateVerIter(*backend->cache()->depCache()).Downloadable())
+        !stateCache.CandidateVerIter(*backend->cache()->depCache()).Downloadable())
         downloadable = false;
 
     if (!downloadable)
@@ -1300,6 +1300,9 @@ void Package::setAuto(bool flag)
 void Package::setKeep()
 {
     d->backend->cache()->depCache()->MarkKeep(d->packageIter, false);
+    if (state() & ToReInstall) {
+        d->backend->cache()->depCache()->SetReInstall(d->packageIter, false);
+    }
     if (d->backend->cache()->depCache()->BrokenCount() > 0) {
         pkgProblemResolver Fix(d->backend->cache()->depCache());
         Fix.ResolveByKeep();
