@@ -19,8 +19,8 @@ include(ECMPoQmTools)
 include(ECMSetupVersion)
 include(FeatureSummary)
 include(KDEInstallDirs)
-include(KDECMakeSettings)
-include(KDECompilerSettings)
+include(KDECMakeSettings NO_POLICY_SCOPE)
+include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMGeneratePriFile) # This needs InstallDirs
 
 # Turn exceptions on
