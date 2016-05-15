@@ -46,6 +46,7 @@
 #include <apt-pkg/versionmatch.h>
 
 #include <algorithm>
+#include <random>
 
 // Own includes
 #include "backend.h"
