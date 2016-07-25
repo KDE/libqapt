@@ -268,8 +268,8 @@ void QAptBatch::errorOccurred(QApt::ErrorCode code)
 void QAptBatch::provideMedium(const QString &label, const QString &mountPoint)
 {
     QString title = i18nc("@title:window", "Media Change Required");
-    QString text = i18nc("@label", "Please insert %1 into <filename>%2</filename>",
-                         label, mountPoint);
+    QString text = xi18nc("@label", "Please insert %1 into <filename>%2</filename>",
+                          label, mountPoint);
     KMessageBox::informationWId(m_winId, text, title);
     m_trans->provideMedium(mountPoint);
 }
@@ -277,16 +277,16 @@ void QAptBatch::provideMedium(const QString &label, const QString &mountPoint)
 void QAptBatch::untrustedPrompt(const QStringList &untrustedPackages)
 {
     QString title = i18nc("@title:window", "Warning - Unverified Software");
-    QString text = i18ncp("@label",
-                          "The following piece of software cannot be verified. "
-                          "<warning>Installing unverified software represents a "
-                          "security risk, as the presence of unverifiable software "
-                          "can be a sign of tampering.</warning> Do you wish to continue?",
-                          "The following pieces of software cannot be authenticated. "
-                          "<warning>Installing unverified software represents a "
-                          "security risk, as the presence of unverifiable software "
-                          "can be a sign of tampering.</warning> Do you wish to continue?",
-                          untrustedPackages.size());
+    QString text = xi18ncp("@label",
+                           "The following piece of software cannot be verified. "
+                           "<warning>Installing unverified software represents a "
+                           "security risk, as the presence of unverifiable software "
+                           "can be a sign of tampering.</warning> Do you wish to continue?",
+                           "The following pieces of software cannot be authenticated. "
+                           "<warning>Installing unverified software represents a "
+                           "security risk, as the presence of unverifiable software "
+                           "can be a sign of tampering.</warning> Do you wish to continue?",
+                           untrustedPackages.size());
     int result = KMessageBox::Cancel;
 
     result = KMessageBox::warningContinueCancelListWId(m_winId, text,
