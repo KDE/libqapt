@@ -35,6 +35,7 @@
 
 // Apt includes
 #include <apt-pkg/algorithms.h>
+#include <apt-pkg/acquire-item.h>
 #include <apt-pkg/debversion.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/indexfile.h>
@@ -569,34 +570,15 @@ QUrl Package::changelogUrl() const
     if (ver.end())
         return QUrl();
 
-    pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
+    const QString url = QString::fromStdString(pkgAcqChangelog::URI(ver));
 
-    // Find the latest version for the latest changelog
-    QString versionString;
-    if (!availableVersion().isEmpty())
-        versionString = availableVersion();
+    // pkgAcqChangelog::URI(ver) may return URIs with schemes other than http(s)
+    // e.g. copy:// gzip:// for local files. We exclude them for backward
+    // compatibility with libQApt <= 3.0.3.
+    if (!url.startsWith("http"))
+        return QUrl();
 
-    // Epochs in versions are ignored on changelog servers
-    if (versionString.contains(QLatin1Char(':'))) {
-        QStringList epochVersion = versionString.split(QLatin1Char(':'));
-        // If the version has an epoch, take the stuff after the epoch
-        versionString = epochVersion.at(1);
-    }
-
-    // Create URL in form using the correct server, file path, and file suffix
-    Config *config = d->backend->config();
-    QString server = config->readEntry(QLatin1String("Apt::Changelogs::Server"),
-                                       QLatin1String("http://packages.debian.org/changelogs"));
-
-    QString path = QLatin1String(rec.FileName().c_str());
-    path = path.left(path.lastIndexOf(QLatin1Char('/')) + 1);
-    path += sourcePackage() % '_' % versionString % '/';
-
-    bool fromDebian = server.contains(QLatin1String("debian"));
-    QString suffix = fromDebian ? QLatin1String("changelog.txt")
-                                : QLatin1String("changelog");
-
-    return QUrl(server % '/' % path % suffix);
+    return QUrl(url);
 }
 
 QUrl Package::screenshotUrl(QApt::ScreenshotType type) const
