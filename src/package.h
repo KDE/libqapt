@@ -309,6 +309,27 @@ public:
     */
     qint64 availableInstalledSize() const;
 
+/**
+    * Returns the amount of hard drive space that this package takes up
+    * when installed.
+    * If the package is installed, then it is the size of the currently
+    * installed version. Otherwise, it is the size of the candidate
+    * version.
+    * This is human-unreadable, so KDE applications may wish to run this
+    * through the KFormat().formatByteSize() function to get a
+    * localized, human-readable number.
+    *
+    * Returns -1 on error.
+    *
+    * @return The installed size of the package
+    *
+    * @see currentInstalledSize()
+    * @see availableInstalledSize()
+    *
+    * @since 3.1
+    */
+    qint64 installedSize() const;
+
    /**
     * Returns the download size of the package archive in bytes.
     * This is human-unreadable, so KDE applications may wish to run this

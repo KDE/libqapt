@@ -710,6 +710,17 @@ qint64 Package::availableInstalledSize() const
     return qint64(State.CandidateVerIter(*d->backend->cache()->depCache())->InstalledSize);
 }
 
+qint64 Package::installedSize() const
+{
+    const pkgCache::VerIterator &ver = d->packageIter.CurrentVer();
+
+    if (!ver.end()) {
+        return qint64(ver->InstalledSize);
+    }
+
+    return availableInstalledSize();
+}
+
 qint64 Package::downloadSize() const
 {
     pkgDepCache::StateCache &State = (*d->backend->cache()->depCache())[d->packageIter];
