@@ -20,7 +20,7 @@
 
 #include "sourceslisttest.h"
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include <dependencyinfo.h>
 
@@ -39,7 +39,7 @@ private slots:
 
 void DependencyInfoTest::testSimpleParse()
 {
-    // Build list of [ dep1 dep2 dep3 ] to later use for comparision.
+    // Build list of [ dep1 dep2 dep3 ] to later use for comparison.
     int depCount = 3;
     QStringList packageNames;
     for (int i = 0; i < depCount; ++i) {

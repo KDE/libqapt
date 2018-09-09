@@ -837,19 +837,19 @@ bool Package::isInUpdatePhase() const
         return d->setInUpdatePhase(true);
     }
 
-    // This is a more or less an exact reimplemenation of the update phasing
+    // This is a more or less an exact reimplementation of the update phasing
     // algorithm Ubuntu uses.
     // Deciding whether a machine is in the phasing pool or not happens in
     // two steps.
     // 1. repeatable random number generation between 0..100
-    // 2. comparision of random number with phasing percentage and marking
+    // 2. comparison of random number with phasing percentage and marking
     //    as upgradable if rand is greater than the phasing.
 
     // Repeatable discrete random number generation is based on
     // the MD5 hash of "sourcename-sourceversion-dbusmachineid", this
     // hash is used as seed for the random number generator to provide
     // stable randomness based on the stable seed. Combined with the discrete
-    // quasi-randomiziation we get about even distribution of machines accross
+    // quasi-randomiziation we get about even distribution of machines across
     // phases.
     static QString machineId;
     if (machineId.isNull()) {

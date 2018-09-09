@@ -22,8 +22,8 @@
 #ifndef QAPT_DEPENDENCYINFO_H
 #define QAPT_DEPENDENCYINFO_H
 
-#include <QtCore/QSharedDataPointer>
-#include <QtCore/QString>
+#include <QSharedDataPointer>
+#include <QString>
 
 #include "globals.h"
 

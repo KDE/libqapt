@@ -21,8 +21,8 @@
 #ifndef WORKERDAEMON_H
 #define WORKERDAEMON_H
 
-#include <QtCore/QCoreApplication>
-#include <QtDBus/QDBusContext>
+#include <QCoreApplication>
+#include <QDBusContext>
 
 #include "globals.h"
 

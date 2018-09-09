@@ -22,9 +22,9 @@
 #include "transaction.h"
 
 // Qt includes
-#include <QtCore/QTimer>
-#include <QtCore/QUuid>
-#include <QtDBus/QDBusConnection>
+#include <QTimer>
+#include <QUuid>
+#include <QDBusConnection>
 
 // Own includes
 #include "qaptauthorization.h"

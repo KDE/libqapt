@@ -21,8 +21,8 @@
 #ifndef MARKINGERRORINFO_H
 #define MARKINGERRORINFO_H
 
-#include <QtCore/QSharedDataPointer>
-#include <QtCore/QString>
+#include <QSharedDataPointer>
+#include <QString>
 
 #include "dependencyinfo.h"
 

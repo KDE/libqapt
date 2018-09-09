@@ -21,9 +21,9 @@
 #include "backend.h"
 
 // Qt includes
-#include <QtCore/QByteArray>
-#include <QtCore/QTemporaryFile>
-#include <QtDBus/QDBusConnection>
+#include <QByteArray>
+#include <QTemporaryFile>
+#include <QDBusConnection>
 
 // Apt includes
 #include <apt-pkg/algorithms.h>

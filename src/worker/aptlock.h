@@ -21,7 +21,7 @@
 #ifndef APTLOCK_H
 #define APTLOCK_H
 
-#include <QtCore/QString>
+#include <QString>
 
 #include <apt-pkg/fileutl.h>
 

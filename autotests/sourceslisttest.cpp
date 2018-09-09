@@ -21,7 +21,7 @@
  */
 #include "sourceslisttest.h"
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include <apt-pkg/init.h>
 

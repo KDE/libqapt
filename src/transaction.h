@@ -21,9 +21,9 @@
 #ifndef QAPT_TRANSACTION_H
 #define QAPT_TRANSACTION_H
 
-#include <QtCore/QObject>
-#include <QtCore/QVariantMap>
-#include <QtDBus/QDBusVariant>
+#include <QObject>
+#include <QVariantMap>
+#include <QDBusVariant>
 
 #include "downloadprogress.h"
 

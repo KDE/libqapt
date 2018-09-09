@@ -22,8 +22,8 @@
 #ifndef TRANSACTIONQUEUE_H
 #define TRANSACTIONQUEUE_H
 
-#include <QtCore/QObject>
-#include <QtCore/QQueue>
+#include <QObject>
+#include <QQueue>
 
 class AptWorker;
 class Transaction;

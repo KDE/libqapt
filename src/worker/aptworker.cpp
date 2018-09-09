@@ -21,13 +21,13 @@
 #include "aptworker.h"
 
 // Qt includes
-#include <QtCore/QDateTime>
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QStringList>
-#include <QtCore/QThread>
-#include <QtCore/QDebug>
+#include <QDateTime>
+#include <QDir>
+#include <QFileInfo>
+#include <QStringBuilder>
+#include <QStringList>
+#include <QThread>
+#include <QDebug>
 
 // Apt-pkg includes
 #include <apt-pkg/acquire-item.h>

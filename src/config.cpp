@@ -21,11 +21,11 @@
 #include "config.h" // krazy:exclude=includes
 
 // Qt includes
-#include <QtCore/QByteArray>
-#include <QtCore/QFile>
-#include <QtCore/QHash>
-#include <QtCore/QLatin1String>
-#include <QtDBus/QDBusConnection>
+#include <QByteArray>
+#include <QFile>
+#include <QHash>
+#include <QLatin1String>
+#include <QDBusConnection>
 
 // APT includes
 #include <apt-pkg/aptconfiguration.h>

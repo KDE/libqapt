@@ -20,7 +20,7 @@
 
 #include "cache.h"
 
-#include <QtCore/QCoreApplication>
+#include <QCoreApplication>
 
 #include <apt-pkg/cachefile.h>
 

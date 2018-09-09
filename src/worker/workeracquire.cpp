@@ -21,10 +21,10 @@
 #include "workeracquire.h"
 
 // Qt includes
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QEventLoop>
-#include <QtCore/QStringBuilder>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QEventLoop>
+#include <QStringBuilder>
 
 // Apt-pkg includes
 #include <apt-pkg/error.h>

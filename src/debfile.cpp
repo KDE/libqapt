@@ -20,10 +20,10 @@
 
 #include "debfile.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QProcess>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QTemporaryFile>
+#include <QDir>
+#include <QProcess>
+#include <QStringBuilder>
+#include <QTemporaryFile>
 
 #include <apt-pkg/debfile.h>
 #include <apt-pkg/fileutl.h>

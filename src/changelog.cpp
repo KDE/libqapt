@@ -21,10 +21,10 @@
 #include "changelog.h"
 
 // Qt includes
-#include <QtCore/QRegExp>
-#include <QtCore/QSharedData>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QStringList>
+#include <QRegExp>
+#include <QSharedData>
+#include <QStringBuilder>
+#include <QStringList>
 
 // QApt includes
 #include "package.h"

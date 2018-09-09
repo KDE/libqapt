@@ -21,9 +21,9 @@
 #ifndef QAPT_BACKEND_H
 #define QAPT_BACKEND_H
 
-#include <QtCore/QHash>
-#include <QtCore/QStringList>
-#include <QtCore/QVariantMap>
+#include <QHash>
+#include <QStringList>
+#include <QVariantMap>
 
 #include "globals.h"
 #include "package.h"

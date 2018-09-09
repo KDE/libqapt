@@ -22,10 +22,10 @@
 #ifndef QAPT_PACKAGE_H
 #define QAPT_PACKAGE_H
 
-#include <QtCore/QFlags>
-#include <QtCore/QUrl>
-#include <QtCore/QDateTime>
-#include <QtCore/QVariantMap>
+#include <QFlags>
+#include <QUrl>
+#include <QDateTime>
+#include <QVariantMap>
 
 #include <apt-pkg/pkgcache.h>
 

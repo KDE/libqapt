@@ -23,10 +23,10 @@
 #define TRANSACTION_H
 
 // Qt includes
-#include <QtCore/QMutex>
-#include <QtCore/QObject>
-#include <QtDBus/QDBusContext>
-#include <QtDBus/QDBusVariant>
+#include <QMutex>
+#include <QObject>
+#include <QDBusContext>
+#include <QDBusVariant>
 
 // Own includes
 #include "downloadprogress.h"

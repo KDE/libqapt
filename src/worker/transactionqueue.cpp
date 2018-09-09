@@ -22,8 +22,8 @@
 #include "transactionqueue.h"
 
 // Qt includes
-#include <QtCore/QStringList>
-#include <QtCore/QTimer>
+#include <QStringList>
+#include <QTimer>
 
 // Own includes
 #include "aptworker.h"

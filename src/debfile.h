@@ -21,7 +21,7 @@
 #ifndef QAPT_DEBFILE_H
 #define QAPT_DEBFILE_H
 
-#include <QtCore/QStringList>
+#include <QStringList>
 
 #include "dependencyinfo.h"
 

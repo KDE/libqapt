@@ -21,9 +21,9 @@
 
 #include "workerinstallprogress.h"
 
-#include <QtCore/QStringBuilder>
-#include <QtCore/QStringList>
-#include <QtCore/QTextCodec>
+#include <QStringBuilder>
+#include <QStringList>
+#include <QTextCodec>
 #include <QDebug>
 
 #include <apt-pkg/error.h>

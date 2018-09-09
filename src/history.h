@@ -21,11 +21,11 @@
 #ifndef QAPT_HISTORY_H
 #define QAPT_HISTORY_H
 
-#include <QtCore/QDateTime>
-#include <QtCore/QList>
-#include <QtCore/QObject>
-#include <QtCore/QSharedDataPointer>
-#include <QtCore/QString>
+#include <QDateTime>
+#include <QList>
+#include <QObject>
+#include <QSharedDataPointer>
+#include <QString>
 
 #include "package.h"
 

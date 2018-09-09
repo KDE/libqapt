@@ -21,8 +21,8 @@
 #include "workerdaemon.h"
 
 // Qt includes
-#include <QtCore/QThread>
-#include <QtCore/QTimer>
+#include <QThread>
+#include <QTimer>
 
 // Apt-pkg includes
 #include <apt-pkg/configuration.h>

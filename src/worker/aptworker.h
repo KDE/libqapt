@@ -21,9 +21,9 @@
 #ifndef APTWORKER_H
 #define APTWORKER_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QProcess>
-#include <QtCore/QVector>
+#include <QMutex>
+#include <QProcess>
+#include <QVector>
 
 class QProcess;
 

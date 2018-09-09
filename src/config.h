@@ -21,8 +21,8 @@
 #ifndef QAPT_CONFIG_H
 #define QAPT_CONFIG_H
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
+#include <QObject>
+#include <QString>
 
 /**
  * The QApt namespace is the main namespace for LibQApt. All classes in this

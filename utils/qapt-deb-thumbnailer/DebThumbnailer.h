@@ -21,7 +21,7 @@
 #ifndef DEBTHUMBNAILER_H
 #define DEBTHUMBNAILER_H
 
-#include <QtCore/QStringList>
+#include <QStringList>
 
 #include <kio/thumbcreator.h>
 

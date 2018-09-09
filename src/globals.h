@@ -21,9 +21,9 @@
 #ifndef QAPT_GLOBALS_H
 #define QAPT_GLOBALS_H
 
-#include <QtCore/QFlags>
-#include <QtCore/QList>
-#include <QtCore/QVariantMap>
+#include <QFlags>
+#include <QList>
+#include <QVariantMap>
 
 namespace QApt
 {

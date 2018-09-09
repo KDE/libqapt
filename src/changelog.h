@@ -21,10 +21,10 @@
 #ifndef QAPT_CHANGELOG_H
 #define QAPT_CHANGELOG_H
 
-#include <QtCore/QDateTime>
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QSharedDataPointer>
+#include <QDateTime>
+#include <QList>
+#include <QString>
+#include <QSharedDataPointer>
 
 namespace QApt {
 

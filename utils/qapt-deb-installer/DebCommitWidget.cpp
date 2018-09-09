@@ -21,9 +21,9 @@
 #include "DebCommitWidget.h"
 
 // Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QStringBuilder>
-#include <QtCore/QUuid>
+#include <QDir>
+#include <QStringBuilder>
+#include <QUuid>
 #include <QLabel>
 #include <QProgressBar>
 #include <QVBoxLayout>

@@ -20,7 +20,7 @@
 
 #include "qapttest.h"
 
-#include <QtCore/QDir>
+#include <QDir>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>

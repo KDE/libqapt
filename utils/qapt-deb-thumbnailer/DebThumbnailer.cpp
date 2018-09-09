@@ -21,8 +21,8 @@
 
 #include "DebThumbnailer.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QStringBuilder>
+#include <QDir>
+#include <QStringBuilder>
 #include <QImage>
 #include <QPainter>
 

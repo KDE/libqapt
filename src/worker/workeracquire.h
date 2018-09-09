@@ -22,7 +22,7 @@
 #define WORKERACQUIRE_H
 
 // Qt includes
-#include <QtCore/QObject>
+#include <QObject>
 
 // Apt-pkg includes
 #include <apt-pkg/acquire.h>

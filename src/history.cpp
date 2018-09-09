@@ -20,12 +20,12 @@
 
 #include "history.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QProcess>
-#include <QtCore/QSharedData>
-#include <QtCore/QStringBuilder>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QProcess>
+#include <QSharedData>
+#include <QStringBuilder>
 
 // APT includes
 #include <apt-pkg/configuration.h>
