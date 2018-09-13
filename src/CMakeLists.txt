@@ -56,10 +56,10 @@ set_target_properties(QApt
 
 target_link_libraries(QApt
     PUBLIC
+        Qt5::DBus
         Qt5::Widgets
         ${APTPKG_LIBRARIES}
     PRIVATE
-        Qt5::DBus
         ${XAPIAN_LIBRARIES})
 
 install(TARGETS QApt EXPORT QAptTargets LIBRARY DESTINATION ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
