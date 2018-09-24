@@ -23,9 +23,10 @@
 
 #include <QSharedDataPointer>
 #include <QString>
-#include <QDBusArgument>
 
 #include "globals.h"
+
+class QDBusArgument;
 
 namespace QApt {
 

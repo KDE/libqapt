@@ -23,11 +23,11 @@
 
 #include <QObject>
 #include <QVariantMap>
-#include <QDBusVariant>
 
 #include "downloadprogress.h"
 
 class QDBusPendingCallWatcher;
+class QDBusVariant;
 
 #ifdef __CURRENTLY_UNIT_TESTING__
 class TransactionErrorHandlingTest;

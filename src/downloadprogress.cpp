@@ -23,6 +23,7 @@
 // Qt includes
 #include <QSharedData>
 #include <QDBusMetaType>
+#include <QDBusArgument>
 #include <QDebug>
 
 namespace QApt {

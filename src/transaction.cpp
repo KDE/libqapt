@@ -22,6 +22,8 @@
 
 // Qt includes
 #include <QDBusPendingCallWatcher>
+#include <QDBusVariant>
+
 #include <QDebug>
 
 // Own includes
