@@ -26,7 +26,7 @@ include(ECMGeneratePriFile) # This needs InstallDirs
 # Turn exceptions on
 kde_enable_exceptions()
 
-set(REQUIRED_QT_VERSION 5.2.0) # Used in QAptConfig
+set(REQUIRED_QT_VERSION 5.8.0) # Used in QAptConfig
 find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED DBus Widgets)
 
 find_package(Xapian REQUIRED)

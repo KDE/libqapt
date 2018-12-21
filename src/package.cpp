@@ -85,7 +85,6 @@ class PackagePrivate
         bool inUpdatePhaseCalculated;
 
         pkgCache::PkgFileIterator searchPkgFileIter(QLatin1String label, const QString &release) const;
-        QString getReleaseFileForOrigin(QLatin1String label, const QString &release) const;
 
         // Calculate state flags that cannot change
         void initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache);
@@ -117,40 +116,6 @@ pkgCache::PkgFileIterator PackagePrivate::searchPkgFileIter(QLatin1String label,
     }
     found = pkgCache::PkgFileIterator(*packageIter.Cache());
     return found;
-}
-
-QString PackagePrivate::getReleaseFileForOrigin(QLatin1String label, const QString &release) const
-{
-    pkgCache::PkgFileIterator pkg = searchPkgFileIter(label, release);
-
-    // Return empty if no package matches the given label and release
-    if (pkg.end())
-        return QString();
-
-    // Search for the matching meta-index
-    pkgSourceList *list = backend->packageSourceList();
-    pkgIndexFile *index;
-
-    // Return empty if the source list doesn't contain an index for the package
-    if (!list->FindIndex(pkg, index))
-        return QString();
-
-    for (auto I = list->begin(); I != list->end(); ++I) {
-        vector<pkgIndexFile *> *ifv = (*I)->GetIndexFiles();
-        if (find(ifv->begin(), ifv->end(), index) == ifv->end())
-            continue;
-
-        // Construct release file path
-        QString uri = backend->config()->findDirectory("Dir::State::lists")
-                % QString::fromStdString(URItoFileName((*I)->GetURI()))
-                % QLatin1String("dists_")
-                % QString::fromStdString((*I)->GetDist())
-                % QLatin1String("_Release");
-
-        return uri;
-    }
-
-    return QString();
 }
 
 void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCache::StateCache &stateCache)
@@ -608,45 +573,8 @@ QDateTime Package::supportedUntil() const
         return QDateTime();
     }
 
-    QFile lsb_release(QLatin1String("/etc/lsb-release"));
-    if (!lsb_release.open(QFile::ReadOnly)) {
-        // Though really, your system is screwed if this happens...
-        return QDateTime();
-    }
-
-    pkgTagSection sec;
-    time_t releaseDate = -1;
-    QString release;
-
-    QTextStream stream(&lsb_release);
-    QString line;
-    do {
-        line = stream.readLine();
-        QStringList split = line.split(QLatin1Char('='));
-        if (split.size() != 2) {
-            continue;
-        }
-
-        if (split.at(0) == QLatin1String("DISTRIB_CODENAME")) {
-            release = split.at(1);
-        }
-    } while (!line.isNull());
-
-    // Canonical only provides support for Ubuntu, but we don't have to worry
-    // about Debian systems as long as we assume that this function can fail.
-    QString releaseFile = d->getReleaseFileForOrigin(QLatin1String("Ubuntu"), release);
-
-    if(!FileExists(releaseFile.toStdString())) {
-        // happens e.g. when there is no release file and is harmless
-        return QDateTime();
-    }
-
-    // read the relase file
-    FileFd fd(releaseFile.toStdString(), FileFd::ReadOnly);
-    pkgTagFile tag(&fd);
-    tag.Step(sec);
-
-    if(!RFC1123StrToTime(sec.FindS("Date").data(), releaseDate)) {
+    QDateTime releaseDate = d->backend->releaseDate();
+    if (!releaseDate.isValid()) {
         return QDateTime();
     }
 
@@ -665,9 +593,9 @@ QDateTime Package::supportedUntil() const
     QDateTime supportEnd;
 
     if (unit == QLatin1Char('m')) {
-        supportEnd = QDateTime::fromTime_t(releaseDate).addMonths(supportTime);
+        supportEnd = releaseDate.addMonths(supportTime);
     } else if (unit == QLatin1Char('y')) {
-        supportEnd = QDateTime::fromTime_t(releaseDate).addYears(supportTime);
+        supportEnd = releaseDate.addYears(supportTime);
     }
 
     return supportEnd;

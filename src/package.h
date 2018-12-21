@@ -257,8 +257,7 @@ public:
     * Returns the date when Canonical's support of the package ends.
     *
     * \return The date that the package is supported until. If it is not
-    *         supported now, then it will return an empty QString. The date
-    *         will be localized in the "month year" format.
+    *         supported now, then it will return an invalid date.
     */
     QDateTime supportedUntil() const;
 

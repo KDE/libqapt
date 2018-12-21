@@ -31,6 +31,7 @@
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/fileutl.h>
+#include <apt-pkg/gpgv.h>
 #include <apt-pkg/init.h>
 #include <apt-pkg/policy.h>
 #include <apt-pkg/sourcelist.h>
@@ -85,6 +86,11 @@ public:
     // Relation of an origin and its hostname
     QHash<QString, QString> siteMap;
 
+    // Date when the distribution's release was issued. See Backend::releaseDate()
+    QDateTime releaseDate;
+    QDateTime getReleaseDateFromDistroInfo(const QString &releaseId, const QString &releaseCodename) const;
+    QDateTime getReleaseDateFromArchive(const QString &releaseId, const QString &releaseCodename) const;
+
     // Counts
     int installedCount;
 
@@ -120,6 +126,68 @@ public:
     QString initErrorMessage;
     QApt::FrontendCaps frontendCaps;
 };
+
+QDateTime BackendPrivate::getReleaseDateFromDistroInfo(const QString &releaseId, const QString &releaseCodename) const
+{
+    QDateTime releaseDate;
+    QString line;
+    QStringList split;
+
+    QFile distro_info(QStringLiteral("/usr/share/distro-info/%1.csv").arg(releaseId.toLower()));
+    if (distro_info.open(QFile::ReadOnly)) {
+        QTextStream info_stream(&distro_info);
+        line = info_stream.readLine();
+        split = line.split(QLatin1Char(','));
+        const int codenameColumn = split.indexOf(QStringLiteral("series"));
+        const int releaseColumn = split.indexOf(QStringLiteral("release"));
+        if (codenameColumn == -1 || releaseColumn == -1) {
+            return QDateTime();
+        }
+        do {
+            line = info_stream.readLine();
+            split = line.split(QLatin1Char(','));
+            if (split.value(codenameColumn) == releaseCodename) {
+                releaseDate = QDateTime::fromString(split.value(releaseColumn), Qt::ISODate);
+                releaseDate.setTimeSpec(Qt::UTC);;
+                break;
+            }
+        } while (!line.isNull());
+    }
+    return releaseDate;
+}
+
+QDateTime BackendPrivate::getReleaseDateFromArchive(const QString &releaseId, const QString &releaseCodename) const
+{
+    pkgDepCache *depCache = cache->depCache();
+
+    // We are only interested in `*ubuntu_dists_<codename>_[In]Release`
+    // in order to get the release date. In `<codename>-updates` and
+    // `-security` the Date gets updated throughout the life of the release.
+    pkgCache::RlsFileIterator rls;
+    for (rls = depCache->GetCache().RlsFileBegin(); !rls.end(); ++rls) {
+        if (rls.Origin() == releaseId
+                && rls.Label() == releaseId
+                && rls.Archive() == releaseCodename) {
+
+            FileFd fd;
+            if (!OpenMaybeClearSignedFile(rls.FileName(), fd)) {
+                continue;
+            }
+
+            time_t releaseDate = -1;
+            pkgTagSection sec;
+            pkgTagFile tag(&fd);
+            tag.Step(sec);
+
+            if(!RFC1123StrToTime(sec.FindS("Date").data(), releaseDate)) {
+                continue;
+            }
+
+            return QDateTime::fromSecsSinceEpoch(releaseDate);
+        }
+    }
+    return QDateTime();
+}
 
 bool BackendPrivate::writeSelectionFile(const QString &selectionDocument, const QString &path) const
 {
@@ -245,6 +313,8 @@ bool Backend::reloadCache()
     // Determine which packages are pinned for display purposes
     loadPackagePins();
 
+    loadReleaseDate();
+
     emit cacheReloadFinished();
 
     return true;
@@ -291,6 +361,45 @@ void Backend::loadPackagePins()
             if (pkg)
                 pkg->setPinned(true);
         }
+    }
+}
+
+void Backend::loadReleaseDate()
+{
+    Q_D(Backend);
+
+    // Reset value in case we are re-loading cache
+    d->releaseDate = QDateTime();
+
+    QString releaseId;
+    QString releaseCodename;
+
+    QFile lsb_release(QLatin1String("/etc/os-release"));
+    if (!lsb_release.open(QFile::ReadOnly)) {
+        // Though really, your system is screwed if this happens...
+        return;
+    }
+
+    QTextStream stream(&lsb_release);
+    QString line;
+    do {
+        line = stream.readLine();
+        QStringList split = line.split(QLatin1Char('='));
+        if (split.size() != 2) {
+            continue;
+        }
+
+        if (split.at(0) == QLatin1String("VERSION_CODENAME")) {
+            releaseCodename = split.at(1);
+        } else if (split.at(0) == QLatin1String("ID")) {
+            releaseId = split.at(1);
+        }
+    } while (!line.isNull());
+
+    d->releaseDate = d->getReleaseDateFromDistroInfo(releaseId, releaseCodename);
+    if (!d->releaseDate.isValid()) {
+        // If we could not find the date in the csv file, we fallback to Apt archive.
+        d->releaseDate = d->getReleaseDateFromArchive(releaseId, releaseCodename);
     }
 }
 
@@ -636,6 +745,13 @@ QString Backend::nativeArchitecture() const
     Q_D(const Backend);
 
     return d->nativeArch;
+}
+
+QDateTime Backend::releaseDate() const
+{
+    Q_D(const Backend);
+
+    return d->releaseDate;
 }
 
 bool Backend::areChangesMarked() const
