@@ -26,6 +26,7 @@
 #include <QDBusConnection>
 
 // Apt includes
+#include <apt-pkg/acquire.h>
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/aptconfiguration.h>
 #include <apt-pkg/depcache.h>
@@ -33,10 +34,13 @@
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/gpgv.h>
 #include <apt-pkg/init.h>
+#include <apt-pkg/pkgrecords.h>
+#include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/policy.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/tagfile.h>
+#include <apt-pkg/upgrade.h>
 
 // Xapian includes
 #undef slots

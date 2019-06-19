@@ -24,6 +24,7 @@
 #include <QtTest>
 
 #include <apt-pkg/init.h>
+#include <apt-pkg/configuration.h>
 
 QTEST_MAIN(SourcesListTest);
 

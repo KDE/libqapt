@@ -37,6 +37,10 @@
 #include <apt-pkg/init.h>
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/pkgsystem.h>
+#include <apt-pkg/progress.h>
+#include <apt-pkg/sourcelist.h>
+#include <apt-pkg/update.h>
+#include <apt-pkg/versionmatch.h>
 #include <string>
 
 // System includes
