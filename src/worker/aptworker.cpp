@@ -40,6 +40,7 @@
 #include <apt-pkg/progress.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/update.h>
+#include <apt-pkg/upgrade.h>
 #include <apt-pkg/versionmatch.h>
 #include <string>
 
@@ -434,9 +435,9 @@ bool AptWorker::markChanges()
 void AptWorker::upgradeSystem()
 {
     if (m_trans->safeUpgrade())
-        pkgAllUpgrade(*m_cache);
+        APT::Upgrade::Upgrade(*m_cache, APT::Upgrade::FORBID_REMOVE_PACKAGES | APT::Upgrade::FORBID_INSTALL_NEW_PACKAGES);
     else
-        pkgDistUpgrade(*m_cache);
+        APT::Upgrade::Upgrade(*m_cache, APT::Upgrade::ALLOW_EVERYTHING);
 
     commitChanges();
 }

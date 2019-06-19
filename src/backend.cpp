@@ -1026,7 +1026,7 @@ void Backend::markPackagesForUpgrade()
 {
     Q_D(Backend);
 
-    pkgAllUpgrade(*d->cache->depCache());
+    APT::Upgrade::Upgrade(*d->cache->depCache(), APT::Upgrade::FORBID_REMOVE_PACKAGES | APT::Upgrade::FORBID_INSTALL_NEW_PACKAGES);
     emit packageChanged();
 }
 
@@ -1034,7 +1034,7 @@ void Backend::markPackagesForDistUpgrade()
 {
     Q_D(Backend);
 
-    pkgDistUpgrade(*d->cache->depCache());
+    APT::Upgrade::Upgrade(*d->cache->depCache(), APT::Upgrade::ALLOW_EVERYTHING);
     emit packageChanged();
 }
 
