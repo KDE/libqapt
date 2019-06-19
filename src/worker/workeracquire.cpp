@@ -153,7 +153,11 @@ bool WorkerAcquire::Pulse(pkgAcquire *Owner)
             continue;
         }
 
+#if APT_PKG_ABI >= 590
+        (*iter->CurrentItem).Owner->PartialSize = iter->CurrentItem->CurrentSize;
+#else
         (*iter->CurrentItem).Owner->PartialSize = iter->CurrentSize;
+#endif
 
         updateStatus(*iter->CurrentItem);
     }
