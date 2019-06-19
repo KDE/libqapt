@@ -304,8 +304,7 @@ void AptWorker::updateCache()
     acquire->setTransaction(m_trans);
 
     // Initialize fetcher with our progress watcher
-    pkgAcquire fetcher;
-    fetcher.Setup(acquire);
+    pkgAcquire fetcher(acquire);
 
     // Fetch the lists.
     if (!ListUpdate(*acquire, *m_cache->GetSourceList())) {
@@ -448,8 +447,7 @@ void AptWorker::commitChanges()
     WorkerAcquire *acquire = new WorkerAcquire(this, 15, 50);
     acquire->setTransaction(m_trans);
 
-    pkgAcquire fetcher;
-    fetcher.Setup(acquire);
+    pkgAcquire fetcher(acquire);
 
     pkgPackageManager *packageManager;
     packageManager = _system->CreatePM(*m_cache);
@@ -575,8 +573,7 @@ void AptWorker::downloadArchives()
     WorkerAcquire *acquire = new WorkerAcquire(this, 15, 100);
     acquire->setTransaction(m_trans);
 
-    pkgAcquire fetcher;
-    fetcher.Setup(acquire);
+    pkgAcquire fetcher(acquire);
 
     pkgIndexFile *index;
 
