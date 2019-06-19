@@ -34,6 +34,7 @@
 #include <sys/wait.h>
 #include <sys/fcntl.h>
 #include <pty.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <stdlib.h>

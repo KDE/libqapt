@@ -35,6 +35,8 @@
 #include "aptworker.h"
 #include "transaction.h"
 
+#include <unistd.h>
+
 using namespace std;
 
 WorkerAcquire::WorkerAcquire(QObject *parent, int begin, int end)
