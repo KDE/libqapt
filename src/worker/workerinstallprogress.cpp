@@ -27,6 +27,7 @@
 #include <QDebug>
 
 #include <apt-pkg/error.h>
+#include <apt-pkg/install-progress.h>
 
 #include <errno.h>
 #include <sys/statvfs.h>
@@ -108,7 +109,8 @@ pkgPackageManager::OrderResult WorkerInstallProgress::start(pkgPackageManager *p
         // close pipe we don't need
         close(readFromChildFD[0]);
 
-        res = pm->DoInstallPostFork(readFromChildFD[1]);
+        APT::Progress::PackageManagerProgressFd progress(readFromChildFD[1]);
+        res = pm->DoInstallPostFork(&progress);
 
         // dump errors into cerr (pass it to the parent process)
         _error->DumpErrors();
