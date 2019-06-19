@@ -233,8 +233,8 @@ void WorkerAcquire::updateStatus(const pkgAcquire::ItemDesc &Itm)
 
     if (downloadStatus == QApt::DoneState && errorMsg.size())
         message = errorMsg;
-    else if (Itm.Owner->Mode)
-        message = QString::fromUtf8(Itm.Owner->Mode);
+    else if (!Itm.Owner->ActiveSubprocess.empty())
+        message = QString::fromStdString(Itm.Owner->ActiveSubprocess);
 
     QApt::DownloadProgress dp(URI, downloadStatus, shortDesc,
                               fileSize, fetchedSize, message);
