@@ -223,7 +223,7 @@ QString Package::sourcePackage() const
     // In the APT package record format, the only time when a "Source:" field
     // is present is when the binary package name doesn't match the source
     // name
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (!ver.end()) {
         pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
         sourcePackage = QString::fromStdString(rec.SourcePkg());
@@ -241,7 +241,7 @@ QString Package::sourcePackage() const
 QString Package::shortDescription() const
 {
     QString shortDescription;
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (!ver.end()) {
         pkgCache::DescIterator Desc = ver.TranslatedDescription();
         pkgRecords::Parser & parser = d->backend->records()->Lookup(Desc.FileList());
@@ -254,7 +254,7 @@ QString Package::shortDescription() const
 
 QString Package::longDescription() const
 {
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if (!ver.end()) {
         QString rawDescription;
@@ -299,7 +299,7 @@ QString Package::longDescription() const
 QString Package::maintainer() const
 {
     QString maintainer;
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (!ver.end()) {
         pkgRecords::Parser &parser = d->backend->records()->Lookup(ver.FileList());
         maintainer = QString::fromUtf8(parser.Maintainer().data());
@@ -313,7 +313,7 @@ QString Package::maintainer() const
 QString Package::homepage() const
 {
     QString homepage;
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (!ver.end()) {
         pkgRecords::Parser &parser = d->backend->records()->Lookup(ver.FileList());
         homepage = QString::fromUtf8(parser.Homepage().data());
@@ -417,7 +417,7 @@ QString Package::availableVersion() const
 
 QString Package::priority() const
 {
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (ver.end())
         return QString();
 
@@ -469,7 +469,7 @@ QStringList Package::installedFilesList() const
 
 QString Package::origin() const
 {
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if(Ver.end())
         return QString();
@@ -480,7 +480,7 @@ QString Package::origin() const
 
 QString Package::site() const
 {
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if(Ver.end())
         return QString();
@@ -491,7 +491,7 @@ QString Package::site() const
 
 QStringList Package::archives() const
 {
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if(Ver.end())
         return QStringList();
@@ -519,7 +519,7 @@ QString Package::component() const
 
 QByteArray Package::md5Sum() const
 {
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if(ver.end())
         return QByteArray();
@@ -532,7 +532,7 @@ QByteArray Package::md5Sum() const
 
 QUrl Package::changelogUrl() const
 {
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (ver.end())
         return QUrl();
 
@@ -604,7 +604,7 @@ QDateTime Package::supportedUntil() const
 
 QString Package::controlField(QLatin1String name) const
 {
-    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     if (ver.end()) {
         return QString();
     }
@@ -1007,7 +1007,7 @@ QStringList Package::recommendsList() const
 {
     QStringList recommends;
 
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if (Ver.end()) {
         return recommends;
@@ -1033,7 +1033,7 @@ QStringList Package::suggestsList() const
 {
     QStringList suggests;
 
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if (Ver.end()) {
         return suggests;
@@ -1059,7 +1059,7 @@ QStringList Package::enhancesList() const
 {
     QStringList enhances;
 
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if (Ver.end()) {
         return enhances;
@@ -1097,7 +1097,7 @@ QStringList Package::enhancedByList() const
 
 QList<QApt::MarkingErrorInfo> Package::brokenReason() const
 {
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
     QList<MarkingErrorInfo> reasons;
 
     // check if there is actually something to install
@@ -1172,7 +1172,7 @@ QList<QApt::MarkingErrorInfo> Package::brokenReason() const
 
 bool Package::isTrusted() const
 {
-    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVer(d->packageIter);
+    const pkgCache::VerIterator &Ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
 
     if (!Ver)
         return false;

@@ -586,7 +586,7 @@ void AptWorker::downloadArchives()
         if (!iter)
             continue; // Package not found
 
-        pkgCache::VerIterator ver = (*m_cache)->GetCandidateVer(iter);
+        pkgCache::VerIterator ver = (*m_cache)->GetCandidateVersion(iter);
 
         if (!ver || !ver.Downloadable() || !ver.Arch())
             continue; // Virtual package or not downloadable or broken
