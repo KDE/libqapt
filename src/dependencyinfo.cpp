@@ -102,11 +102,11 @@ DependencyInfo &DependencyInfo::operator=(const DependencyInfo &rhs)
 
 QList<DependencyItem> DependencyInfo::parseDepends(const QString &field, DependencyType type)
 {
-    string package;
-    string version;
+    std::string package;
+    std::string version;
     unsigned int op;
 
-    string fieldStr = field.toStdString();
+    std::string fieldStr = field.toStdString();
 
     const char *start = fieldStr.c_str();
     const char *stop = start + strlen(start);

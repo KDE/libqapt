@@ -328,7 +328,7 @@ void Backend::setInitError()
 {
     Q_D(Backend);
 
-    string message;
+    std::string message;
     if (_error->PopMessage(message))
         d->initErrorMessage = QString::fromStdString(message);
 }
@@ -360,7 +360,7 @@ void Backend::loadPackagePins()
 
         pkgTagSection tags;
         while (tagFile.Step(tags)) {
-            string name = tags.FindS("Package");
+            std::string name = tags.FindS("Package");
             Package *pkg = package(QLatin1String(name.c_str()));
             if (pkg)
                 pkg->setPinned(true);
@@ -639,7 +639,7 @@ PackageList Backend::search(const QString &searchString) const
         return QApt::PackageList();
     }
 
-    string unsplitSearchString = searchString.toStdString();
+    std::string unsplitSearchString = searchString.toStdString();
     static int qualityCutoff = 15;
     PackageList searchResult;
 
@@ -664,8 +664,8 @@ PackageList Backend::search(const QString &searchString) const
         * index is built with the full package name
         */
         // Always search for the package name
-        string xpString = "name:";
-        string::size_type pos = unsplitSearchString.find_first_of(" ,;");
+        std::string xpString = "name:";
+        std::string::size_type pos = unsplitSearchString.find_first_of(" ,;");
         if (pos > 0) {
             xpString += unsplitSearchString.substr(0,pos);
         } else {
@@ -674,7 +674,7 @@ PackageList Backend::search(const QString &searchString) const
         Xapian::Query xpQuery = parser.parse_query(xpString);
 
         pos = 0;
-        while ( (pos = unsplitSearchString.find("-", pos)) != string::npos ) {
+        while ( (pos = unsplitSearchString.find("-", pos)) != std::string::npos ) {
             unsplitSearchString.replace(pos, 1, " ");
             pos+=1;
         }

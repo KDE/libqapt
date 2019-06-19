@@ -41,7 +41,7 @@ public:
     void Done(pkgAcquire::ItemDesc &Itm);
     void Fail(pkgAcquire::ItemDesc &Itm);
     void Stop();
-    bool MediaChange(string Media, string Drive);
+    bool MediaChange(std::string Media, std::string Drive);
 
     bool Pulse(pkgAcquire *Owner);
 

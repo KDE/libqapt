@@ -311,7 +311,7 @@ void AptWorker::updateCache()
         if (!m_trans->isCancelled()) {
             m_trans->setError(QApt::FetchError);
 
-            string message;
+            std::string message;
             while(_error->PopMessage(message))
                 m_trans->setErrorDetails(m_trans->errorDetails() +
                                          QString::fromStdString(message));
@@ -421,7 +421,7 @@ bool AptWorker::markChanges()
     {
         // We've failed to mark the packages
         m_trans->setError(QApt::MarkingError);
-        string message;
+        std::string message;
         if (_error->PopMessage(message))
             m_trans->setErrorDetails(QString::fromStdString(message));
 
@@ -466,7 +466,7 @@ void AptWorker::commitChanges()
     double FetchPBytes = fetcher.PartialPresent();
 
     struct statvfs Buf;
-    string OutputDir = _config->FindDir("Dir::Cache::Archives");
+    std::string OutputDir = _config->FindDir("Dir::Cache::Archives");
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
         m_trans->setError(QApt::DiskSpaceError);
         delete acquire;
@@ -598,8 +598,8 @@ void AptWorker::downloadArchives()
         if (!m_cache->GetSourceList()->FindIndex(vf.File(), index))
             continue;
 
-        string fileName = rec.FileName();
-        string MD5sum = rec.MD5Hash();
+        std::string fileName = rec.FileName();
+        std::string MD5sum = rec.MD5Hash();
 
         if (fileName.empty()) {
             m_trans->setError(QApt::NotFoundError);
