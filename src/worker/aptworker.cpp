@@ -597,7 +597,7 @@ void AptWorker::downloadArchives()
             continue;
 
         std::string fileName = rec.FileName();
-        std::string MD5sum = rec.MD5Hash();
+        auto hashes = rec.Hashes();
 
         if (fileName.empty()) {
             m_trans->setError(QApt::NotFoundError);
@@ -608,7 +608,7 @@ void AptWorker::downloadArchives()
 
         new pkgAcqFile(&fetcher,
                        index->ArchiveURI(fileName),
-                       MD5sum,
+                       hashes,
                        ver->Size,
                        index->ArchiveInfo(ver),
                        ver.ParentPkg().Name(),
