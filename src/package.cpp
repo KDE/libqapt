@@ -529,7 +529,9 @@ QByteArray Package::md5Sum() const
 
     pkgRecords::Parser &rec = d->backend->records()->Lookup(ver.FileList());
 
-    return rec.MD5Hash().c_str();
+    auto MD5HashString = rec.Hashes().find("MD5Sum");
+
+    return MD5HashString ? QByteArray::fromStdString(MD5HashString->HashValue()) : "";
 
 }
 
