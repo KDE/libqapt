@@ -1517,8 +1517,8 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             tempFile.close();
 
             QString tempFileName = tempFile.fileName();
-            FILE *out = fopen(tempFileName.toUtf8(), "w");
-            if (!out) {
+            FileFd out(tempFileName.toUtf8().toStdString(), FileFd::WriteOnly|FileFd::Create|FileFd::Empty);
+            if (!out.IsOpen()) {
                 return false;
             }
 
@@ -1526,7 +1526,6 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 
             pkgTagFile tagFile(&Fd);
             if (_error->PendingError()) {
-                fclose(out);
                 return false;
             }
 
@@ -1540,15 +1539,11 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 
                 // Include all but the matching name in the new pinfile
                 if (name != package->name()) {
-                    TFRewriteData tfrd;
-                    tfrd.Tag = 0;
-                    tfrd.Rewrite = 0;
-                    tfrd.NewTag = 0;
-                    TFRewrite(out, tags, TFRewritePackageOrder, &tfrd);
-                    fprintf(out, "\n");
+                    tags.Write(out, TFRewritePackageOrder, {});
+                    out.Write("\n", 1);
                 }
             }
-            fclose(out);
+            out.Close();
 
             if (!tempFile.open()) {
                 return false;
