@@ -213,7 +213,10 @@ int Package::id() const
 
 QLatin1String Package::section() const
 {
-    return QLatin1String(d->packageIter.Section());
+    const pkgCache::VerIterator &ver = (*d->backend->cache()->depCache()).GetCandidateVersion(d->packageIter);
+    if (!ver.end())
+        return QLatin1String(ver.Section());
+    return QLatin1String("");
 }
 
 QString Package::sourcePackage() const
