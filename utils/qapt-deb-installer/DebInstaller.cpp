@@ -335,8 +335,8 @@ QApt::PackageList DebInstaller::checkConflicts()
                 continue;
             }
 
-            string pkgVer = pkg->version().toStdString();
-            string depVer = info.packageVersion().toStdString();
+            std::string pkgVer = pkg->version().toStdString();
+            std::string depVer = info.packageVersion().toStdString();
 
             ok = _system->VS->CheckDep(pkgVer.c_str(),
                                        info.relationType(),
@@ -359,7 +359,7 @@ QApt::PackageList DebInstaller::checkConflicts()
 QApt::Package *DebInstaller::checkBreaksSystem()
 {
     QApt::PackageList systemPackages = m_backend->availablePackages();
-    string debVer = m_debFile->version().toStdString();
+    std::string debVer = m_debFile->version().toStdString();
 
     foreach (QApt::Package *pkg, systemPackages) {
         if (!pkg->isInstalled()) {
@@ -373,7 +373,7 @@ QApt::Package *DebInstaller::checkBreaksSystem()
                     continue;
                 }
 
-                string depVer = dep.packageVersion().toStdString();
+                std::string depVer = dep.packageVersion().toStdString();
 
                 if (!_system->VS->CheckDep(debVer.c_str(), dep.relationType(),
                                            depVer.c_str())) {
@@ -390,7 +390,7 @@ QApt::Package *DebInstaller::checkBreaksSystem()
                     continue;
                 }
 
-                string conflictVer = conflict.packageVersion().toStdString();
+                std::string conflictVer = conflict.packageVersion().toStdString();
 
                 if (_system->VS->CheckDep(debVer.c_str(),
                                           conflict.relationType(),
@@ -419,11 +419,11 @@ bool DebInstaller::satisfyDepends()
                 continue;
             }
 
-            string debVersion = dep.packageVersion().toStdString();
+            std::string debVersion = dep.packageVersion().toStdString();
 
             // If we're installed, see if we already satisfy the dependency
             if (pkg->isInstalled()) {
-                string pkgVersion = pkg->installedVersion().toStdString();
+                std::string pkgVersion = pkg->installedVersion().toStdString();
 
                 if (_system->VS->CheckDep(pkgVersion.c_str(),
                                           dep.relationType(),
@@ -434,7 +434,7 @@ bool DebInstaller::satisfyDepends()
             }
 
             // else check if cand ver will satisfy, then mark
-            string candVersion = pkg->availableVersion().toStdString();
+            std::string candVersion = pkg->availableVersion().toStdString();
 
             if (!_system->VS->CheckDep(candVersion.c_str(),
                                        dep.relationType(),

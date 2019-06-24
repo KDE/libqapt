@@ -26,6 +26,7 @@
 #include <QDBusConnection>
 
 // Apt includes
+#include <apt-pkg/acquire.h>
 #include <apt-pkg/algorithms.h>
 #include <apt-pkg/aptconfiguration.h>
 #include <apt-pkg/depcache.h>
@@ -33,10 +34,13 @@
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/gpgv.h>
 #include <apt-pkg/init.h>
+#include <apt-pkg/pkgrecords.h>
+#include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/policy.h>
 #include <apt-pkg/sourcelist.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/tagfile.h>
+#include <apt-pkg/upgrade.h>
 
 // Xapian includes
 #undef slots
@@ -324,7 +328,7 @@ void Backend::setInitError()
 {
     Q_D(Backend);
 
-    string message;
+    std::string message;
     if (_error->PopMessage(message))
         d->initErrorMessage = QString::fromStdString(message);
 }
@@ -356,7 +360,7 @@ void Backend::loadPackagePins()
 
         pkgTagSection tags;
         while (tagFile.Step(tags)) {
-            string name = tags.FindS("Package");
+            std::string name = tags.FindS("Package");
             Package *pkg = package(QLatin1String(name.c_str()));
             if (pkg)
                 pkg->setPinned(true);
@@ -635,7 +639,7 @@ PackageList Backend::search(const QString &searchString) const
         return QApt::PackageList();
     }
 
-    string unsplitSearchString = searchString.toStdString();
+    std::string unsplitSearchString = searchString.toStdString();
     static int qualityCutoff = 15;
     PackageList searchResult;
 
@@ -660,8 +664,8 @@ PackageList Backend::search(const QString &searchString) const
         * index is built with the full package name
         */
         // Always search for the package name
-        string xpString = "name:";
-        string::size_type pos = unsplitSearchString.find_first_of(" ,;");
+        std::string xpString = "name:";
+        std::string::size_type pos = unsplitSearchString.find_first_of(" ,;");
         if (pos > 0) {
             xpString += unsplitSearchString.substr(0,pos);
         } else {
@@ -670,7 +674,7 @@ PackageList Backend::search(const QString &searchString) const
         Xapian::Query xpQuery = parser.parse_query(xpString);
 
         pos = 0;
-        while ( (pos = unsplitSearchString.find("-", pos)) != string::npos ) {
+        while ( (pos = unsplitSearchString.find("-", pos)) != std::string::npos ) {
             unsplitSearchString.replace(pos, 1, " ");
             pos+=1;
         }
@@ -1022,7 +1026,7 @@ void Backend::markPackagesForUpgrade()
 {
     Q_D(Backend);
 
-    pkgAllUpgrade(*d->cache->depCache());
+    APT::Upgrade::Upgrade(*d->cache->depCache(), APT::Upgrade::FORBID_REMOVE_PACKAGES | APT::Upgrade::FORBID_INSTALL_NEW_PACKAGES);
     emit packageChanged();
 }
 
@@ -1030,7 +1034,7 @@ void Backend::markPackagesForDistUpgrade()
 {
     Q_D(Backend);
 
-    pkgDistUpgrade(*d->cache->depCache());
+    APT::Upgrade::Upgrade(*d->cache->depCache(), APT::Upgrade::ALLOW_EVERYTHING);
     emit packageChanged();
 }
 
@@ -1513,8 +1517,8 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             tempFile.close();
 
             QString tempFileName = tempFile.fileName();
-            FILE *out = fopen(tempFileName.toUtf8(), "w");
-            if (!out) {
+            FileFd out(tempFileName.toUtf8().toStdString(), FileFd::WriteOnly|FileFd::Create|FileFd::Empty);
+            if (!out.IsOpen()) {
                 return false;
             }
 
@@ -1522,7 +1526,6 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 
             pkgTagFile tagFile(&Fd);
             if (_error->PendingError()) {
-                fclose(out);
                 return false;
             }
 
@@ -1536,15 +1539,11 @@ bool Backend::setPackagePinned(Package *package, bool pin)
 
                 // Include all but the matching name in the new pinfile
                 if (name != package->name()) {
-                    TFRewriteData tfrd;
-                    tfrd.Tag = 0;
-                    tfrd.Rewrite = 0;
-                    tfrd.NewTag = 0;
-                    TFRewrite(out, tags, TFRewritePackageOrder, &tfrd);
-                    fprintf(out, "\n");
+                    tags.Write(out, TFRewritePackageOrder, {});
+                    out.Write("\n", 1);
                 }
             }
-            fclose(out);
+            out.Close();
 
             if (!tempFile.open()) {
                 return false;

@@ -37,6 +37,11 @@
 #include <apt-pkg/init.h>
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/pkgsystem.h>
+#include <apt-pkg/progress.h>
+#include <apt-pkg/sourcelist.h>
+#include <apt-pkg/update.h>
+#include <apt-pkg/upgrade.h>
+#include <apt-pkg/versionmatch.h>
 #include <string>
 
 // System includes
@@ -299,15 +304,14 @@ void AptWorker::updateCache()
     acquire->setTransaction(m_trans);
 
     // Initialize fetcher with our progress watcher
-    pkgAcquire fetcher;
-    fetcher.Setup(acquire);
+    pkgAcquire fetcher(acquire);
 
     // Fetch the lists.
     if (!ListUpdate(*acquire, *m_cache->GetSourceList())) {
         if (!m_trans->isCancelled()) {
             m_trans->setError(QApt::FetchError);
 
-            string message;
+            std::string message;
             while(_error->PopMessage(message))
                 m_trans->setErrorDetails(m_trans->errorDetails() +
                                          QString::fromStdString(message));
@@ -417,7 +421,7 @@ bool AptWorker::markChanges()
     {
         // We've failed to mark the packages
         m_trans->setError(QApt::MarkingError);
-        string message;
+        std::string message;
         if (_error->PopMessage(message))
             m_trans->setErrorDetails(QString::fromStdString(message));
 
@@ -430,9 +434,9 @@ bool AptWorker::markChanges()
 void AptWorker::upgradeSystem()
 {
     if (m_trans->safeUpgrade())
-        pkgAllUpgrade(*m_cache);
+        APT::Upgrade::Upgrade(*m_cache, APT::Upgrade::FORBID_REMOVE_PACKAGES | APT::Upgrade::FORBID_INSTALL_NEW_PACKAGES);
     else
-        pkgDistUpgrade(*m_cache);
+        APT::Upgrade::Upgrade(*m_cache, APT::Upgrade::ALLOW_EVERYTHING);
 
     commitChanges();
 }
@@ -443,8 +447,7 @@ void AptWorker::commitChanges()
     WorkerAcquire *acquire = new WorkerAcquire(this, 15, 50);
     acquire->setTransaction(m_trans);
 
-    pkgAcquire fetcher;
-    fetcher.Setup(acquire);
+    pkgAcquire fetcher(acquire);
 
     pkgPackageManager *packageManager;
     packageManager = _system->CreatePM(*m_cache);
@@ -462,7 +465,7 @@ void AptWorker::commitChanges()
     double FetchPBytes = fetcher.PartialPresent();
 
     struct statvfs Buf;
-    string OutputDir = _config->FindDir("Dir::Cache::Archives");
+    std::string OutputDir = _config->FindDir("Dir::Cache::Archives");
     if (statvfs(OutputDir.c_str(),&Buf) != 0) {
         m_trans->setError(QApt::DiskSpaceError);
         delete acquire;
@@ -570,8 +573,7 @@ void AptWorker::downloadArchives()
     WorkerAcquire *acquire = new WorkerAcquire(this, 15, 100);
     acquire->setTransaction(m_trans);
 
-    pkgAcquire fetcher;
-    fetcher.Setup(acquire);
+    pkgAcquire fetcher(acquire);
 
     pkgIndexFile *index;
 
@@ -581,7 +583,7 @@ void AptWorker::downloadArchives()
         if (!iter)
             continue; // Package not found
 
-        pkgCache::VerIterator ver = (*m_cache)->GetCandidateVer(iter);
+        pkgCache::VerIterator ver = (*m_cache)->GetCandidateVersion(iter);
 
         if (!ver || !ver.Downloadable() || !ver.Arch())
             continue; // Virtual package or not downloadable or broken
@@ -594,8 +596,8 @@ void AptWorker::downloadArchives()
         if (!m_cache->GetSourceList()->FindIndex(vf.File(), index))
             continue;
 
-        string fileName = rec.FileName();
-        string MD5sum = rec.MD5Hash();
+        std::string fileName = rec.FileName();
+        auto hashes = rec.Hashes();
 
         if (fileName.empty()) {
             m_trans->setError(QApt::NotFoundError);
@@ -606,7 +608,7 @@ void AptWorker::downloadArchives()
 
         new pkgAcqFile(&fetcher,
                        index->ArchiveURI(fileName),
-                       MD5sum,
+                       hashes,
                        ver->Size,
                        index->ArchiveInfo(ver),
                        ver.ParentPkg().Name(),
