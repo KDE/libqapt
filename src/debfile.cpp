@@ -25,9 +25,16 @@
 #include <QStringBuilder>
 #include <QTemporaryFile>
 
+// Must be before APT_PKG_ABI checks!
+#include <apt-pkg/macros.h>
+
 #include <apt-pkg/debfile.h>
 #include <apt-pkg/fileutl.h>
+#if APT_PKG_ABI >= 600
+#include <apt-pkg/hashes.h>
+#else
 #include <apt-pkg/md5.h>
+#endif
 #include <apt-pkg/tagfile.h>
 
 #include <QDebug>
@@ -193,13 +200,21 @@ QByteArray DebFile::md5Sum() const
 {
     FileFd in(d->filePath.toStdString(), FileFd::ReadOnly);
     debDebFile deb(in);
+#if APT_PKG_ABI >= 600
+    Hashes debMD5(Hashes::MD5SUM);
+#else
     MD5Summation debMD5;
+#endif
 
     in.Seek(0);
 
     debMD5.AddFD(in.Fd(), in.Size());
 
-    return QByteArray(debMD5.Result().Value().c_str());
+#if APT_PKG_ABI >= 600
+    return QByteArray::fromStdString(debMD5.GetHashString(Hashes::MD5SUM).HashValue());
+#else
+    return QByteArray::fromStdString(debMD5.Result().Value());
+#endif
 }
 
 QStringList DebFile::fileList() const
