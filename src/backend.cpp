@@ -1322,7 +1322,7 @@ bool Backend::saveInstalledPackagesList(const QString &path) const
 
         if (d->packages.at(i)->isInstalled()) {
             selectionDocument.append(d->packages[i]->name() %
-            QLatin1Literal("\t\tinstall") % QLatin1Char('\n'));
+            QLatin1String("\t\tinstall") % QLatin1Char('\n'));
         }
     }
 
@@ -1343,10 +1343,10 @@ bool Backend::saveSelections(const QString &path) const
 
         if (flags & Package::ToInstall) {
             selectionDocument.append(d->packages[i]->name() %
-            QLatin1Literal("\t\tinstall") % QLatin1Char('\n'));
+            QLatin1String("\t\tinstall") % QLatin1Char('\n'));
         } else if (flags & Package::ToRemove) {
             selectionDocument.append(d->packages[i]->name() %
-            QLatin1Literal("\t\tdeinstall") % QLatin1Char('\n'));
+            QLatin1String("\t\tdeinstall") % QLatin1Char('\n'));
         }
     }
 
@@ -1479,13 +1479,13 @@ bool Backend::setPackagePinned(Package *package, bool pin)
             return true;
         }
 
-        pinDocument = QLatin1Literal("Package: ") % package->name()
+        pinDocument = QLatin1String("Package: ") % package->name()
                       % QLatin1Char('\n');
 
         if (package->installedVersion().isEmpty()) {
             pinDocument += QLatin1String("Pin: version  0.0\n");
         } else {
-            pinDocument += QLatin1Literal("Pin: version ") % package->installedVersion()
+            pinDocument += QLatin1String("Pin: version ") % package->installedVersion()
                            % QLatin1Char('\n');
         }
 

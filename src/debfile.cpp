@@ -160,7 +160,7 @@ QString DebFile::longDescription() const
 
     for (int i = 0; i < sections.count(); ++i) {
         sections[i].replace(QRegExp(QLatin1String("\n( |\t)+(-|\\*)")),
-                                QLatin1Literal("\n\r ") % QString::fromUtf8("\xE2\x80\xA2"));
+                                QLatin1String("\n\r ") % QString::fromUtf8("\xE2\x80\xA2"));
         // There should be no new lines within a section.
         sections[i].remove(QLatin1Char('\n'));
         // Hack to get the lists working again.
@@ -173,7 +173,7 @@ QString DebFile::longDescription() const
         if (sections[i].startsWith(QLatin1String("\n ") % QString::fromUtf8("\xE2\x80\xA2 ")) || !i) {
             parsedDescription += sections[i];
         }  else {
-            parsedDescription += QLatin1Literal("\n\n") % sections[i];
+            parsedDescription += QLatin1String("\n\n") % sections[i];
         }
     }
     return parsedDescription;
@@ -371,8 +371,8 @@ bool DebFile::extractFileFromArchive(const QString &fileName, const QString &des
     dpkg.start(program);
     dpkg.waitForFinished();
 
-    QString program2 = QLatin1Literal("tar -xf") % tempFileName %
-                       QLatin1Literal(" -C ") % destination % ' ' % fileName;
+    QString program2 = QLatin1String("tar -xf") % tempFileName %
+                       QLatin1String(" -C ") % destination % ' ' % fileName;
 
     QProcess tar;
     tar.start(program2);

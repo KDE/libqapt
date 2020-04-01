@@ -275,7 +275,7 @@ QString Package::longDescription() const
 
         for (int i = 0; i < sections.count(); ++i) {
             sections[i].replace(QRegExp(QLatin1String("\n( |\t)+(-|\\*)")),
-                                QLatin1Literal("\n\r ") % QString::fromUtf8("\xE2\x80\xA2"));
+                                QLatin1String("\n\r ") % QString::fromUtf8("\xE2\x80\xA2"));
             // There should be no new lines within a section.
             sections[i].remove(QLatin1Char('\n'));
             // Hack to get the lists working again.
@@ -290,7 +290,7 @@ QString Package::longDescription() const
             if (sections[i].startsWith(QLatin1String("\n ") % QString::fromUtf8("\xE2\x80\xA2 ")) || !i) {
                 parsedDescription += sections[i];
             }  else {
-                parsedDescription += QLatin1Literal("\n\n") % sections[i];
+                parsedDescription += QLatin1String("\n\n") % sections[i];
             }
         }
         return parsedDescription;
@@ -956,9 +956,9 @@ QStringList Package::dependencyList(bool useCandidateVersion) const
             versionCompare = QLatin1String(D.CompType());
         }
 
-        finalString = QLatin1Literal("<b>") % type % QLatin1Literal(":</b> ");
+        finalString = QLatin1String("<b>") % type % QLatin1String(":</b> ");
         if (isVirtual) {
-            finalString += QLatin1Literal("<i>") % name % QLatin1Literal("</i>");
+            finalString += QLatin1String("<i>") % name % QLatin1String("</i>");
         } else {
             finalString += name;
         }
