@@ -725,7 +725,7 @@ GroupList Backend::availableGroups() const
 {
     Q_D(const Backend);
 
-    GroupList groupList = d->groups.toList();
+    GroupList groupList = d->groups.values();
 
     return groupList;
 }
