@@ -1252,7 +1252,7 @@ void Package::setInstall()
 
     // FIXME: can't we get rid of it here?
     // if there is something wrong, try to fix it
-    if (!state() & ToInstall || d->backend->cache()->depCache()->BrokenCount() > 0) {
+    if (!(state() & ToInstall) || d->backend->cache()->depCache()->BrokenCount() > 0) {
         pkgProblemResolver Fix(d->backend->cache()->depCache());
         Fix.Clear(d->packageIter);
         Fix.Protect(d->packageIter);
