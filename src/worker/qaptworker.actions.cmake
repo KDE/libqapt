@@ -385,5 +385,5 @@ Description[x-test]=xxTo cancel someone else's software changes you need to auth
 Description[zh_CN]=取消其他用户对软件的更改需要您进行认证。
 Description[zh_HK]=要取消其他使用者的工作，您必須通過認證。
 Description[zh_TW]=要取消其他使用者的工作，您必須通過認證。
-Policy=auth_admin
+Policy=auth_admin_keep
 Persistence=session
