@@ -129,6 +129,19 @@ void PackagePrivate::initStaticState(const pkgCache::VerIterator &ver, pkgDepCac
         if (stateCache.CandidateVer && stateCache.Upgradable()) {
             packageState |= QApt::Package::Upgradeable;
         }
+        
+        // If there is no installed packages from requiredByList() then it is an orphaned package
+        // Some packages are included in their requiredByList(), but we don't want to take it into account
+        bool canBeOrphaned = true;
+        for(pkgCache::DepIterator it = packageIter.RevDependsList(); !it.end(); ++it) {
+            if (!it.ParentPkg().CurrentVer().end() && QLatin1String(it.ParentPkg().Name()) != QLatin1String(packageIter.Name())) {
+                canBeOrphaned = false;
+                break;
+            }
+        }
+        if (canBeOrphaned) {
+            packageState |= QApt::Package::Orphaned;
+        }
     } else {
         packageState |= QApt::Package::NotInstalled;
     }
