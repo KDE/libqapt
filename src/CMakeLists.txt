@@ -41,6 +41,8 @@ qt5_add_dbus_interface(qapt_SRCS
 
 configure_file(dbusinterfaces_p.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/dbusinterfaces_p.h)
 
+ecm_create_qm_loader(qapt_SRCS libqapt)
+
 add_library(QApt SHARED ${qapt_SRCS})
 add_library(QApt::Main ALIAS QApt)
 
