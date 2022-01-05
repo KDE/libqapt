@@ -240,8 +240,10 @@ QString Transaction::errorString() const
         break;
         
     case QApt::ErrorCode::UntrustedError:
+        //~ singular The following package has not been verified by its authors. Downloading untrusted packages has been disallowed by your current configuration.
+        //~ plural The following packages have not been verified by its authors. Downloading untrusted packages has been disallowed by your current configuration.
         text = tr(
-            "The following package(s) has not been verified by its author(s). "
+            "The following package(s) has not been verified by its authors. "
             "Downloading untrusted packages has been disallowed "
             "by your current configuration.",
             "error",
